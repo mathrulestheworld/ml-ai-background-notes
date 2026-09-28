@@ -1,0 +1,92 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN"
+"http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<!-- Creator: fig2dev Version 3.2 Patchlevel 5-alpha7 -->
+<!-- CreationDate: Wed Nov  1 15:24:42 2006 -->
+<!-- Magnification: 1.050 -->
+<svg xmlns="http://www.w3.org/2000/svg" width="2.8in" height="2.8in" viewBox="449 220 3353 3354">
+<g style="stroke-width:.025in; stroke:black; fill:none">
+<!-- Line -->
+<polyline points="472,1889
+3779,1889
+" style="stroke:#0000ff;stroke-width:16;
+stroke-linejoin:miter; stroke-linecap:butt;
+"/>
+<!-- Circle -->
+<circle cx="944" cy="472" r="47"
+ style="fill:#000000;stroke:#000000;stroke-width:0;"/>
+<!-- Circle -->
+<circle cx="1748" cy="3307" r="47"
+ style="fill:#000000;stroke:#000000;stroke-width:0;"/>
+<!-- Circle -->
+<circle cx="1748" cy="1889" r="47"
+ style="fill:#000000;stroke:#000000;stroke-width:0;"/>
+<!-- Circle -->
+<circle cx="944" cy="1889" r="47"
+ style="fill:#000000;stroke:#000000;stroke-width:0;"/>
+<!-- Circle -->
+<circle cx="2456" cy="1889" r="47"
+ style="fill:#000000;stroke:#000000;stroke-width:0;"/>
+<!-- Circle -->
+<circle cx="3165" cy="1889" r="47"
+ style="fill:#000000;stroke:#000000;stroke-width:0;"/>
+<!-- Circle -->
+<circle cx="3165" cy="944" r="47"
+ style="fill:#000000;stroke:#000000;stroke-width:0;"/>
+<!-- Line -->
+<polyline points="944,472
+944,1804
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+stroke-dasharray:50 50;
+"/>
+<!-- Arrowhead on XXXpoint -->
+<polyline points="913 1729
+944 1807
+976 1729
+" style="stroke:#000000;stroke-width:8;
+"/>
+<!-- Line -->
+<polyline points="1748,3307
+1748,1975
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+stroke-dasharray:50 50;
+"/>
+<!-- Arrowhead on XXXpoint -->
+<polyline points="1779 2051
+1748 1972
+1716 2051
+" style="stroke:#000000;stroke-width:8;
+"/>
+<!-- Line -->
+<polyline points="3165,944
+3165,1804
+" style="stroke:#000000;stroke-width:8;
+stroke-linejoin:miter; stroke-linecap:butt;
+stroke-dasharray:50 50;
+"/>
+<!-- Arrowhead on XXXpoint -->
+<polyline points="3133 1729
+3165 1807
+3196 1729
+" style="stroke:#000000;stroke-width:8;
+"/>
+<!-- Text -->
+<text xml:space="preserve" x="3637" y="1811" stroke="#0000ff" fill="#0000ff"  font-family="Helvetica" font-style="italic" font-weight="normal" font-size="152" text-anchor="middle">m</text>
+<!-- Text -->
+<text xml:space="preserve" x="1737" y="1774" stroke="#000000" fill="#000000"  font-family="Helvetica" font-style="italic" font-weight="normal" font-size="152" text-anchor="middle">Pv</text>
+<!-- Text -->
+<text xml:space="preserve" x="944" y="2159" stroke="#000000" fill="#000000"  font-family="Helvetica" font-style="italic" font-weight="normal" font-size="152" text-anchor="middle">Pu</text>
+<!-- Text -->
+<text xml:space="preserve" x="2446" y="2159" stroke="#000000" fill="#000000"  font-family="Helvetica" font-style="italic" font-weight="normal" font-size="152" text-anchor="middle">w = Pw</text>
+<!-- Text -->
+<text xml:space="preserve" x="3139" y="2159" stroke="#000000" fill="#000000"  font-family="Helvetica" font-style="italic" font-weight="normal" font-size="152" text-anchor="middle">Px</text>
+<!-- Text -->
+<text xml:space="preserve" x="1732" y="3559" stroke="#000000" fill="#000000"  font-family="Helvetica" font-style="italic" font-weight="normal" font-size="152" text-anchor="middle">v</text>
+<!-- Text -->
+<text xml:space="preserve" x="944" y="362" stroke="#000000" fill="#000000"  font-family="Helvetica" font-style="italic" font-weight="normal" font-size="152" text-anchor="middle">u</text>
+<!-- Text -->
+<text xml:space="preserve" x="3154" y="834" stroke="#000000" fill="#000000"  font-family="Helvetica" font-style="italic" font-weight="normal" font-size="152" text-anchor="middle">x</text>
+</g>
+</svg>

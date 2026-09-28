@@ -1,0 +1,59 @@
+[ML Mastery Notes](../README.md)
+
+# Generative AI
+
+Generative AI studies models that learn a probability distribution from examples and produce new samples from it: images, audio, video, molecules, actions, and text. It builds on the probability, information theory, and change of variables of Foundations, on the mixtures, EM, and density estimation of Machine Learning, on the autoencoders, U-Nets, transformers, and contrastive image–text models of Deep Learning, on the variational inference and Markov chain Monte Carlo of Artificial Intelligence, and on the autoregressive transformers, tokenizers, and preference optimization of NLP and LLMs. Thirteen core chapters follow the main topics of the reading plan, and two optional chapters cover applications in science and control and the theory of diffusion models.
+
+## <a id="chapters"></a>Chapters
+
+| Chapter | Main content | Reading plan |
+| --- | --- | --- |
+| 1. Foundations of Generative Modeling | Density estimation, sampling, and representation; the manifold hypothesis and intrinsic dimension; maximum likelihood as forward KL; mode covering and mode seeking; f-divergences, integral probability metrics, and classifiers as density-ratio estimators; the generative learning trilemma. | Topic 1 |
+| 2. Autoregressive Models | The chain rule for any data; NADE and MADE; orderings; PixelRNN, PixelCNN, and the blind spot; transformers over pixels; WaveNet, μ-law quantization, and dilated causal convolutions; strengths and weaknesses of exact likelihood. | Topic 2 |
+| 3. Variational Autoencoders | Latent-variable models and the evidence lower bound; amortized inference; the reparameterization trick and score-function gradients; importance-weighted bounds; rate and distortion, β-VAE, and posterior collapse; conditional and hierarchical VAEs. | Topic 3 |
+| 4. Normalizing Flows | The change-of-variables formula; coupling and autoregressive layers; Glow and flows for images; continuous-time flows, the instantaneous change of variables, and trace estimation; dequantization; where flows stand. | Topic 4 |
+| 5. Generative Adversarial Networks | The minimax game and the non-saturating loss; training dynamics and the Dirac GAN; mode coverage and mode collapse; Wasserstein GANs, spectral normalization, and gradient penalties; DCGAN, StyleGAN, BigGAN, and conditional and paired generation. | Topic 5 |
+| 6. Energy-Based Models and Score Matching | Unnormalized densities and the likelihood gradient; Langevin dynamics and its failure with separated modes; noise-contrastive estimation; the score; Hyvärinen's and denoising score matching; Tweedie's formula; noise-conditional score networks and annealed Langevin dynamics. | Topic 6 |
+| 7. Denoising Diffusion Models | The forward process, its closed form, and noise schedules; the reverse process and the variational bound; predicting the noise, the data, or the velocity; loss weighting and the signal-to-noise ratio; ancestral sampling and DDIM; U-Net denoisers and results. | Topic 7 |
+| 8. Diffusion SDEs and Fast Sampling | Variance-preserving and variance-exploding SDEs; the Fokker–Planck equation; the reverse-time SDE and predictor–corrector sampling; the probability-flow ODE and exact likelihoods; the design space of Karras et al.; exponential integrators and DPM-Solver; progressive distillation, consistency models, and distribution-matching distillation. | Topic 8 |
+| 9. Flow Matching | Flows and the continuity equation; conditional paths and the conditional flow matching loss; straight paths and their relation to diffusion; stochastic interpolants; why learned paths curve; reflow and minibatch optimal-transport couplings; shortcut models and MeanFlow. | Topic 9 |
+| 10. Guidance and Conditional Generation | Conditional denoisers and Bayes' rule for scores; classifier and classifier-free guidance, what guidance samples, guidance intervals, and autoguidance; inverse problems by replacement and posterior sampling; editing, inversion, ControlNet, and personalization; fine-tuning against rewards and preferences. | Topic 10 |
+| 11. Latent Diffusion and Large-Scale Generation | Perceptual and semantic compression; cascades; autoencoders for latent diffusion; frozen text encoders, cross-attention, and recaptioning; diffusion transformers and rectified-flow transformers; noise schedules at high resolution; data and compute; video generation; distillation for deployment. | Topic 11 |
+| 12. Discrete Tokens and Multimodal Generation | Gumbel-softmax and straight-through gradients; VQ-VAE, VQGAN, finite scalar and residual quantization, and neural audio codecs; autoregressive and masked generative transformers; discrete and masked diffusion and diffusion language models; vision–language models and unified multimodal models. | Topic 12 |
+| 13. Evaluating Generative Models | Bits per dimension and why likelihood and samples disagree; the Inception score, FID, its bias and its feature space, and kernel distances; precision and recall for distributions; text–image alignment; human preference; memorization and data copying. | Topic 13 |
+| 14. Generative Models for Science and Control *(optional)* | Diffusion policies and action chunks; planning with diffusion; vision–language–action models; equivariance for molecules; docking; protein structure prediction and design; ensemble weather forecasts; CRPS and spread–skill; validation outside the model. | Topic 14 |
+| 15. The Theory of Diffusion Models *(optional)* | Convergence of diffusion samplers given an accurate score; deterministic and stochastic samplers under score error; score estimation rates; memorization by the empirical score, collapse, and generalization; inductive biases of denoisers; spectral autoregression; Schrödinger bridges. | Topic 15 |
+
+Chapter 1 sets out what generative models are asked to do and how their training objectives measure the gap between distributions. Chapters 2–5 develop the families that generate in one pass or one step at a time: autoregressive models, VAEs, flows, and adversarial networks. Chapter 6 introduces energies and scores, and chapters 7–9 build diffusion and flow matching on them, from the discrete chain through stochastic and ordinary differential equations to learned straight paths. Chapters 10–12 turn these models into the conditional, large-scale, and multimodal systems in current use, and chapter 13 asks how any of them should be evaluated. The optional chapters apply the models to control, molecules, and weather, and collect what theory explains about why diffusion works. Proofs and longer derivations appear in collapsed appendices at the end of each chapter.
+
+## <a id="shared-conventions"></a>Shared conventions
+
+- Data are $x$, drawn from $p_{\text{data}}$, and a model with parameters $\theta$ has density or distribution $p_\theta$. For latent-variable models, $z$ is the latent, $q_\phi(z\mid x)$ the encoder, and $p_\theta(x\mid z)$ the decoder.
+- In the diffusion chapters, $x_0$ is clean data and $x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon$ its noisy version at step or time $t$, with $\epsilon\sim\mathcal N(0,I)$ and signal-to-noise ratio $\operatorname{SNR}(t)=\bar\alpha_t/(1-\bar\alpha_t)$; in the form of Karras et al., $x_\sigma=x_0+\sigma\epsilon$ at noise level $\sigma$, and $D(x;\sigma)$ is the denoiser. Time runs from data at $t=0$ to noise at $t=T$ or $t=1$.
+- In the flow-matching chapter, time runs the other way, as in its literature: $x_0$ is noise at $t=0$, $x_1$ is data at $t=1$, and $v_t(x)$ is a velocity field. Chapter 9 relates the two conventions.
+- The score is $\nabla_x\log p(x)$, written $s_\theta$ when learned; $\epsilon_\theta$ predicts noise, $\hat x_0$ a clean image, and $v$ a velocity.
+- Likelihoods are in nats with $\log$ and in bits with $\log_2$; bits per dimension divide the negative log-likelihood in bits by the number of pixels or subpixels.
+- Each code block runs on its own on a CPU with PyTorch, NumPy, SciPy, and scikit-learn, and implements its method from scratch. Blocks use the $8\times8$ digits of scikit-learn with a fixed split, or synthetic distributions whose exact answers are known (data sources). Seeds are fixed, and the comment lines at the end of a block record what it printed in the environment described in the computing setup. Models have at most about a million parameters, so results illustrate the chapters' claims and are not benchmarks.
+
+## <a id="examples-and-supporting-resources"></a>Examples and supporting resources
+
+The chapter text contains the definitions, derivations, and worked examples, and every figure is generated by a script in `Sources/Figure code`. The computing setup records the Python environment and how to regenerate the figures, data sources describes the digits and the synthetic distributions, and figure sources records the data and construction behind each figure.
+
+The reading plan lists the lectures and readings for each topic. Course links collects the courses it draws on, video links the lecture recordings by chapter, books and documentation the reference texts, tutorials, and libraries for real models, and papers the principal research behind each chapter. The four [CS294-158 homeworks](https://github.com/rll/deepul) and the three [6.S184 labs](https://github.com/eje24/iap-diffusion-labs/tree/2026) are the best exercises: the homeworks implement autoregressive, latent-variable, adversarial, and diffusion models on images, and the labs build a conditional image generator from SDE simulation through flow matching to guidance.
+
+## <a id="connections-to-later-modules"></a>Connections to later modules
+
+**Reinforcement learning** meets generative models in both directions. Fine-tuning a sampler against a reward treats its denoising chain as a policy, the setting of the policy-gradient methods DDPO and DPOK (chapter 10), and generative models serve as policies, planners, and world models for agents (chapter 14), including the video models that some argue can simulate environments (chapter 11). The RL module develops the policy gradients, value functions, and exploration that these uses depend on.
+
+**Safety and frontier** research starts from the risks and limits this module documents: the memorization and extraction of training data (chapter 13), reward hacking when generators are tuned against learned preferences (chapter 10), the difficulty of measuring what generators do (chapter 13), and the dual use of models that design molecules (chapter 14). It adds watermarking and provenance of generated media, deepfakes and misuse, and the questions of consent and copyright raised by training data.
+
+## Reading plan and sources
+
+- [Reading plan](reading-plan.md)
+- [Book and documentation links](sources/book-and-documentation-links.md)
+- [Computing setup](sources/computing-setup.md)
+- [Course links](sources/course-links.md)
+- [Data sources](sources/data-sources.md)
+- [Figure sources](sources/figure-sources.md)
+- [Paper links](sources/paper-links.md)
+- [Video links](sources/video-links.md)

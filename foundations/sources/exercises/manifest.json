@@ -1,0 +1,66 @@
+{
+  "Sources/Exercises/F01/notes.pdf": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f01/notes.pdf",
+    "sha256": "30b53679f08d703cf8372b4d3990985d99667810c74021a33e89f6c232d068d6"
+  },
+  "Sources/Exercises/F01/lab.ipynb": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f01/lab.ipynb",
+    "sha256": "52038a083015e29fa8aa08e62f74de9152f11112f2dd9dc69a5bab8974635c44"
+  },
+  "Sources/Exercises/F02/notes.pdf": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f02/notes.pdf",
+    "sha256": "369cbfee497eb4aa1ed54bfe85578155dbb91a6c86048cb32fdb183335dd79f8"
+  },
+  "Sources/Exercises/F02/lab.ipynb": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f02/lab.ipynb",
+    "sha256": "85de7021c235448e6a5f51eaa99686259564b5f4c6acc28886a656a0f7a3b824"
+  },
+  "Sources/Exercises/F03/notes.pdf": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f03/notes.pdf",
+    "sha256": "a99ed7aecbbf4ba2f4d1fbd42e76969e328c2293661d46162fa7427f7837b103"
+  },
+  "Sources/Exercises/F03/lab.ipynb": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f03/lab.ipynb",
+    "sha256": "ef28c93dd8705f0b87c692c8996428764c73816acb5df7d1f44fc9d14da11289"
+  },
+  "Sources/Exercises/F04/notes.pdf": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f04/notes.pdf",
+    "sha256": "393cb0b37bfcb5fc88b409ca6db589e348a6dd7f3629c085188c0d1b605b42b6"
+  },
+  "Sources/Exercises/F04/lab.ipynb": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f04/lab.ipynb",
+    "sha256": "0192cfc8481bb4ed067dadb7f8b178efe031e4a7c011bb7b2995bf769532e0f2"
+  },
+  "Sources/Exercises/F05/notes.pdf": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f05/notes.pdf",
+    "sha256": "314d676f74914e3ba735864b2b26aeb631bd801efc2663f0ae0f04bdaaad69ba"
+  },
+  "Sources/Exercises/F05/lab.ipynb": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f05/lab.ipynb",
+    "sha256": "207eda10784f1b887d08cd20c2020eb2774736ca246a6563c69dd9254ea3a800"
+  },
+  "Sources/Exercises/F06/notes.pdf": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f06/notes.pdf",
+    "sha256": "30ba8850f457c47c0dd41ff8490e1dc23b9a214b940becb2fba7aedfbeb437a1"
+  },
+  "Sources/Exercises/F06/lab.ipynb": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f06/lab.ipynb",
+    "sha256": "a209a23c063de528a53793c0edf15d4cf9ae13b925e65845b286da0b3b172a56"
+  },
+  "Sources/Exercises/F07/notes.pdf": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f07/notes.pdf",
+    "sha256": "cea0303509dae29af269896a943000530bcdd9cc331bc01be043ff71b96a1b3a"
+  },
+  "Sources/Exercises/F07/lab.ipynb": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f07/lab.ipynb",
+    "sha256": "f5be983ed6d02b97ae08508e7532d4bfdc293d04236063c7ff35e7b160a10190"
+  },
+  "Sources/Exercises/F08/notes.pdf": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f08/notes.pdf",
+    "sha256": "a433dfc7f6e1f56cbef529e8783248c465b7de92adeec03408d9527d2922edff"
+  },
+  "Sources/Exercises/F08/lab.ipynb": {
+    "source": "/Users/mpittu/Dropbox/Mac/Desktop/ml-mastery/course/materials/foundations/f08/lab.ipynb",
+    "sha256": "8e6ad287be5768bce65294abab267a1f4a6d8032d75a936344f06a8ef970eb14"
+  }
+}
