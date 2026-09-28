@@ -1,8 +1,8 @@
 # Background Notes on Machine Learning and AI
 
-Supplementary notes for [Generative AI from First Principles](https://github.com/mathrulestheworld/generative-ai-from-first-principles). They develop in full the material that the lectures assume: the mathematics of learning, machine learning, deep learning, classical AI, NLP and large language models, generative models, and reinforcement learning. They are working notes and are revised continually.
+Supplementary notes for [Generative AI from First Principles](https://mathrulestheworld.github.io/genai-first-principles/). They develop in full the material that the lectures assume: the mathematics of learning, machine learning, deep learning, classical AI, NLP and large language models, generative models, and reinforcement learning. They are working notes and are revised continually.
 
-Math, figures, and diagrams render in GitHub's file viewer. Proofs, derivations, and worked examples are in collapsed sections: click a heading marked ▸ to open it.
+The same notes are also on the course website: <https://mathrulestheworld.github.io/genai-first-principles/notes/>. Here, math, figures, and diagrams render in GitHub's file viewer; proofs, derivations, and worked examples are in collapsed sections (click a heading marked ▸ to open it).
 
 ## [Foundations](foundations/README.md)
 
@@ -143,4 +143,4 @@ Math, figures, and diagrams render in GitHub's file viewer. Proofs, derivations,
 
 ---
 
-This repository is generated from the Obsidian vault by `tools/export_notes_github.py` in the course repository. Edit the vault, not these files. Last exported 28 September 2026.
+This repository is generated from an Obsidian vault by the script `tools/export_notes_github.py` of the course. Edit the vault, not these files. Last exported 28 September 2026.
