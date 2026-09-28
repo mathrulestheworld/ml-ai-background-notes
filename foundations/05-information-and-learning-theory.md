@@ -412,7 +412,7 @@ p_\lambda(x)=\frac{\exp\{\sum_j\lambda_jT_j(x)\}}{Z(\lambda)},
 Z(\lambda)=\sum_x\exp\{\sum_j\lambda_jT_j(x)\}.
 ```
 
-Setting the derivative of the Lagrangian to zero gives this form, and the constraints determine the multipliers; boundary constraints may force zero probabilities and require restricting the support. This is the exponential-family form, and the choice of constrained moments determines which family appears: fixing a mean and covariance gives the Gaussian, and fixing a mean on $`[0,\infty)`$ gives the exponential. These are characterizations of distributions under stated information, not evidence that real observations follow them. MacKay's [*Information Theory, Inference, and Learning Algorithms*](https://www.inference.org.uk/mackay/itila/book.html) develops the connections among these distributional ideas, inference, and coding.
+Setting the derivative of the Lagrangian to zero gives this form, and the constraints determine the multipliers; boundary constraints may force zero probabilities and require restricting the support. This is the [exponential-family](04-probability-and-statistics.md#exponential-families-and-moment-matching) form, and the choice of constrained moments determines which family appears: fixing a mean and covariance gives the Gaussian, and fixing a mean on $`[0,\infty)`$ gives the exponential. These are characterizations of distributions under stated information, not evidence that real observations follow them. MacKay's [*Information Theory, Inference, and Learning Algorithms*](https://www.inference.org.uk/mackay/itila/book.html) develops the connections among these distributional ideas, inference, and coding.
 
 ### <a id="sequences-entropy-rates-and-language-model-loss"></a>Sequences, entropy rates, and language-model loss
 
@@ -443,7 +443,7 @@ The second question concerns the true process. If a model used the true law $`p`
 
 **Definition (entropy rate).** The **entropy rate** of a process $`X_1,X_2,\ldots`$ is $`\overline H=\lim_{T\to\infty}\frac1TH(X_{1:T})`$, when the limit exists. It is the uncertainty per token that no predictor can remove.
 
-The simplest process with dependence is a Markov chain (chapter 4, Appendix D), in which only the current token matters for the next.
+The simplest process with dependence is a Markov chain ([chapter 4, Appendix D](04-probability-and-statistics.md#block-probability-appendix-d)), in which only the current token matters for the next.
 
 **Definition (Markov chain and stationary law).** A finite-state, time-homogeneous **Markov chain** has a transition matrix $`K`$, with nonnegative entries and rows summing to one, such that
 
@@ -562,7 +562,7 @@ Judging a fitted rule requires a benchmark, and there are two natural ones: the 
 R_*^{\mathrm{Bayes}}=\inf_h R_*(h).
 ```
 
-The name does not refer to a prior on parameters; it refers to the optimal decision under the actual joint law. (In statistical decision theory, “Bayes risk” also denotes risk averaged over a parameter prior, as in the preceding chapter's decision-theory section.) When a minimizing rule exists, it can be built one input at a time: for each $`x`$, choose the action $`a`$ that minimizes the conditional expected loss $`\mathbb E[L(Y,a)\mid X=x]`$.
+The name does not refer to a prior on parameters; it refers to the optimal decision under the actual joint law. (In statistical decision theory, “Bayes risk” also denotes risk averaged over a parameter prior, as in the preceding chapter's [decision-theory section](04-probability-and-statistics.md#decisions-loss-and-risk).) When a minimizing rule exists, it can be built one input at a time: for each $`x`$, choose the action $`a`$ that minimizes the conditional expected loss $`\mathbb E[L(Y,a)\mid X=x]`$.
 
 For binary classification with $`\eta(x)=P_\ast(Y=1\mid X=x)`$, predicting one at $`x`$ has conditional error $`1-\eta(x)`$ and predicting zero has error $`\eta(x)`$. A Bayes classifier therefore predicts one where $`\eta(x)\ge1/2`$, and
 
@@ -812,7 +812,7 @@ In higher dimensions, geometry determines the VC dimension. Affine halfspaces $`
 | --- | --- | --- | --- |
 | <img src="sources/images/learning-vc-1.svg" alt="learning-vc-1" width="140"> | <img src="sources/images/learning-vc-2.svg" alt="learning-vc-2" width="140"> | <img src="sources/images/learning-vc-3.svg" alt="learning-vc-3" width="140"> | <img src="sources/images/learning-vc-4.svg" alt="learning-vc-4" width="140"> |
 
-*Affine halfspaces in the plane have VC dimension three. The first three panels show three of the eight possible labelings of the same noncollinear triple; all eight can be separated. In the fourth, opposite corners have matching labels, and no single line separates the two classes. This one obstruction illustrates the geometry; Radon's argument above establishes that **every** four-point configuration has an unachievable labeling. Images: MithrandirMage, based on BAxelrod, with later simplifications by Jarvisa (panels 1, 2, and 4), CC BY-SA 3.0; full attribution appears in Figure sources.*
+*Affine halfspaces in the plane have VC dimension three. The first three panels show three of the eight possible labelings of the same noncollinear triple; all eight can be separated. In the fourth, opposite corners have matching labels, and no single line separates the two classes. This one obstruction illustrates the geometry; Radon's argument above establishes that **every** four-point configuration has an unachievable labeling. Images: MithrandirMage, based on BAxelrod, with later simplifications by Jarvisa (panels 1, 2, and 4), CC BY-SA 3.0; full attribution appears in [Figure sources](sources/figure-sources.md).*
 
 A finite VC dimension limits the number of patterns on every larger set as well. If $`v=\operatorname{VCdim}(\mathcal H)<\infty`$, the **Sauer–Shelah bound** gives
 

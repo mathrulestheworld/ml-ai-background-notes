@@ -867,7 +867,7 @@ A **population** is the collection of units or possible observations to which a 
 D=(Z_1,\ldots,Z_n),\qquad Z_i\sim P_*,
 ```
 
-where $`P_\ast`$ is the true population distribution. Chapter 1 writes this distribution as $`\mathcal D`$ when it defines population risk; this chapter uses $`P_\ast`$ to keep it visibly distinct from the dataset $`D`$. Capital letters denote random observations; $`z_i`$ denotes a realized value. The dataset $`D`$ is random before collection. After collection, its realized values are fixed, although the same symbol is often used when the distinction is clear. An observation may be a scalar, a vector, or an input–target pair $`Z_i=(X_i,Y_i)`$.
+where $`P_\ast`$ is the true population distribution. Chapter 1 writes this distribution as $`\mathcal D`$ when it [defines population risk](01-terminology-and-mathematical-language.md#losses-and-objectives); this chapter uses $`P_\ast`$ to keep it visibly distinct from the dataset $`D`$. Capital letters denote random observations; $`z_i`$ denotes a realized value. The dataset $`D`$ is random before collection. After collection, its realized values are fixed, although the same symbol is often used when the distinction is clear. An observation may be a scalar, a vector, or an input–target pair $`Z_i=(X_i,Y_i)`$.
 
 #### <a id="sampling-assumptions-and-study-design"></a>Sampling assumptions and study design
 
@@ -1183,7 +1183,7 @@ Why should maximizing likelihood recover the parameter? By the law of large numb
 =D_{\mathrm{KL}}(P_{\theta_*}\,\|\,P_\theta)\ge0,
 ```
 
-the Kullback–Leibler divergence of chapter 5. For an identifiable model it is zero only at $`\theta=\theta_\ast`$, so the limiting average log-likelihood is maximized at the true parameter. Turning this pointwise limit into **consistency** of the maximizer requires control that is uniform over $`\theta`$, which standard regularity conditions supply.
+the Kullback–Leibler divergence of [chapter 5](05-information-and-learning-theory.md#cross-entropy-divergence-and-log-loss). For an identifiable model it is zero only at $`\theta=\theta_\ast`$, so the limiting average log-likelihood is maximized at the true parameter. Turning this pointwise limit into **consistency** of the maximizer requires control that is uniform over $`\theta`$, which standard regularity conditions supply.
 
 #### <a id="score-information-and-asymptotic-uncertainty"></a>Score, information, and asymptotic uncertainty
 
@@ -2542,7 +2542,7 @@ The slope is the sample covariance of covariate and response divided by the samp
 =\mathrm{ESS}+\mathrm{RSS}.
 ```
 
-Hence $`R^2=1-\mathrm{RSS}/\mathrm{TSS}=\mathrm{ESS}/\mathrm{TSS}`$ lies in $`[0,1]`$. Chapter 2 develops this projection geometry.
+Hence $`R^2=1-\mathrm{RSS}/\mathrm{TSS}=\mathrm{ESS}/\mathrm{TSS}`$ lies in $`[0,1]`$. [Chapter 2](02-linear-algebra.md#least-squares-as-projection) develops this projection geometry.
 
 #### <a id="proof-of-the-gaussmarkov-theorem"></a>Proof of the Gauss–Markov theorem
 
@@ -2683,7 +2683,7 @@ Adding controls is not a universal remedy. Conditioning on a variable on the cau
 
 #### <a id="computing-least-squares-fits"></a>Computing least-squares fits
 
-Forming $`(\mathbf X^\top\mathbf X)^{-1}`$ explicitly squares the condition number, since $`\kappa(\mathbf X^\top\mathbf X)=\kappa(\mathbf X)^2`$ in the Euclidean norm, so weakly determined directions become much worse. A QR factorization $`\mathbf X=\mathbf Q\mathbf R`$ reduces the problem to the triangular system $`\mathbf R\widehat\beta=\mathbf Q^\top\mathbf Y`$ and is stable for full-rank problems. The singular value decomposition also reveals rank deficiency and the directions responsible for instability. Ridge regression replaces the factor $`1/s_j`$ applied along each singular direction with $`s_j/(s_j^2+\lambda)`$, which damps the weakest directions. Chapter 2 treats these computations.
+Forming $`(\mathbf X^\top\mathbf X)^{-1}`$ explicitly squares the condition number, since $`\kappa(\mathbf X^\top\mathbf X)=\kappa(\mathbf X)^2`$ in the Euclidean norm, so weakly determined directions become much worse. A QR factorization $`\mathbf X=\mathbf Q\mathbf R`$ reduces the problem to the triangular system $`\mathbf R\widehat\beta=\mathbf Q^\top\mathbf Y`$ and is stable for full-rank problems. The singular value decomposition also reveals rank deficiency and the directions responsible for instability. Ridge regression replaces the factor $`1/s_j`$ applied along each singular direction with $`s_j/(s_j^2+\lambda)`$, which damps the weakest directions. [Chapter 2](02-linear-algebra.md#sensitivity-and-numerical-stability) treats these computations.
 
 </details>
 

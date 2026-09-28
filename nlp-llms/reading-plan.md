@@ -10,7 +10,7 @@
 
 The order below follows the chapters of this module. Each block lists the material to cover and its primary lectures; further reading and exercises provide additional depth. Blocks 1–14 form the main plan; 15–16 are optional extensions. Timing is flexible.
 
-Slide links are the courses' original PDFs; CS224N videos are the Spring 2024 recordings except where a block names the 2023 recording. Deep Learning already covered backpropagation, recurrent networks, attention, the transformer block, position encodings, self-supervised learning, and training at scale, so CS224N lectures 3, 5 (second half), and 8 and CS336 lectures 5–8 (GPUs, kernels, and parallelism) serve as review. Policy-gradient methods, which preference tuning and reasoning training use, are developed in the RL module; this module states the objectives they optimize.
+Slide links are the courses' original PDFs; CS224N videos are the Spring 2024 recordings except where a block names the 2023 recording. [Deep Learning](../dl/README.md) already covered backpropagation, recurrent networks, attention, the transformer block, position encodings, self-supervised learning, and training at scale, so CS224N lectures 3, 5 (second half), and 8 and CS336 lectures 5–8 (GPUs, kernels, and parallelism) serve as review. Policy-gradient methods, which preference tuning and reasoning training use, are developed in the RL module; this module states the objectives they optimize.
 
 ## <a id="topic-list"></a>Topic list
 
@@ -205,7 +205,7 @@ Slide links are the courses' original PDFs; CS224N videos are the Spring 2024 re
 - The four CS224N assignments, linked from the [course homepage](https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1246/), cover word vectors, a neural dependency parser, attention-based translation, and pretraining and fine-tuning a small transformer.
 - The [CMU 11-711 code repository](https://github.com/cmu-l3/anlp-fall2025-code) has short notebooks for each lecture, including decoding, fine-tuning, retrieval, and reinforcement learning with language models.
 - Karpathy's [nanoGPT](https://github.com/karpathy/nanoGPT) and [minbpe](https://github.com/karpathy/minbpe) are minimal, readable implementations of a GPT training loop and a BPE tokenizer.
-- Foundations supplies probability and information theory for perplexity and cross-entropy; ML supplies logistic regression and EM; DL supplies the transformer, self-supervised learning, and training at scale; AI supplies search for decoding, hidden Markov models, and conditional random fields.
+- [Foundations](../foundations/README.md) supplies probability and information theory for perplexity and cross-entropy; [ML](../ml/README.md) supplies logistic regression and EM; [DL](../dl/README.md) supplies the transformer, self-supervised learning, and training at scale; [AI](../ai/README.md) supplies search for decoding, hidden Markov models, and conditional random fields.
 
 ## <a id="connections-to-later-modules"></a>Connections to later modules
 

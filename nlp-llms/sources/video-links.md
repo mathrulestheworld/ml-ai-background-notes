@@ -4,7 +4,7 @@
 
 # <a id="video-links"></a>Video links
 
-The lecture recordings of the courses in the course links, arranged by chapter. The reading plan gives the matching slides, notes, and readings. CMU 11-711 publishes slides and code but no public recordings, so it appears only in the reading plan.
+The lecture recordings of the courses in the [course links](course-links.md), arranged by chapter. The [reading plan](../reading-plan.md) gives the matching slides, notes, and readings. CMU 11-711 publishes slides and code but no public recordings, so it appears only in the reading plan.
 
 | Video or playlist | Link | Notes |
 | --- | --- | --- |
@@ -16,21 +16,21 @@ The lecture recordings of the courses in the course links, arranged by chapter. 
 
 | Chapter | CS224N Spring 2024 lectures | CS336 Spring 2025 lectures | Other recordings |
 | --- | --- | --- | --- |
-| 1. Text, Tokens, and Tokenization | — | [1: Overview, tokenization](https://www.youtube.com/watch?v=SQ3fZ1sAqXI) | [Karpathy: Let's build the GPT tokenizer](https://www.youtube.com/watch?v=zduSFxRajkE) |
-| 2. N-gram Language Models and Perplexity | [5: Recurrent neural networks, first half](https://www.youtube.com/watch?v=fyc0Jzr74y4) | — | [Karpathy: The spelled-out intro to language modeling](https://www.youtube.com/watch?v=PaCmpygFfXo) |
-| 3. Word Embeddings | [1: Intro and word vectors](https://www.youtube.com/watch?v=DzpHeXVSC5I) · [2: Word vectors and language models](https://www.youtube.com/watch?v=nBor4jfWetQ) | — | — |
-| 4. Transformer Language Models | — | [2: PyTorch, resource accounting](https://www.youtube.com/watch?v=msHyYioAyNE) · [3: Architectures, hyperparameters](https://www.youtube.com/watch?v=ptFiH_bHnJw) · [4: Mixture of experts](https://www.youtube.com/watch?v=LPv1KfUXLCo) | [Karpathy: Let's build GPT, from scratch, in code, spelled out](https://www.youtube.com/watch?v=kCc8FmEb1nY) |
-| 5. Pretraining and Transfer | [9: Pretraining (2023 recording)](https://www.youtube.com/watch?v=DGfCRXuNA2w) | — | — |
-| 6. Pretraining Data | — | [13: Data](https://www.youtube.com/watch?v=WePxmeXU1xg) · [14: Data, filtering and deduplication](https://www.youtube.com/watch?v=9Cd0THLS1t0) | — |
-| 7. Scaling Laws | — | [9: Scaling laws](https://www.youtube.com/watch?v=6Q-ESEmDf4Q) · [11: Scaling laws, details](https://www.youtube.com/watch?v=OSYuUqGBQxw) | — |
-| 8. Decoding and Text Generation | — | [10: Inference](https://www.youtube.com/watch?v=fcgPYo3OtV0) | — |
-| 9. In-Context Learning and Prompting | [10: Post-training, first part](https://www.youtube.com/watch?v=35X6zlhoCy4) | — | — |
-| 10. Fine-Tuning and Parameter-Efficient Adaptation | [12: Efficient training, section on parameter-efficient fine-tuning](https://www.youtube.com/watch?v=UVX7SYGCKkA) | — | — |
-| 11. Learning from Human Preferences | [10: Post-training, second part](https://www.youtube.com/watch?v=35X6zlhoCy4) · [15: Life after DPO (Nathan Lambert)](https://www.youtube.com/watch?v=dnF463_Ar9I) | [15: Alignment, SFT and RLHF](https://www.youtube.com/watch?v=Dfu7vC9jo4w) | — |
-| 12. Reasoning and Test-Time Compute | [14: Reasoning and agents, first half](https://www.youtube.com/watch?v=I0tj4Y7xaOQ) | [16: Alignment, reinforcement learning from verifiable rewards](https://www.youtube.com/watch?v=46f2QTDB08Q) · [17: Alignment, policy gradients for language models](https://www.youtube.com/watch?v=JdGFdViaOJk) | — |
-| 13. Retrieval, Tools, and Agents | [14: Reasoning and agents, second half](https://www.youtube.com/watch?v=I0tj4Y7xaOQ) | — | — |
-| 14. Evaluating Language Models | [11: Benchmarking and evaluation (Yann Dubois)](https://www.youtube.com/watch?v=TO0CqzqiArM) | [12: Evaluation](https://www.youtube.com/watch?v=x-R5l2HsXqM) | — |
-| 15. Machine Translation and Multilingual Models *(optional)* | [6: Sequence-to-sequence models and machine translation](https://www.youtube.com/watch?v=Ba6Fn1-Jsfw) | — | — |
-| 16. Syntactic Parsing *(optional)* | [4: Dependency parsing](https://www.youtube.com/watch?v=KVKvde-_MYc) · [16: ConvNets, tree recursive networks, and constituency parsing](https://www.youtube.com/watch?v=S8d-7v3f5MQ) | — | — |
+| [1. Text, Tokens, and Tokenization](../01-text-tokens-and-tokenization.md) | — | [1: Overview, tokenization](https://www.youtube.com/watch?v=SQ3fZ1sAqXI) | [Karpathy: Let's build the GPT tokenizer](https://www.youtube.com/watch?v=zduSFxRajkE) |
+| [2. N-gram Language Models and Perplexity](../02-n-gram-language-models-and-perplexity.md) | [5: Recurrent neural networks, first half](https://www.youtube.com/watch?v=fyc0Jzr74y4) | — | [Karpathy: The spelled-out intro to language modeling](https://www.youtube.com/watch?v=PaCmpygFfXo) |
+| [3. Word Embeddings](../03-word-embeddings.md) | [1: Intro and word vectors](https://www.youtube.com/watch?v=DzpHeXVSC5I) · [2: Word vectors and language models](https://www.youtube.com/watch?v=nBor4jfWetQ) | — | — |
+| [4. Transformer Language Models](../04-transformer-language-models.md) | — | [2: PyTorch, resource accounting](https://www.youtube.com/watch?v=msHyYioAyNE) · [3: Architectures, hyperparameters](https://www.youtube.com/watch?v=ptFiH_bHnJw) · [4: Mixture of experts](https://www.youtube.com/watch?v=LPv1KfUXLCo) | [Karpathy: Let's build GPT, from scratch, in code, spelled out](https://www.youtube.com/watch?v=kCc8FmEb1nY) |
+| [5. Pretraining and Transfer](../05-pretraining-and-transfer.md) | [9: Pretraining (2023 recording)](https://www.youtube.com/watch?v=DGfCRXuNA2w) | — | — |
+| [6. Pretraining Data](../06-pretraining-data.md) | — | [13: Data](https://www.youtube.com/watch?v=WePxmeXU1xg) · [14: Data, filtering and deduplication](https://www.youtube.com/watch?v=9Cd0THLS1t0) | — |
+| [7. Scaling Laws](../07-scaling-laws.md) | — | [9: Scaling laws](https://www.youtube.com/watch?v=6Q-ESEmDf4Q) · [11: Scaling laws, details](https://www.youtube.com/watch?v=OSYuUqGBQxw) | — |
+| [8. Decoding and Text Generation](../08-decoding-and-text-generation.md) | — | [10: Inference](https://www.youtube.com/watch?v=fcgPYo3OtV0) | — |
+| [9. In-Context Learning and Prompting](../09-in-context-learning-and-prompting.md) | [10: Post-training, first part](https://www.youtube.com/watch?v=35X6zlhoCy4) | — | — |
+| [10. Fine-Tuning and Parameter-Efficient Adaptation](../10-fine-tuning-and-parameter-efficient-adaptation.md) | [12: Efficient training, section on parameter-efficient fine-tuning](https://www.youtube.com/watch?v=UVX7SYGCKkA) | — | — |
+| [11. Learning from Human Preferences](../11-learning-from-human-preferences.md) | [10: Post-training, second part](https://www.youtube.com/watch?v=35X6zlhoCy4) · [15: Life after DPO (Nathan Lambert)](https://www.youtube.com/watch?v=dnF463_Ar9I) | [15: Alignment, SFT and RLHF](https://www.youtube.com/watch?v=Dfu7vC9jo4w) | — |
+| [12. Reasoning and Test-Time Compute](../12-reasoning-and-test-time-compute.md) | [14: Reasoning and agents, first half](https://www.youtube.com/watch?v=I0tj4Y7xaOQ) | [16: Alignment, reinforcement learning from verifiable rewards](https://www.youtube.com/watch?v=46f2QTDB08Q) · [17: Alignment, policy gradients for language models](https://www.youtube.com/watch?v=JdGFdViaOJk) | — |
+| [13. Retrieval, Tools, and Agents](../13-retrieval-tools-and-agents.md) | [14: Reasoning and agents, second half](https://www.youtube.com/watch?v=I0tj4Y7xaOQ) | — | — |
+| [14. Evaluating Language Models](../14-evaluating-language-models.md) | [11: Benchmarking and evaluation (Yann Dubois)](https://www.youtube.com/watch?v=TO0CqzqiArM) | [12: Evaluation](https://www.youtube.com/watch?v=x-R5l2HsXqM) | — |
+| [15. Machine Translation and Multilingual Models](../15-machine-translation-and-multilingual-models.md) *(optional)* | [6: Sequence-to-sequence models and machine translation](https://www.youtube.com/watch?v=Ba6Fn1-Jsfw) | — | — |
+| [16. Syntactic Parsing](../16-syntactic-parsing.md) *(optional)* | [4: Dependency parsing](https://www.youtube.com/watch?v=KVKvde-_MYc) · [16: ConvNets, tree recursive networks, and constituency parsing](https://www.youtube.com/watch?v=S8d-7v3f5MQ) | — | — |
 
-The CS224N lectures on neural networks, backpropagation, recurrent networks, attention, and transformers (lectures 3, the second half of 5, and 8) and the CS336 lectures on GPUs, kernels, and parallelism (5–8) review material covered in Deep Learning and are not listed above.
+The CS224N lectures on neural networks, backpropagation, recurrent networks, attention, and transformers (lectures 3, the second half of 5, and 8) and the CS336 lectures on GPUs, kernels, and parallelism (5–8) review material covered in [Deep Learning](../../dl/README.md) and are not listed above.

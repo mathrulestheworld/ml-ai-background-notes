@@ -19,14 +19,14 @@ The NLP code blocks and figure scripts use one text corpus and one trained model
 | --- | --- |
 | Size | 1,115,394 bytes, all ASCII, so also 1,115,394 characters |
 | Alphabet | 65 distinct characters: the 52 letters, the digit 3, space, newline, and 10 punctuation marks |
-| Words | about 204,000 lowercase word tokens and 12,400 types (chapter 1) |
+| Words | about 204,000 lowercase word tokens and 12,400 types ([chapter 1](../01-text-tokens-and-tokenization.md#words-types-and-tokens)) |
 | Lines | 40,000, with excerpts of several plays concatenated play by play |
 
-Most chapters split the file by position. The first 90% (1,003,854 characters) is the training text and the last 10% (111,540 characters) the held-out text. The split is not random, so the held-out text comes from different plays than the training text: it consists mostly of *The Taming of the Shrew*, and its last 34,657 characters are from *The Tempest*. This makes held-out scores measure generalization to unseen plays rather than to unseen lines of familiar ones, and it explains some numbers in the notes: the best Kneser–Ney character model needs 2.52 bits per character on the last 10% when trained on the first 80%, but 2.25 when trained on the first 90%, because the added tenth contains the opening of *The Taming of the Shrew* (chapter 2), and chapters 5 and 10 use *The Tempest* as the unseen play to adapt to. The file is small enough for every experiment in the module to run on a laptop CPU, and large enough for a character-level model to learn spelling, word boundaries, and the layout of a script.
+Most chapters split the file by position. The first 90% (1,003,854 characters) is the training text and the last 10% (111,540 characters) the held-out text. The split is not random, so the held-out text comes from different plays than the training text: it consists mostly of *The Taming of the Shrew*, and its last 34,657 characters are from *The Tempest*. This makes held-out scores measure generalization to unseen plays rather than to unseen lines of familiar ones, and it explains some numbers in the notes: the best Kneser–Ney character model needs 2.52 bits per character on the last 10% when trained on the first 80%, but 2.25 when trained on the first 90%, because the added tenth contains the opening of *The Taming of the Shrew* ([chapter 2](../02-n-gram-language-models-and-perplexity.md#comparing-the-methods)), and chapters 5 and 10 use *The Tempest* as the unseen play to adapt to. The file is small enough for every experiment in the module to run on a laptop CPU, and large enough for a character-level model to learn spelling, word boundaries, and the layout of a script.
 
 ## <a id="the-character-transformer"></a>The character transformer
 
-`shakespeare-char-transformer.pt` holds a small transformer language model over the 65 characters of Tiny Shakespeare, trained by `Sources/Figure code/ch04_transformer_lm.py` on the first 90% of the file (chapter 4). It is saved with `torch.save` as a dictionary with four entries:
+`shakespeare-char-transformer.pt` holds a small transformer language model over the 65 characters of Tiny Shakespeare, trained by `Sources/Figure code/ch04_transformer_lm.py` on the first 90% of the file ([chapter 4](../04-transformer-language-models.md)). It is saved with `torch.save` as a dictionary with four entries:
 
 | Key | Contents |
 | --- | --- |

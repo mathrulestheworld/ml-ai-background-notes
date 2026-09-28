@@ -41,4 +41,4 @@ The chapter notes develop the module's main material. These books and official d
 | [PyTorch optimizers](https://docs.pytorch.org/docs/stable/optim.html) | Gradient clearing, parameter updates, and optimizer state. |
 | [PyTorch data utilities](https://docs.pytorch.org/docs/stable/data.html) | Dataset indexing, batching, and sampling order. |
 
-The computing examples notebook accompanies chapter 6. Additional API links appear beside the corresponding definitions in that chapter. Chapters 2 and 3 link each NumPy and PyTorch function where the text first discusses it and list every function their examples use in a final collapsed appendix.
+The [computing examples notebook](notebooks/NumPy-and-PyTorch-examples.ipynb) accompanies chapter 6. Additional API links appear beside the corresponding definitions in that chapter. Chapters 2 and 3 link each NumPy and PyTorch function where the text first discusses it and list every function their examples use in a final collapsed appendix.

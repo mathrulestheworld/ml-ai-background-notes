@@ -8,9 +8,9 @@
 
 ### <a id="what-changes-in-deep-learning"></a>What changes in deep learning
 
-The ML module fitted models of the form $`f(x)=w^\top\phi(x)+b`$, where the features $`\phi(x)`$ were fixed in advance: the raw inputs, polynomial or spline bases, or the implicit feature map of a kernel (ML chapter 8). Given $`\phi`$, fitting is usually a convex problem. A **neural network** learns the features as well. It composes several parameterized maps, and training adjusts all of them to reduce the same loss. The price is a nonconvex objective; the gain is a representation adapted to the task, which can be far more economical than any fixed basis for high-dimensional inputs such as images, audio, or text.
+The ML module fitted models of the form $`f(x)=w^\top\phi(x)+b`$, where the features $`\phi(x)`$ were fixed in advance: the raw inputs, polynomial or spline bases, or the implicit feature map of a kernel ([ML chapter 8](../ml/08-support-vector-machines-and-kernels.md#kernels)). Given $`\phi`$, fitting is usually a convex problem. A **neural network** learns the features as well. It composes several parameterized maps, and training adjusts all of them to reduce the same loss. The price is a nonconvex objective; the gain is a representation adapted to the task, which can be far more economical than any fixed basis for high-dimensional inputs such as images, audio, or text.
 
-The idea is old. The perceptron of ML chapter 2 is a single linear unit; networks with hidden layers trained by backpropagation were popularized by [Rumelhart, Hinton, and Williams (1986)](https://doi.org/10.1038/323533a0). What changed after 2010 was scale: large labeled datasets, graphics processors, and a set of techniques, developed in chapters 2–5, that make deep networks trainable. The ImageNet result of [Krizhevsky, Sutskever, and Hinton (2012)](https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html) is the usual marker of the transition. Foundations places deep learning among the other disciplines.
+The idea is old. The perceptron of [ML chapter 2](../ml/02-the-perceptron-and-linear-separation.md) is a single linear unit; networks with hidden layers trained by backpropagation were popularized by [Rumelhart, Hinton, and Williams (1986)](https://doi.org/10.1038/323533a0). What changed after 2010 was scale: large labeled datasets, graphics processors, and a set of techniques, developed in chapters 2–5, that make deep networks trainable. The ImageNet result of [Krizhevsky, Sutskever, and Hinton (2012)](https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html) is the usual marker of the transition. [Foundations](../foundations/01-terminology-and-mathematical-language.md#deep-learning) places deep learning among the other disciplines.
 
 ### <a id="the-multilayer-perceptron"></a>The multilayer perceptron
 
@@ -26,13 +26,13 @@ Here $`W^{(l)}\in\mathbb R^{d_l\times d_{l-1}}`$ and $`b^{(l)}\in\mathbb R^{d_l}
 \sum_{l=1}^Ld_l\,(d_{l-1}+1).
 ```
 
-For a batch of $`n`$ inputs stored as rows of $`X\in\mathbb R^{n\times d_0}`$, layer $`l`$ computes $`H^{(l)}=\sigma\bigl(H^{(l-1)}W^{(l)\top}+\mathbf 1b^{(l)\top}\bigr)`$, the row convention of Foundations. PyTorch's `nn.Linear(d_in, d_out)` stores its weight with shape `(d_out, d_in)` for this reason, as described in Foundations chapter 6.
+For a batch of $`n`$ inputs stored as rows of $`X\in\mathbb R^{n\times d_0}`$, layer $`l`$ computes $`H^{(l)}=\sigma\bigl(H^{(l-1)}W^{(l)\top}+\mathbf 1b^{(l)\top}\bigr)`$, the row convention of [Foundations](../foundations/README.md#shared-conventions). PyTorch's `nn.Linear(d_in, d_out)` stores its weight with shape `(d_out, d_in)` for this reason, as described in [Foundations chapter 6](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#models-and-registered-parameters).
 
 The nonlinearity is essential. Without it, the composition of affine maps is affine, and a network of any depth computes the same functions as a single linear layer. With it, each hidden layer computes new features of the previous layer's features, and the last layer is a linear model on the learned representation $`h^{(L-1)}(x)`$.
 
 ### <a id="computing-gradients"></a>Computing gradients
 
-Training minimizes an empirical risk $`\widehat R_n(\theta)=\frac1n\sum_i\ell\bigl(y_i,f_\theta(x_i)\bigr)`$ by stochastic gradient methods. The gradient with respect to every weight comes from one backward pass through the network, the reverse-mode differentiation derived in Foundations chapter 3. For the MLP it takes a compact form. Write $`\delta^{(l)}=\partial\ell/\partial z^{(l)}`$ for the gradient of the loss with respect to the pre-activations of layer $`l`$, as a column. Then
+Training minimizes an empirical risk $`\widehat R_n(\theta)=\frac1n\sum_i\ell\bigl(y_i,f_\theta(x_i)\bigr)`$ by stochastic gradient methods. The gradient with respect to every weight comes from one backward pass through the network, the reverse-mode differentiation derived in [Foundations chapter 3](../foundations/03-calculus-and-optimization.md#the-chain-rule-and-backpropagation). For the MLP it takes a compact form. Write $`\delta^{(l)}=\partial\ell/\partial z^{(l)}`$ for the gradient of the loss with respect to the pre-activations of layer $`l`$, as a column. Then
 
 ```math
 \delta^{(l)}=\sigma'\bigl(z^{(l)}\bigr)\odot\Bigl(W^{(l+1)\top}\delta^{(l+1)}\Bigr),\qquad
@@ -40,7 +40,7 @@ Training minimizes an empirical risk $`\widehat R_n(\theta)=\frac1n\sum_i\ell\bi
 \frac{\partial\ell}{\partial b^{(l)}}=\delta^{(l)} .
 ```
 
-The backward pass multiplies by the transposed weight matrices in reverse order, scaled at each layer by the derivative of the activation. Two consequences recur in the next chapters. First, the backward pass needs every $`z^{(l)}`$ and $`h^{(l-1)}`$ from the forward pass, so memory grows with depth and batch size (chapter 11). Second, the gradient reaching early layers is a product of many matrices and derivative factors, which can shrink or grow geometrically with depth (chapter 2).
+The backward pass multiplies by the transposed weight matrices in reverse order, scaled at each layer by the derivative of the activation. Two consequences recur in the next chapters. First, the backward pass needs every $`z^{(l)}`$ and $`h^{(l-1)}`$ from the forward pass, so memory grows with depth and batch size ([chapter 11](11-training-at-scale-and-efficient-inference.md)). Second, the gradient reaching early layers is a product of many matrices and derivative factors, which can shrink or grow geometrically with depth ([chapter 2](02-initialization-and-signal-propagation.md)).
 
 ## <a id="activation-functions"></a>Activation functions
 
@@ -49,7 +49,7 @@ The choice of $`\sigma`$ affects what is easy to represent and, more importantly
 - The **logistic sigmoid** $`1/(1+e^{-z})`$ and **tanh** were standard until about 2010. Both **saturate**: for large $`|z|`$ their derivatives vanish, so a unit pushed far from zero stops learning. The sigmoid's derivative is at most $`1/4`$, which shrinks gradients by at least a factor of four per layer; tanh is centered at zero and has slope 1 at the origin.
 - The **rectified linear unit** $`\mathrm{ReLU}(z)=\max\{z,0\}`$ ([Glorot, Bordes, and Bengio, 2011](https://proceedings.mlr.press/v15/glorot11a.html)) does not saturate for positive inputs, is cheap, and produces exact zeros. Its derivative is 0 or 1. A unit whose pre-activation is negative for every input is **dead**: it receives no gradient and cannot recover.
 - **Leaky ReLU** $`\max\{z,\alpha z\}`$ with small $`\alpha`$ keeps a gradient for negative inputs; the **ELU** ([Clevert, Unterthiner, and Hochreiter, 2015](https://arxiv.org/abs/1511.07289)) is a smooth variant.
-- **GELU** $`z\,\Phi(z)`$, with $`\Phi`$ the standard normal distribution function ([Hendrycks and Gimpel, 2016](https://arxiv.org/abs/1606.08415)), and **SiLU** (or Swish) $`z\,\mathrm{sigmoid}(z)`$ ([Ramachandran, Zoph, and Le, 2017](https://arxiv.org/abs/1710.05941)) are smooth, slightly non-monotone versions of ReLU. They are the defaults in transformers (chapter 9).
+- **GELU** $`z\,\Phi(z)`$, with $`\Phi`$ the standard normal distribution function ([Hendrycks and Gimpel, 2016](https://arxiv.org/abs/1606.08415)), and **SiLU** (or Swish) $`z\,\mathrm{sigmoid}(z)`$ ([Ramachandran, Zoph, and Le, 2017](https://arxiv.org/abs/1710.05941)) are smooth, slightly non-monotone versions of ReLU. They are the defaults in transformers ([chapter 9](09-attention-and-transformers.md)).
 
 <img src="sources/images/dl-activations.png" alt="dl-activations" width="840">
 
@@ -114,7 +114,7 @@ for N in [4, 16, 64, 256]:
 
 Universal approximation is an existence statement. It gives no bound on the width needed, no method for finding the weights from data, and no guarantee that the approximating network generalizes. Polynomials, splines, and Gaussian kernel expansions are universal approximators too. The theorem rules out only one worry, that a network of fixed architecture type is too restricted in principle.
 
-The width needed can be enormous. Approximating an arbitrary function with $`s`$ bounded derivatives to accuracy $`\varepsilon`$ in $`d`$ dimensions requires on the order of $`\varepsilon^{-d/s}`$ parameters for any method whose parameters depend continuously on the target, the curse of dimensionality of ML chapter 1 in another form. Networks escape it only for restricted function classes. [Barron (1993)](https://doi.org/10.1109/18.256500) showed that if $`g`$ has a Fourier transform with finite first moment $`C_g=\int\|\omega\|\,|\hat g(\omega)|\,d\omega`$, then a sigmoidal network with $`N`$ hidden units achieves squared $`L^2`$ error at most $`(2rC_g)^2/N`$ on a ball of radius $`r`$, a rate that does not depend on $`d`$, although $`C_g`$ may. Fixed bases with $`N`$ terms cannot match this rate uniformly over the same class.
+The width needed can be enormous. Approximating an arbitrary function with $`s`$ bounded derivatives to accuracy $`\varepsilon`$ in $`d`$ dimensions requires on the order of $`\varepsilon^{-d/s}`$ parameters for any method whose parameters depend continuously on the target, the curse of dimensionality of [ML chapter 1](../ml/01-learning-problems-and-nearest-neighbors.md#the-curse-of-dimensionality) in another form. Networks escape it only for restricted function classes. [Barron (1993)](https://doi.org/10.1109/18.256500) showed that if $`g`$ has a Fourier transform with finite first moment $`C_g=\int\|\omega\|\,|\hat g(\omega)|\,d\omega`$, then a sigmoidal network with $`N`$ hidden units achieves squared $`L^2`$ error at most $`(2rC_g)^2/N`$ on a ball of radius $`r`$, a rate that does not depend on $`d`$, although $`C_g`$ may. Fixed bases with $`N`$ terms cannot match this rate uniformly over the same class.
 
 ### <a id="depth-and-linear-regions"></a>Depth and linear regions
 
@@ -178,7 +178,7 @@ The random narrow networks are nearly linear on $`[0,1]`$: most units are inacti
 
 ## <a id="output-layers-and-losses"></a>Output layers and losses
 
-The last layer produces unconstrained scores, and the loss turns them into a statement about the target. As in ML chapter 5, the losses are negative log-likelihoods of a conditional model $`p_\theta(y\mid x)`$ whose parameters are the network outputs, so training is maximum conditional likelihood and the loss values are in nats (Foundations chapter 5).
+The last layer produces unconstrained scores, and the loss turns them into a statement about the target. As in [ML chapter 5](../ml/05-logistic-regression-and-probabilistic-prediction.md), the losses are negative log-likelihoods of a conditional model $`p_\theta(y\mid x)`$ whose parameters are the network outputs, so training is maximum conditional likelihood and the loss values are in nats ([Foundations chapter 5](../foundations/05-information-and-learning-theory.md#cross-entropy-divergence-and-log-loss)).
 
 | Target | Output layer and model | Loss per example |
 | --- | --- | --- |
@@ -187,9 +187,9 @@ The last layer produces unconstrained scores, and the loss turns them into a sta
 | One of $`K`$ classes | logits $`f(x)\in\mathbb R^K`$; softmax probabilities | cross-entropy $`-f_y(x)+\log\sum_ke^{f_k(x)}`$ |
 | Several binary labels | one logit per label; independent Bernoulli | sum of binary cross-entropies |
 
-Two practical points follow. First, the loss should be computed from logits with a log-sum-exp, as PyTorch's `cross_entropy` does, never by taking the logarithm of computed probabilities (Foundations chapter 6). Second, the likelihood view extends to richer outputs: a network can output the parameters of a mixture ([Bishop's mixture density networks](https://research.aston.ac.uk/en/publications/mixture-density-networks/)), of a distribution over sequences (the NLP and LLMs module), or of an image distribution (the Generative AI module).
+Two practical points follow. First, the loss should be computed from logits with a log-sum-exp, as PyTorch's `cross_entropy` does, never by taking the logarithm of computed probabilities ([Foundations chapter 6](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#stable-probability-calculations)). Second, the likelihood view extends to richer outputs: a network can output the parameters of a mixture ([Bishop's mixture density networks](https://research.aston.ac.uk/en/publications/mixture-density-networks/)), of a distribution over sequences (the NLP and LLMs module), or of an image distribution (the Generative AI module).
 
-Classifiers trained with cross-entropy are not automatically calibrated; large networks tend to be overconfident, and the recalibration methods of ML chapter 5 apply unchanged.
+Classifiers trained with cross-entropy are not automatically calibrated; large networks tend to be overconfident, and the recalibration methods of [ML chapter 5](../ml/05-logistic-regression-and-probabilistic-prediction.md#calibration) apply unchanged.
 
 ## <a id="training-a-network"></a>Training a network
 
@@ -249,7 +249,7 @@ for widths in [[4], [16], [64], [8, 8, 8]]:
 
 *Decision regions of one-hidden-layer ReLU networks trained on the spirals (seed 0). Four units give a few straight cuts; sixteen give a polygonal approximation to the spiral arms; sixty-four fit the arms closely and classify the test set almost perfectly. Every boundary is made of straight segments, one per change of activation pattern.*
 
-Two features of these results carry over to real problems. Capacity matters: the widest network fits the arms and generalizes best, and far larger networks, with many more parameters than training examples, often generalize well too, a puzzle taken up in chapter 5. And the narrow deep network, which can represent the spirals, reaches 0.92–0.94 accuracy from two initializations and 0.74 from the third: whether training finds a good solution depends on initialization, width, and the optimizer, not only on what the architecture can represent.
+Two features of these results carry over to real problems. Capacity matters: the widest network fits the arms and generalizes best, and far larger networks, with many more parameters than training examples, often generalize well too, a puzzle taken up in [chapter 5](05-regularization-and-generalization-in-deep-networks.md). And the narrow deep network, which can represent the spirals, reaches 0.92–0.94 accuracy from two initializations and 0.74 from the third: whether training finds a good solution depends on initialization, width, and the optimizer, not only on what the architecture can represent.
 
 ### <a id="nonconvexity-and-symmetry"></a>Nonconvexity and symmetry
 
@@ -281,9 +281,9 @@ print("equivalent parameter settings from permutations alone: 5! =", torch.arang
 
 Symmetry rules out convexity. If the loss were convex, the average of a minimizer over all permutations of a layer's units would also be a minimizer. In that average every unit of the layer has the same weights, so the layer behaves like a single unit. Whenever a wider layer fits strictly better than a single unit, the loss therefore cannot be convex. Symmetry has a second consequence: the parameters of a network are not identifiable, and individual weights have no meaning on their own. Comparisons between trained networks must be made through the functions or representations they compute.
 
-Nonconvexity is less damaging in practice than the worst case suggests. Gradient descent is repelled by most saddle points, the loss surfaces of wide networks contain large connected sets of near-optimal parameters, and different runs typically reach solutions with similar loss. Chapter 3 examines what is known about these landscapes. The first requirement, however, is that gradients reach every layer with a useful magnitude at the start of training, which is the subject of chapter 2.
+Nonconvexity is less damaging in practice than the worst case suggests. Gradient descent is repelled by most saddle points, the loss surfaces of wide networks contain large connected sets of near-optimal parameters, and different runs typically reach solutions with similar loss. [Chapter 3](03-optimization-for-deep-networks.md) examines what is known about these landscapes. The first requirement, however, is that gradients reach every layer with a useful magnitude at the start of training, which is the subject of chapter 2.
 
-[UDL](https://udlbook.github.io/udlbook/) chapters 3–5 develop shallow networks, deep networks, and loss functions with interactive figures, and chapter 20 discusses why depth helps. [DLB](https://www.deeplearningbook.org/contents/mlp.html) chapter 6 covers feedforward networks and backpropagation. Pinkus's survey [*Approximation theory of the MLP model in neural networks*](https://www.cambridge.org/core/journals/acta-numerica/article/abs/approximation-theory-of-the-mlp-model-in-neural-networks/18072C558C8410C4F92A82BCC8FC8CF9) collects the approximation results. UMich lecture 5 and UNIGE sections 3.4 and 6.1, listed in the reading plan, cover the same material in lectures.
+[UDL](https://udlbook.github.io/udlbook/) chapters 3–5 develop shallow networks, deep networks, and loss functions with interactive figures, and chapter 20 discusses why depth helps. [DLB](https://www.deeplearningbook.org/contents/mlp.html) chapter 6 covers feedforward networks and backpropagation. Pinkus's survey [*Approximation theory of the MLP model in neural networks*](https://www.cambridge.org/core/journals/acta-numerica/article/abs/approximation-theory-of-the-mlp-model-in-neural-networks/18072C558C8410C4F92A82BCC8FC8CF9) collects the approximation results. UMich lecture 5 and UNIGE sections 3.4 and 6.1, listed in the [reading plan](reading-plan.md#1-deep-feedforward-networks), cover the same material in lectures.
 
 ## <a id="appendices"></a>Appendices
 

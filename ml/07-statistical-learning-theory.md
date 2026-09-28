@@ -6,9 +6,9 @@
 
 ## <a id="from-foundations-to-concrete-classes"></a>From Foundations to concrete classes
 
-The general theory of generalization is developed in Information and Learning Theory: the decomposition of excess risk into approximation, estimation, and optimization error; uniform convergence for finite classes and description-length weights; realizable and agnostic PAC learning; the no-free-lunch argument; growth functions, shattering, and VC dimension; Rademacher complexity, contraction, and margin bounds; algorithmic stability; online-to-batch conversion; and PAC-Bayes bounds. This chapter uses those results. It adds what is needed to apply them: learning algorithms for specific classes with complete proofs, the combinatorial lemma that turns VC dimension into a polynomial growth rate, techniques for computing VC dimensions, the characterization of learnability by VC dimension, model selection over several classes, and the online mistake-bound model that underlies the perceptron analysis of chapter 2.
+The general theory of generalization is developed in [Information and Learning Theory](../foundations/05-information-and-learning-theory.md#statistical-learning-theory): the decomposition of excess risk into approximation, estimation, and optimization error; uniform convergence for finite classes and description-length weights; realizable and agnostic PAC learning; the no-free-lunch argument; growth functions, shattering, and VC dimension; Rademacher complexity, contraction, and margin bounds; algorithmic stability; online-to-batch conversion; and PAC-Bayes bounds. This chapter uses those results. It adds what is needed to apply them: learning algorithms for specific classes with complete proofs, the combinatorial lemma that turns VC dimension into a polynomial growth rate, techniques for computing VC dimensions, the characterization of learnability by VC dimension, model selection over several classes, and the online mistake-bound model that underlies the perceptron analysis of [chapter 2](02-the-perceptron-and-linear-separation.md).
 
-The notation follows Foundations: a class $`\mathcal H`$ of binary classifiers $`h:\mathcal X\to\{0,1\}`$, an unknown distribution $`P`$ over labeled examples $`(X,Y)`$, the zero–one risk $`R(h)=P(h(X)\ne Y)`$, the empirical risk $`\widehat R_n(h)`$, the fraction of an iid sample of size $`n`$ that $`h`$ misclassifies, accuracy $`\varepsilon`$, and confidence $`1-\delta`$. Foundations writes $`P_\ast`$ and $`R_\ast`$ for the law and the risk; as in chapter 1, the subscript is dropped here. A classifier with zero training error is **consistent** with the sample. In the **realizable** case some $`h^\ast\in\mathcal H`$ has $`R(h^\ast)=0`$ (Foundations calls it $`h_0`$); in the **agnostic** case the goal is to compete with the best risk in the class, $`\inf_{h\in\mathcal H}R(h)`$, written $`R_\ast^{\mathcal H}`$ in Foundations. Natural logarithms are written $`\ln`$, as in the learning-theory part of Foundations, and base-two logarithms $`\log_2`$.
+The notation follows Foundations: a class $`\mathcal H`$ of binary classifiers $`h:\mathcal X\to\{0,1\}`$, an unknown distribution $`P`$ over labeled examples $`(X,Y)`$, the zero–one risk $`R(h)=P(h(X)\ne Y)`$, the empirical risk $`\widehat R_n(h)`$, the fraction of an iid sample of size $`n`$ that $`h`$ misclassifies, accuracy $`\varepsilon`$, and confidence $`1-\delta`$. Foundations writes $`P_\ast`$ and $`R_\ast`$ for the law and the risk; as in [chapter 1](01-learning-problems-and-nearest-neighbors.md), the subscript is dropped here. A classifier with zero training error is **consistent** with the sample. In the **realizable** case some $`h^\ast\in\mathcal H`$ has $`R(h^\ast)=0`$ (Foundations calls it $`h_0`$); in the **agnostic** case the goal is to compete with the best risk in the class, $`\inf_{h\in\mathcal H}R(h)`$, written $`R_\ast^{\mathcal H}`$ in Foundations. Natural logarithms are written $`\ln`$, as in the learning-theory part of Foundations, and base-two logarithms $`\log_2`$.
 
 Two finite-class results from Foundations recur throughout. For a class of $`M`$ classifiers in the realizable case, every consistent learner that returns a member of the class has error at most $`\varepsilon`$ with probability at least $`1-\delta`$ once
 
@@ -16,13 +16,13 @@ Two finite-class results from Foundations recur throughout. For a class of $`M`$
 n\ge\frac{\ln M+\ln(1/\delta)}{\varepsilon},
 ```
 
-because a fixed classifier with error above $`\varepsilon`$ survives $`n`$ examples with probability at most $`(1-\varepsilon)^n\le e^{-n\varepsilon}`$, and a union bound covers the whole class (PAC learning and its limits). Without realizability, Hoeffding's inequality and a union bound show that with probability at least $`1-\delta`$ every classifier in the class satisfies
+because a fixed classifier with error above $`\varepsilon`$ survives $`n`$ examples with probability at most $`(1-\varepsilon)^n\le e^{-n\varepsilon}`$, and a union bound covers the whole class ([PAC learning and its limits](../foundations/05-information-and-learning-theory.md#pac-learning-and-its-limits)). Without realizability, Hoeffding's inequality and a union bound show that with probability at least $`1-\delta`$ every classifier in the class satisfies
 
 ```math
 \bigl\lvert R(h)-\widehat R_n(h)\bigr\rvert\le\varepsilon_n(M,\delta):=\sqrt{\frac{\ln(2M/\delta)}{2n}},
 ```
 
-so an empirical risk minimizer has risk at most $`\inf_{h\in\mathcal H}R(h)+2\varepsilon_n(M,\delta)`$ (From concentration to generalization).
+so an empirical risk minimizer has risk at most $`\inf_{h\in\mathcal H}R(h)+2\varepsilon_n(M,\delta)`$ ([From concentration to generalization](../foundations/05-information-and-learning-theory.md#from-concentration-to-generalization)).
 
 ## <a id="learning-concrete-classes-in-the-realizable-case"></a>Learning concrete classes in the realizable case
 
@@ -68,7 +68,7 @@ examples suffice, and the algorithm runs in $`O(nd)`$ time. Conjunctions are the
 
 ### <a id="representation-and-computational-hardness"></a>Representation and computational hardness
 
-Statistical and computational learnability can separate. A **3-term DNF** formula (disjunctive normal form) is a disjunction of three conjunctions, $`T_1\vee T_2\vee T_3`$. There are at most $`(3^d+1)^3`$ of them, so the logarithm of the class size grows only linearly in $`d`$, and few examples suffice statistically. Yet [Pitt and Valiant (1988)](https://dl.acm.org/doi/10.1145/48014.63140) showed that finding a 3-term DNF consistent with a given sample is NP-hard. Consequently, unless $`\mathrm{RP}=\mathrm{NP}`$, no efficient *proper* learner exists, one that must output a 3-term DNF. Here RP is the class of problems solvable in polynomial time by randomized algorithms with one-sided error, and an efficient proper learner would place the consistency problem in it: run on the uniform distribution over a sample, with $`\varepsilon`$ below one over the sample size, it would return a consistent formula with high probability. Proper and improper learners are defined in Foundations.
+Statistical and computational learnability can separate. A **3-term DNF** formula (disjunctive normal form) is a disjunction of three conjunctions, $`T_1\vee T_2\vee T_3`$. There are at most $`(3^d+1)^3`$ of them, so the logarithm of the class size grows only linearly in $`d`$, and few examples suffice statistically. Yet [Pitt and Valiant (1988)](https://dl.acm.org/doi/10.1145/48014.63140) showed that finding a 3-term DNF consistent with a given sample is NP-hard. Consequently, unless $`\mathrm{RP}=\mathrm{NP}`$, no efficient *proper* learner exists, one that must output a 3-term DNF. Here RP is the class of problems solvable in polynomial time by randomized algorithms with one-sided error, and an efficient proper learner would place the consistency problem in it: run on the uniform distribution over a sample, with $`\varepsilon`$ below one over the sample size, it would return a consistent formula with high probability. Proper and improper learners are defined in [Foundations](../foundations/05-information-and-learning-theory.md#learning-a-rule-from-a-sample).
 
 The obstacle disappears if the learner may output a different representation. Distributing the disjunction gives
 
@@ -82,7 +82,7 @@ where $`u`$, $`v`$, and $`w`$ range over the literals of $`T_1`$, $`T_2`$, and $
 
 ### <a id="why-a-polynomial-growth-rate-suffices"></a>Why a polynomial growth rate suffices
 
-For a class of binary classifiers, the **growth function** $`\Pi_{\mathcal H}(m)`$ is the largest number of distinct labelings the class produces on $`m`$ points, and the **VC dimension** $`v`$ is the largest $`m`$ with $`\Pi_{\mathcal H}(m)=2^m`$; both are defined in Infinite classes and VC dimension. The uniform deviation bounds in Foundations depend on $`\ln\Pi_{\mathcal H}(n)`$, which takes the place of $`\ln M`$ in the finite-class bound; the proof in Foundations, Appendix B gives, with probability at least $`1-\delta`$ and simultaneously for all $`h\in\mathcal H`$,
+For a class of binary classifiers, the **growth function** $`\Pi_{\mathcal H}(m)`$ is the largest number of distinct labelings the class produces on $`m`$ points, and the **VC dimension** $`v`$ is the largest $`m`$ with $`\Pi_{\mathcal H}(m)=2^m`$; both are defined in [Infinite classes and VC dimension](../foundations/05-information-and-learning-theory.md#infinite-classes-and-vc-dimension). The uniform deviation bounds in Foundations depend on $`\ln\Pi_{\mathcal H}(n)`$, which takes the place of $`\ln M`$ in the finite-class bound; the proof in [Foundations, Appendix B](../foundations/05-information-and-learning-theory.md#why-a-finite-vc-dimension-gives-a-deviation-rate) gives, with probability at least $`1-\delta`$ and simultaneously for all $`h\in\mathcal H`$,
 
 ```math
 \bigl\lvert R(h)-\widehat R_n(h)\bigr\rvert\le2\sqrt{\frac{2\ln\Pi_{\mathcal H}(n)}{n}}+\sqrt{\frac{\ln(2/\delta)}{2n}}.
@@ -175,12 +175,12 @@ Other standard examples, with the same structure of proof:
 
 | Class on the given domain | VC dimension | Witness and obstruction |
 | --- | --- | --- |
-| Thresholds $`\mathbf 1\{x\ge t\}`$ on $`\mathbb R`$ | 1 | Foundations |
-| Intervals $`\mathbf 1\{a\le x\le b\}`$ on $`\mathbb R`$ | 2 | Foundations |
+| Thresholds $`\mathbf 1\{x\ge t\}`$ on $`\mathbb R`$ | 1 | [Foundations](../foundations/05-information-and-learning-theory.md#infinite-classes-and-vc-dimension) |
+| Intervals $`\mathbf 1\{a\le x\le b\}`$ on $`\mathbb R`$ | 2 | [Foundations](../foundations/05-information-and-learning-theory.md#infinite-classes-and-vc-dimension) |
 | Unions of $`k`$ intervals on $`\mathbb R`$ | $`2k`$ | Any labeling of $`2k`$ points has at most $`k`$ runs of consecutive positives, one interval for each; $`2k+1`$ points labeled $`+,-,+,\ldots,+`$ need $`k+1`$ intervals |
 | Axis-aligned rectangles in $`\mathbb R^d`$ | $`2d`$ | Above |
 | Homogeneous halfspaces $`\mathbf 1\{w^\top x\ge0\}`$ in $`\mathbb R^d`$ | $`d`$ | Standard basis vectors; $`d+1`$ vectors are linearly dependent |
-| Affine halfspaces in $`\mathbb R^d`$ | $`d+1`$ | Foundations (Radon's theorem) |
+| Affine halfspaces in $`\mathbb R^d`$ | $`d+1`$ | [Foundations](../foundations/05-information-and-learning-theory.md#infinite-classes-and-vc-dimension) (Radon's theorem) |
 | Linear classifiers on $`p`$ fixed features $`\phi(x)\in\mathbb R^p`$ | at most $`p+1`$ | Halfspaces in feature space |
 | A finite class | at most $`\log_2\lvert\mathcal H\rvert`$ | Shattering $`v`$ points needs $`2^v`$ classifiers |
 
@@ -202,7 +202,7 @@ For the point $`x_j`$, the product $`\omega x_j=\pi2^{-j}+\pi\sum_{i:\,y_i=0}2^{
 
 ### <a id="margins-bound-effective-capacity"></a>Margins bound effective capacity
 
-Conversely, a class with many parameters can have small effective capacity when predictions must be made with a margin. With labels in $`\{-1,+1\}`$, as in chapter 2, say that unit-norm linear functions **shatter points $`x_1,\ldots,x_m`$ with margin $`\gamma`$** if, for every labeling $`y\in\{-1,+1\}^m`$, some $`w`$ with $`\|w\|_2\le1`$ satisfies $`y_iw^\top x_i\ge\gamma`$ for all $`i`$.
+Conversely, a class with many parameters can have small effective capacity when predictions must be made with a margin. With labels in $`\{-1,+1\}`$, as in [chapter 2](02-the-perceptron-and-linear-separation.md), say that unit-norm linear functions **shatter points $`x_1,\ldots,x_m`$ with margin $`\gamma`$** if, for every labeling $`y\in\{-1,+1\}^m`$, some $`w`$ with $`\|w\|_2\le1`$ satisfies $`y_iw^\top x_i\ge\gamma`$ for all $`i`$.
 
 **Proposition.** If $`\|x_i\|_2\le R`$ and the points are shattered with margin $`\gamma`$, then $`m\le R^2/\gamma^2`$.
 
@@ -214,7 +214,7 @@ m\gamma\le\mathbb E\Bigl\|\sum_iy_ix_i\Bigr\|_2\le\Bigl(\mathbb E\Bigl\|\sum_iy_
 
 Hence $`\sqrt m\le R/\gamma`$. $`\square`$
 
-The dimension $`d`$ does not appear; the same computation bounds the Rademacher complexity of linear scores in Norm bounds for linear scores. The quantity $`(R/\gamma)^2`$ is the same one that bounds the perceptron's mistakes in chapter 2, and its square root, the ratio of input radius to margin, controls the Rademacher margin bound in Foundations. It explains why large-margin classifiers in very high-dimensional, even infinite-dimensional, feature spaces can generalize, which is the theoretical basis of the support vector machine (chapter 8).
+The dimension $`d`$ does not appear; the same computation bounds the Rademacher complexity of linear scores in [Norm bounds for linear scores](../foundations/05-information-and-learning-theory.md#norm-bounds-for-linear-scores). The quantity $`(R/\gamma)^2`$ is the same one that bounds the perceptron's mistakes in [chapter 2](02-the-perceptron-and-linear-separation.md#novikoff-s-theorem), and its square root, the ratio of input radius to margin, controls the Rademacher margin bound in [Foundations](../foundations/05-information-and-learning-theory.md#rademacher-complexity-and-margins). It explains why large-margin classifiers in very high-dimensional, even infinite-dimensional, feature spaces can generalize, which is the theoretical basis of the support vector machine ([chapter 8](08-support-vector-machines-and-kernels.md)).
 
 ## <a id="the-fundamental-theorem-of-pac-learning"></a>The fundamental theorem of PAC learning
 
@@ -228,7 +228,7 @@ For binary classification with the zero–one loss, the following are equivalent
 4. $`\mathcal H`$ is PAC learnable in the realizable case.
 5. $`\operatorname{VCdim}(\mathcal H)<\infty`$.
 
-The two kinds of PAC learnability are defined in PAC learning and its limits: in the realizable case the learner must reach error at most $`\varepsilon`$, and in the agnostic case error at most $`\inf_{h\in\mathcal H}R(h)+\varepsilon`$, with probability at least $`1-\delta`$ for every permitted distribution, once $`n`$ exceeds a sample size that depends only on $`\varepsilon`$ and $`\delta`$. Moreover, if $`\operatorname{VCdim}(\mathcal H)=v<\infty`$, the sample complexities satisfy, for universal constants $`C_1,C_2`$,
+The two kinds of PAC learnability are defined in [PAC learning and its limits](../foundations/05-information-and-learning-theory.md#pac-learning-and-its-limits): in the realizable case the learner must reach error at most $`\varepsilon`$, and in the agnostic case error at most $`\inf_{h\in\mathcal H}R(h)+\varepsilon`$, with probability at least $`1-\delta`$ for every permitted distribution, once $`n`$ exceeds a sample size that depends only on $`\varepsilon`$ and $`\delta`$. Moreover, if $`\operatorname{VCdim}(\mathcal H)=v<\infty`$, the sample complexities satisfy, for universal constants $`C_1,C_2`$,
 
 | Setting | Lower bound | Upper bound |
 | --- | --- | --- |
@@ -239,7 +239,7 @@ These are Theorems 6.7 and 6.8 of [*Understanding Machine Learning*](https://www
 
 The theorem says that a single combinatorial number determines, up to constants, how many examples are needed to learn a class of classifiers in the worst case over distributions. It also marks the difference between the two settings: estimating an error rate near zero needs $`O(1/\varepsilon)`$ examples, while estimating the difference between two nonzero error rates needs $`O(1/\varepsilon^2)`$.
 
-The figure isolates this difference for a single pair of classifiers. In the realizable case the best classifier makes no mistakes, so a classifier with error $`\varepsilon`$ looks as good only if it also makes no mistake on the sample, which happens with probability $`(1-\varepsilon)^n\le e^{-n\varepsilon}`$; halving $`\varepsilon`$ doubles the sample size needed to expose it. In the agnostic case both classifiers make mistakes, and the worse one is exposed only when the difference of their mistake counts becomes reliably positive. That difference is a sum of $`n`$ independent terms with mean $`\varepsilon`$ and a standard deviation of order one, so by the central limit theorem its sign is reliable only once $`n\varepsilon`$ exceeds a few multiples of $`\sqrt n`$, that is, once $`n`$ is of order $`1/\varepsilon^2`$.
+The figure isolates this difference for a single pair of classifiers. In the realizable case the best classifier makes no mistakes, so a classifier with error $`\varepsilon`$ looks as good only if it also makes no mistake on the sample, which happens with probability $`(1-\varepsilon)^n\le e^{-n\varepsilon}`$; halving $`\varepsilon`$ doubles the sample size needed to expose it. In the agnostic case both classifiers make mistakes, and the worse one is exposed only when the difference of their mistake counts becomes reliably positive. That difference is a sum of $`n`$ independent terms with mean $`\varepsilon`$ and a standard deviation of order one, so by the [central limit theorem](../foundations/04-probability-and-statistics.md#laws-of-large-numbers-and-the-central-limit-theorem) its sign is reliable only once $`n\varepsilon`$ exceeds a few multiples of $`\sqrt n`$, that is, once $`n`$ is of order $`1/\varepsilon^2`$.
 
 <img src="sources/images/theory-realizable-agnostic.png" alt="theory-realizable-agnostic" width="760">
 
@@ -247,7 +247,7 @@ The figure isolates this difference for a single pair of classifiers. In the rea
 
 ### <a id="why-finite-vc-dimension-is-necessary"></a>Why finite VC dimension is necessary
 
-The lower bound adapts the no-free-lunch argument of Foundations to a shattered set. Suppose $`\mathcal H`$ shatters a set $`C`$ of size $`2m`$, and consider a learner using $`m`$ examples. Put the uniform distribution on $`C`$, and let the target labeling be uniformly random among the $`2^{2m}`$ labelings of $`C`$; each is realized by some member of $`\mathcal H`$, so the problem is realizable. The sample reveals at most $`m`$ of the $`2m`$ labels, and the unseen points carry at least half of the probability. On each unseen point, the label is an independent fair bit given the sample, so every learner errs there with probability $`1/2`$. The expected error, averaged over targets and samples, is at least $`1/4`$; since an average over targets is at most the largest term, some fixed target in $`\mathcal H`$ forces expected error at least $`1/4`$.
+The lower bound adapts the no-free-lunch argument of [Foundations](../foundations/05-information-and-learning-theory.md#why-some-restriction-is-unavoidable) to a shattered set. Suppose $`\mathcal H`$ shatters a set $`C`$ of size $`2m`$, and consider a learner using $`m`$ examples. Put the uniform distribution on $`C`$, and let the target labeling be uniformly random among the $`2^{2m}`$ labelings of $`C`$; each is realized by some member of $`\mathcal H`$, so the problem is realizable. The sample reveals at most $`m`$ of the $`2m`$ labels, and the unseen points carry at least half of the probability. On each unseen point, the label is an independent fair bit given the sample, so every learner errs there with probability $`1/2`$. The expected error, averaged over targets and samples, is at least $`1/4`$; since an average over targets is at most the largest term, some fixed target in $`\mathcal H`$ forces expected error at least $`1/4`$.
 
 Since the error lies in $`[0,1]`$, $`\mathbb E[\mathrm{err}]\ge1/4`$ implies $`P(\mathrm{err}>1/8)\ge(1/4-1/8)/(1-1/8)=1/7`$: writing $`q=P(\mathrm{err}>1/8)`$, the expectation is at most $`q+(1-q)/8`$. Every subset of a shattered set is shattered, so if $`\operatorname{VCdim}(\mathcal H)=v`$ the argument applies whenever $`2m\le v`$. Hence, with fewer than $`v/2`$ examples, no learner achieves error at most $`1/8`$ with probability above $`6/7`$ for every realizable distribution. If $`\operatorname{VCdim}(\mathcal H)=\infty`$, this holds for every sample size, and $`\mathcal H`$ is not PAC learnable. Refinements that place most of the probability on one point and spread the rest over the shattered set give the $`\Omega(v/\varepsilon)`$ realizable lower bound of [Ehrenfeucht, Haussler, Kearns, and Valiant (1989)](https://www.sciencedirect.com/science/article/pii/0890540189900023).
 
@@ -275,7 +275,7 @@ Indeed, abbreviate $`\epsilon_k(n,\delta_k)`$ as $`\epsilon_k`$. For any $`k`$ a
 R(\hat h)\le\widehat R_n(\hat h)+\epsilon_{k(\hat h)}\le\widehat R_n(h)+\epsilon_{k(h)}\le R(h)+2\epsilon_{k(h)}\le R(h)+2\epsilon_k,
 ```
 
-where the last step uses $`k(h)\le k`$ and the growth of the bounds with $`k`$. The learner competes with every class at once, paying only for the class that the comparison actually uses, plus the logarithmic cost of the weights. Classes that are countable unions of finite-VC classes are **nonuniformly learnable** in this way: the required sample size may depend on the target, but no fixed class needs to be chosen in advance. The finite-class version with description-length weights appears in Foundations.
+where the last step uses $`k(h)\le k`$ and the growth of the bounds with $`k`$. The learner competes with every class at once, paying only for the class that the comparison actually uses, plus the logarithmic cost of the weights. Classes that are countable unions of finite-VC classes are **nonuniformly learnable** in this way: the required sample size may depend on the target, but no fixed class needs to be chosen in advance. The finite-class version with description-length weights appears in [Foundations](../foundations/05-information-and-learning-theory.md#countable-classes-and-description-length).
 
 ### <a id="validation-is-learning-over-a-finite-class"></a>Validation is learning over a finite class
 
@@ -285,7 +285,7 @@ The penalties in SRM are worst-case bounds and are usually far too large to guid
 R(\hat h_{\hat k})\le\min_kR(\hat h_k)+2\sqrt{\frac{\ln(2K/\delta)}{2m}},
 ```
 
-where $`\hat k`$ minimizes validation error. Choosing among $`K`$ candidates costs only a factor $`\ln K`$. This is the theoretical reason that hold-out selection works well even among many models, and also a reminder that the cost is not zero: selecting among thousands of configurations with a small validation set can overfit it, as chapter 6 demonstrates. Foundations discusses the same distinction between evaluating a fixed classifier and selecting among many.
+where $`\hat k`$ minimizes validation error. Choosing among $`K`$ candidates costs only a factor $`\ln K`$. This is the theoretical reason that hold-out selection works well even among many models, and also a reminder that the cost is not zero: selecting among thousands of configurations with a small validation set can overfit it, as [chapter 6](06-losses-model-selection-and-evaluation.md#selection-bias-and-nested-cross-validation) demonstrates. [Foundations](../foundations/05-information-and-learning-theory.md#what-the-guarantees-say-about-evaluation) discusses the same distinction between evaluating a fixed classifier and selecting among many.
 
 The figure compares the two procedures on a problem whose answer is known. The inputs are uniform on $`[0,1]`$, the label is $`1`$ on three intervals and is flipped with probability 0.15, and $`\mathcal H_k`$ is the class of unions of at most $`k`$ intervals, with VC dimension $`2k`$ (see the table in [The two halves of a proof](#the-two-halves-of-a-proof)), so the Bayes rule lies in $`\mathcal H_3`$. The SRM bound $`\epsilon_k`$ is the explicit VC bound displayed in [Why a polynomial growth rate suffices](#why-a-polynomial-growth-rate-suffices), with $`\ln\Pi_{\mathcal H_k}(n)\le2k\ln(en/2k)`$, $`\delta_k=\delta/(k(k+1))`$, and $`\delta=0.05`$. With 500 training examples the bounds exceed the error rates they are meant to control, the SRM objective exceeds 0.8 for every class, and SRM chooses a single interval, whose population risk is 0.331. Validation on 500 further examples chooses three intervals, with population risk 0.163. With 10,000 examples of each kind the bounds shrink enough for SRM to choose three intervals as well.
 
@@ -297,7 +297,7 @@ The figure compares the two procedures on a problem whose answer is known. The i
 
 ### <a id="the-mistake-bound-model"></a>The mistake-bound model
 
-In the **mistake-bound model**, examples arrive one at a time in an arbitrary order, possibly chosen by an adversary. The learner predicts each label before seeing it and is judged by its total number of mistakes. There is no distribution. In the realizable version, the labels are consistent with some $`h^\ast\in\mathcal H`$; the perceptron's guarantee in chapter 2 is a mistake bound for halfspaces with margin.
+In the **mistake-bound model**, examples arrive one at a time in an arbitrary order, possibly chosen by an adversary. The learner predicts each label before seeing it and is judged by its total number of mistakes. There is no distribution. In the realizable version, the labels are consistent with some $`h^\ast\in\mathcal H`$; the perceptron's guarantee in [chapter 2](02-the-perceptron-and-linear-separation.md#novikoff-s-theorem) is a mistake bound for halfspaces with margin.
 
 For a finite class, the **halving algorithm** maintains the **version space**, the set of classifiers consistent with all labels seen so far, and predicts by majority vote over it. Every mistake means that at least half of the version space voted wrongly and is eliminated. The target is never eliminated, so after $`M`$ mistakes $`1\le\lvert\mathcal H\rvert2^{-M}`$, and
 
@@ -349,7 +349,7 @@ which is $`M\le2.41(m^\ast+\log_2N)`$ for $`\beta=1/2`$. The proof, in [Appendix
 
 *Left: cumulative mistakes of the experts (gray), of the best expert so far, and of weighted majority with $`\beta=1/2`$, with the bound evaluated at the best expert's count. One expert is right 90% of the time; the others are right with probabilities between 0.55 and 0.8. Right: the share of the total weight held by the 90% expert when each vote is taken. Once that share passes one half, the vote copies this expert, so the algorithm tracks the best expert almost exactly, far below its worst-case bound. Its small lead comes from the first rounds, when the weighted vote of many independent experts was more accurate than any one of them.*
 
-The deterministic bound has a factor above one in front of $`m^\ast`$, and no deterministic algorithm can avoid a factor of two against an adversary. Randomizing the prediction, by following a random expert with probability proportional to its weight, gives expected **regret**, the excess over the best expert, of order $`\sqrt{T\ln N}`$ over $`T`$ rounds. This exponential-weights algorithm, called Hedge, is the discrete counterpart of the online gradient methods and online-to-batch conversion in Foundations, and it reappears in boosting (chapter 11).
+The deterministic bound has a factor above one in front of $`m^\ast`$, and no deterministic algorithm can avoid a factor of two against an adversary. Randomizing the prediction, by following a random expert with probability proportional to its weight, gives expected **regret**, the excess over the best expert, of order $`\sqrt{T\ln N}`$ over $`T`$ rounds. This exponential-weights algorithm, called Hedge, is the discrete counterpart of the online gradient methods and online-to-batch conversion in [Foundations](../foundations/05-information-and-learning-theory.md#online-regret-and-its-connection-to-statistical-learning), and it reappears in boosting ([chapter 11](11-boosting.md)).
 
 ## <a id="appendices"></a>Appendices
 
@@ -365,7 +365,7 @@ For $`m\ge v\ge1`$, since $`v/m\le1`$,
 \le\Bigl(\frac mv\Bigr)^v\Bigl(1+\frac vm\Bigr)^m\le\Bigl(\frac{em}v\Bigr)^v.
 ```
 
-The first inequality multiplies each term by $`(m/v)^{v-j}\ge1`$. The second extends the sum to $`j=m`$ and applies the binomial theorem; the last uses $`1+u\le e^u`$. Thus $`\ln\Pi_{\mathcal H}(m)\le v\ln(em/v)`$, which is what enters the VC generalization bound in Foundations.
+The first inequality multiplies each term by $`(m/v)^{v-j}\ge1`$. The second extends the sum to $`j=m`$ and applies the binomial theorem; the last uses $`1+u\le e^u`$. Thus $`\ln\Pi_{\mathcal H}(m)\le v\ln(em/v)`$, which is what enters the VC generalization bound in [Foundations](../foundations/05-information-and-learning-theory.md#infinite-classes-and-vc-dimension).
 
 </details>
 

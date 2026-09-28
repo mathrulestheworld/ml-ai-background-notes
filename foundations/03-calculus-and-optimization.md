@@ -53,7 +53,7 @@ d\ell=\langle\nabla_W\ell,dW\rangle_F
 =\sum_{i,j}\frac{\partial\ell}{\partial W_{ij}}\,dW_{ij}.
 ```
 
-The same entrywise pairing applies to higher-order tensors. The general derivative-array convention is developed in Linear Algebra.
+The same entrywise pairing applies to higher-order tensors. The general derivative-array convention is developed in [Linear Algebra](02-linear-algebra.md#block-la-appendix-b).
 
 ## <a id="the-chain-rule-and-backpropagation"></a>The chain rule and backpropagation
 
@@ -1060,7 +1060,7 @@ All microbatches use the same parameters. An unweighted average of microbatch me
 
 **Global norm clipping** replaces $`g_t`$ by $`g_t\min\{1,c/\|g_t\|\}`$ for threshold $`c>0`$, with zero mapped to zero. It preserves direction and caps the gradient magnitude. Applying it once after accumulation differs from clipping each microbatch first. For AdamW it bounds the gradient entering the moments, rather than directly bounding the final parameter displacement.
 
-Appendix G contains schedule formulas, an accumulation-and-clipping example, distributed averaging, and additional optimizer families. A basic forward/backward/update loop is developed in Numerical Computing with NumPy and PyTorch.
+Appendix G contains schedule formulas, an accumulation-and-clipping example, distributed averaging, and additional optimizer families. A basic forward/backward/update loop is developed in [Numerical Computing with NumPy and PyTorch](06-numerical-computing-with-numpy-and-pytorch.md).
 
 ## <a id="convergence-rates-and-their-scope"></a>Convergence rates and their scope
 

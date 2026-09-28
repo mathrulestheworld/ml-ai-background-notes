@@ -12,7 +12,7 @@
 
 The order below follows the chapters of this module. Each block lists the material to cover and its primary lectures; further reading and exercises provide additional depth. Blocks 1–13 form the main plan; 14–15 are optional extensions. Timing is flexible.
 
-Slide links are the courses' original files; four CS236 lectures are available only as PowerPoint files. Several prerequisites come from earlier modules: the evidence lower bound, Markov chain Monte Carlo, and Langevin-type samplers from AI chapter 10; mixtures, EM, and kernel density estimates from ML; autoencoders, contrastive image–text models, U-Nets, and vision transformers from DL; and autoregressive transformers, tokenization, sampling, and preference optimization from NLP and LLMs. The corresponding introductory lectures serve as review.
+Slide links are the courses' original files; four CS236 lectures are available only as PowerPoint files. Several prerequisites come from earlier modules: the evidence lower bound, Markov chain Monte Carlo, and Langevin-type samplers from [AI chapter 10](../ai/10-approximate-inference.md); mixtures, EM, and kernel density estimates from [ML](../ml/README.md); autoencoders, contrastive image–text models, U-Nets, and vision transformers from [DL](../dl/README.md); and autoregressive transformers, tokenization, sampling, and preference optimization from [NLP and LLMs](../nlp-llms/README.md). The corresponding introductory lectures serve as review.
 
 ## <a id="topic-list"></a>Topic list
 
@@ -209,7 +209,7 @@ Slide links are the courses' original files; four CS236 lectures are available o
 - The four [CS294-158 homeworks](https://github.com/rll/deepul) implement autoregressive models, VAEs, adversarial networks, and diffusion models on images, with starter code and tests.
 - The three [6.S184 labs](https://github.com/eje24/iap-diffusion-labs/tree/2026) build flow and diffusion models from simulating SDEs through flow matching, score matching, and a conditional image generator with classifier-free guidance.
 - Jakub Tomczak's [code for *Deep Generative Modeling*](https://github.com/jmtomczak/intro_dgm) gives short, self-contained notebooks for each family of models.
-- Foundations supplies the KL divergence, entropy, and the change of variables; ML supplies mixtures, EM, and kernel density estimates; DL supplies autoencoders, U-Nets, vision transformers, and contrastive image–text learning; AI supplies variational inference and Markov chain Monte Carlo; NLP and LLMs supplies autoregressive transformers, tokenizers, sampling, and preference optimization.
+- [Foundations](../foundations/README.md) supplies the KL divergence, entropy, and the change of variables; [ML](../ml/README.md) supplies mixtures, EM, and kernel density estimates; [DL](../dl/README.md) supplies autoencoders, U-Nets, vision transformers, and contrastive image–text learning; [AI](../ai/README.md) supplies variational inference and Markov chain Monte Carlo; [NLP and LLMs](../nlp-llms/README.md) supplies autoregressive transformers, tokenizers, sampling, and preference optimization.
 
 ## <a id="connections-to-later-modules"></a>Connections to later modules
 

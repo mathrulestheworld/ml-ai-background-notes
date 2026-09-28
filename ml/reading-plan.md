@@ -232,7 +232,7 @@ CMU slide links are original PDFs. Cornell’s Fall 2018 topic notes are HTML an
 ## <a id="exercises-and-local-references"></a>Exercises and local references
 
 - [CMU homework archive](https://www.cs.cmu.edu/~ninamf/courses/601sp15/homeworks.shtml) and [recitations](https://www.cs.cmu.edu/~ninamf/courses/601sp15/recitations.shtml). Homework PDFs are available; the archive’s solution links returned 404 when checked. Some programming exercises use Octave/MATLAB and would need adaptation for Python. The theory and derivation questions remain useful.
-- Foundations overview links the mathematical and numerical prerequisites. Its existing notes are references during this module.
+- [Foundations overview](../foundations/README.md) links the mathematical and numerical prerequisites. Its existing notes are references during this module.
 - NumPy implementations of small algorithms can accompany the notes you write. The linked scikit-learn notebooks provide concrete comparisons, plots and evaluation examples.
 
 ## <a id="connections-to-later-modules"></a>Connections to later modules

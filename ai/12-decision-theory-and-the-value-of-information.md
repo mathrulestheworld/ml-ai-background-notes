@@ -8,7 +8,7 @@
 
 ### <a id="beliefs-are-not-enough"></a>Beliefs are not enough
 
-Chapters 8–11 compute what an agent should believe. To act, it also needs to know what it wants. A **decision-theoretic agent** combines the two: it holds probabilities over the outcomes of its actions and a **utility function** over outcomes, and chooses the action with the highest expected utility. This chapter asks where utilities come from, why maximizing their expectation is the rational way to combine them with probabilities, and how an agent should decide what to observe before acting. It concerns single decisions, or fixed sequences of observations and decisions; sequential decision making under uncertainty, where each action changes the situation for the next, is the subject of the RL module, which builds on the utilities and expectations defined here. Foundations chapter 4 treats decisions from the statistician's side, with losses given in advance; here the losses themselves are the object of study.
+Chapters 8–11 compute what an agent should believe. To act, it also needs to know what it wants. A **decision-theoretic agent** combines the two: it holds probabilities over the outcomes of its actions and a **utility function** over outcomes, and chooses the action with the highest expected utility. This chapter asks where utilities come from, why maximizing their expectation is the rational way to combine them with probabilities, and how an agent should decide what to observe before acting. It concerns single decisions, or fixed sequences of observations and decisions; sequential decision making under uncertainty, where each action changes the situation for the next, is the subject of the RL module, which builds on the utilities and expectations defined here. [Foundations chapter 4](../foundations/04-probability-and-statistics.md#decisions-loss-and-risk) treats decisions from the statistician's side, with losses given in advance; here the losses themselves are the object of study.
 
 ### <a id="lotteries-and-the-axioms-of-utility"></a>Lotteries and the axioms of utility
 
@@ -37,7 +37,7 @@ The utility of a lottery is the expected utility of its outcomes, and $`U`$ is u
 a^*=\arg\max_a\;\mathbb E[U\mid a,e]=\arg\max_a\sum_sP(\mathrm{Result}(a)=s\mid a,e)\,U(s).
 ```
 
-The principle does not say that agents compute utilities or maximize them explicitly; it says that the behavior of any agent with consistent preferences can be described as if it did. It also fixes what utility numbers mean: only their ratios of differences are meaningful, which is why, unlike in deterministic games (chapter 4), a monotone but nonlinear rescaling of utilities can change decisions under uncertainty.
+The principle does not say that agents compute utilities or maximize them explicitly; it says that the behavior of any agent with consistent preferences can be described as if it did. It also fixes what utility numbers mean: only their ratios of differences are meaningful, which is why, unlike in deterministic games ([chapter 4](04-adversarial-search-and-games.md#expectiminimax)), a monotone but nonlinear rescaling of utilities can change decisions under uncertainty.
 
 ## <a id="utility-functions"></a>Utility functions
 
@@ -179,9 +179,9 @@ Under the prior, rain is unlikely enough that leaving the umbrella is best, with
 
 ### <a id="information-gathering"></a>Information gathering
 
-An agent that can choose which observations to make can use VPI directly: repeatedly acquire the observation with the highest value minus cost, until no observation is worth its cost, then act. This **myopic** strategy considers one observation at a time and can undervalue observations that are useful only in combination, since non-additivity means that each alone may seem worthless; nonmyopic planning of observations is a sequential decision problem, a partially observable Markov decision process, and belongs to the RL module. In active learning (ML chapter 16), Bayesian optimization, and medical diagnosis, heuristics based on expected information gain or expected improvement play the role of VPI.
+An agent that can choose which observations to make can use VPI directly: repeatedly acquire the observation with the highest value minus cost, until no observation is worth its cost, then act. This **myopic** strategy considers one observation at a time and can undervalue observations that are useful only in combination, since non-additivity means that each alone may seem worthless; nonmyopic planning of observations is a sequential decision problem, a partially observable Markov decision process, and belongs to the RL module. In active learning ([ML chapter 16](../ml/16-semi-supervised-and-active-learning.md)), Bayesian optimization, and medical diagnosis, heuristics based on expected information gain or expected improvement play the role of VPI.
 
-The same reasoning applies to computation itself: thinking is an action whose value is the expected improvement of the decision it might bring. **Metareasoning** uses this to decide which part of a search tree to expand, or when to stop deliberating, and the selection rule of Monte Carlo tree search (chapter 4) can be read as an approximation of it.
+The same reasoning applies to computation itself: thinking is an action whose value is the expected improvement of the decision it might bring. **Metareasoning** uses this to decide which part of a search tree to expand, or when to stop deliberating, and the selection rule of Monte Carlo tree search ([chapter 4](04-adversarial-search-and-games.md#selection-with-uct)) can be read as an approximation of it.
 
 ## <a id="appendices"></a>Appendices
 

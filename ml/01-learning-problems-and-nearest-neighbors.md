@@ -14,7 +14,7 @@ Supervised learning begins with observations of input–target pairs. Throughout
 D=\{(x_i,y_i)\}_{i=1}^n,\qquad (X_i,Y_i)\stackrel{\mathrm{iid}}{\sim}P,
 ```
 
-where $`x_i\in\mathcal X`$ is an input, usually a feature vector in $`\mathbb R^d`$, and $`y_i\in\mathcal Y`$ is its target. In **regression** the target is numerical, $`\mathcal Y\subseteq\mathbb R`$. In **classification** it is one of $`K`$ labels. The design matrix $`X\in\mathbb R^{n\times d}`$ stores the inputs as rows $`x_i^\top`$, following the conventions in Foundations.
+where $`x_i\in\mathcal X`$ is an input, usually a feature vector in $`\mathbb R^d`$, and $`y_i\in\mathcal Y`$ is its target. In **regression** the target is numerical, $`\mathcal Y\subseteq\mathbb R`$. In **classification** it is one of $`K`$ labels. The design matrix $`X\in\mathbb R^{n\times d}`$ stores the inputs as rows $`x_i^\top`$, following the conventions in [Foundations](../foundations/README.md#shared-conventions).
 
 A **prediction rule** is a function $`f:\mathcal X\to\widehat{\mathcal Y}`$. A **loss** $`\ell(y,\hat y)`$, with the target first, measures the cost of predicting $`\hat y`$ when the target is $`y`$. The quantity a learning method ultimately cares about is the **population risk**
 
@@ -28,7 +28,7 @@ the expected loss on a fresh observation from the same law. The data supply only
 \widehat R_n(f)=\frac1n\sum_{i=1}^n\ell\bigl(y_i,f(x_i)\bigr).
 ```
 
-These are the objects written $`R_\ast`$ and $`\widehat R_n`$ in Information and Learning Theory; the subscript on the law is dropped in this module. A **learning algorithm** maps the sample to a rule, $`\hat f=\mathcal A(D)`$. The rule is then applied to new inputs, and its quality is judged by $`R(\hat f)`$, a random quantity because $`\hat f`$ depends on $`D`$. The terminology of tasks, models, algorithms, and data splits is developed in Terminology and Mathematical Language.
+These are the objects written $`R_\ast`$ and $`\widehat R_n`$ in [Information and Learning Theory](../foundations/05-information-and-learning-theory.md#learning-a-rule-from-a-sample); the subscript on the law is dropped in this module. A **learning algorithm** maps the sample to a rule, $`\hat f=\mathcal A(D)`$. The rule is then applied to new inputs, and its quality is judged by $`R(\hat f)`$, a random quantity because $`\hat f`$ depends on $`D`$. The terminology of tasks, models, algorithms, and data splits is developed in [Terminology and Mathematical Language](../foundations/01-terminology-and-mathematical-language.md#tasks-models-and-learning-algorithms).
 
 Three losses recur:
 
@@ -38,7 +38,7 @@ Three losses recur:
 | Regression | Absolute error $`\lvert y-\hat y\rvert`$ | A conditional median of $`Y`$ given $`X=x`$ |
 | Classification | Zero–one loss $`\mathbf 1\{y\ne\hat y\}`$ | A label $`k`$ maximizing $`P(Y=k\mid X=x)`$ |
 
-Each entry follows by minimizing the conditional expected loss $`\mathbb E[\ell(Y,a)\mid X=x]`$ separately for every $`x`$. The resulting rule is the **Bayes predictor**, and its risk $`R^\ast=\inf_fR(f)`$ is the **Bayes risk**, written $`R_\ast^{\mathrm{Bayes}}`$ in Information and Learning Theory. No method can do better on average under $`P`$, and when the target is noisy given the input, $`R^\ast`$ is positive. Probability and Statistics states the three results, and its decision-theory section gives the same three answers for choosing an action under a posterior distribution and proves the squared-error case. That section uses *Bayes risk* differently, for risk averaged over a prior; here the name refers to the optimal decision under the true law.
+Each entry follows by minimizing the conditional expected loss $`\mathbb E[\ell(Y,a)\mid X=x]`$ separately for every $`x`$. The resulting rule is the **Bayes predictor**, and its risk $`R^\ast=\inf_fR(f)`$ is the **Bayes risk**, written $`R_\ast^{\mathrm{Bayes}}`$ in [Information and Learning Theory](../foundations/05-information-and-learning-theory.md#the-best-possible-rule-and-the-best-available-rule). No method can do better on average under $`P`$, and when the target is noisy given the input, $`R^\ast`$ is positive. [Probability and Statistics](../foundations/04-probability-and-statistics.md#from-inference-to-learning) states the three results, and its [decision-theory section](../foundations/04-probability-and-statistics.md#decisions-loss-and-risk) gives the same three answers for choosing an action under a posterior distribution and proves the squared-error case. That section uses *Bayes risk* differently, for risk averaged over a prior; here the name refers to the optimal decision under the true law.
 
 For binary classification with labels $`\{0,1\}`$, write
 
@@ -68,7 +68,7 @@ The contrast is visible on a simulated two-class problem whose Bayes classifier 
 \ln\frac{p_1(x)}{p_0(x)}=2x_1-2+\ln4-\tfrac{15}{8}x_2^2
 ```
 
-is positive exactly when $`\eta(x)>1/2`$. The Bayes boundary is therefore the parabola $`x_1=1-\ln2+\tfrac{15}{16}x_2^2`$, which curves around class 1. It is curved rather than straight because the two covariance matrices differ, as Generative Classifiers explains. The Bayes error is $`0.099`$. Fitting a least-squares linear function to the $`0/1`$ labels and thresholding it at $`1/2`$ gives a single straight boundary. Nearest-neighbor rules, defined in the next section, instead follow the data locally.
+is positive exactly when $`\eta(x)>1/2`$. The Bayes boundary is therefore the parabola $`x_1=1-\ln2+\tfrac{15}{16}x_2^2`$, which curves around class 1. It is curved rather than straight because the two covariance matrices differ, as [Generative Classifiers](04-generative-classifiers.md) explains. The Bayes error is $`0.099`$. Fitting a least-squares linear function to the $`0/1`$ labels and thresholding it at $`1/2`$ gives a single straight boundary. Nearest-neighbor rules, defined in the next section, instead follow the data locally.
 
 <img src="sources/images/nn-linear-vs-knn.png" alt="nn-linear-vs-knn" width="760">
 
@@ -86,7 +86,7 @@ Every method in the ML module can be located between these extremes: it specifie
 
 ### <a id="inductive-bias"></a>Inductive bias
 
-A finite sample is consistent with infinitely many functions that differ away from the observed inputs. A learning method must therefore prefer some functions to others before seeing the data. This preference is its **inductive bias**. A linear model prefers affine functions; a nearest-neighbor rule prefers functions that are locally constant with respect to a chosen distance; a regularized method prefers small norms. The no-free-lunch argument shows that some such preference is unavoidable: without one, the observed labels say nothing about unobserved inputs.
+A finite sample is consistent with infinitely many functions that differ away from the observed inputs. A learning method must therefore prefer some functions to others before seeing the data. This preference is its **inductive bias**. A linear model prefers affine functions; a nearest-neighbor rule prefers functions that are locally constant with respect to a chosen distance; a regularized method prefers small norms. The [no-free-lunch argument](../foundations/05-information-and-learning-theory.md#why-some-restriction-is-unavoidable) shows that some such preference is unavoidable: without one, the observed labels say nothing about unobserved inputs.
 
 The word *bias* here refers to an assumption, not yet to the statistical bias of an estimator. The two are connected: a strong inductive bias typically produces an estimator with low variance and, if the assumption is wrong, high statistical bias.
 
@@ -100,7 +100,7 @@ Fix a distance $`\rho`$ on $`\mathcal X`$, usually Euclidean distance on standar
 \rho\bigl(x,x_{(1)}(x)\bigr)\le\rho\bigl(x,x_{(2)}(x)\bigr)\le\cdots\le\rho\bigl(x,x_{(n)}(x)\bigr).
 ```
 
-The subscript in parentheses is a rank, as in the order statistics $`X_{(1)}\le\cdots\le X_{(n)}`$ of Probability and Statistics, and the argument $`x`$ records that the ranking depends on the query: a different query reorders the same sample. Thus $`\rho\bigl(x,x_{(j)}(x)\bigr)`$ is the $`j`$th smallest of the distances $`\rho(x,x_1),\ldots,\rho(x,x_n)`$. Let $`y_{(j)}(x)`$ be the target paired with $`x_{(j)}(x)`$, and let $`N_k(x)`$ be the set of indices of the $`k`$ inputs of rank $`1`$ to $`k`$, the **$`k`$ nearest neighbors** of $`x`$. The **$`k`$-nearest-neighbor ($`k`$-NN) regression estimate** is the local average
+The subscript in parentheses is a rank, as in the order statistics $`X_{(1)}\le\cdots\le X_{(n)}`$ of [Probability and Statistics](../foundations/04-probability-and-statistics.md#order-statistics), and the argument $`x`$ records that the ranking depends on the query: a different query reorders the same sample. Thus $`\rho\bigl(x,x_{(j)}(x)\bigr)`$ is the $`j`$th smallest of the distances $`\rho(x,x_1),\ldots,\rho(x,x_n)`$. Let $`y_{(j)}(x)`$ be the target paired with $`x_{(j)}(x)`$, and let $`N_k(x)`$ be the set of indices of the $`k`$ inputs of rank $`1`$ to $`k`$, the **$`k`$ nearest neighbors** of $`x`$. The **$`k`$-nearest-neighbor ($`k`$-NN) regression estimate** is the local average
 
 ```math
 \hat m_k(x)=\frac1k\sum_{j=1}^k y_{(j)}(x)=\frac1k\sum_{i\in N_k(x)}y_i.
@@ -128,7 +128,7 @@ The rule stores the training sample and does no fitting. It is sometimes called 
 \hat m(x)=\frac{\sum_iK\bigl(\rho(x,x_i)/h\bigr)y_i}{\sum_iK\bigl(\rho(x,x_i)/h\bigr)}.
 ```
 
-With a fixed bandwidth $`h`$ instead of a fixed number of neighbors, this is the **Nadaraya–Watson** kernel smoother. The $`k`$-NN rule is the special case with a uniform kernel whose bandwidth adapts to the local density of the data: in sparse regions the $`k`$th neighbor is farther away, so the neighborhood widens automatically. Kernel smoothing and local polynomial regression are developed in Smoothing, Density Estimation, and Basis Expansions.
+With a fixed bandwidth $`h`$ instead of a fixed number of neighbors, this is the **Nadaraya–Watson** kernel smoother. The $`k`$-NN rule is the special case with a uniform kernel whose bandwidth adapts to the local density of the data: in sparse regions the $`k`$th neighbor is farther away, so the neighborhood widens automatically. Kernel smoothing and local polynomial regression are developed in [Smoothing, Density Estimation, and Basis Expansions](17-smoothing-density-estimation-and-basis-expansions.md).
 
 ### <a id="a-worked-example"></a>A worked example
 
@@ -168,9 +168,9 @@ print("feature standard deviations:", np.round(scale[[0, 7, 12]], 3).tolist())
 
 The last line of output shows why the raw distances perform poorly. Proline, the thirteenth feature, has a standard deviation of about 325 in its measurement units, while nonflavanoid phenols have about 0.12. Squared Euclidean distance adds squared coordinate differences, so proline alone essentially determines which wines are neighbors. Standardizing each feature by its training-set standard deviation gives every feature comparable influence, and accuracy rises from 0.72 to 0.96 on these 54 test wines.
 
-The function `knn_predict` computes all query-to-training distances at once by broadcasting a `(q, 1, d)` array against a `(1, n, d)` array. This materializes a $`q\times n\times d`$ array of differences, which is harmless here but not for large data; [Computing nearest neighbors](#computing-nearest-neighbors) describes the alternatives.
+The function `knn_predict` computes all query-to-training distances at once by [broadcasting](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#broadcasting-and-reductions) a `(q, 1, d)` array against a `(1, n, d)` array. This materializes a $`q\times n\times d`$ array of differences, which is harmless here but not for large data; [Computing nearest neighbors](#computing-nearest-neighbors) describes the alternatives.
 
-The standardization constants are computed from the training inputs only and then applied unchanged to the test inputs. They are part of the fitted predictor, as in the complete example of Numerical Computing with NumPy and PyTorch. Computing them from all the data would let the test inputs influence the predictor, a mild form of the leakage discussed in Losses, Model Selection, and Evaluation.
+The standardization constants are computed from the training inputs only and then applied unchanged to the test inputs. They are part of the fitted predictor, as in the complete example of [Numerical Computing with NumPy and PyTorch](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#a-complete-numerical-example). Computing them from all the data would let the test inputs influence the predictor, a mild form of the leakage discussed in [Losses, Model Selection, and Evaluation](06-losses-model-selection-and-evaluation.md).
 
 ### <a id="choosing-k-flexibility-and-its-cost"></a>Choosing k: flexibility and its cost
 
@@ -182,7 +182,7 @@ A useful heuristic count is that $`k`$-NN has about $`n/k`$ **effective paramete
 
 *Training and population error of $`k`$-NN on the problem of the first figure, averaged over 30 training samples of size 200. Because $`k`$ decreases to the right, the rule becomes more flexible from left to right. The band shows the middle 80% of the population errors across samples. Training error falls to zero at $`k=1`$, while population error is flat at about $`0.111`$ for $`k`$ from 11 to 17 and stays above the Bayes error. On average every $`k`$ up to 85 beats the linear rule.*
 
-The pattern is the prototypical tradeoff between fitting the observed sample and generalizing to new observations. Training error decreases with flexibility, apart from small fluctuations, while population error first decreases and then increases: from $`0.177`$ at $`k=101`$ it falls to about $`0.111`$ for $`k`$ between 11 and 17 and rises again to $`0.146`$ at $`k=1`$. Within that range the averages differ by less than $`0.0005`$, far less than the spread between training samples, so no single $`k`$ there is meaningfully best. The same spread explains why the 15-NN rule of the first figure has population error $`0.109`$, slightly below the average $`0.111`$: that figure shows one particular training sample. In practice the population error is unknown and must be estimated. Error on a test set cannot be used to *choose* $`k`$ without contaminating it as a performance estimate; a separate validation set, or cross-validation, estimates the risk for each candidate $`k`$; selection procedures are the subject of Losses, Model Selection, and Evaluation.
+The pattern is the prototypical tradeoff between fitting the observed sample and generalizing to new observations. Training error decreases with flexibility, apart from small fluctuations, while population error first decreases and then increases: from $`0.177`$ at $`k=101`$ it falls to about $`0.111`$ for $`k`$ between 11 and 17 and rises again to $`0.146`$ at $`k=1`$. Within that range the averages differ by less than $`0.0005`$, far less than the spread between training samples, so no single $`k`$ there is meaningfully best. The same spread explains why the 15-NN rule of the first figure has population error $`0.109`$, slightly below the average $`0.111`$: that figure shows one particular training sample. In practice the population error is unknown and must be estimated. Error on a test set cannot be used to *choose* $`k`$ without contaminating it as a performance estimate; a separate validation set, or cross-validation, estimates the risk for each candidate $`k`$; selection procedures are the subject of [Losses, Model Selection, and Evaluation](06-losses-model-selection-and-evaluation.md).
 
 ### <a id="bias-and-variance-at-a-point"></a>Bias and variance at a point
 
@@ -208,7 +208,7 @@ Its expectation is the average of $`m`$ over the neighbors, and its variance is 
 }
 ```
 
-This is the decomposition of mean squared error into squared bias and variance from Probability and Statistics, applied to the estimator $`\hat m_k(x_0)`$ of the number $`m(x_0)`$. Increasing $`k`$ reduces variance but averages over neighbors farther from $`x_0`$, whose conditional means may differ from $`m(x_0)`$. For a new observation $`Y_0=m(x_0)+\varepsilon_0`$, the expected squared prediction error adds the irreducible $`\sigma^2`$. The decomposition for a whole predictor, rather than one query, is studied in Losses, Model Selection, and Evaluation.
+This is the decomposition of mean squared error into squared bias and variance from [Probability and Statistics](../foundations/04-probability-and-statistics.md#bias-variance-and-mean-squared-error), applied to the estimator $`\hat m_k(x_0)`$ of the number $`m(x_0)`$. Increasing $`k`$ reduces variance but averages over neighbors farther from $`x_0`$, whose conditional means may differ from $`m(x_0)`$. For a new observation $`Y_0=m(x_0)+\varepsilon_0`$, the expected squared prediction error adds the irreducible $`\sigma^2`$. The decomposition for a whole predictor, rather than one query, is studied in [Losses, Model Selection, and Evaluation](06-losses-model-selection-and-evaluation.md).
 
 A simulation makes both terms visible. It uses 200 equally spaced inputs on $`[0,1]`$, the regression function $`m(x)=\sin(2\pi x)`$, noise standard deviation $`0.3`$, and the query $`x_0=0.25`$, where $`m`$ peaks at $`1`$. Every other input has a smaller conditional mean than the peak, so the local average always lies below $`m(x_0)`$; the shortfall is negligible for small $`k`$ and grows quickly once the neighborhood reaches the slopes on either side.
 
@@ -248,13 +248,13 @@ For small $`k`$ the error is almost entirely variance; for $`k=101`$, half the s
 
 ### <a id="the-distance-is-a-modeling-choice"></a>The distance is a modeling choice
 
-A nearest-neighbor rule is only as good as its notion of similarity. Common choices for numerical features are the Minkowski distances $`\|x-z\|_p`$ built from the norms of Linear Algebra, with $`p=2`$ (Euclidean) and $`p=1`$ (Manhattan) most frequent. Their unit balls, drawn in the left panel of the figure in the next subsection, show which points each distance treats as equally near: the Euclidean ball is round, the $`\ell_1`$ ball is a diamond that favors changes along a single coordinate, and the $`\ell_\infty`$ ball is a square that looks only at the largest coordinate difference. The **Mahalanobis distance**
+A nearest-neighbor rule is only as good as its notion of similarity. Common choices for numerical features are the Minkowski distances $`\|x-z\|_p`$ built from the norms of [Linear Algebra](../foundations/02-linear-algebra.md#vector-and-matrix-norms), with $`p=2`$ (Euclidean) and $`p=1`$ (Manhattan) most frequent. Their unit balls, drawn in the left panel of the figure in the next subsection, show which points each distance treats as equally near: the Euclidean ball is round, the $`\ell_1`$ ball is a diamond that favors changes along a single coordinate, and the $`\ell_\infty`$ ball is a square that looks only at the largest coordinate difference. The **Mahalanobis distance**
 
 ```math
 \rho_\Sigma(x,z)=\sqrt{(x-z)^\top\Sigma^{-1}(x-z)}
 ```
 
-is Euclidean distance after whitening by a covariance matrix $`\Sigma`$; see Whitening and Mahalanobis distance. With $`\Sigma`$ diagonal it reduces to standardization of each feature.
+is Euclidean distance after whitening by a covariance matrix $`\Sigma`$; see [Whitening and Mahalanobis distance](../foundations/02-linear-algebra.md#whitening-and-mahalanobis-distance). With $`\Sigma`$ diagonal it reduces to standardization of each feature.
 
 Other data call for other distances. Binary or categorical attributes can use the **Hamming distance**, the number of disagreeing attributes. Word-count vectors of documents are often compared by cosine similarity, which ignores document length. Mixed data need a rule for combining heterogeneous coordinates. Each choice encodes a claim about which differences between inputs matter for the target.
 
@@ -286,7 +286,7 @@ Let $`X`$ have law $`\mu`$ on $`\mathbb R^d`$ and let $`x`$ be in the **support*
 \rho\bigl(x,X_{(1)}(x)\bigr)\longrightarrow0\quad\text{almost surely as }n\to\infty.
 ```
 
-Indeed, for any $`r>0`$ the ball $`B(x,r)`$ has probability $`p_r>0`$, so the chance that none of $`n`$ observations lands in it is $`(1-p_r)^n`$, which tends to zero. This is the formula $`P(X_{(1)}>t)=[1-F(t)]^n`$ for the smallest order statistic, applied to the distances $`\rho(x,X_i)`$. The nearest distance is nonincreasing in $`n`$, so convergence in probability upgrades to almost-sure convergence. The same holds for the $`k`$th nearest neighbor with $`k`$ fixed. Since $`X`$ itself lies in the support with probability one, the nearest neighbor of a random query converges to that query.
+Indeed, for any $`r>0`$ the ball $`B(x,r)`$ has probability $`p_r>0`$, so the chance that none of $`n`$ observations lands in it is $`(1-p_r)^n`$, which tends to zero. This is the formula $`P(X_{(1)}>t)=[1-F(t)]^n`$ for the smallest [order statistic](../foundations/04-probability-and-statistics.md#order-statistics), applied to the distances $`\rho(x,X_i)`$. The nearest distance is nonincreasing in $`n`$, so convergence in probability upgrades to almost-sure convergence. The same holds for the $`k`$th nearest neighbor with $`k`$ fixed. Since $`X`$ itself lies in the support with probability one, the nearest neighbor of a random query converges to that query.
 
 ### <a id="the-coverhart-theorem"></a>The Cover–Hart theorem
 
@@ -396,13 +396,13 @@ The sampling construction scales a uniformly random direction, obtained by norma
 
 *Left: the edge length $`r^{1/d}`$ of a subcube of $`[0,1]^d`$ that holds a fraction $`r`$ of uniformly distributed data. Right: the median distance from the center of the unit ball to the nearest of $`N`$ uniform points, $`\bigl(1-2^{-1/N}\bigr)^{1/d}`$. Even a million points leave the nearest one far from the center once $`d`$ reaches a few dozen.*
 
-**Distances concentrate.** For a query and data points with iid coordinates, the squared distance from the query to a point is a sum of $`d`$ independent terms. By the law of large numbers, such a sum stays close to $`d`$ times the mean term, and its relative spread shrinks like $`d^{-1/2}`$, so the nearest and farthest points become almost equally far away. The ratio $`(\max-\min)/\min`$ of distances to a query tends to zero in probability under mild conditions; [Beyer et al., *When Is "Nearest Neighbor" Meaningful?* (1999)](https://minds.wisconsin.edu/handle/1793/60174) analyze when this happens.
+**Distances concentrate.** For a query and data points with iid coordinates, the squared distance from the query to a point is a sum of $`d`$ independent terms. By the [law of large numbers](../foundations/04-probability-and-statistics.md#averages-limit-theorems-and-concentration), such a sum stays close to $`d`$ times the mean term, and its relative spread shrinks like $`d^{-1/2}`$, so the nearest and farthest points become almost equally far away. The ratio $`(\max-\min)/\min`$ of distances to a query tends to zero in probability under mild conditions; [Beyer et al., *When Is "Nearest Neighbor" Meaningful?* (1999)](https://minds.wisconsin.edu/handle/1793/60174) analyze when this happens.
 
 <img src="sources/images/nn-distance-concentration.png" alt="nn-distance-concentration" width="700">
 
 *Distances from a uniform query to 500 uniform points in $`[0,1]^d`$, divided by their median and averaged over 20 repetitions. In two dimensions the relative contrast $`(\max-\min)/\min`$ has median 34 over the repetitions, so the farthest point is about 35 times as far as the nearest; in a thousand dimensions every point lies within about 5% of the median distance.*
 
-These calculations assume that the data fill the space. Real high-dimensional data rarely do. Images, sounds, and measurements typically concentrate near lower-dimensional structures, and the rates of $`k`$-NN then depend on this **intrinsic dimension** rather than the ambient one; see [Kpotufe (2011)](https://proceedings.neurips.cc/paper/2011/hash/05f971b5ec196b8c65b75d2ef8267331-Abstract.html). Many irrelevant coordinates, however, do fill the space and damage distances. The practical conclusion is not that local methods fail in high dimension, but that their success depends on a representation in which Euclidean distance reflects similarity of targets. Constructing such representations is a central concern of dimensionality reduction (chapter 12) and of representation learning in deep learning.
+These calculations assume that the data fill the space. Real high-dimensional data rarely do. Images, sounds, and measurements typically concentrate near lower-dimensional structures, and the rates of $`k`$-NN then depend on this **intrinsic dimension** rather than the ambient one; see [Kpotufe (2011)](https://proceedings.neurips.cc/paper/2011/hash/05f971b5ec196b8c65b75d2ef8267331-Abstract.html). Many irrelevant coordinates, however, do fill the space and damage distances. The practical conclusion is not that local methods fail in high dimension, but that their success depends on a representation in which Euclidean distance reflects similarity of targets. Constructing such representations is a central concern of dimensionality reduction ([chapter 12](12-principal-components-and-dimensionality-reduction.md)) and of representation learning in deep learning.
 
 Global assumptions are the other response. A linear model in $`d`$ dimensions has estimation error of order $`\sigma^2d/n`$ when correctly specified, which does not deteriorate exponentially with $`d`$. The curse is avoided by assuming more.
 
@@ -414,7 +414,7 @@ A brute-force query computes all $`n`$ distances in $`O(nd)`$ time and selects t
 \|x-z\|_2^2=\|x\|_2^2+\|z\|_2^2-2x^\top z,
 ```
 
-which is how many libraries compute them. This expansion subtracts large, nearly equal quantities when the two points are close relative to their norms, so tiny distances can lose relative accuracy or even become slightly negative in floating point. The expansion needs only the $`q\times n`$ matrix of inner products instead of the $`q\times n\times d`$ array of differences; Numerical Computing with NumPy and PyTorch discusses this tradeoff between memory and accuracy. Centering the data first reduces the problem; exact ties may need a direct recomputation.
+which is how many libraries compute them. This expansion subtracts large, nearly equal quantities when the two points are close relative to their norms, so tiny distances can lose relative accuracy or even become slightly negative in floating point. The expansion needs only the $`q\times n`$ matrix of inner products instead of the $`q\times n\times d`$ array of differences; [Numerical Computing with NumPy and PyTorch](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#products-contractions-and-batches) discusses this tradeoff between memory and accuracy. Centering the data first reduces the problem; exact ties may need a direct recomputation.
 
 The full $`q\times n`$ distance matrix can be too large to store. Processing queries in blocks bounds memory while retaining the vectorized products. For low-dimensional data, **k-d trees** and **ball trees** partition space so that many points can be excluded without computing their distances. A k-d tree splits the sample at the median of one coordinate, splits each half at the median of the next coordinate, and continues until each cell holds a few points. A search finds a candidate neighbor in the query's own cell; a closer point would have to lie inside the ball through that candidate, so only the cells meeting that ball need to be inspected.
 
@@ -422,7 +422,7 @@ The full $`q\times n`$ distance matrix can be too large to store. Processing que
 
 *A k-d tree with 16 cells on 64 points. The nearest neighbor lies in the query's own cell, and the circle through it meets only one other cell, so 8 of the 64 points are compared with the query.*
 
-In high dimension these savings disappear. Because distances concentrate, the ball through the best candidate is barely smaller than the ball through a typical point, and it meets most cells. **Approximate** nearest-neighbor methods then trade exactness for speed. Search structures are developed in Smoothing, Density Estimation, and Basis Expansions.
+In high dimension these savings disappear. Because distances concentrate, the ball through the best candidate is barely smaller than the ball through a typical point, and it meets most cells. **Approximate** nearest-neighbor methods then trade exactness for speed. Search structures are developed in [Smoothing, Density Estimation, and Basis Expansions](17-smoothing-density-estimation-and-basis-expansions.md).
 
 ## <a id="appendices"></a>Appendices
 

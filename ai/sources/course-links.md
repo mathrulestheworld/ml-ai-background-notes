@@ -22,4 +22,4 @@ Two collections of code complement the courses:
 | AIMA Python | [Repository](https://github.com/aimacode/aima-python) | Implementations of most algorithms of Russell and Norvig's textbook, with notebooks. |
 | CS188 Pacman projects | [Projects](https://inst.eecs.berkeley.edu/~cs188/sp24/projects/) | Search, multiagent search, logic, and Bayesian-network tracking in a Pacman world, with autograders; the machine-learning and reinforcement-learning projects belong with ML, DL, and RL. |
 
-The reading plan maps individual lectures, slides, and readings to the study sequence. Video links arranges the recordings by chapter, and the AI overview maps the reading-plan topics to the chapters.
+[The reading plan](../reading-plan.md) maps individual lectures, slides, and readings to the study sequence. [Video links](video-links.md) arranges the recordings by chapter, and the [AI overview](../README.md) maps the reading-plan topics to the chapters.

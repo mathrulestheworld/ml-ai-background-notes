@@ -16,7 +16,7 @@ The chain rule of probability writes any sequence probability as a product of ne
 P(w_{1:T})=\prod_{t=1}^TP(w_t\mid w_{1:t-1}),
 ```
 
-so a model of the conditionals is a model of text, and its log-likelihood is a sum of next-token log losses (Foundations chapter 5). The factorization is exact but offers no help by itself: a history of 20 words from a 10,000-word vocabulary has $`10^{80}`$ possible values, and almost every history in a new text has never occurred before.
+so a model of the conditionals is a model of text, and its log-likelihood is a sum of next-token log losses ([Foundations chapter 5](../foundations/05-information-and-learning-theory.md#sequences-entropy-rates-and-language-model-loss)). The factorization is exact but offers no help by itself: a history of 20 words from a 10,000-word vocabulary has $`10^{80}`$ possible values, and almost every history in a new text has never occurred before.
 
 ### <a id="the-markov-assumption"></a>The Markov assumption
 
@@ -26,7 +26,7 @@ An **n-gram model** assumes that only the last $`n-1`$ tokens matter,
 P(w_t\mid w_{1:t-1})\approx P(w_t\mid w_{t-n+1:t-1}),
 ```
 
-a Markov chain of order $`n-1`$ (AI chapter 11). A unigram model ($`n=1`$) ignores context entirely, a bigram model conditions on the previous token, and a trigram model on the previous two. Sequences are padded with start symbols `<s>` so that the first tokens have a full context, and an end symbol `</s>` is often added so that the model also assigns probabilities to lengths.
+a Markov chain of order $`n-1`$ ([AI chapter 11](../ai/11-temporal-probabilistic-models.md)). A unigram model ($`n=1`$) ignores context entirely, a bigram model conditions on the previous token, and a trigram model on the previous two. Sequences are padded with start symbols `<s>` so that the first tokens have a full context, and an end symbol `</s>` is often added so that the model also assigns probabilities to lengths.
 
 The maximum-likelihood estimate of each conditional is a relative frequency: with $`c(\cdot)`$ counting occurrences in the training text,
 
@@ -34,7 +34,7 @@ The maximum-likelihood estimate of each conditional is a relative frequency: wit
 P_{\mathrm{ML}}(w\mid h)=\frac{c(h\,w)}{c(h)},
 ```
 
-the fraction of the times the context $`h`$ was followed by $`w`$. The code counts the word bigrams of Tiny Shakespeare, the corpus of chapter 1, lists the most likely words after two contexts, and generates text by sampling each next word from the counts of a unigram, bigram, trigram, and 4-gram model. It splits text into lowercase words and punctuation marks, the unit used throughout this chapter.
+the fraction of the times the context $`h`$ was followed by $`w`$. The code counts the word bigrams of Tiny Shakespeare, the corpus of [chapter 1](01-text-tokens-and-tokenization.md), lists the most likely words after two contexts, and generates text by sampling each next word from the counts of a unigram, bigram, trigram, and 4-gram model. It splits text into lowercase words and punctuation marks, the unit used throughout this chapter.
 
 ```python
 import random
@@ -89,9 +89,9 @@ Sampling from successively higher-order models reproduces the demonstration in S
 
 ### <a id="held-out-likelihood"></a>Held-out likelihood
 
-A language model is judged by the probability it assigns to text it was not trained on. The data are split into a **training set** for the counts, a **development set** for choosing hyperparameters such as smoothing constants, and a **test set** used once at the end; any overlap between training and test text inflates the result. The score is the average negative log-likelihood per token, reported as **cross-entropy** in bits or as **perplexity**, its exponential (Foundations chapter 5). A perplexity of 150 means the model is, on average, as uncertain as if it chose uniformly among 150 equally likely tokens at each step; lower is better, and a single test token assigned probability zero makes it infinite.
+A language model is judged by the probability it assigns to text it was not trained on. The data are split into a **training set** for the counts, a **development set** for choosing hyperparameters such as smoothing constants, and a **test set** used once at the end; any overlap between training and test text inflates the result. The score is the average negative log-likelihood per token, reported as **cross-entropy** in bits or as **perplexity**, its exponential ([Foundations chapter 5](../foundations/05-information-and-learning-theory.md#sequences-entropy-rates-and-language-model-loss)). A perplexity of 150 means the model is, on average, as uncertain as if it chose uniformly among 150 equally likely tokens at each step; lower is better, and a single test token assigned probability zero makes it infinite.
 
-Perplexities are comparable only between models that predict the same tokens. Word models usually fix a **closed vocabulary**, for example all words seen at least twice in training, and map every other word to an unknown-word token `<unk>`. The choice changes the numbers: a smaller vocabulary means more `<unk>` tokens, each easy to predict, and a lower perplexity. Comparisons across tokenizations should use bits per character or per byte (chapter 1, Appendix C).
+Perplexities are comparable only between models that predict the same tokens. Word models usually fix a **closed vocabulary**, for example all words seen at least twice in training, and map every other word to an unknown-word token `<unk>`. The choice changes the numbers: a smaller vocabulary means more `<unk>` tokens, each easy to predict, and a lower perplexity. Comparisons across tokenizations should use bits per character or per byte ([chapter 1, Appendix C](01-text-tokens-and-tokenization.md#block-nlp01-appendix-c)).
 
 ### <a id="how-predictable-is-english"></a>How predictable is English?
 
@@ -105,7 +105,7 @@ Cross-entropy on held-out text bounds from above the entropy rate of the languag
 
 *N-gram models of Tiny Shakespeare, trained on the first 80% of the text, tuned on the next 10%, and tested on the last 10%. Left: the share of test n-grams never seen in training; for words it is 21.5% of bigrams, 65% of trigrams, and 92.7% of 4-grams, for characters 15.6% of 5-grams. Middle: bits per character of character models; Kneser–Ney reaches 2.52 at order 6, interpolation 2.54, while add-$`k`$ is best at order 4 (2.83) and degrades after. Right: word models with rare words mapped to `<unk>`; Kneser–Ney reaches perplexity 146 at order 3 and stays there, interpolation is best at order 2 (171), and add-$`k`$ is worst beyond unigrams.*
 
-The left panel shows why maximum-likelihood estimates are unusable. Two thirds of the word trigrams in the test text never occur in 200,000 words of training text, so a maximum-likelihood trigram model assigns most test sentences probability zero. Zipf's law (chapter 1) makes this unavoidable at any corpus size: the number of possible n-grams grows as $`V^n`$, while the counts concentrate on a few. Even nonzero counts are unreliable: a bigram seen once in training has an estimated probability far above its true one, because it is one of millions of rare bigrams of which only the lucky ones appeared.
+The left panel shows why maximum-likelihood estimates are unusable. Two thirds of the word trigrams in the test text never occur in 200,000 words of training text, so a maximum-likelihood trigram model assigns most test sentences probability zero. Zipf's law ([chapter 1](01-text-tokens-and-tokenization.md#words-types-and-tokens)) makes this unavoidable at any corpus size: the number of possible n-grams grows as $`V^n`$, while the counts concentrate on a few. Even nonzero counts are unreliable: a bigram seen once in training has an estimated probability far above its true one, because it is one of millions of rare bigrams of which only the lucky ones appeared.
 
 **Smoothing** moves probability mass from observed events to unobserved ones and from rare observed events to their lower-order generalizations. The methods below differ in how much mass they move and where they put it.
 
@@ -117,7 +117,7 @@ The simplest method adds a pseudo-count $`k`$ to every possible continuation,
 P_{\text{add-}k}(w\mid h)=\frac{c(h\,w)+k}{c(h)+kV}.
 ```
 
-With $`k=1`$ this is **Laplace smoothing**. It is the posterior mean of the next-word distribution under a symmetric Dirichlet prior ([Appendix C](#block-nlp02-appendix-c); AI chapter 14), which suits small vocabularies. For words it fails badly. A context seen 100 times, followed by 40 distinct words in a vocabulary of 12,000, gives the 11,960 unseen continuations a total probability of $`11{,}960/12{,}100\approx0.99`$, leaving 1% for the words actually observed. Smaller values of $`k`$ help, but a single constant cannot suit both frequent contexts, which need little smoothing, and rare ones, which need much. In the figure, add-$`k`$ with $`k`$ tuned on the development set is competitive for unigrams and low-order character models and deteriorates quickly beyond them.
+With $`k=1`$ this is **Laplace smoothing**. It is the posterior mean of the next-word distribution under a symmetric Dirichlet prior ([Appendix C](#block-nlp02-appendix-c); [AI chapter 14](../ai/14-learning-graphical-models.md)), which suits small vocabularies. For words it fails badly. A context seen 100 times, followed by 40 distinct words in a vocabulary of 12,000, gives the 11,960 unseen continuations a total probability of $`11{,}960/12{,}100\approx0.99`$, leaving 1% for the words actually observed. Smaller values of $`k`$ help, but a single constant cannot suit both frequent contexts, which need little smoothing, and rare ones, which need much. In the figure, add-$`k`$ with $`k`$ tuned on the development set is competitive for unigrams and low-order character models and deteriorates quickly beyond them.
 
 ### <a id="goodturing-estimation"></a>Good–Turing estimation
 
@@ -265,7 +265,7 @@ for n in [1, 2, 3, 4]:
 
 ### <a id="comparing-the-methods"></a>Comparing the methods
 
-The figure summarizes the comparison. Every method improves from unigrams to bigrams. Add-$`k`$ collapses as the order grows because it spreads mass uniformly over $`V^n`$ mostly impossible continuations. Interpolation holds up but slowly worsens at high orders, where its fixed weights trust sparse high-order estimates too much. Kneser–Ney improves until the data run out and then stays flat, because the discounted mass automatically routes sparse contexts to the lower orders. The best character model, at order 6, needs 2.52 bits per character. Trained on the first 90% of the corpus instead of 80%, the same model needs only 2.25 bits on the same test text, because the added tenth contains the opening of *The Taming of the Shrew*, which fills most of the test text; chapter 4 compares a transformer with this stronger baseline.
+The figure summarizes the comparison. Every method improves from unigrams to bigrams. Add-$`k`$ collapses as the order grows because it spreads mass uniformly over $`V^n`$ mostly impossible continuations. Interpolation holds up but slowly worsens at high orders, where its fixed weights trust sparse high-order estimates too much. Kneser–Ney improves until the data run out and then stays flat, because the discounted mass automatically routes sparse contexts to the lower orders. The best character model, at order 6, needs 2.52 bits per character. Trained on the first 90% of the corpus instead of 80%, the same model needs only 2.25 bits on the same test text, because the added tenth contains the opening of *The Taming of the Shrew*, which fills most of the test text; [chapter 4](04-transformer-language-models.md) compares a transformer with this stronger baseline.
 
 ## <a id="scaling-and-the-limits-of-counting"></a>Scaling and the limits of counting
 
@@ -275,7 +275,7 @@ Count-based models scale easily to large corpora because training is counting. G
 
 ### <a id="what-counting-cannot-do"></a>What counting cannot do
 
-Count-based models treat every token as an unrelated symbol. Having seen *the cat is walking in the bedroom* tells a trigram model nothing about *a dog was running in a room*, although the two sentences share nearly everything but their exact words; statistical strength is shared only between contexts that match exactly. The fixed window is a second limit: a trigram model cannot connect a pronoun to its antecedent five words back, and raising $`n`$ runs into sparsity immediately. Both problems yield to the same idea. Represent each word by a vector, so that similar words have similar vectors (chapter 3), and compute the next-token distribution with a neural network whose input is the sequence of vectors (chapter 4). The first neural language model ([Bengio et al., 2003](https://www.jmlr.org/papers/v3/bengio03a.html)) did exactly this with a feedforward network over a fixed window and already outperformed smoothed trigrams.
+Count-based models treat every token as an unrelated symbol. Having seen *the cat is walking in the bedroom* tells a trigram model nothing about *a dog was running in a room*, although the two sentences share nearly everything but their exact words; statistical strength is shared only between contexts that match exactly. The fixed window is a second limit: a trigram model cannot connect a pronoun to its antecedent five words back, and raising $`n`$ runs into sparsity immediately. Both problems yield to the same idea. Represent each word by a vector, so that similar words have similar vectors ([chapter 3](03-word-embeddings.md)), and compute the next-token distribution with a neural network whose input is the sequence of vectors ([chapter 4](04-transformer-language-models.md)). The first neural language model ([Bengio et al., 2003](https://www.jmlr.org/papers/v3/bengio03a.html)) did exactly this with a feedforward network over a fixed window and already outperformed smoothed trigrams.
 
 ### <a id="the-noisy-channel"></a>The noisy channel
 
@@ -285,7 +285,7 @@ Before language models generated text, their main use was as a **prior** in the 
 \hat w=\arg\max_wP(w\mid o)=\arg\max_wP(o\mid w)\,P(w),
 ```
 
-combining a channel model $`P(o\mid w)`$ that describes the corruption with a language model $`P(w)`$ that describes what people write. The decomposition lets each part be trained on different data, and it dominated speech recognition, spelling correction, and statistical machine translation (chapter 15) for three decades. Neural systems now usually model $`P(w\mid o)`$ directly, but the idea survives wherever a separately trained language model rescores the outputs of another system.
+combining a channel model $`P(o\mid w)`$ that describes the corruption with a language model $`P(w)`$ that describes what people write. The decomposition lets each part be trained on different data, and it dominated speech recognition, spelling correction, and statistical machine translation ([chapter 15](15-machine-translation-and-multilingual-models.md)) for three decades. Neural systems now usually model $`P(w\mid o)`$ directly, but the idea survives wherever a separately trained language model rescores the outputs of another system.
 
 ## <a id="appendices"></a>Appendices
 

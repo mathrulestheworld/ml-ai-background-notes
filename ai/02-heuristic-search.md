@@ -8,7 +8,7 @@
 
 ### <a id="estimating-the-distance-to-a-goal"></a>Estimating the distance to a goal
 
-The strategies of chapter 1 search in every direction at once, because they have no idea where the goal is. A **heuristic function** $`h(n)`$ estimates the cost of the cheapest path from the state of node $`n`$ to a goal, computed from the state alone. The true cost is written $`h^*(n)`$, and $`h(n)=0`$ at goal states. Typical heuristics are the straight-line distance for route finding, which ignores roads; the number of misplaced tiles in the 8-puzzle, which ignores that tiles block each other; and the sum of the Manhattan distances of the tiles from their goal squares, which ignores only that tiles cannot pass through each other. A heuristic is domain knowledge in a form a general algorithm can use, and its quality decides whether a problem is solvable at all.
+The strategies of [chapter 1](01-agents-and-uninformed-search.md) search in every direction at once, because they have no idea where the goal is. A **heuristic function** $`h(n)`$ estimates the cost of the cheapest path from the state of node $`n`$ to a goal, computed from the state alone. The true cost is written $`h^*(n)`$, and $`h(n)=0`$ at goal states. Typical heuristics are the straight-line distance for route finding, which ignores roads; the number of misplaced tiles in the 8-puzzle, which ignores that tiles block each other; and the sum of the Manhattan distances of the tiles from their goal squares, which ignores only that tiles cannot pass through each other. A heuristic is domain knowledge in a form a general algorithm can use, and its quality decides whether a problem is solvable at all.
 
 All the algorithms of this chapter are **best-first searches**: the generic loop of chapter 1 with a priority queue ordered by an **evaluation function** $`f(n)`$. Uniform-cost search is the case $`f(n)=g(n)`$, the cost of the path so far.
 
@@ -162,7 +162,7 @@ Where do admissible heuristics come from? A **relaxed problem** has fewer restri
 - delete both conditions: a tile moves anywhere in one step, and the optimal cost is the number of **misplaced tiles**;
 - delete "A is adjacent to B": a tile can jump into the blank from anywhere, which gives Gaschnig's heuristic, never smaller than the number of misplaced tiles.
 
-The relaxed problem must be easy to solve, ideally decomposing into independent subproblems, as the tiles do once blocking is ignored. Programs can generate relaxations automatically from a formal problem description, which is how domain-independent planners obtain their heuristics (chapter 7).
+The relaxed problem must be easy to solve, ideally decomposing into independent subproblems, as the tiles do once blocking is ignored. Programs can generate relaxations automatically from a formal problem description, which is how domain-independent planners obtain their heuristics ([chapter 7](07-automated-planning.md#the-delete-relaxation)).
 
 ### <a id="pattern-databases"></a>Pattern databases
 
@@ -176,7 +176,7 @@ A single pattern counts moves of other tiles too, so the costs of two patterns c
 
 ### <a id="learned-heuristics"></a>Learned heuristics
 
-A heuristic can also be learned: a regression model predicts $`h^*(s)`$ from features of $`s`$, trained on solved instances or on distances obtained by searching backward from the goal. [Agostinelli et al. (2019)](https://doi.org/10.1038/s42256-019-0070-z) trained a deep network as the cost-to-go function of Rubik's cube by approximate value iteration and used it in a weighted, batched A\* that solves every test configuration, most of them optimally. A learned heuristic is not guaranteed to be admissible, so the optimality guarantee becomes approximate; the value functions of the RL module are learned heuristics of the same kind, and game programs learn evaluation functions in the same way (chapter 4).
+A heuristic can also be learned: a regression model predicts $`h^*(s)`$ from features of $`s`$, trained on solved instances or on distances obtained by searching backward from the goal. [Agostinelli et al. (2019)](https://doi.org/10.1038/s42256-019-0070-z) trained a deep network as the cost-to-go function of Rubik's cube by approximate value iteration and used it in a weighted, batched A\* that solves every test configuration, most of them optimally. A learned heuristic is not guaranteed to be admissible, so the optimality guarantee becomes approximate; the value functions of the RL module are learned heuristics of the same kind, and game programs learn evaluation functions in the same way ([chapter 4](04-adversarial-search-and-games.md#evaluation-functions)).
 
 ## <a id="memory-bounded-search"></a>Memory-bounded search
 
@@ -361,7 +361,7 @@ The choice among these algorithms depends on the resources and on how much the s
 | IDA\* | $`g+h`$ with a bound | yes, if $`h`$ admissible | linear | integer costs, large spaces with few duplicates |
 | Beam search | $`g+h`$ or $`h`$, best $`k`$ kept | no | $`k`$ per level | very large spaces, sequence decoding |
 
-When the problem is to *find an assignment* rather than a path, and any assignment that satisfies the constraints will do, the structure of the problem can be exploited far more directly. Chapter 3 factors states into variables and develops search that prunes by inference, and local search that dispenses with paths altogether.
+When the problem is to *find an assignment* rather than a path, and any assignment that satisfies the constraints will do, the structure of the problem can be exploited far more directly. [Chapter 3](03-constraint-satisfaction-and-local-search.md) factors states into variables and develops search that prunes by inference, and local search that dispenses with paths altogether.
 
 ## <a id="appendices"></a>Appendices
 
@@ -396,7 +396,7 @@ so A\* would have expanded $`u`$ before $`s`$, a contradiction. Hence every stat
 <summary><a id="block-ai02-appendix-b"></a><b>B. The suboptimality bound of weighted A\*</b></summary>
 
 
-Let $`h`$ be admissible, $`w\ge1`$, and $`f_w(n)=g(n)+w\,h(n)`$. Suppose weighted A\* (as a tree search, or as a graph search that reopens states) removes a goal $`G`$ with cost $`g(G)`$. At that moment, some node $`u`$ on an optimal solution path is on the frontier with $`g(u)=g^*(u)`$, for the same reason as in Appendix A of chapter 1. Because $`G`$ was removed first,
+Let $`h`$ be admissible, $`w\ge1`$, and $`f_w(n)=g(n)+w\,h(n)`$. Suppose weighted A\* (as a tree search, or as a graph search that reopens states) removes a goal $`G`$ with cost $`g(G)`$. At that moment, some node $`u`$ on an optimal solution path is on the frontier with $`g(u)=g^*(u)`$, for the same reason as in Appendix A of [chapter 1](01-agents-and-uninformed-search.md#block-ai01-appendix-a). Because $`G`$ was removed first,
 
 ```math
 g(G)=f_w(G)\le f_w(u)=g^*(u)+w\,h(u)\le g^*(u)+w\,h^*(u)\le w\bigl(g^*(u)+h^*(u)\bigr)=w\,C^*,

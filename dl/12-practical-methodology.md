@@ -10,9 +10,9 @@
 
 Most of the effort in applied deep learning goes into finding out why a network does not work as well as expected, and the failures are rarely loud. A bug in the data pipeline or the loss usually does not crash the program; the network trains anyway, a little worse, and the loss curve looks plausible ([Karpathy, 2019](https://karpathy.github.io/2019/04/25/recipe/)). The defense is a workflow that makes each step checkable before the next is added.
 
-1. **Understand the data.** Look at many examples and their labels. Check the class balance, duplicates between training and test sets, corrupted or mislabeled examples, and whether the inputs carry information about the label that will not exist at deployment, the leakage of ML chapter 6.
+1. **Understand the data.** Look at many examples and their labels. Check the class balance, duplicates between training and test sets, corrupted or mislabeled examples, and whether the inputs carry information about the label that will not exist at deployment, the leakage of [ML chapter 6](../ml/06-losses-model-selection-and-evaluation.md#leakage-and-the-fitting-pipeline).
 2. **Fix the evaluation first.** Choose the metric, split the data into training, validation, and test sets in a way that reflects deployment (by time, by user, or by patient when examples are grouped), and do not look at the test set until the end.
-3. **Establish baselines.** A constant prediction (the majority class, the mean), a linear model or gradient-boosted trees on simple features (ML chapter 11), and a published architecture with its published training recipe. The baselines tell you what "good" means for this problem and catch evaluation bugs: a network that does not beat logistic regression on tabular data is not unusual, but one that does worse than the constant prediction is broken.
+3. **Establish baselines.** A constant prediction (the majority class, the mean), a linear model or gradient-boosted trees on simple features ([ML chapter 11](../ml/11-boosting.md)), and a published architecture with its published training recipe. The baselines tell you what "good" means for this problem and catch evaluation bugs: a network that does not beat logistic regression on tabular data is not unusual, but one that does worse than the constant prediction is broken.
 4. **Get a small model working end to end**, then grow it. Change one thing at a time and record every run.
 
 Start from a known recipe rather than inventing one: an architecture and optimizer settings that worked on a similar problem are more likely to be close to right than any first guess, and deviations can then be tested one at a time.
@@ -71,7 +71,7 @@ print(f"floor of the buggy loss: log(1 + 9/e) = {math.log(1 + 9 / math.e):.4f}")
 # floor of the buggy loss: log(1 + 9/e) = 1.4612
 ```
 
-`F.cross_entropy` applies a log-softmax to its input, so the buggy version computes the softmax of probabilities, whose values lie in $`[0,1]`$. The best it can do is put probability $`e^1/(e^1+9e^0)`$ on the correct class, which gives the floor $`\log(1+9/e)`$. The network still learns to classify, and the only symptom is a loss that refuses to fall below 1.46. Custom layers with hand-written backward passes should also be checked against finite differences with `torch.autograd.gradcheck` (Foundations chapter 6).
+`F.cross_entropy` applies a log-softmax to its input, so the buggy version computes the softmax of probabilities, whose values lie in $`[0,1]`$. The best it can do is put probability $`e^1/(e^1+9e^0)`$ on the correct class, which gives the floor $`\log(1+9/e)`$. The network still learns to classify, and the only symptom is a loss that refuses to fall below 1.46. Custom layers with hand-written backward passes should also be checked against finite differences with `torch.autograd.gradcheck` ([Foundations chapter 6](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#directional-derivatives-and-output-sensitivities)).
 
 ## <a id="monitoring-training"></a>Monitoring training
 
@@ -84,19 +84,19 @@ The training and validation losses, plotted against the number of steps, are the
 *Left: training loss of a one-hidden-layer MLP on the digits with Adam at four learning rates, averaged over 25 steps. At $`10^{-4}`$ the loss falls steadily but slowly and is still 0.42 after 1,500 steps; at $`3\times10^{-3}`$ it reaches 0.003; at 0.1 it drops fast and then fluctuates around 0.1 without improving; at 1 it jumps to 20 in the first steps and settles near the loss of a constant prediction, $`\log10`$. Right: a two-hidden-layer MLP with 512 units trained on only 100 examples. The training loss falls to $`10^{-5}`$, the validation loss reaches its minimum of 0.44 after 100 steps and then rises to 0.76, while the validation accuracy stays near 87%.*
 
 - **The loss decreases slowly and steadily**: the learning rate is too small, or the model is underpowered; try a larger rate first.
-- **The loss falls fast and then stalls at a noisy level**: the learning rate is too large for the final phase; decay it (chapter 3).
-- **The loss explodes or becomes NaN**: the learning rate is too large, the initialization is wrong, a numerical operation overflows (a logarithm of zero, a float16 overflow; chapter 11), or a batch contains corrupted data. Occasional spikes in long runs call for warmup, gradient clipping, and the stabilizers of chapter 9.
+- **The loss falls fast and then stalls at a noisy level**: the learning rate is too large for the final phase; decay it ([chapter 3](03-optimization-for-deep-networks.md#why-the-rate-should-decay)).
+- **The loss explodes or becomes NaN**: the learning rate is too large, the initialization is wrong, a numerical operation overflows (a logarithm of zero, a float16 overflow; [chapter 11](11-training-at-scale-and-efficient-inference.md#mixed-precision-training)), or a batch contains corrupted data. Occasional spikes in long runs call for warmup, gradient clipping, and the stabilizers of [chapter 9](09-attention-and-transformers.md#training-transformers).
 - **Training and validation losses are both high and close**: the model underfits; train longer or make it larger.
-- **The validation loss rises while the training loss keeps falling**: the model overfits. More data, augmentation, and regularization help (chapter 5), and early stopping at the validation minimum is the simplest remedy (chapter 5).
+- **The validation loss rises while the training loss keeps falling**: the model overfits. More data, augmentation, and regularization help ([chapter 5](05-regularization-and-generalization-in-deep-networks.md#explicit-regularizers)), and early stopping at the validation minimum is the simplest remedy ([chapter 5](05-regularization-and-generalization-in-deep-networks.md#early-stopping)).
 
-The right panel shows a subtlety. Validation loss and validation accuracy can disagree: after step 100 the network becomes more confident on every validation example, including the ones it gets wrong, which raises the cross-entropy while the fraction of correct answers stays the same. Whether to stop early on the loss or on the accuracy depends on whether calibrated probabilities matter (ML chapter 5). Also note that the training loss is often measured with dropout and augmentation switched on, which makes it look worse than the validation loss for reasons that have nothing to do with generalization.
+The right panel shows a subtlety. Validation loss and validation accuracy can disagree: after step 100 the network becomes more confident on every validation example, including the ones it gets wrong, which raises the cross-entropy while the fraction of correct answers stays the same. Whether to stop early on the loss or on the accuracy depends on whether calibrated probabilities matter ([ML chapter 5](../ml/05-logistic-regression-and-probabilistic-prediction.md)). Also note that the training loss is often measured with dropout and augmentation switched on, which makes it look worse than the validation loss for reasons that have nothing to do with generalization.
 
 ### <a id="looking-inside-the-network"></a>Looking inside the network
 
 When the curves show a problem without explaining it, statistics of the internal quantities help. Forward hooks record activations, and the gradients and updates can be compared layer by layer:
 
-- the **standard deviation of each layer's activations**, which should stay of order one through the network (chapter 2);
-- the **fraction of dead units**, ReLUs that output zero for every input of a batch (chapter 2);
+- the **standard deviation of each layer's activations**, which should stay of order one through the network ([chapter 2](02-initialization-and-signal-propagation.md));
+- the **fraction of dead units**, ReLUs that output zero for every input of a batch ([chapter 2](02-initialization-and-signal-propagation.md#dead-relus));
 - the **gradient norm of each layer**, to find where gradients vanish or explode;
 - the **ratio of the update size to the weight size**, $`\|\Delta W\|/\|W\|`$, for each layer. A common rule of thumb for SGD puts a healthy value near $`10^{-3}`$; much smaller means the layer barely learns, much larger means it is being overwritten.
 
@@ -151,7 +151,7 @@ With He initialization the activations keep a standard deviation near 0.7 throug
 
 ### <a id="what-to-tune"></a>What to tune
 
-Not all hyperparameters matter equally. For a given architecture and optimizer, the **learning rate** is almost always the most important, followed by its schedule, the batch size, weight decay, and other regularization ([Godbole et al., 2023](https://github.com/google-research/tuning_playbook)). The batch size is usually set by the hardware, as large as fits, below the critical batch size of chapter 3, and the learning rate is then retuned, since the best rate grows with the batch size. Adam's defaults for $`\beta_1`$, $`\beta_2`$, and $`\epsilon`$ rarely need tuning at small scale.
+Not all hyperparameters matter equally. For a given architecture and optimizer, the **learning rate** is almost always the most important, followed by its schedule, the batch size, weight decay, and other regularization ([Godbole et al., 2023](https://github.com/google-research/tuning_playbook)). The batch size is usually set by the hardware, as large as fits, below the critical batch size of [chapter 3](03-optimization-for-deep-networks.md#the-critical-batch-size), and the learning rate is then retuned, since the best rate grows with the batch size. Adam's defaults for $`\beta_1`$, $`\beta_2`$, and $`\epsilon`$ rarely need tuning at small scale.
 
 The *Deep Learning Tuning Playbook* organizes tuning around the question being asked. When testing whether a change helps, for example a new activation function, that change is the **scientific** hyperparameter; hyperparameters whose best value may depend on it, such as the learning rate, are **nuisance** hyperparameters that must be retuned for each setting to make the comparison fair; the rest are **fixed**. Comparing a new method with a tuned learning rate against a baseline with an untuned one is one of the most common ways to report an improvement that does not exist.
 
@@ -176,7 +176,7 @@ The test measures which rates make progress in the first few hundred steps, not 
 Several refinements go further:
 
 - **Quasi-random** sequences, such as Halton or Sobol sequences, spread the trials more evenly than independent sampling while keeping its advantages; the *Tuning Playbook* recommends them for exploration.
-- **Bayesian optimization** fits a probabilistic model of the validation score as a function of the hyperparameters, often a Gaussian process (ML chapter 15), and chooses each new trial where the model predicts a good score or is uncertain ([Snoek, Larochelle, and Adams, 2012](https://arxiv.org/abs/1206.2944)).
+- **Bayesian optimization** fits a probabilistic model of the validation score as a function of the hyperparameters, often a Gaussian process ([ML chapter 15](../ml/15-gaussian-processes.md)), and chooses each new trial where the model predicts a good score or is uncertain ([Snoek, Larochelle, and Adams, 2012](https://arxiv.org/abs/1206.2944)).
 - **Early stopping of poor trials.** Successive halving and **Hyperband** ([Li et al., 2018](https://arxiv.org/abs/1603.06560)) start many trials with a small budget, keep the best fraction, and give the survivors more, since learning curves that are far behind early rarely catch up.
 - **Population-based training** ([Jaderberg et al., 2017](https://arxiv.org/abs/1711.09846)) trains a population of models in parallel and periodically replaces the worst with copies of the best with perturbed hyperparameters, which yields a hyperparameter schedule rather than a single value.
 
@@ -232,7 +232,7 @@ print(f"single-run comparisons in which 2e-3 beats 3e-3: {wins:.0%}")
 # single-run comparisons in which 2e-3 beats 3e-3: 15%
 ```
 
-On average the learning rate $`3\times10^{-3}`$ beats $`2\times10^{-3}`$ by 0.6 points, but the spread across seeds is about as large, and a comparison of one run of each would rank them the wrong way 15% of the time. Differences of a few tenths of a point between single runs, which fill many results tables, are well within this noise. The remedies are cheap in principle: run several seeds, report means with an estimate of their uncertainty, and compare configurations with paired tests where possible (ML chapter 6). The tuning budget also matters: a method that needs more trials to tune looks better when every method gets many trials than when every method gets few, so the expected best validation score as a function of the number of trials is a fairer summary than a single best number ([Dodge et al., 2019](https://arxiv.org/abs/1909.03004); [Appendix B](#block-dl12-appendix-b)).
+On average the learning rate $`3\times10^{-3}`$ beats $`2\times10^{-3}`$ by 0.6 points, but the spread across seeds is about as large, and a comparison of one run of each would rank them the wrong way 15% of the time. Differences of a few tenths of a point between single runs, which fill many results tables, are well within this noise. The remedies are cheap in principle: run several seeds, report means with an estimate of their uncertainty, and compare configurations with paired tests where possible ([ML chapter 6](../ml/06-losses-model-selection-and-evaluation.md#comparing-two-classifiers)). The tuning budget also matters: a method that needs more trials to tune looks better when every method gets many trials than when every method gets few, so the expected best validation score as a function of the number of trials is a fairer summary than a single best number ([Dodge et al., 2019](https://arxiv.org/abs/1909.03004); [Appendix B](#block-dl12-appendix-b)).
 
 ### <a id="silent-bugs"></a>Silent bugs
 
@@ -271,7 +271,7 @@ Others that recur:
 - stepping a learning-rate scheduler once per epoch when it was written for steps, or the reverse;
 - applying weight decay to normalization gains and biases, which usually should be excluded;
 - labels shifted by one relative to the inputs after a shuffle or a join;
-- a loss averaged over padded positions of variable-length sequences (Foundations chapter 6).
+- a loss averaged over padded positions of variable-length sequences ([Foundations chapter 6](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#masks-and-the-denominator-of-an-average)).
 
 ### <a id="reproducibility"></a>Reproducibility
 
@@ -281,9 +281,9 @@ A result should be reproducible by its author at least. That requires:
 - **Deterministic kernels** where exact repetition matters: `torch.use_deterministic_algorithms(True)` makes PyTorch use deterministic implementations or raise an error, at some cost in speed. Results can still differ across hardware and library versions.
 - **A record of everything**: the code version (a commit hash), the configuration, the library versions, the hardware, and the data version, stored with the metrics and the checkpoints. Experiment trackers such as TensorBoard, Weights & Biases, and MLflow do this bookkeeping.
 
-The final evaluation on the test set should happen once, after all choices have been made on the validation set; every decision made after looking at test results turns the test set into a second validation set and biases the final estimate upward (ML chapter 6).
+The final evaluation on the test set should happen once, after all choices have been made on the validation set; every decision made after looking at test results turns the test set into a second validation set and biases the final estimate upward ([ML chapter 6](../ml/06-losses-model-selection-and-evaluation.md#selection-bias-and-nested-cross-validation)).
 
-UMich lecture 11, UNIGE section 5.6, Karpathy's *Recipe for Training Neural Networks*, and the *Deep Learning Tuning Playbook*, listed in the reading plan, cover the practice of training; DLB chapter 11 gives an earlier, still useful account.
+UMich lecture 11, UNIGE section 5.6, Karpathy's *Recipe for Training Neural Networks*, and the *Deep Learning Tuning Playbook*, listed in the [reading plan](reading-plan.md#12-practical-methodology), cover the practice of training; DLB chapter 11 gives an earlier, still useful account.
 
 ## <a id="appendices"></a>Appendices
 

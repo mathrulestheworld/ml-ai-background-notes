@@ -18,4 +18,4 @@ Three practical guides complement the courses:
 | Godbole, Dahl, Gilmer, Shallue, and Nado, *Deep Learning Tuning Playbook* (2023) | [Repository](https://github.com/google-research/tuning_playbook) | Hyperparameter tuning as a scientific process (chapter 12). |
 | Hugging Face, *The Ultra-Scale Playbook* (2025), and Google DeepMind, *How to Scale Your Model* (2025) | [Ultra-Scale Playbook](https://huggingface.co/spaces/nanotron/ultrascale-playbook) · [How to Scale Your Model](https://jax-ml.github.io/scaling-book/) | Memory, parallelism, and hardware for training at scale (chapter 11). |
 
-The reading plan maps individual lectures, slides, and readings to the study sequence. Video links arranges the lecture recordings by chapter, and the DL overview maps the reading-plan topics to the chapters.
+[The reading plan](../reading-plan.md) maps individual lectures, slides, and readings to the study sequence. [Video links](video-links.md) arranges the lecture recordings by chapter, and the [DL overview](../README.md) maps the reading-plan topics to the chapters.

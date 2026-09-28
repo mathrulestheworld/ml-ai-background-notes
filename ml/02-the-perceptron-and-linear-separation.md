@@ -22,7 +22,7 @@ The set $`\{x:w^\top x+b=0\}`$ is a **hyperplane**, the classifier's decision bo
 \frac{w^\top x+b}{\|w\|_2},
 ```
 
-which follows by projecting onto the direction $`w/\|w\|_2`$; see orthogonal projections. Pick any point $`x_0`$ on the hyperplane, so that $`w^\top x_0=-b`$. The component of $`x-x_0`$ along the unit normal is $`w^\top(x-x_0)/\|w\|_2=(w^\top x+b)/\|w\|_2`$; it is positive on the side to which $`w`$ points and negative on the other. In particular, the origin is at distance $`\lvert b\rvert/\|w\|_2`$ from the boundary. The score $`f(x)`$ is therefore a distance measured in units of $`1/\|w\|_2`$. Multiplying $`(w,b)`$ by a positive constant rescales every score without changing any prediction.
+which follows by projecting onto the direction $`w/\|w\|_2`$; see [orthogonal projections](../foundations/02-linear-algebra.md#projection-onto-a-subspace). Pick any point $`x_0`$ on the hyperplane, so that $`w^\top x_0=-b`$. The component of $`x-x_0`$ along the unit normal is $`w^\top(x-x_0)/\|w\|_2=(w^\top x+b)/\|w\|_2`$; it is positive on the side to which $`w`$ points and negative on the other. In particular, the origin is at distance $`\lvert b\rvert/\|w\|_2`$ from the boundary. The score $`f(x)`$ is therefore a distance measured in units of $`1/\|w\|_2`$. Multiplying $`(w,b)`$ by a positive constant rescales every score without changing any prediction.
 
 With signed labels, a prediction is correct exactly when the label and the score agree in sign:
 
@@ -30,7 +30,7 @@ With signed labels, a prediction is correct exactly when the label and the score
 y\,f(x)>0.
 ```
 
-The product $`y f(x)`$ is the **functional margin** of the example. Dividing by $`\|w\|_2`$ gives the **geometric margin**, the signed distance of the example from the boundary, positive on the correct side. Unlike the functional margin, the geometric margin does not change when $`(w,b)`$ is multiplied by a positive constant. Margins recur throughout the module: they define the perceptron's update rule, the support vector machine's objective (chapter 8), and the margin theory of boosting (chapter 11).
+The product $`y f(x)`$ is the **functional margin** of the example. Dividing by $`\|w\|_2`$ gives the **geometric margin**, the signed distance of the example from the boundary, positive on the correct side. Unlike the functional margin, the geometric margin does not change when $`(w,b)`$ is multiplied by a positive constant. Margins recur throughout the module: they define the perceptron's update rule, the support vector machine's objective ([chapter 8](08-support-vector-machines-and-kernels.md)), and the margin theory of boosting ([chapter 11](11-boosting.md)).
 
 **Absorbing the intercept.** Appending a constant coordinate $`c>0`$ to every input, $`\tilde x=(x,c)`$, and setting $`\tilde w=(w,b/c)`$ gives $`\tilde w^\top\tilde x=w^\top x+b`$. An affine classifier in $`\mathbb R^d`$ is therefore a **homogeneous** linear classifier, whose boundary passes through the origin, in $`\mathbb R^{d+1}`$. The algorithms below are stated in homogeneous form. The choice of $`c`$ does not affect which classifiers are representable, but it does affect the geometry used in mistake bounds: it changes the norms of the lifted inputs and of the lifted weight vector, a trade-off worked out in [The cost of an intercept](#the-cost-of-an-intercept).
 
@@ -48,13 +48,13 @@ A labeled sample $`\{(x_i,y_i)\}_{i=1}^n`$ is **linearly separable** if some $`w
 
 The maximum exists because the worst-case margin is a continuous function of $`u`$ on the compact unit sphere. The data are separable exactly when $`\gamma(D)>0`$: a separating $`w`$, divided by its norm, has a positive margin on each of the finitely many examples. The maximizing direction, written $`u^\ast`$, is unique for separable data. Indeed, writing $`v=u/\gamma`$ for a unit vector $`u`$ with worst-case margin $`\gamma>0`$ turns the problem into minimizing $`\|v\|_2^2`$ subject to $`y_iv^\top x_i\ge1`$ for every $`i`$, a strictly convex objective over a convex set, and the solution gives $`\gamma(D)=1/\|v\|_2`$; the implementation below computes the margin this way.
 
-The hyperplane $`u^{\ast\top}x=0`$ is the **maximum-margin separator**. The hard-margin SVM of chapter 8 computes the same kind of object, except that it keeps the intercept separate instead of absorbing it, so that the intercept does not count toward the norm. A large margin means that the two classes are far apart relative to the scale of the inputs; a small margin means that every separating hyperplane passes close to some example.
+The hyperplane $`u^{\ast\top}x=0`$ is the **maximum-margin separator**. The hard-margin SVM of [chapter 8](08-support-vector-machines-and-kernels.md) computes the same kind of object, except that it keeps the intercept separate instead of absorbing it, so that the intercept does not count toward the norm. A large margin means that the two classes are far apart relative to the scale of the inputs; a small margin means that every separating hyperplane passes close to some example.
 
 <img src="sources/images/perceptron-margin.png" alt="perceptron-margin" width="740">
 
 *Left: 20 separable points. The solid line is the maximum-margin separator through the origin, and the shaded band around it, of half-width $`\gamma(D)`$, contains no points; its edges pass through the two circled examples, one from each class. The dashed magenta line also separates the data, but its nearest example, joined to it by the magenta segment, is much closer. Right: the worst-case margin of each unit vector $`u`$, plotted against its angle from $`u^\ast`$. It is positive exactly on the shaded arc of separating directions, and its maximum is $`\gamma(D)`$.*
 
-Separability is a property of a representation. The **exclusive-or** pattern, with one class in the first and third quadrants and the other in the second and fourth, is not linearly separable in $`(x_1,x_2)`$. The four points $`(\pm1,\pm1)`$ with these labels are the smallest example: each class is a diagonal of the square, and the two diagonals cross, so no line separates them. Information and Learning Theory uses such crossing groups, which Radon's theorem provides for any four points, to show that halfspaces in the plane cannot shatter four points; their VC dimension is therefore at most three. Adding the product feature $`x_1x_2`$ makes the pattern separable by the linear rule $`\operatorname{sign}(x_1x_2)`$ in the enlarged feature space.
+Separability is a property of a representation. The **exclusive-or** pattern, with one class in the first and third quadrants and the other in the second and fourth, is not linearly separable in $`(x_1,x_2)`$. The four points $`(\pm1,\pm1)`$ with these labels are the smallest example: each class is a diagonal of the square, and the two diagonals cross, so no line separates them. [Information and Learning Theory](../foundations/05-information-and-learning-theory.md#infinite-classes-and-vc-dimension) uses such crossing groups, which Radon's theorem provides for any four points, to show that halfspaces in the plane cannot shatter four points; their VC dimension is therefore at most three. Adding the product feature $`x_1x_2`$ makes the pattern separable by the linear rule $`\operatorname{sign}(x_1x_2)`$ in the enlarged feature space.
 
 <img src="sources/images/perceptron-xor.png" alt="perceptron-xor" width="740">
 
@@ -64,9 +64,9 @@ Separability is a property of a representation. The **exclusive-or** pattern, wi
 
 ### <a id="why-not-minimize-the-number-of-mistakes-directly"></a>Why not minimize the number of mistakes directly?
 
-For a fixed dataset, the training error $`\frac1n\sum_i\mathbf 1\{y_iw^\top x_i\le0\}`$ is the empirical risk $`\widehat R_n`$ of chapter 1 under the zero–one loss, with a zero score counted as an error. It is piecewise constant in $`w`$, changing only when $`w`$ crosses one of the hyperplanes $`\{w:w^\top x_i=0\}`$, so its gradient is zero almost everywhere and gradient methods receive no signal. The combinatorial problem is also hard. When the data are not separable, it is NP-hard even to find a halfspace whose number of correctly classified training examples comes within a fixed constant factor of the largest achievable number ([Ben-David, Eiron, and Long, 2003](https://www.sciencedirect.com/science/article/pii/S0022000003000382)). When the data *are* separable, a separating vector solves a system of linear inequalities and can be found in polynomial time by linear programming.
+For a fixed dataset, the training error $`\frac1n\sum_i\mathbf 1\{y_iw^\top x_i\le0\}`$ is the empirical risk $`\widehat R_n`$ of [chapter 1](01-learning-problems-and-nearest-neighbors.md#data-rules-and-risk) under the zero–one loss, with a zero score counted as an error. It is piecewise constant in $`w`$, changing only when $`w`$ crosses one of the hyperplanes $`\{w:w^\top x_i=0\}`$, so its gradient is zero almost everywhere and gradient methods receive no signal. The combinatorial problem is also hard. When the data are not separable, it is NP-hard even to find a halfspace whose number of correctly classified training examples comes within a fixed constant factor of the largest achievable number ([Ben-David, Eiron, and Long, 2003](https://www.sciencedirect.com/science/article/pii/S0022000003000382)). When the data *are* separable, a separating vector solves a system of linear inequalities and can be found in polynomial time by linear programming.
 
-Practical linear classifiers therefore either exploit separability or replace the zero–one loss by a tractable surrogate. The perceptron does the former; logistic regression (chapter 5) and the support vector machine (chapter 8) do the latter. The perceptron is the simplest of these algorithms and has the cleanest complete analysis.
+Practical linear classifiers therefore either exploit separability or replace the zero–one loss by a tractable surrogate. The perceptron does the former; logistic regression ([chapter 5](05-logistic-regression-and-probabilistic-prediction.md)) and the support vector machine ([chapter 8](08-support-vector-machines-and-kernels.md)) do the latter. The perceptron is the simplest of these algorithms and has the cleanest complete analysis.
 
 ## <a id="the-perceptron-algorithm"></a>The perceptron algorithm
 
@@ -104,7 +104,7 @@ The perceptron is stochastic subgradient descent, with step size one, on the **p
 \phi_{\mathrm P}(w;x,y)=\max\{0,\,-y\,w^\top x\}.
 ```
 
-This loss is zero on correctly classified examples and grows linearly with the violation otherwise. Where $`y\,w^\top x<0`$ its gradient is $`-y\,x`$, and the step $`w\leftarrow w-(-yx)`$ is the perceptron update. At the kink $`y\,w^\top x=0`$ the loss has no gradient, and its subgradients are the vectors $`-\lambda\,y\,x`$ with $`0\le\lambda\le1`$; the update uses the subgradient $`-yx`$. The method is stochastic in the sense of stochastic gradient descent: each step uses the loss of a single example, although here the examples arrive in cycling order rather than as independent draws. Unlike the zero–one loss, the perceptron loss is convex and provides a direction to move.
+This loss is zero on correctly classified examples and grows linearly with the violation otherwise. Where $`y\,w^\top x<0`$ its gradient is $`-y\,x`$, and the step $`w\leftarrow w-(-yx)`$ is the perceptron update. At the kink $`y\,w^\top x=0`$ the loss has no gradient, and its [subgradients](../foundations/03-calculus-and-optimization.md#constraints-and-nonsmooth-objectives) are the vectors $`-\lambda\,y\,x`$ with $`0\le\lambda\le1`$; the update uses the subgradient $`-yx`$. The method is stochastic in the sense of [stochastic gradient descent](../foundations/03-calculus-and-optimization.md#stochastic-gradients-and-convergence-in-expectation): each step uses the loss of a single example, although here the examples arrive in cycling order rather than as independent draws. Unlike the zero–one loss, the perceptron loss is convex and provides a direction to move.
 
 The step size is irrelevant when the algorithm starts from zero. Running the update with $`w\leftarrow w+\eta\,y_tx_t`$ produces exactly $`\eta`$ times the weights of the unit-step run, and positive scaling does not change any sign. This scale invariance distinguishes the perceptron from most gradient methods, and it is one reason its analysis is so clean. It also shows that the perceptron loss has a degenerate minimizer: $`w=0`$ attains zero loss on every example. The algorithm avoids this trivial solution only because a zero score counts as a mistake.
 
@@ -186,7 +186,7 @@ After $`M`$ mistakes, $`u^\top w\ge M\gamma`$. Second, the squared norm grows by
 \|w_{t+1}\|_2^2=\|w_t\|_2^2+2y_t\,w_t^\top x_t+\|x_t\|_2^2\le\|w_t\|_2^2+R^2,
 ```
 
-because a mistake means $`y_t\,w_t^\top x_t\le0`$. After $`M`$ mistakes, $`\|w\|_2^2\le MR^2`$. Rounds without mistakes change neither quantity. The Cauchy–Schwarz inequality $`u^\top w\le\|u\|_2\|w\|_2`$ and $`\|u\|_2=1`$ give
+because a mistake means $`y_t\,w_t^\top x_t\le0`$. After $`M`$ mistakes, $`\|w\|_2^2\le MR^2`$. Rounds without mistakes change neither quantity. The [Cauchy–Schwarz inequality](../foundations/02-linear-algebra.md#inner-products-and-orthogonality) $`u^\top w\le\|u\|_2\|w\|_2`$ and $`\|u\|_2=1`$ give
 
 ```math
 M\gamma\le u^\top w\le\|w\|_2\le\sqrt M\,R,
@@ -202,7 +202,7 @@ The proof is a potential argument: the weight vector's projection onto $`u`$ gro
 
 Several features deserve emphasis.
 
-- **The bound is dimension-free.** Neither $`d`$ nor the number of distinct examples appears. What matters is the ratio of the data's radius to the margin, a scale-invariant measure of how hard the separation problem is. Bounds based on the VC dimension of halfspaces, which is $`d+1`$ in $`\mathbb R^d`$ (Information and Learning Theory), grow with the dimension instead.
+- **The bound is dimension-free.** Neither $`d`$ nor the number of distinct examples appears. What matters is the ratio of the data's radius to the margin, a scale-invariant measure of how hard the separation problem is. Bounds based on the VC dimension of halfspaces, which is $`d+1`$ in $`\mathbb R^d`$ ([Information and Learning Theory](../foundations/05-information-and-learning-theory.md#infinite-classes-and-vc-dimension)), grow with the dimension instead.
 - **On a finite separable training set, the perceptron terminates.** Cycling through $`n`$ examples, each pass either makes a mistake or ends the algorithm, so there are at most $`(R/\gamma)^2`$ passes with mistakes. The final weight vector separates the training data.
 - **Any separating $`u`$ may be used.** The tightest bound uses the maximum-margin direction, for which $`\gamma=\gamma(D)`$.
 - **The bound can be exponentially large.** When the margin is tiny, for example because the inputs have many bits of precision, $`(R/\gamma)^2`$ can be exponential in the input size. Linear programming finds a separator in polynomial time in such cases; the perceptron's efficiency depends on a reasonable margin.
@@ -241,13 +241,13 @@ Let $`(x_1,y_1),\ldots,(x_{n+1},y_{n+1})`$ be iid from $`P`$, and run the percep
 \mathbb E\bigl[\operatorname{err}_P(w_t)\bigr]=P\bigl(y_t\,w_t^\top x_t\le0\bigr),
 ```
 
-where $`\operatorname{err}_P(w)=P(Y\,w^\top X\le0)`$ is the zero–one population risk of chapter 1, written $`R(f)`$ there, for the classifier $`\operatorname{sign}(w^\top x)`$, again counting a zero score as an error; in this chapter the letter $`R`$ is reserved for the radius of the data. Choose $`T`$ uniformly from $`\{1,\ldots,n+1\}`$, independently of the data, and output $`w_T`$. Averaging over $`T`$,
+where $`\operatorname{err}_P(w)=P(Y\,w^\top X\le0)`$ is the zero–one population risk of [chapter 1](01-learning-problems-and-nearest-neighbors.md#data-rules-and-risk), written $`R(f)`$ there, for the classifier $`\operatorname{sign}(w^\top x)`$, again counting a zero score as an error; in this chapter the letter $`R`$ is reserved for the radius of the data. Choose $`T`$ uniformly from $`\{1,\ldots,n+1\}`$, independently of the data, and output $`w_T`$. Averaging over $`T`$,
 
 ```math
 \mathbb E\bigl[\operatorname{err}_P(w_T)\bigr]=\frac{\mathbb E[M_{n+1}]}{n+1},
 ```
 
-where $`M_{n+1}`$ is the number of mistakes in the single pass. If $`P`$ is supported on a ball of radius $`R`$ and is separable with margin $`\gamma`$, then $`M_{n+1}\le(R/\gamma)^2`$ always, and the randomly selected hypothesis has expected error at most $`(R/\gamma)^2/(n+1)`$. This is the online-to-batch conversion of Foundations, specialized to the zero–one loss. Foundations averages the iterates, which requires a loss that is convex in $`w`$; the zero–one loss is not convex, so the conversion here returns a randomly selected iterate instead, the alternative that the Foundations passage names for nonconvex problems.
+where $`M_{n+1}`$ is the number of mistakes in the single pass. If $`P`$ is supported on a ball of radius $`R`$ and is separable with margin $`\gamma`$, then $`M_{n+1}\le(R/\gamma)^2`$ always, and the randomly selected hypothesis has expected error at most $`(R/\gamma)^2/(n+1)`$. This is the [online-to-batch conversion](../foundations/05-information-and-learning-theory.md#online-regret-and-its-connection-to-statistical-learning) of Foundations, specialized to the zero–one loss. Foundations averages the iterates, which requires a loss that is convex in $`w`$; the zero–one loss is not convex, so the conversion here returns a randomly selected iterate instead, the alternative that the Foundations passage names for nonconvex problems.
 
 The figure checks both identities by simulation, on a distribution for which the population error of every weight vector is known exactly. There, a pass over 200 examples makes 5.4 mistakes on average, so the randomly selected iterate has expected error about 0.027. The bound $`(R/\gamma)^2/(n+1)`$ allows 0.5.
 
@@ -261,7 +261,7 @@ The randomly selected hypothesis is awkward in practice. The **voted perceptron*
 
 The final perceptron weight vector is determined by the examples on which mistakes occurred and the order in which they occurred: rerunning the algorithm on those examples alone reproduces it, because between two mistakes the weights do not change. This makes the perceptron a **sample compression scheme** of size at most $`(R/\gamma)^2`$, and compression schemes admit generalization bounds that grow with their size. The idea is due to Littlestone and Warmuth (1986); [Floyd and Warmuth (1995)](https://tr.soe.ucsc.edu/sites/default/files/technical-reports/UCSC-CRL-93-13.pdf) develop it.
 
-Margin-based uniform bounds for all linear classifiers of bounded norm, developed in Rademacher complexity and margins, give another route. For weights of norm at most one, inputs of norm at most $`R`$, and a margin level $`\gamma`$ fixed before seeing the data, the complexity term of that bound is $`2R/(\gamma\sqrt n)`$, which becomes small once $`n`$ is large compared with $`(R/\gamma)^2`$. The same ratio limits how many points unit-norm linear functions can shatter with margin $`\gamma`$ (chapter 7). All of these results show the same pattern: the quantity controlling generalization is $`(R/\gamma)^2`$, not the dimension $`d`$.
+Margin-based uniform bounds for all linear classifiers of bounded norm, developed in [Rademacher complexity and margins](../foundations/05-information-and-learning-theory.md#rademacher-complexity-and-margins), give another route. For weights of norm at most one, inputs of norm at most $`R`$, and a margin level $`\gamma`$ fixed before seeing the data, the complexity term of that bound is $`2R/(\gamma\sqrt n)`$, which becomes small once $`n`$ is large compared with $`(R/\gamma)^2`$. The same ratio limits how many points unit-norm linear functions can shatter with margin $`\gamma`$ ([chapter 7](07-statistical-learning-theory.md#margins-bound-effective-capacity)). All of these results show the same pattern: the quantity controlling generalization is $`(R/\gamma)^2`$, not the dimension $`d`$.
 
 ## <a id="when-the-data-are-not-separable"></a>When the data are not separable
 
@@ -355,7 +355,7 @@ for name, M in [("last", W), ("averaged", W_sum)]:
 # averaged weights: training accuracy 0.956, test accuracy 1.000
 ```
 
-Versicolor and virginica are not linearly separable in these four features, so the last iterate keeps changing. The averaged weights are more stable. With 60 test flowers, a perfect test score is compatible with a true error of a few percent: after no errors in 60 independent trials, the one-sided 95% Clopper–Pearson upper bound for the error rate is $`1-0.05^{1/60}\approx0.049`$ (Probability and Statistics). The small sample limits what this comparison establishes.
+Versicolor and virginica are not linearly separable in these four features, so the last iterate keeps changing. The averaged weights are more stable. With 60 test flowers, a perfect test score is compatible with a true error of a few percent: after no errors in 60 independent trials, the one-sided 95% Clopper–Pearson upper bound for the error rate is $`1-0.05^{1/60}\approx0.049`$ ([Probability and Statistics](../foundations/04-probability-and-statistics.md#proportions-and-score-inversion)). The small sample limits what this comparison establishes.
 
 ## <a id="the-perceptron-among-linear-classifiers"></a>The perceptron among linear classifiers
 
@@ -365,7 +365,7 @@ The perceptron stores its weight vector as a sum of training inputs:
 w=\sum_{i=1}^n\alpha_i\,y_i\,x_i,
 ```
 
-where $`\alpha_i`$ counts the mistakes made on example $`i`$. Scores are therefore inner products with training examples, $`w^\top x=\sum_i\alpha_iy_i\,x_i^\top x`$. Replacing each inner product by a kernel evaluation gives the **kernel perceptron**, a nonlinear classifier trained by the same mistake-driven rule; this **dual representation** is developed in chapter 8.
+where $`\alpha_i`$ counts the mistakes made on example $`i`$. Scores are therefore inner products with training examples, $`w^\top x=\sum_i\alpha_iy_i\,x_i^\top x`$. Replacing each inner product by a kernel evaluation gives the **kernel perceptron**, a nonlinear classifier trained by the same mistake-driven rule; this **dual representation** is developed in [chapter 8](08-support-vector-machines-and-kernels.md).
 
 The linear classifiers of this module differ mainly in the loss they minimize over the margin $`z=y\,w^\top x`$:
 
@@ -377,7 +377,7 @@ The linear classifiers of this module differ mainly in the loss they minimize ov
 | Logistic | $`\log(1+e^{-z})`$ | Convex and smooth; yields class probabilities |
 | Squared error on $`\pm1`$ labels | $`(1-z)^2`$ | Convex; penalizes confident correct predictions too |
 
-The last row is the least-squares classifier of chapter 1, which fits the $`0/1`$ labels by linear regression and thresholds the fit at $`1/2`$. With an intercept in the model, fitting the recoded labels $`2y-1\in\{-1,+1\}`$ instead gives exactly $`2\hat f-1`$, where $`\hat f`$ is the fit to the $`0/1`$ labels, and thresholding it at zero is the same classifier. The identity $`(y-f)^2=(1-yf)^2`$ for $`y=\pm1`$ shows that this fit penalizes large correct margins. The consequences of these choices for classification accuracy are examined in chapter 6.
+The last row is the least-squares classifier of [chapter 1](01-learning-problems-and-nearest-neighbors.md#two-ways-to-estimate-a-conditional-average), which fits the $`0/1`$ labels by linear regression and thresholds the fit at $`1/2`$. With an intercept in the model, fitting the recoded labels $`2y-1\in\{-1,+1\}`$ instead gives exactly $`2\hat f-1`$, where $`\hat f`$ is the fit to the $`0/1`$ labels, and thresholding it at zero is the same classifier. The identity $`(y-f)^2=(1-yf)^2`$ for $`y=\pm1`$ shows that this fit penalizes large correct margins. The consequences of these choices for classification accuracy are examined in [chapter 6](06-losses-model-selection-and-evaluation.md).
 
 ## <a id="appendices"></a>Appendices
 

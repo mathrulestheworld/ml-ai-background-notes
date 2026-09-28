@@ -19,11 +19,11 @@ With **stationary** models, the same in every slice, the whole process is specif
 P(X_{0:t},E_{1:t})=P(X_0)\prod_{i=1}^tP(X_i\mid X_{i-1})\,P(E_i\mid X_i),
 ```
 
-a Bayesian network (chapter 8) unrolled in time. If the first-order Markov assumption is inaccurate, the state can be augmented, for example with velocity in addition to position, until it holds approximately.
+a Bayesian network ([chapter 8](08-bayesian-networks-and-markov-networks.md)) unrolled in time. If the first-order Markov assumption is inaccurate, the state can be augmented, for example with velocity in addition to position, until it holds approximately.
 
 ### <a id="markov-chains"></a>Markov chains
 
-Without evidence, the states form a **Markov chain**. For a discrete state with transition matrix $`T_{ij}=P(X_{t+1}=j\mid X_t=i)`$, a distribution $`p_t`$ over states evolves as $`p_{t+1}^\top=p_t^\top T`$. An irreducible, aperiodic chain on finitely many states has a unique **stationary distribution** $`\pi^\top=\pi^\top T`$, and $`p_t\to\pi`$ from any start at a geometric rate set by the second-largest eigenvalue modulus of $`T`$: the chain forgets its initial state. MCMC (chapter 10) exploits this convergence, and PageRank is the stationary distribution of a random surfer's chain on the web graph. The same fact limits prediction: forecasts far ahead converge to the stationary distribution and carry no information about the present.
+Without evidence, the states form a **Markov chain**. For a discrete state with transition matrix $`T_{ij}=P(X_{t+1}=j\mid X_t=i)`$, a distribution $`p_t`$ over states evolves as $`p_{t+1}^\top=p_t^\top T`$. An irreducible, aperiodic chain on finitely many states has a unique **stationary distribution** $`\pi^\top=\pi^\top T`$, and $`p_t\to\pi`$ from any start at a geometric rate set by the second-largest eigenvalue modulus of $`T`$: the chain forgets its initial state. MCMC ([chapter 10](10-approximate-inference.md#markov-chains-and-stationary-distributions)) exploits this convergence, and PageRank is the stationary distribution of a random surfer's chain on the web graph. The same fact limits prediction: forecasts far ahead converge to the stationary distribution and carry no information about the present.
 
 ## <a id="hidden-markov-models"></a>Hidden Markov models
 
@@ -49,7 +49,7 @@ or in matrix form $`f_{t+1}=\alpha\,O_{e_{t+1}}T^\top f_t`$ for the **forward me
 b_k=T\,O_{e_{k+1}}\,b_{k+1},\qquad P(X_k\mid e_{1:t})=\alpha\,f_k\odot b_k.
 ```
 
-The **forward–backward algorithm** computes all smoothed estimates in $`O(S^2t)`$ time; it is the sum-product algorithm of chapter 9 on a chain.
+The **forward–backward algorithm** computes all smoothed estimates in $`O(S^2t)`$ time; it is the sum-product algorithm of [chapter 9](09-exact-inference.md#sum-product) on a chain.
 
 ### <a id="the-most-likely-sequence"></a>The most likely sequence
 
@@ -124,7 +124,7 @@ The filtered probability of rain rises to 0.818 after the first umbrella and 0.8
 
 ### <a id="learning-with-baumwelch"></a>Learning with Baum–Welch
 
-The parameters of an HMM are usually unknown. The **Baum–Welch algorithm** ([Baum et al., 1970](https://doi.org/10.1214/aoms/1177697196)) is the EM algorithm of ML chapter 14 for HMMs. The E-step runs forward–backward to compute the expected number of times each state is occupied, each transition is taken, and each observation is emitted from each state; the M-step sets the parameters to the normalized expected counts. Each iteration increases the likelihood of the observations, which converges to a local maximum. The forward and backward messages are rescaled at every step, since for long sequences their raw values underflow.
+The parameters of an HMM are usually unknown. The **Baum–Welch algorithm** ([Baum et al., 1970](https://doi.org/10.1214/aoms/1177697196)) is the EM algorithm of [ML chapter 14](../ml/14-gaussian-mixtures-and-expectation-maximization.md#em-beyond-gaussian-mixtures) for HMMs. The E-step runs forward–backward to compute the expected number of times each state is occupied, each transition is taken, and each observation is emitted from each state; the M-step sets the parameters to the normalized expected counts. Each iteration increases the likelihood of the observations, which converges to a local maximum. The forward and backward messages are rescaled at every step, since for long sequences their raw values underflow.
 
 ```python
 import numpy as np
@@ -200,7 +200,7 @@ For continuous states such as positions and velocities, the analogue of the HMM 
 x_{t+1}=Fx_t+w_t,\quad w_t\sim\mathcal N(0,Q),\qquad z_t=Hx_t+v_t,\quad v_t\sim\mathcal N(0,R).
 ```
 
-Because linear maps and conditioning preserve Gaussianity (Foundations chapter 4), the belief state stays Gaussian, $`\mathcal N(\mu_t,\Sigma_t)`$, and filtering reduces to updating a mean and a covariance.
+Because linear maps and conditioning preserve Gaussianity ([Foundations chapter 4](../foundations/04-probability-and-statistics.md#gaussian-vectors-and-conditioning)), the belief state stays Gaussian, $`\mathcal N(\mu_t,\Sigma_t)`$, and filtering reduces to updating a mean and a covariance.
 
 ### <a id="the-kalman-filter"></a>The Kalman filter
 
@@ -265,7 +265,7 @@ Compact representation does not bring compact inference. Exact filtering in a DB
 2. **weight:** give each particle the likelihood of the new evidence, $`w^{(i)}=P(e_{t+1}\mid x^{(i)}_{t+1})`$;
 3. **resample:** draw $`N`$ new particles from the current ones with probabilities proportional to the weights.
 
-Propagation and weighting are the likelihood weighting of chapter 10 applied one slice at a time; resampling is what keeps the method from degenerating, by discarding particles in regions the evidence has made improbable and duplicating those in probable regions, so that the population concentrates where the posterior mass is. The particle approximation is consistent as $`N\to\infty`$ for each fixed horizon, and it handles nonlinear models, discrete and continuous variables, and multimodal beliefs, which is why **Monte Carlo localization** with particle filters is the standard way for mobile robots to track their position on a map ([Thrun, Burgard, and Fox, 2005](https://mitpress.mit.edu/9780262201629/probabilistic-robotics/)). Its weaknesses are high-dimensional states, where exponentially many particles are needed to cover the posterior, and very informative observations, which leave almost all particles with negligible weight; better proposals that look at the new evidence, and **Rao–Blackwellization**, which handles some variables exactly and samples only the rest, address both.
+Propagation and weighting are the likelihood weighting of [chapter 10](10-approximate-inference.md#likelihood-weighting) applied one slice at a time; resampling is what keeps the method from degenerating, by discarding particles in regions the evidence has made improbable and duplicating those in probable regions, so that the population concentrates where the posterior mass is. The particle approximation is consistent as $`N\to\infty`$ for each fixed horizon, and it handles nonlinear models, discrete and continuous variables, and multimodal beliefs, which is why **Monte Carlo localization** with particle filters is the standard way for mobile robots to track their position on a map ([Thrun, Burgard, and Fox, 2005](https://mitpress.mit.edu/9780262201629/probabilistic-robotics/)). Its weaknesses are high-dimensional states, where exponentially many particles are needed to cover the posterior, and very informative observations, which leave almost all particles with negligible weight; better proposals that look at the new evidence, and **Rao–Blackwellization**, which handles some variables exactly and samples only the rest, address both.
 
 ## <a id="appendices"></a>Appendices
 

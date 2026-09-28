@@ -13,7 +13,7 @@ A pretrained model continues text. Asked *What is the capital of France?*, it ma
 - **A chat template.** Conversations are serialized with special tokens that mark the roles, such as a system message, the user's turns, and the assistant's turns, so the model learns where its own turn begins and ends. The template becomes part of the model's interface, and prompting a fine-tuned model without it degrades its behavior.
 - **Loss masking.** The loss is computed only on the tokens of the responses; prompt tokens are inputs, not targets, so the model is not trained to produce user messages.
 
-The learning rate is small, the number of examples is modest, from thousands to a few million, and training lasts a few epochs. Everything else is as in chapter 4.
+The learning rate is small, the number of examples is modest, from thousands to a few million, and training lasts a few epochs. Everything else is as in [chapter 4](04-transformer-language-models.md#training-a-language-model).
 
 ### <a id="the-data"></a>The data
 
@@ -24,7 +24,7 @@ The history of instruction data is a series of answers to the question of where 
 - **Synthetic data.** **Self-instruct** ([Wang et al., 2023](https://arxiv.org/abs/2212.10560)) had a model generate new instructions and responses from 175 seed examples; **Alpaca** used the method with a stronger commercial model to create 52,000 examples for under 500 dollars and fine-tuned the 7-billion-parameter Llama on them ([Taori et al., 2023](https://crfm.stanford.edu/2023/03/13/alpaca.html)). Generating responses with a stronger model is a form of distillation, discussed below.
 - **Small curated sets.** **LIMA** ([Zhou et al., 2023](https://arxiv.org/abs/2305.11206)) fine-tuned a 65-billion-parameter model on only 1,000 carefully chosen examples and obtained responses that people rated as good as or better than GPT-4's in 43% of comparisons.
 
-Open recipes such as Tülu 3 ([Lambert et al., 2024](https://arxiv.org/abs/2411.15124)) document current practice: a mixture of curated human data, public datasets, and synthetic data targeted at specific skills such as mathematics, coding, instruction following with constraints, and safe refusals, followed by the preference and reinforcement-learning stages of chapters 11 and 12.
+Open recipes such as Tülu 3 ([Lambert et al., 2024](https://arxiv.org/abs/2411.15124)) document current practice: a mixture of curated human data, public datasets, and synthetic data targeted at specific skills such as mathematics, coding, instruction following with constraints, and safe refusals, followed by the preference and reinforcement-learning stages of [chapters 11](11-learning-from-human-preferences.md) and [12](12-reasoning-and-test-time-compute.md).
 
 ### <a id="what-fine-tuning-changes"></a>What fine-tuning changes
 
@@ -38,13 +38,13 @@ Fine-tuning on a narrow distribution degrades performance elsewhere, the **catas
 
 ### <a id="the-cost-of-full-fine-tuning"></a>The cost of full fine-tuning
 
-Updating all weights needs memory for the weights, their gradients, and the optimizer state: with mixed-precision AdamW, about 16 bytes per parameter, or 112 GB for a 7-billion-parameter model before any activations (DL chapter 11; [Appendix B](#block-nlp10-appendix-b)). Each fine-tuned model is also a full copy to store and serve. **Parameter-efficient fine-tuning** (PEFT) freezes the pretrained weights and trains a small number of added or selected parameters, often under 1% of the model, which cuts optimizer memory proportionally and turns each task into a small file that can be swapped in at serving time.
+Updating all weights needs memory for the weights, their gradients, and the optimizer state: with mixed-precision AdamW, about 16 bytes per parameter, or 112 GB for a 7-billion-parameter model before any activations ([DL chapter 11](../dl/11-training-at-scale-and-efficient-inference.md#what-must-be-stored); [Appendix B](#block-nlp10-appendix-b)). Each fine-tuned model is also a full copy to store and serve. **Parameter-efficient fine-tuning** (PEFT) freezes the pretrained weights and trains a small number of added or selected parameters, often under 1% of the model, which cuts optimizer memory proportionally and turns each task into a small file that can be swapped in at serving time.
 
 ### <a id="adapters-and-soft-prompts"></a>Adapters and soft prompts
 
 **Adapters** ([Houlsby et al., 2019](https://arxiv.org/abs/1902.00751)) insert a small bottleneck network, a down-projection, a nonlinearity, and an up-projection with a residual connection, after the attention and MLP sublayers of each block; with 3.6% as many parameters per task, adapters came within 0.4 points of full fine-tuning on the GLUE benchmark. They add sequential computation at inference, which later methods avoid.
 
-**Soft prompts** replace a written prompt with trained vectors. **Prefix tuning** ([Li and Liang, 2021](https://arxiv.org/abs/2101.00190)) prepends trainable key and value vectors to the attention of every layer and trains only those, about 0.1% of the parameters; **prompt tuning** ([Lester, Al-Rfou, and Constant, 2021](https://arxiv.org/abs/2104.08691)) prepends trainable embeddings to the input only, and becomes competitive with full fine-tuning as models grow beyond about ten billion parameters. Soft prompts are continuous analogues of the prompts of chapter 9, optimized by gradient descent instead of written by hand.
+**Soft prompts** replace a written prompt with trained vectors. **Prefix tuning** ([Li and Liang, 2021](https://arxiv.org/abs/2101.00190)) prepends trainable key and value vectors to the attention of every layer and trains only those, about 0.1% of the parameters; **prompt tuning** ([Lester, Al-Rfou, and Constant, 2021](https://arxiv.org/abs/2104.08691)) prepends trainable embeddings to the input only, and becomes competitive with full fine-tuning as models grow beyond about ten billion parameters. Soft prompts are continuous analogues of the prompts of [chapter 9](09-in-context-learning-and-prompting.md), optimized by gradient descent instead of written by hand.
 
 ### <a id="low-rank-adaptation"></a>Low-rank adaptation
 
@@ -56,7 +56,7 @@ W'=W+\frac\alpha r\,BA,\qquad B\in\mathbb R^{m\times r},\ A\in\mathbb R^{r\times
 
 with $`A`$ initialized randomly and $`B`$ at zero, so training starts exactly at the pretrained model, and a scale $`\alpha/r`$ that makes the learning dynamics roughly independent of the rank ([Appendix A](#block-nlp10-appendix-a)). Each adapted matrix costs $`r(m+n)`$ trained parameters instead of $`mn`$. After training, $`BA`$ can be added into $`W`$, so the adapted model has exactly the original architecture and no extra inference cost; alternatively, many LoRA updates can share one base model in memory and be applied per request. On GPT-3 175B, LoRA cut the number of trained parameters by a factor of 10,000 and the GPU memory for training by a factor of three while matching full fine-tuning on the tasks tested, and ranks as small as 1 or 2 were often enough.
 
-The code adds rank-4 LoRA updates to every weight matrix in the blocks of the character model of chapter 4, using PyTorch's parametrizations so that the frozen weight and the update combine automatically, and fine-tunes it for 40 steps on 8,000 characters of *The Tempest*, the play that pretraining never saw (chapter 5). It compares full fine-tuning on the same data, measuring both the held-out part of *The Tempest* and the other held-out plays, which the fine-tuning does not see.
+The code adds rank-4 LoRA updates to every weight matrix in the blocks of the character model of chapter 4, using PyTorch's parametrizations so that the frozen weight and the update combine automatically, and fine-tunes it for 40 steps on 8,000 characters of *The Tempest*, the play that pretraining never saw ([chapter 5](05-pretraining-and-transfer.md#continued-pretraining)). It compares full fine-tuning on the same data, measuring both the held-out part of *The Tempest* and the other held-out plays, which the fine-tuning does not see.
 
 ```python
 import math
@@ -311,7 +311,7 @@ Merging works because fine-tuning from a shared pretrained model tends to stay i
 
 ### <a id="distillation"></a>Distillation
 
-A small model can also be trained to imitate a large one (DL chapter 11). For language models the simplest form is **sequence-level distillation** ([Kim and Rush, 2016](https://arxiv.org/abs/1606.07947)): generate outputs with the teacher and fine-tune the student on them, which is how much instruction data is produced today. Matching the teacher's full next-token distributions rather than its sampled tokens transfers more information per example, and **on-policy distillation** trains the student on sequences it generates itself, with the teacher's distributions as targets, so that it learns to recover from its own mistakes rather than only from the teacher's contexts ([Agarwal et al., 2024](https://arxiv.org/abs/2306.13649)). Distillation transfers capabilities efficiently when the teacher is much stronger, and it transfers the teacher's errors and style along with them.
+A small model can also be trained to imitate a large one ([DL chapter 11](../dl/11-training-at-scale-and-efficient-inference.md#distillation)). For language models the simplest form is **sequence-level distillation** ([Kim and Rush, 2016](https://arxiv.org/abs/1606.07947)): generate outputs with the teacher and fine-tune the student on them, which is how much instruction data is produced today. Matching the teacher's full next-token distributions rather than its sampled tokens transfers more information per example, and **on-policy distillation** trains the student on sequences it generates itself, with the teacher's distributions as targets, so that it learns to recover from its own mistakes rather than only from the teacher's contexts ([Agarwal et al., 2024](https://arxiv.org/abs/2306.13649)). Distillation transfers capabilities efficiently when the teacher is much stronger, and it transfers the teacher's errors and style along with them.
 
 ## <a id="appendices"></a>Appendices
 
@@ -348,7 +348,7 @@ For a model with $`P`$ parameters trained with AdamW in mixed precision, full fi
 <summary><a id="block-nlp10-appendix-c"></a><b>C. Why task vectors add</b></summary>
 
 
-Let $`f(x;\theta)`$ be the network's output. If fine-tuning moves the weights only slightly from $`\theta_0`$, the output is close to its first-order expansion, $`f(x;\theta_0+\tau)\approx f(x;\theta_0)+\nabla_\theta f(x;\theta_0)^\top\tau`$, the linearized network of DL chapter 15. In that regime, adding two task vectors adds their effects on the output:
+Let $`f(x;\theta)`$ be the network's output. If fine-tuning moves the weights only slightly from $`\theta_0`$, the output is close to its first-order expansion, $`f(x;\theta_0+\tau)\approx f(x;\theta_0)+\nabla_\theta f(x;\theta_0)^\top\tau`$, the linearized network of [DL chapter 15](../dl/15-infinite-width-and-the-neural-tangent-kernel.md#linearization-and-the-tangent-kernel). In that regime, adding two task vectors adds their effects on the output:
 
 ```math
 f(x;\theta_0+\tau_1+\tau_2)-f(x;\theta_0)\approx\nabla f^\top\tau_1+\nabla f^\top\tau_2.

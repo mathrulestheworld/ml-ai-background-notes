@@ -42,7 +42,7 @@ A **structural causal model** (SCM) ([Pearl, 2009](https://doi.org/10.1017/CBO97
 V_i:=f_i\bigl(\mathrm{PA}_i,U_i\bigr),\qquad U_1,\dots,U_n\text{ independent},
 ```
 
-with the direct causes drawn as arrows in a **causal graph**. The assignments are mechanisms, not equations: each can be changed without changing the others. With acyclic graphs and independent noises, an SCM induces a joint distribution that factorizes over the graph as a Bayesian network does (chapter 8); what the SCM adds is a meaning for interventions. The **intervention** $`\mathrm{do}(X=x)`$ replaces the mechanism of $`X`$ by the constant $`x`$, cutting all arrows into $`X`$ and leaving the other mechanisms intact. The resulting interventional distribution follows from the **truncated factorization**:
+with the direct causes drawn as arrows in a **causal graph**. The assignments are mechanisms, not equations: each can be changed without changing the others. With acyclic graphs and independent noises, an SCM induces a joint distribution that factorizes over the graph as a Bayesian network does ([chapter 8](08-bayesian-networks-and-markov-networks.md)); what the SCM adds is a meaning for interventions. The **intervention** $`\mathrm{do}(X=x)`$ replaces the mechanism of $`X`$ by the constant $`x`$, cutting all arrows into $`X`$ and leaving the other mechanisms intact. The resulting interventional distribution follows from the **truncated factorization**:
 
 ```math
 P\bigl(v\mid\mathrm{do}(x)\bigr)=\prod_{i:\,V_i\notin X}P\bigl(v_i\mid\mathrm{pa}_i\bigr)\Big|_{X=x},
@@ -64,7 +64,7 @@ An interventional quantity is **identifiable** if it can be computed from the ob
 
 ### <a id="confounding-and-the-backdoor-criterion"></a>Confounding and the backdoor criterion
 
-A set of variables $`Z`$ satisfies the **backdoor criterion** relative to $`(X,Y)`$ if no variable in $`Z`$ is a descendant of $`X`$, and $`Z`$ blocks, in the sense of d-separation (chapter 8), every path between $`X`$ and $`Y`$ that starts with an arrow into $`X`$, the **backdoor paths**. Then
+A set of variables $`Z`$ satisfies the **backdoor criterion** relative to $`(X,Y)`$ if no variable in $`Z`$ is a descendant of $`X`$, and $`Z`$ blocks, in the sense of d-separation ([chapter 8](08-bayesian-networks-and-markov-networks.md#d-separation)), every path between $`X`$ and $`Y`$ that starts with an arrow into $`X`$, the **backdoor paths**. Then
 
 ```math
 P\bigl(y\mid\mathrm{do}(x)\bigr)=\sum_zP(y\mid x,z)\,P(z),
@@ -171,7 +171,7 @@ Counterfactuals formalize notions that interventional distributions cannot: the 
 
 ### <a id="constraint-based-discovery"></a>Constraint-based discovery
 
-Can the graph itself be learned from data? Observational data determine the conditional independences of the distribution, and under the **faithfulness** assumption, that the distribution has no independences beyond those implied by the graph, they determine the graph up to Markov equivalence: its skeleton and v-structures (chapter 8). The **PC algorithm** ([Spirtes, Glymour, and Scheines, 2000](https://direct.mit.edu/books/monograph/2057/Causation-Prediction-and-Search)) finds this class with independence tests:
+Can the graph itself be learned from data? Observational data determine the conditional independences of the distribution, and under the **faithfulness** assumption, that the distribution has no independences beyond those implied by the graph, they determine the graph up to Markov equivalence: its skeleton and v-structures ([chapter 8](08-bayesian-networks-and-markov-networks.md#i-maps-and-i-equivalence)). The **PC algorithm** ([Spirtes, Glymour, and Scheines, 2000](https://direct.mit.edu/books/monograph/2057/Causation-Prediction-and-Search)) finds this class with independence tests:
 
 1. Start from the complete undirected graph. For conditioning sets of growing size, remove the edge $`X-Y`$ whenever $`X\perp Y\mid S`$ for some set $`S`$ of current neighbors of $`X`$ or of $`Y`$, and record $`S`$ as their **separating set**.
 2. For each unshielded triple $`X-M-Y`$ (with $`X`$ and $`Y`$ nonadjacent), orient $`X\to M\leftarrow Y`$ if $`M`$ is not in their separating set, since a non-collider would have been needed to separate them.
@@ -249,7 +249,7 @@ From 5,000 samples of a five-variable linear Gaussian model, the tests remove ex
 
 ### <a id="beyond-equivalence-classes"></a>Beyond equivalence classes
 
-Additional assumptions identify more. In linear models with **non-Gaussian** noise, the full graph is identifiable, because regressing in the wrong direction leaves residuals that are uncorrelated but not independent of the regressor (LiNGAM; [Shimizu et al., 2006](https://www.jmlr.org/papers/v7/shimizu06a.html)); **additive noise models** extend the idea to nonlinear mechanisms, and allow cause and effect to be distinguished even with two variables. **Score-based** methods search over graphs for the best penalized likelihood, the structure learning of chapter 14. And **interventions** break equivalence directly: randomizing a variable orients every edge adjacent to it, and experimental design chooses which interventions to perform.
+Additional assumptions identify more. In linear models with **non-Gaussian** noise, the full graph is identifiable, because regressing in the wrong direction leaves residuals that are uncorrelated but not independent of the regressor (LiNGAM; [Shimizu et al., 2006](https://www.jmlr.org/papers/v7/shimizu06a.html)); **additive noise models** extend the idea to nonlinear mechanisms, and allow cause and effect to be distinguished even with two variables. **Score-based** methods search over graphs for the best penalized likelihood, the structure learning of [chapter 14](14-learning-graphical-models.md#structure-learning). And **interventions** break equivalence directly: randomizing a variable orients every edge adjacent to it, and experimental design chooses which interventions to perform.
 
 ## <a id="causality-and-learning"></a>Causality and learning
 

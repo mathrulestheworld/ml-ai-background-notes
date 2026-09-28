@@ -14,7 +14,7 @@ The AI code blocks and figure scripts use only NumPy, SciPy, Matplotlib, and Net
 | Matplotlib | 3.8.4 |
 | NetworkX | 3.7 |
 
-These packages are all part of the Foundations environment, so either of the following works.
+These packages are all part of the [Foundations environment](../../foundations/sources/computing-setup.md), so either of the following works.
 
 ## <a id="reuse-the-foundations-environment"></a>Reuse the Foundations environment
 
@@ -45,8 +45,8 @@ python ch11_temporal.py        # all figures of chapter 11
 python ch11_temporal.py 2      # only figure 2 (every script accepts figure numbers)
 ```
 
-The scripts write PNG files to `Sources/Images`. Most figures take seconds; those that run many searches take minutes, as noted at the top of each script and in Figure sources. The longest, the blocks-world comparison of chapter 7, takes about ten minutes on one core, because its planning heuristics are recomputed in pure Python for every state.
+The scripts write PNG files to `Sources/Images`. Most figures take seconds; those that run many searches take minutes, as noted at the top of each script and in [Figure sources](figure-sources.md). The longest, the blocks-world comparison of chapter 7, takes about ten minutes on one core, because its planning heuristics are recomputed in pure Python for every state.
 
 ## <a id="beyond-this-snapshot"></a>Beyond this snapshot
 
-Pure Python is slow for search and inference: the implementations here expand thousands of nodes per second where compiled solvers expand millions. The tools for larger problems list mature solvers, planners, inference libraries, and probabilistic programming languages to use once the algorithms are understood.
+Pure Python is slow for search and inference: the implementations here expand thousands of nodes per second where compiled solvers expand millions. The [tools for larger problems](book-and-documentation-links.md#tools-for-larger-problems) list mature solvers, planners, inference libraries, and probabilistic programming languages to use once the algorithms are understood.

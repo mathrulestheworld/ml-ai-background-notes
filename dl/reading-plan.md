@@ -181,7 +181,7 @@ Foundations covered reverse-mode differentiation, backpropagation as an algorith
 
 - [UMich EECS 498-007 assignments](https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2019/) implement networks, convolution, batch normalization, recurrent networks, and attention from scratch in PyTorch, with automatic checks.
 - The UNIGE course page provides six practical sessions with solutions.
-- Foundations and ML supply the mathematical and statistical prerequisites; their chapters are references during this module.
+- [Foundations](../foundations/README.md) and [ML](../ml/README.md) supply the mathematical and statistical prerequisites; their chapters are references during this module.
 
 ## <a id="connections-to-later-modules"></a>Connections to later modules
 

@@ -6,7 +6,7 @@
 
 ## <a id="overview"></a>Overview
 
-This lab puts chapter 21 to work. You will implement DDPG, TD3, and soft actor–critic in one short program that shares a replay memory and networks, compare them on a pendulum, look at what their critics believe, and train two of them to run a simulated cheetah with a tenth of the data PPO needed in Lab 10.
+This lab puts [chapter 21](../21-continuous-control-and-maximum-entropy-rl.md) to work. You will implement DDPG, TD3, and soft actor–critic in one short program that shares a replay memory and networks, compare them on a pendulum, look at what their critics believe, and train two of them to run a simulated cheetah with a tenth of the data PPO needed in [Lab 10](lab-10-proximal-policy-optimization-from-scratch.md).
 
 - **Environments:** `Pendulum-v1`: swing a pendulum up and hold it upright with a torque limited to $`[-2,2]`$; 200-step episodes, rewards between about $`-16`$ and 0 per step, so a return near $`-150`$ or better means the pendulum is swung up and held. `HalfCheetah-v5` (MuJoCo): 6 torques in $`[-1,1]`$, a reward for forward speed minus a small control cost, 1,000-step episodes.
 - **Prerequisites:** chapter 21; PyTorch and Gymnasium with the MuJoCo extra.

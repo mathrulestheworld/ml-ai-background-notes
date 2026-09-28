@@ -4,7 +4,7 @@
 
 # <a id="books-and-documentation"></a>Books and documentation
 
-The chapter notes develop the module's main material. These books and official documentation provide alternative explanations, fuller derivations, and the details of the library interfaces used in the code. The reading plan lists the lecture slides and readings for each topic.
+The chapter notes develop the module's main material. These books and official documentation provide alternative explanations, fuller derivations, and the details of the library interfaces used in the code. The [reading plan](../reading-plan.md) lists the lecture slides and readings for each topic.
 
 ## <a id="main-references"></a>Main references
 

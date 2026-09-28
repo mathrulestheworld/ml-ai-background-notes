@@ -6,10 +6,10 @@
 
 ## <a id="overview"></a>Overview
 
-This lab puts chapter 28 to work on a language model small enough to train on a laptop. You will pretrain a three-layer transformer on a sequential arithmetic task in which it mostly answers directly and only occasionally writes out its intermediate steps, then fine-tune it with reinforcement learning against a verifier that checks only the final answer. What happens is a miniature of what happened with reasoning models: the model discovers that writing out its steps pays, its responses grow longer, and its accuracy jumps. You will compare four policy-gradient estimators, add a cost for length, and measure what the training did to pass@$`k`$.
+This lab puts [chapter 28](../28-reinforcement-learning-for-language-models-and-reasoning.md) to work on a language model small enough to train on a laptop. You will pretrain a three-layer transformer on a sequential arithmetic task in which it mostly answers directly and only occasionally writes out its intermediate steps, then fine-tune it with reinforcement learning against a verifier that checks only the final answer. What happens is a miniature of what happened with reasoning models: the model discovers that writing out its steps pays, its responses grow longer, and its accuracy jumps. You will compare four policy-gradient estimators, add a cost for length, and measure what the training did to pass@$`k`$.
 
 - **Task:** a prompt is a list of $`n`$ digits, $`2\le n\le8`$, and the answer is the final state of $`s\leftarrow(3s+d)\bmod10`$, starting from $`s=0`$ and applying each digit $`d`$ in turn. A response is either a direct answer, `> a <end>`, or a worked one, `: s1 s2 ... sn > a <end>`, which writes out every intermediate state. Each step of the worked form is a small table lookup, while the direct answer requires a weighted sum of all the digits modulo 10, which a small transformer learns only for short lists. The reward is 1 if the response ends with the correct answer, whatever came before.
-- **Prerequisites:** chapter 28, DL chapter 9 for the transformer; PyTorch.
+- **Prerequisites:** chapter 28, [DL chapter 9](../../dl/09-attention-and-transformers.md) for the transformer; PyTorch.
 - **Reference solution:** [lab16_llm_rl.py](code/lab16_llm_rl.py), about 25 minutes on two cores: 7 for pretraining, 17 for reinforcement learning. Try each part yourself before reading it.
 
 ## <a id="part-1-a-small-pretrained-model"></a>Part 1 — A small pretrained model

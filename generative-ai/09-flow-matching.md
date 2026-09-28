@@ -10,7 +10,7 @@
 
 Chapter 8 ended with a deterministic sampler: an ordinary differential equation that carries Gaussian noise to data, whose velocity field was assembled from a score model. **Flow matching** removes the detour through the score. It chooses a path of distributions from noise to data, and trains a network to output the velocity field that moves samples along it, by a regression as simple as the denoising loss of chapter 7. The idea was published within a few months by four groups: [Lipman et al. (2023)](https://arxiv.org/abs/2210.02747) as flow matching, [Liu, Gong, and Liu (2023)](https://arxiv.org/abs/2209.03003) as **rectified flow**, [Albergo and Vanden-Eijnden (2023)](https://arxiv.org/abs/2209.15571) as **stochastic interpolants**, and [Heitz, Belcour, and Chambon (2023)](https://arxiv.org/abs/2305.03486) as iterative blending. It has since become the training objective of many of the largest image and video generators.
 
-A time-dependent velocity field $`v_t(x)`$ defines a **flow**: the solution of $`\frac d{dt}\psi_t(x)=v_t(\psi_t(x))`$ with $`\psi_0(x)=x`$, which moves every point along a smooth path. Applied to samples from a source distribution $`p_0`$, here the standard Gaussian, it produces a distribution $`p_t`$ at each time $`t\in[0,1]`$, and the goal is a field for which $`p_1`$ is the data distribution. This is a continuous normalizing flow (chapter 4), but the continuous flows of chapter 4 were trained by maximum likelihood, which requires solving the ODE, with its divergence, at every training step. Flow matching never simulates the flow during training.
+A time-dependent velocity field $`v_t(x)`$ defines a **flow**: the solution of $`\frac d{dt}\psi_t(x)=v_t(\psi_t(x))`$ with $`\psi_0(x)=x`$, which moves every point along a smooth path. Applied to samples from a source distribution $`p_0`$, here the standard Gaussian, it produces a distribution $`p_t`$ at each time $`t\in[0,1]`$, and the goal is a field for which $`p_1`$ is the data distribution. This is a continuous normalizing flow ([chapter 4](04-normalizing-flows.md#continuous-time-flows)), but the continuous flows of chapter 4 were trained by maximum likelihood, which requires solving the ODE, with its divergence, at every training step. Flow matching never simulates the flow during training.
 
 ### <a id="the-continuity-equation"></a>The continuity equation
 
@@ -48,7 +48,7 @@ The flow matching loss $`\mathbb E_{t,x_t}\|v_\theta(x_t,t)-u_t(x_t)\|^2`$ would
 \mathcal L_{\text{CFM}}(\theta)=\mathbb E_{t\sim\mathcal U[0,1],\ x_1\sim p_{\text{data}},\ x_t\sim p_t(\cdot\mid x_1)}\bigl\|v_\theta(x_t,t)-u_t(x_t\mid x_1)\bigr\|^2 .
 ```
 
-Lipman et al. showed that the two losses differ by a constant that does not depend on $`\theta`$, so they have the same gradients and the same minimizer ([Appendix B](#block-gen09-appendix-b)). The argument is the one behind denoising score matching (chapter 6): a squared-error regression on a noisy target is minimized by the conditional mean of the target, and here the conditional mean of the conditional velocity given $`x_t`$ is the marginal velocity. The code checks this for a model that is linear in fixed random features of $`(x,t)`$, on the one-dimensional mixture of chapters 6 and 8, whose marginal velocity is known exactly.
+Lipman et al. showed that the two losses differ by a constant that does not depend on $`\theta`$, so they have the same gradients and the same minimizer ([Appendix B](#block-gen09-appendix-b)). The argument is the one behind denoising score matching ([chapter 6](06-energy-based-models-and-score-matching.md#denoising-score-matching)): a squared-error regression on a noisy target is minimized by the conditional mean of the target, and here the conditional mean of the conditional velocity given $`x_t`$ is the marginal velocity. The code checks this for a model that is linear in fixed random features of $`(x,t)`$, on the one-dimensional mixture of chapters 6 and 8, whose marginal velocity is known exactly.
 
 ```python
 import numpy as np
@@ -247,7 +247,7 @@ The remaining terms, $`\mathbb E\|u_t(x_t\mid x_1)\|^2`$ and $`\mathbb E\|u_t(x_
 u_t(x)=\frac{x-\hat x_0}{t}=\frac{x+(1-t)\,\nabla\log p_t(x)}{t}.
 ```
 
-**DDIM.** An Euler step from $`t`$ to $`t'`$ gives $`x_t+(t'-t)(\hat x_1-\hat x_0)=(1-t')\,\hat x_0+t'\,\hat x_1`$. DDIM predicts the clean data $`\hat x_1`$ and the noise $`\hat x_0`$ at the current point and recombines them at the new noise level, which for this path is the same expression. In the variables of chapter 7, Appendix C, $`x_t/t=x_1+\frac{1-t}t\,x_0`$ is the variance-exploding state with noise level $`\sigma=(1-t)/t`$, the reciprocal square root of the signal-to-noise ratio.
+**DDIM.** An Euler step from $`t`$ to $`t'`$ gives $`x_t+(t'-t)(\hat x_1-\hat x_0)=(1-t')\,\hat x_0+t'\,\hat x_1`$. DDIM predicts the clean data $`\hat x_1`$ and the noise $`\hat x_0`$ at the current point and recombines them at the new noise level, which for this path is the same expression. In the variables of [chapter 7, Appendix C](07-denoising-diffusion-models.md#block-gen07-appendix-c), $`x_t/t=x_1+\frac{1-t}t\,x_0`$ is the variance-exploding state with noise level $`\sigma=(1-t)/t`$, the reciprocal square root of the signal-to-noise ratio.
 
 </details>
 

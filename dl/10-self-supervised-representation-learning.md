@@ -8,7 +8,7 @@
 
 ### <a id="representations-and-pretext-tasks"></a>Representations and pretext tasks
 
-Labeled data are expensive and unlabeled data are abundant. The networks of the previous chapters learned features as a by-product of supervised training, and chapter 7 showed that those features transfer: an ImageNet classifier's penultimate layer is a good input for many other tasks. **Self-supervised learning** asks whether such features can be learned without labels, by training on a **pretext task** whose targets are computed from the data themselves. The pretext task is not the goal. The goal is an encoder $`f`$ whose output $`h=f(x)`$, the **representation**, makes the tasks that matter easy to learn from few labels.
+Labeled data are expensive and unlabeled data are abundant. The networks of the previous chapters learned features as a by-product of supervised training, and [chapter 7](07-convolutional-architectures-and-transfer-learning.md#transfer-learning) showed that those features transfer: an ImageNet classifier's penultimate layer is a good input for many other tasks. **Self-supervised learning** asks whether such features can be learned without labels, by training on a **pretext task** whose targets are computed from the data themselves. The pretext task is not the goal. The goal is an encoder $`f`$ whose output $`h=f(x)`$, the **representation**, makes the tasks that matter easy to learn from few labels.
 
 Early pretext tasks were designed by hand. A network was trained to predict the relative position of two patches of an image ([Doersch, Gupta, and Efros, 2015](https://arxiv.org/abs/1505.05192)), to solve a jigsaw puzzle of shuffled patches ([Noroozi and Favaro, 2016](https://arxiv.org/abs/1603.09246)), to color a grayscale image ([Zhang, Isola, and Efros, 2016](https://arxiv.org/abs/1603.08511)), to fill in a missing region ([Pathak et al., 2016](https://arxiv.org/abs/1604.07379)), or to recognize which of four rotations had been applied ([Gidaris, Singh, and Komodakis, 2018](https://arxiv.org/abs/1803.07728)). Each task can only be solved by understanding something about objects, and each produced useful features, but the features also specialized to the pretext task: the best layer for transfer was often in the middle of the network rather than at the end, especially in architectures without skip connections ([Kolesnikov, Zhai, and Beyer, 2019](https://arxiv.org/abs/1901.09005)). In text, predicting a word from its neighbors gave word embeddings ([Mikolov et al., 2013](https://arxiv.org/abs/1301.3781)), and predicting masked or next words became the pretraining of language models, developed in the NLP and LLMs module.
 
@@ -23,8 +23,8 @@ Three general families have since replaced the hand-designed tasks, and this cha
 A representation is judged by how well it serves downstream tasks, under one of a few standard protocols:
 
 - **Linear probe**: freeze the encoder and fit a linear classifier on its outputs. This measures how much class information is linearly accessible and is cheap enough to compare many encoders.
-- **$`k`$-nearest-neighbor classification** in the representation space, with no training at all (ML chapter 1).
-- **Fine-tuning**: train the whole network on the downstream task, starting from the pretrained weights (chapter 7). It usually gives the best accuracy and can rank encoders differently from a linear probe.
+- **$`k`$-nearest-neighbor classification** in the representation space, with no training at all ([ML chapter 1](../ml/01-learning-problems-and-nearest-neighbors.md)).
+- **Fine-tuning**: train the whole network on the downstream task, starting from the pretrained weights ([chapter 7](07-convolutional-architectures-and-transfer-learning.md#linear-probes-and-fine-tuning)). It usually gives the best accuracy and can rank encoders differently from a linear probe.
 - **Low-shot evaluation**: any of the above with only a few labeled examples per class, which is where pretraining matters most.
 
 A good representation is invariant to what the downstream tasks ignore, such as small shifts, lighting, and background, while keeping what they need. These goals conflict: an encoder that maps everything to a constant is perfectly invariant and useless. Much of this chapter is about how each method avoids that failure, called **collapse**.
@@ -39,7 +39,7 @@ An **autoencoder** trains an encoder $`f`$ and a decoder $`g`$ to reconstruct th
 \min_{f,g}\ \mathbb E\,\bigl\|x-g\bigl(f(x)\bigr)\bigr\|^2,
 ```
 
-where $`h=f(x)`$ has fewer dimensions than $`x`$, so the network cannot copy its input and must keep the directions that matter most for reconstruction. With linear maps and squared error, the optimal encoder–decoder pair projects onto the principal subspace of the data, the subspace spanned by the top $`k`$ principal components ([Baldi and Hornik, 1989](https://www.sciencedirect.com/science/article/pii/0893608089900142); ML chapter 12; [Appendix B](#block-dl10-appendix-b)). The code below trains a linear autoencoder by gradient descent on the digits and compares it with PCA.
+where $`h=f(x)`$ has fewer dimensions than $`x`$, so the network cannot copy its input and must keep the directions that matter most for reconstruction. With linear maps and squared error, the optimal encoder–decoder pair projects onto the principal subspace of the data, the subspace spanned by the top $`k`$ principal components ([Baldi and Hornik, 1989](https://www.sciencedirect.com/science/article/pii/0893608089900142); [ML chapter 12](../ml/12-principal-components-and-dimensionality-reduction.md#fit-transform-reconstruct); [Appendix B](#block-dl10-appendix-b)). The code below trains a linear autoencoder by gradient descent on the digits and compares it with PCA.
 
 ```python
 import numpy as np
@@ -84,7 +84,7 @@ The autoencoder finds the same subspace as PCA, but not the principal directions
 
 Instead of a bottleneck, an autoencoder can be prevented from learning the identity by other constraints: a sparsity penalty on the code, a penalty on the Jacobian of the encoder that makes the code insensitive to small input changes (**contractive** autoencoders; [Rifai et al., 2011](https://icml.cc/2011/papers/455_icmlpaper.pdf)), or corruption of the input. A **denoising autoencoder** ([Vincent et al., 2008](https://doi.org/10.1145/1390156.1390294)) receives a corrupted input $`\tilde x`$, for example with Gaussian noise added or some pixels set to zero, and must reconstruct the clean $`x`$. To do so it must learn how clean data look.
 
-For small Gaussian noise of variance $`\sigma^2`$, the optimal denoiser moves a noisy point toward regions of higher data density: $`r(\tilde x)-\tilde x\approx\sigma^2\nabla_{\tilde x}\log p(\tilde x)`$, the **score** of the noise-smoothed data distribution ([Vincent, 2011](https://doi.org/10.1162/NECO_a_00142); [Alain and Bengio, 2014](https://arxiv.org/abs/1211.4246)). Denoising at many noise levels is the training objective of diffusion models (Generative AI chapter 7), and the variational autoencoder turns the autoencoder into a probabilistic generative model (Generative AI chapter 3). Masked autoencoders, later in this chapter, are denoising autoencoders whose corruption removes whole patches.
+For small Gaussian noise of variance $`\sigma^2`$, the optimal denoiser moves a noisy point toward regions of higher data density: $`r(\tilde x)-\tilde x\approx\sigma^2\nabla_{\tilde x}\log p(\tilde x)`$, the **score** of the noise-smoothed data distribution ([Vincent, 2011](https://doi.org/10.1162/NECO_a_00142); [Alain and Bengio, 2014](https://arxiv.org/abs/1211.4246)). Denoising at many noise levels is the training objective of diffusion models ([Generative AI chapter 7](../generative-ai/07-denoising-diffusion-models.md#predicting-the-noise)), and the variational autoencoder turns the autoencoder into a probabilistic generative model ([Generative AI chapter 3](../generative-ai/03-variational-autoencoders.md)). Masked autoencoders, later in this chapter, are denoising autoencoders whose corruption removes whole patches.
 
 ## <a id="contrastive-learning"></a>Contrastive learning
 
@@ -111,7 +111,7 @@ With a ResNet-50, a linear probe on SimCLR features reached 69.3% top-1 accuracy
 
 ### <a id="what-the-loss-measures"></a>What the loss measures
 
-InfoNCE is a lower bound on the **mutual information** between the two views (Foundations chapter 5). If a critic $`f(x,y)`$ scores how likely $`y`$ is to be the partner of $`x`$, and the loss $`\mathcal L`$ is the cross-entropy of picking the true partner among $`N`$ candidates, then
+InfoNCE is a lower bound on the **mutual information** between the two views ([Foundations chapter 5](../foundations/05-information-and-learning-theory.md#mutual-information-and-data-processing)). If a critic $`f(x,y)`$ scores how likely $`y`$ is to be the partner of $`x`$, and the loss $`\mathcal L`$ is the cross-entropy of picking the true partner among $`N`$ candidates, then
 
 ```math
 I(X;Y)\ \ge\ \log N-\mathcal L ,
@@ -166,7 +166,7 @@ The augmentations define the invariances. Whatever differs between two views is 
 
 *Random views of three digits used in the experiments of this chapter: rotations of up to 17 degrees, rescaling by up to 15%, shifts of up to one pixel, and pixel noise. At a resolution of $`8\times8`$ every transformation also blurs the digit.*
 
-This view-centered picture has a theoretical counterpart. Define a graph whose vertices are all possible augmented images, with edges weighted by the probability that two of them are views of the same image. Minimizing a contrastive loss is then close to computing the top eigenvectors of this graph's normalized adjacency matrix, a spectral embedding in the sense of ML chapter 13, and if classes are rarely connected by augmentations, a linear probe on the embedding classifies well ([HaoChen et al., 2021](https://arxiv.org/abs/2106.04156); [Arora et al., 2019](https://arxiv.org/abs/1902.09229)).
+This view-centered picture has a theoretical counterpart. Define a graph whose vertices are all possible augmented images, with edges weighted by the probability that two of them are views of the same image. Minimizing a contrastive loss is then close to computing the top eigenvectors of this graph's normalized adjacency matrix, a spectral embedding in the sense of [ML chapter 13](../ml/13-clustering.md), and if classes are rarely connected by augmentations, a linear probe on the embedding classifies well ([HaoChen et al., 2021](https://arxiv.org/abs/2106.04156); [Arora et al., 2019](https://arxiv.org/abs/1902.09229)).
 
 ### <a id="contrasting-modalities"></a>Contrasting modalities
 
@@ -248,7 +248,7 @@ Two observations generalize. The benefit of pretraining is largest when labels a
 BERT ([Devlin et al., 2019](https://arxiv.org/abs/1810.04805)) pretrained transformers by hiding 15% of the words of a text and predicting them, and masked prediction became the dominant pretraining for language encoders. Its transfer to images took several years, because pixels are redundant: a missing patch can be interpolated from its neighbors without understanding the image. The **masked autoencoder** (MAE; [He et al., 2022](https://arxiv.org/abs/2111.06377)) made it work with three choices:
 
 - **A high masking ratio.** Hiding 75% of the patches of an image removes so much that the network cannot interpolate and must model objects and scenes.
-- **An asymmetric design.** The encoder, a vision transformer (chapter 9), processes only the visible patches, a quarter of the sequence, which makes pretraining several times cheaper. A small decoder receives the encoded visible patches together with a learned **mask token** at every hidden position and reconstructs the pixels.
+- **An asymmetric design.** The encoder, a vision transformer ([chapter 9](09-attention-and-transformers.md#vision-transformers)), processes only the visible patches, a quarter of the sequence, which makes pretraining several times cheaper. A small decoder receives the encoded visible patches together with a learned **mask token** at every hidden position and reconstructs the pixels.
 - **A loss on the hidden patches only**, with the pixel values of each patch normalized to zero mean and unit variance, which emphasizes edges and texture over overall brightness.
 
 After pretraining, the decoder is discarded. MAE features are best used by fine-tuning, where a ViT-Huge reached 87.8% on ImageNet using no data beyond ImageNet itself; under a linear probe they are weaker than contrastive features, because reconstruction keeps information that classification does not need, and the features are less linearly organized by class.
@@ -263,7 +263,7 @@ Pixels are not the only possible target. BEiT ([Bao et al., 2022](https://arxiv.
 
 DINOv2 ([Oquab et al., 2023](https://arxiv.org/abs/2304.07193)) combined self-distillation on whole images with masked prediction of patch representations, trained on 142 million automatically curated images, and produced frozen features that work across classification, segmentation, and depth estimation without fine-tuning. Together with CLIP, such models are used as general-purpose visual backbones, the image counterpart of pretrained language models.
 
-UNIGE sections 7.2 and 7.3 and the *Cookbook of Self-Supervised Learning* of [Balestriero et al. (2023)](https://arxiv.org/abs/2304.12210), listed in the reading plan, cover autoencoders and the families of self-supervised methods, with the training details that make them work; [Lilian Weng's survey](https://lilianweng.github.io/posts/2021-05-31-contrastive/) collects the contrastive objectives.
+UNIGE sections 7.2 and 7.3 and the *Cookbook of Self-Supervised Learning* of [Balestriero et al. (2023)](https://arxiv.org/abs/2304.12210), listed in the [reading plan](reading-plan.md#10-self-supervised-representation-learning), cover autoencoders and the families of self-supervised methods, with the training details that make them work; [Lilian Weng's survey](https://lilianweng.github.io/posts/2021-05-31-contrastive/) collects the contrastive objectives.
 
 ## <a id="appendices"></a>Appendices
 
@@ -280,7 +280,7 @@ q(k\mid X,Y_{1:N})=\frac{e^{f(X,Y_k)}}{\sum_{j=1}^Ne^{f(X,Y_j)}},
 
 and the InfoNCE loss is $`\mathcal L=-\mathbb E\log q(K\mid X,Y_{1:N})`$.
 
-**Step 1: a cross-entropy bounds an entropy.** For any conditional distribution $`q`$, $`-\mathbb E\log q(K\mid X,Y_{1:N})\ge H(K\mid X,Y_{1:N})`$, because the difference is an expected Kullback–Leibler divergence (Foundations chapter 5). Hence
+**Step 1: a cross-entropy bounds an entropy.** For any conditional distribution $`q`$, $`-\mathbb E\log q(K\mid X,Y_{1:N})\ge H(K\mid X,Y_{1:N})`$, because the difference is an expected Kullback–Leibler divergence ([Foundations chapter 5](../foundations/05-information-and-learning-theory.md#cross-entropy-divergence-and-log-loss)). Hence
 
 ```math
 \log N-\mathcal L\le\log N-H(K\mid X,Y_{1:N})=H(K)-H(K\mid X,Y_{1:N})=I(K;X,Y_{1:N}).
@@ -302,7 +302,7 @@ and the InfoNCE loss is $`\mathcal L=-\mathbb E\log q(K\mid X,Y_{1:N})`$.
 <summary><a id="block-dl10-appendix-b"></a><b>B. Linear autoencoders and principal components</b></summary>
 
 
-Let the centered data matrix $`X\in\mathbb R^{n\times p}`$ have singular value decomposition $`X=USV^\top`$, and consider an encoder $`E\in\mathbb R^{k\times p}`$ and a decoder $`D\in\mathbb R^{p\times k}`$. The reconstruction $`XE^\top D^\top`$ has rank at most $`k`$, so by the Eckart–Young theorem its squared error is at least $`\sum_{i>k}s_i^2`$, the error of projecting onto the top $`k`$ right singular vectors $`V_k`$ (Foundations chapter 2). The minimum is attained whenever $`D E=V_kV_k^\top`$, for example by $`E=A^{-1}V_k^\top`$ and $`D=V_kA`$ for any invertible $`k\times k`$ matrix $`A`$. The decoder's columns then span the principal subspace, but they are orthonormal principal directions only if $`A`$ is orthogonal and ordered, which gradient descent has no reason to produce; the code above finds exactly this.
+Let the centered data matrix $`X\in\mathbb R^{n\times p}`$ have singular value decomposition $`X=USV^\top`$, and consider an encoder $`E\in\mathbb R^{k\times p}`$ and a decoder $`D\in\mathbb R^{p\times k}`$. The reconstruction $`XE^\top D^\top`$ has rank at most $`k`$, so by the Eckart–Young theorem its squared error is at least $`\sum_{i>k}s_i^2`$, the error of projecting onto the top $`k`$ right singular vectors $`V_k`$ ([Foundations chapter 2](../foundations/02-linear-algebra.md)). The minimum is attained whenever $`D E=V_kV_k^\top`$, for example by $`E=A^{-1}V_k^\top`$ and $`D=V_kA`$ for any invertible $`k\times k`$ matrix $`A`$. The decoder's columns then span the principal subspace, but they are orthonormal principal directions only if $`A`$ is orthogonal and ordered, which gradient descent has no reason to produce; the code above finds exactly this.
 
 [Baldi and Hornik (1989)](https://www.sciencedirect.com/science/article/pii/0893608089900142) also showed that this loss has no spurious local minima: every critical point other than the global minima projects onto a subspace spanned by some other set of $`k`$ eigenvectors and is a saddle point, so gradient descent from a generic starting point reaches the principal subspace.
 

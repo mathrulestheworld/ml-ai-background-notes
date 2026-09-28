@@ -8,7 +8,7 @@
 
 ### <a id="planning-tasks"></a>Planning tasks
 
-A search agent of chapter 1 needs a problem-specific state representation, successor function, and heuristic. **Automated planning** asks for more generality: a single program that accepts a *description* of any problem in a standard language and finds a plan for it, with heuristics derived automatically from the description. **Classical planning** keeps the assumptions of chapter 1, a fully observable, deterministic, static environment with a single agent, and uses a **factored** representation of states: a state is a set of ground atoms, the facts true in it, and every atom not listed is false (the closed-world assumption of chapter 6).
+A search agent of [chapter 1](01-agents-and-uninformed-search.md) needs a problem-specific state representation, successor function, and heuristic. **Automated planning** asks for more generality: a single program that accepts a *description* of any problem in a standard language and finds a plan for it, with heuristics derived automatically from the description. **Classical planning** keeps the assumptions of chapter 1, a fully observable, deterministic, static environment with a single agent, and uses a **factored** representation of states: a state is a set of ground atoms, the facts true in it, and every atom not listed is false (the closed-world assumption of [chapter 6](06-first-order-logic-and-knowledge-representation.md#semantics)).
 
 The classical formalism is **STRIPS** ([Fikes and Nilsson, 1971](https://www.sciencedirect.com/science/article/pii/0004370271900105)). A planning task consists of
 
@@ -21,7 +21,7 @@ An action is applicable in $`s`$ when $`\mathrm{pre}(a)\subseteq s`$, and applyi
 \mathrm{Result}(s,a)=\bigl(s\setminus\mathrm{del}(a)\bigr)\cup\mathrm{add}(a).
 ```
 
-Everything not mentioned stays as it was, which solves the frame problem of chapter 5 by convention. A **plan** is a sequence of actions, each applicable in the state produced by its predecessors, that ends in a state containing $`G`$. The **Planning Domain Definition Language** (PDDL) writes actions as schemas with variables, such as
+Everything not mentioned stays as it was, which solves the frame problem of [chapter 5](05-propositional-logic-and-satisfiability.md#logical-agents) by convention. A **plan** is a sequence of actions, each applicable in the state produced by its predecessors, that ends in a state containing $`G`$. The **Planning Domain Definition Language** (PDDL) writes actions as schemas with variables, such as
 
 ```lisp
 (:action move
@@ -58,7 +58,7 @@ the conditions that must hold before $`a`$ so that $`g`$ holds after it. The sea
 
 ### <a id="the-delete-relaxation"></a>The delete relaxation
 
-The central idea of domain-independent planning heuristics, developed in HSP ([Bonet and Geffner, 2001](https://www.sciencedirect.com/science/article/pii/S0004370201001084)), is a relaxed problem in the sense of chapter 2: **ignore the delete lists**. In the relaxed task, atoms once true stay true, so states only grow, applying an action can never hurt, and whether the goal is reachable can be decided in polynomial time by applying every applicable action until nothing changes. The cost $`h^+(s)`$ of an optimal relaxed plan from $`s`$ is an admissible heuristic, since every real plan is also a relaxed plan. Computing $`h^+`$ is itself NP-hard, so practical heuristics approximate it.
+The central idea of domain-independent planning heuristics, developed in HSP ([Bonet and Geffner, 2001](https://www.sciencedirect.com/science/article/pii/S0004370201001084)), is a relaxed problem in the sense of [chapter 2](02-heuristic-search.md#heuristics-from-relaxed-problems): **ignore the delete lists**. In the relaxed task, atoms once true stay true, so states only grow, applying an action can never hurt, and whether the goal is reachable can be decided in polynomial time by applying every applicable action until nothing changes. The cost $`h^+(s)`$ of an optimal relaxed plan from $`s`$ is an admissible heuristic, since every real plan is also a relaxed plan. Computing $`h^+`$ is itself NP-hard, so practical heuristics approximate it.
 
 ### <a id="h-max-and-h-mathrm-add"></a>$`h^{\max}`$ and $`h^{\mathrm{add}}`$
 
@@ -81,7 +81,7 @@ The FF planner ([Hoffmann and Nebel, 2001](https://doi.org/10.1613/jair.855)) ex
 
 ### <a id="landmarks-and-other-heuristics"></a>Landmarks and other heuristics
 
-A **landmark** is an atom that must be true at some point in every plan, or an action that every plan must contain; the goal atoms are trivial landmarks, and others are found by analyzing the relaxed task. Counting the landmarks not yet achieved gives an informative heuristic: the LAMA planner ([Richter and Westphal, 2010](https://doi.org/10.1613/jair.2972)) combines it with $`h^{\mathrm{FF}}`$ in a greedy search followed by weighted A\* with decreasing weights, the anytime scheme of chapter 2. For optimal planning, the **LM-cut** heuristic computes disjunctive action landmarks, sets of actions one of which every plan must use, by cuts in a graph of the relaxed task, and assigns costs to them without double counting; it is admissible and dominates $`h^{\max}`$. **Abstraction heuristics**, including the pattern databases of chapter 2 computed automatically from the task, and **cost partitioning**, which splits each action's cost among several heuristics so that their sum stays admissible, complete the toolkit of optimal planners.
+A **landmark** is an atom that must be true at some point in every plan, or an action that every plan must contain; the goal atoms are trivial landmarks, and others are found by analyzing the relaxed task. Counting the landmarks not yet achieved gives an informative heuristic: the LAMA planner ([Richter and Westphal, 2010](https://doi.org/10.1613/jair.2972)) combines it with $`h^{\mathrm{FF}}`$ in a greedy search followed by weighted A\* with decreasing weights, the anytime scheme of [chapter 2](02-heuristic-search.md#weighted-a). For optimal planning, the **LM-cut** heuristic computes disjunctive action landmarks, sets of actions one of which every plan must use, by cuts in a graph of the relaxed task, and assigns costs to them without double counting; it is admissible and dominates $`h^{\max}`$. **Abstraction heuristics**, including the pattern databases of [chapter 2](02-heuristic-search.md#pattern-databases) computed automatically from the task, and **cost partitioning**, which splits each action's cost among several heuristics so that their sum stays admissible, complete the toolkit of optimal planners.
 
 A small STRIPS planner shows the relaxation heuristics at work:
 
@@ -201,7 +201,7 @@ For this task of stacking six blocks from two towers into one, the shortest plan
 
 ## <a id="planning-as-satisfiability"></a>Planning as satisfiability
 
-A plan of a fixed length $`T`$ can also be found by logical inference, as chapter 5 anticipated. **SATPlan** ([Kautz and Selman, 1996](https://aaai.org/papers/177-aaai96-177-pushing-the-envelope-planning-propositional-logic-and-stochastic-search/)) introduces a propositional variable $`p^t`$ for each atom $`p`$ and time step $`t=0,\dots,T`$, and $`a^t`$ for each action and step $`t<T`$, and writes clauses for
+A plan of a fixed length $`T`$ can also be found by logical inference, as [chapter 5](05-propositional-logic-and-satisfiability.md#logical-agents) anticipated. **SATPlan** ([Kautz and Selman, 1996](https://aaai.org/papers/177-aaai96-177-pushing-the-envelope-planning-propositional-logic-and-stochastic-search/)) introduces a propositional variable $`p^t`$ for each atom $`p`$ and time step $`t=0,\dots,T`$, and $`a^t`$ for each action and step $`t<T`$, and writes clauses for
 
 - the **initial state**: $`p^0`$ for atoms in $`s_0`$ and $`\neg p^0`$ for the others;
 - the **goal**: $`g^T`$ for each goal atom;
@@ -307,7 +307,7 @@ for T in range(1, 5):
 #   plan: move(C,A,table), move(B,table,C), move(A,table,B)
 ```
 
-For one and two steps, unit propagation alone proves the formula unsatisfiable, without any branching; with three steps the solver finds a plan after 16 decisions: put C on the table, B on C, and A on B. Planning as satisfiability inherits all the progress of SAT solvers (chapter 5) and is strong on tasks that need long chains of reasoning within a short parallel horizon. Its weakness is size: the encoding grows with the number of ground actions times the horizon, and plans that need many steps require large formulas. **Graphplan** ([Blum and Furst, 1997](https://www.sciencedirect.com/science/article/pii/S0004370296000471)), which builds a layered **planning graph** of atoms and actions reachable at each level together with mutual-exclusion relations, is a related method; the planning graph also yields the relaxation heuristics above, since ignoring the mutexes gives exactly the delete relaxation.
+For one and two steps, unit propagation alone proves the formula unsatisfiable, without any branching; with three steps the solver finds a plan after 16 decisions: put C on the table, B on C, and A on B. Planning as satisfiability inherits all the progress of SAT solvers ([chapter 5](05-propositional-logic-and-satisfiability.md#conflict-driven-clause-learning)) and is strong on tasks that need long chains of reasoning within a short parallel horizon. Its weakness is size: the encoding grows with the number of ground actions times the horizon, and plans that need many steps require large formulas. **Graphplan** ([Blum and Furst, 1997](https://www.sciencedirect.com/science/article/pii/S0004370296000471)), which builds a layered **planning graph** of atoms and actions reachable at each level together with mutual-exclusion relations, is a related method; the planning graph also yields the relaxation heuristics above, since ignoring the mutexes gives exactly the delete relaxation.
 
 ## <a id="other-planning-paradigms"></a>Other planning paradigms
 
@@ -323,7 +323,7 @@ Human planners think in abstract steps: "go to the conference" before "book the 
 
 Real tasks break classical assumptions in several ways, each with its own extensions:
 
-- **Time and resources.** Temporal planning schedules durative actions that overlap, under deadlines and resource limits, which merges planning with the scheduling problems of chapter 3.
+- **Time and resources.** Temporal planning schedules durative actions that overlap, under deadlines and resource limits, which merges planning with the scheduling problems of [chapter 3](03-constraint-satisfaction-and-local-search.md).
 - **Nondeterminism and partial observability.** **Conformant** planning finds plans that work without any observation, by searching over belief states; **contingent** planning builds plans with branches on observations. When outcomes have probabilities and rewards, the problem becomes a Markov decision process, solved by the dynamic programming and reinforcement learning of the RL module.
 - **Execution monitoring and replanning.** An agent executing a plan checks whether the preconditions of the remaining steps still hold and replans from the current state when they do not. Replanning is often cheaper than planning for every contingency in advance.
 - **Unknown models.** When the action descriptions are not given, they can be learned from observed transitions, or planning can proceed with a learned model, as in the model-based methods of RL.

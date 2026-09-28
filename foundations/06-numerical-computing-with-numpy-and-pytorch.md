@@ -12,7 +12,7 @@ The earlier chapters work with vectors, matrices, functions, and probability dis
 
 **Definition (array, shape, and order).** An **array** of **shape** $`(d_1,\ldots,d_k)`$ assigns a value of one common data type to every index tuple $`(i_1,\ldots,i_k)`$ with $`1\le i_j\le d_j`$; NumPy and PyTorch number the same positions from zero. The number of axes $`k`$ is the array's **order**, reported as `ndim`, and its **size** is the number of entries, $`\prod_{j=1}^k d_j`$. An array of order zero holds one value.
 
-Software documentation sometimes calls the number of axes the "rank". These notes keep the linear-algebra meaning of rank instead: an array of shape `(4, 3)` has order two, while its matrix rank can be anything from zero to three. Tensor rank for arrays of higher order is yet another notion, discussed in Linear Algebra.
+Software documentation sometimes calls the number of axes the "rank". These notes keep the linear-algebra meaning of rank instead: an array of shape `(4, 3)` has order two, while its matrix rank can be anything from zero to three. Tensor rank for arrays of higher order is yet another notion, discussed in [Linear Algebra](02-linear-algebra.md).
 
 In ML code, "tensor" simply means an array of any order. An array can hold the coordinates of a mathematical tensor in chosen bases, but it can just as well hold an image, a list of token identifiers, or a table of unrelated measurements. Its shape records how many axes there are and how long they are, not what the axes mean or how the entries would transform under a change of basis.
 
@@ -242,7 +242,7 @@ Mathematical notation writes the solution of $`Ax=b`$ as $`A^{-1}b`$, but a prog
 
 For $`X\in\mathbb R^{N\times d}`$, least squares minimizes $`\|Xw-y\|_2`$. When $`X`$ has full column rank the minimizer is unique; otherwise the minimizers form an affine set, and the routine returns the one of smallest Euclidean norm. Whether $`X`$ is rank deficient is itself decided numerically: singular values below a tolerance are treated as zero. That decision describes the data at a given precision; it does not prove the exact rank of a matrix whose entries have been rounded.
 
-The normal equations $`X^\top Xw=X^\top y`$ look like a simpler route, but forming $`X^\top X`$ squares the condition number: for $`X`$ of full column rank, $`\kappa_2(X^\top X)=\kappa_2(X)^2`$. Since the error bound at the end of this section grows with the condition number, this can lose about twice as many digits. `lstsq` works with $`X`$ itself, through its singular value decomposition, and so does not introduce this squaring itself. Linear Algebra explains the projection and SVD pictures behind this approach.
+The normal equations $`X^\top Xw=X^\top y`$ look like a simpler route, but forming $`X^\top X`$ squares the condition number: for $`X`$ of full column rank, $`\kappa_2(X^\top X)=\kappa_2(X)^2`$. Since the error bound at the end of this section grows with the condition number, this can lose about twice as many digits. `lstsq` works with $`X`$ itself, through its singular value decomposition, and so does not introduce this squaring itself. [Linear Algebra](02-linear-algebra.md#least-squares-as-projection) explains the projection and SVD pictures behind this approach.
 
 ```python
 import numpy as np
@@ -269,7 +269,7 @@ Once a solution has been computed, its quality can be judged in two ways: by how
 
 **Definition (residual and forward error).** Let $`A`$ be invertible, $`b\ne0`$, and $`x=A^{-1}b`$. For a computed vector $`\widehat x`$, the **residual** is $`r=b-A\widehat x`$ and the **forward error** is $`\widehat x-x`$.
 
-The computed vector solves the perturbed system $`A\widehat x=b-r`$ exactly, so its error is $`\widehat x-x=-A^{-1}r`$ and $`\|\widehat x-x\|_2\le\|A^{-1}\|_2\|r\|_2`$. Dividing by $`\|x\|_2`$ and using $`\|b\|_2\le\|A\|_2\|x\|_2`$ gives the perturbation bound of Linear Algebra:
+The computed vector solves the perturbed system $`A\widehat x=b-r`$ exactly, so its error is $`\widehat x-x=-A^{-1}r`$ and $`\|\widehat x-x\|_2\le\|A^{-1}\|_2\|r\|_2`$. Dividing by $`\|x\|_2`$ and using $`\|b\|_2\le\|A\|_2\|x\|_2`$ gives the perturbation bound of [Linear Algebra](02-linear-algebra.md#sensitivity-and-numerical-stability):
 
 ```math
 \frac{\|\widehat x-x\|_2}{\|x\|_2}
@@ -305,7 +305,7 @@ Log losses need one more step, because a very small probability can still round 
 =m+\operatorname{LSE}(u),
 ```
 
-where the **log-sum-exp** of the shifted logits is safe to compute because its sum lies between $`1`$ and $`K`$. As in NumPy and PyTorch, $`\log`$ in this chapter is the natural logarithm, so log losses are in nats; dividing by $`\ln2`$ converts them to the bits used in Information and Learning Theory.
+where the **log-sum-exp** of the shifted logits is safe to compute because its sum lies between $`1`$ and $`K`$. As in NumPy and PyTorch, $`\log`$ in this chapter is the natural logarithm, so log losses are in nats; dividing by $`\ln2`$ converts them to the bits used in [Information and Learning Theory](05-information-and-learning-theory.md#surprise-and-entropy).
 
 For a class label $`y`$, the negative log-likelihood is $`-\log p_y=\operatorname{LSE}(z)-z_y`$, which is finite whenever the logits are, even when $`p_y`$ itself underflows. Its gradient is simple too. The partial derivative of $`\operatorname{LSE}`$ with respect to $`z_k`$ is $`e^{z_k}/\sum_je^{z_j}=p_k`$, so the gradient of the loss with respect to the logits is $`p-e_y`$, where $`e_y`$ is the coordinate vector of class $`y`$. SciPy provides [`logsumexp`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.logsumexp.html) and [`softmax`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.special.softmax.html) implementations.
 
@@ -373,13 +373,13 @@ Training needs the gradient of a scalar loss $`L(\theta)`$ with respect to param
 dL=\langle\nabla_W L,dW\rangle_F,
 ```
 
-which is the gradient convention of Calculus and Optimization. Code therefore never needs to flatten the parameters into a single vector.
+which is the gradient convention of [Calculus and Optimization](03-calculus-and-optimization.md#derivatives-and-local-approximation). Code therefore never needs to flatten the parameters into a single vector.
 
 To compute such gradients, PyTorch records the computation while it runs.
 
 **Definition (computational graph and leaf).** An operation is **tracked** when gradient recording is enabled and at least one of its inputs requires gradients. While tracked operations execute, PyTorch records a **computational graph**: a directed acyclic graph that links each result to the tensors it was computed from and to the derivative rule of the operation. A tensor that requires gradients but was not produced by a tracked operation, such as a parameter or an input created with `requires_grad=True`, is a **leaf**; by convention, every tensor that does not require gradients also counts as a leaf.
 
-Reverse differentiation traverses this graph backward from the loss, as in Calculus and Optimization. By default it stores gradients only for leaves that require them, in their `.grad` attributes; intermediate results receive no `.grad`, which saves memory. The [`is_leaf` documentation](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html) states the convention precisely.
+Reverse differentiation traverses this graph backward from the loss, as in [Calculus and Optimization](03-calculus-and-optimization.md#computational-graphs-and-local-derivative-rules). By default it stores gradients only for leaves that require them, in their `.grad` attributes; intermediate results receive no `.grad`, which saves memory. The [`is_leaf` documentation](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.is_leaf.html) states the convention precisely.
 
 Calling [`backward`](https://docs.pytorch.org/docs/stable/generated/torch.Tensor.backward.html) on a scalar loss starts this traversal from the derivative of the loss with respect to itself, which is one. The resulting gradients are **added** to whatever the leaves' `.grad` attributes already hold, rather than replacing it. Accumulation is useful when a gradient is assembled from pieces, for example from several small batches whose losses are propagated backward one at a time, but it means that `.grad` must be cleared before each new update. For example, $`L(w)=\tfrac12\|w\|^2`$ has gradient $`w`$, so two backward calls on two fresh evaluations at $`w=(2,-1)^\top`$ leave $`2w`$ in the gradient:
 
@@ -412,7 +412,7 @@ The graph contains only operations that PyTorch executed on tensors. Moving part
 
 ### <a id="directional-derivatives-and-output-sensitivities"></a>Directional derivatives and output sensitivities
 
-A gradient is the derivative of a scalar output. For a map $`F:\mathbb R^d\to\mathbb R^m`$ with several outputs, Calculus and Optimization introduced two derivative products, the Jacobian–vector product (JVP) and the vector–Jacobian product (VJP). In numerator layout their shapes are
+A gradient is the derivative of a scalar output. For a map $`F:\mathbb R^d\to\mathbb R^m`$ with several outputs, [Calculus and Optimization](03-calculus-and-optimization.md#choosing-between-forward-and-reverse-mode) introduced two derivative products, the Jacobian–vector product (JVP) and the vector–Jacobian product (VJP). In numerator layout their shapes are
 
 ```math
 J_F(x)\in\mathbb R^{m\times d},
@@ -579,7 +579,7 @@ For an observed class $`y_i`$, the negative log-likelihood is
 =\log\sum_{c=1}^{C}\exp(s_{ic})-s_{i,y_i},
 ```
 
-the log-sum-exp form of the first part. It is the cross-entropy between the one-hot target and the predicted distribution, the log loss of Information and Learning Theory measured in nats. Its derivative with respect to one logit is $`\partial\ell_i/\partial s_{ic}=p_{ic}-\mathbf 1\{c=y_i\}`$, the probability error, and the mean over a batch adds a factor $`1/B`$.
+the log-sum-exp form of the first part. It is the cross-entropy between the one-hot target and the predicted distribution, the log loss of [Information and Learning Theory](05-information-and-learning-theory.md) measured in nats. Its derivative with respect to one logit is $`\partial\ell_i/\partial s_{ic}=p_{ic}-\mathbf 1\{c=y_i\}`$, the probability error, and the mean over a batch adds a factor $`1/B`$.
 
 [`CrossEntropyLoss`](https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html) and its functional form `F.cross_entropy` take logits, not probabilities, and compute the log-sum-exp internally, so tiny probabilities are never formed. For ordinary integer labels, the scores have shape `(B, C)` and the targets have shape `(B,)`, dtype `torch.long`, and values `0` through `C - 1`. A common mistake is to apply softmax before the loss. The loss then treats the probabilities as logits and applies softmax a second time, which defines a different objective.
 
@@ -654,7 +654,7 @@ Here $`X_B`$ has shape $`B\times d`$ and the residual $`p-y`$ has $`B`$ entries,
 
 In [PyTorch's optimizer interface](https://docs.pytorch.org/docs/stable/optim.html), one update consists of three calls. [`zero_grad(set_to_none=True)`](https://docs.pytorch.org/docs/stable/generated/torch.optim.Optimizer.zero_grad.html) discards the gradients accumulated so far, `loss.backward()` computes the gradient of the current batch's loss, and `optimizer.step()` changes the parameters. For plain SGD without momentum or weight decay, the step replaces each parameter by its old value minus the learning rate times its gradient. Optimizers such as Adam also keep state between steps, such as running averages of past gradients, and `zero_grad` leaves that state intact. [Appendix C](#block-numerical-appendix-c) explains why an absent gradient differs from a zero one.
 
-The batches can be drawn in two ways. If each batch is sampled uniformly from a fixed dataset, its mean gradient is an unbiased estimate of the gradient on the full dataset, which is the setting of the convergence results in Calculus and Optimization. Data loaders more often reshuffle the dataset at every pass and then traverse it without replacement. Later batches of a pass then depend on the examples already used, so a theorem that assumes independent sampling does not apply to this scheme as stated.
+The batches can be drawn in two ways. If each batch is sampled uniformly from a fixed dataset, its mean gradient is an unbiased estimate of the gradient on the full dataset, which is the setting of the convergence results in [Calculus and Optimization](03-calculus-and-optimization.md#stochastic-gradients-and-convergence-in-expectation). Data loaders more often reshuffle the dataset at every pass and then traverse it without replacement. Later batches of a pass then depend on the examples already used, so a theorem that assumes independent sampling does not apply to this scheme as stated.
 
 ### <a id="a-complete-numerical-example"></a>A complete numerical example
 
@@ -754,7 +754,7 @@ print("test loss and accuracy:", test_loss, test_accuracy)
 
 The learning rate and the budget of forty epochs were fixed before the test data were used. Had they been chosen by comparing performance, the comparison would have needed a separate validation set, with the test set kept for the final assessment of the chosen procedure. The code reports the training loss before and after fitting, and then the final loss and accuracy on both datasets. Its fixed seeds make the calculation repeatable in a fixed software environment, but the test scores remain estimates from $`257`$ observations and carry sampling uncertainty.
 
-In the CPU environment of the computing setup, the training loss falls from $`0.879`$ to $`0.521`$ nats and the final training accuracy is $`0.736`$; the test loss and accuracy are $`0.545`$ and $`0.696`$. For comparison, the true conditional probabilities have population log loss $`0.520`$ nats, and the classifier that thresholds them at $`1/2`$ has population accuracy $`0.740`$. No predictor does better in expectation over new observations, although scores on a finite sample can exceed these values by chance.
+In the CPU environment of the [computing setup](sources/computing-setup.md), the training loss falls from $`0.879`$ to $`0.521`$ nats and the final training accuracy is $`0.736`$; the test loss and accuracy are $`0.545`$ and $`0.696`$. For comparison, the true conditional probabilities have population log loss $`0.520`$ nats, and the classifier that thresholds them at $`1/2`$ has population accuracy $`0.740`$. No predictor does better in expectation over new observations, although scores on a finite sample can exceed these values by chance.
 
 <img src="sources/images/numerical-training-curve.png" alt="numerical-training-curve" width="680">
 
@@ -923,7 +923,7 @@ Inside `torch.no_grad()`, the results of operations do not require gradients eve
 
 #### <a id="probability-targets-for-cross-entropy"></a>Probability targets for cross-entropy
 
-Instead of class indices, [`CrossEntropyLoss`](https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html) accepts a floating target $`q`$ with the same shape as the logits, one probability vector per row. The loss of row $`i`$ is then $`-\sum_cq_{ic}\log p_{ic}`$, the cross-entropy $`H(q_i,p_i)`$ of Information and Learning Theory. Each target row should have nonnegative entries summing to one, and then the logit gradient is $`p_i-q_i`$, divided by $`B`$ under the mean reduction. PyTorch does not enforce these constraints, so a correctly shaped target can still define an unintended loss.
+Instead of class indices, [`CrossEntropyLoss`](https://docs.pytorch.org/docs/stable/generated/torch.nn.CrossEntropyLoss.html) accepts a floating target $`q`$ with the same shape as the logits, one probability vector per row. The loss of row $`i`$ is then $`-\sum_cq_{ic}\log p_{ic}`$, the cross-entropy $`H(q_i,p_i)`$ of [Information and Learning Theory](05-information-and-learning-theory.md#cross-entropy-divergence-and-log-loss). Each target row should have nonnegative entries summing to one, and then the logit gradient is $`p_i-q_i`$, divided by $`B`$ under the mean reduction. PyTorch does not enforce these constraints, so a correctly shaped target can still define an unintended loss.
 
 #### <a id="absent-and-zero-gradients"></a>Absent and zero gradients
 

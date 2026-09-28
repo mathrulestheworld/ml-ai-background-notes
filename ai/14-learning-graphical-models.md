@@ -6,7 +6,7 @@
 
 ## <a id="learning-from-data"></a>Learning from data
 
-The graphical models of chapters 8–11 were specified by hand: an expert drew the graph and supplied the probabilities. Most models are instead learned, fully or in part, from data, and learning a graphical model has two layers. **Parameter learning** fits the conditional probability tables or potentials for a given graph; **structure learning** chooses the graph itself. Each is easier when the data are **complete**, every variable observed in every example, and harder with hidden variables or missing values. The methods are those of statistics, maximum likelihood, Bayesian estimation, and EM (Foundations chapter 4, ML chapter 14), and the graph determines how they decompose.
+The graphical models of chapters 8–11 were specified by hand: an expert drew the graph and supplied the probabilities. Most models are instead learned, fully or in part, from data, and learning a graphical model has two layers. **Parameter learning** fits the conditional probability tables or potentials for a given graph; **structure learning** chooses the graph itself. Each is easier when the data are **complete**, every variable observed in every example, and harder with hidden variables or missing values. The methods are those of statistics, maximum likelihood, Bayesian estimation, and EM ([Foundations chapter 4](../foundations/04-probability-and-statistics.md#constructing-point-estimators), [ML chapter 14](../ml/14-gaussian-mixtures-and-expectation-maximization.md)), and the graph determines how they decompose.
 
 ## <a id="parameters-from-complete-data"></a>Parameters from complete data
 
@@ -28,7 +28,7 @@ A CPT with $`k`$ parents of $`d`$ values each has $`d^k`$ rows, and with modest 
 P\bigl(X_i=x\mid\mathrm{pa},\mathcal D\bigr)=\frac{N_i(x,\mathrm{pa})+\alpha}{N_i(\mathrm{pa})+d\,\alpha},
 ```
 
-the Laplace smoothing of naive Bayes (ML chapter 4) for every family. The pseudocounts express prior belief, a weak one when $`\alpha`$ is small, and they matter exactly where data are scarce.
+the Laplace smoothing of naive Bayes ([ML chapter 4](../ml/04-generative-classifiers.md#smoothing-zero-counts)) for every family. The pseudocounts express prior belief, a weak one when $`\alpha`$ is small, and they matter exactly where data are scarce.
 
 <img src="sources/images/ai-learn-trees.png" alt="ai-learn-trees" width="880">
 
@@ -38,17 +38,17 @@ the Laplace smoothing of naive Bayes (ML chapter 4) for every family. The pseudo
 
 ### <a id="log-linear-models-and-the-moment-matching-gradient"></a>Log-linear models and the moment-matching gradient
 
-Undirected models do not decompose so easily, because the partition function couples all parameters. For a log-linear model, $`P(x)=\exp\bigl(w^\top f(x)\bigr)/Z(w)`$ with feature vector $`f`$ (chapter 8), the average log-likelihood of the data is
+Undirected models do not decompose so easily, because the partition function couples all parameters. For a log-linear model, $`P(x)=\exp\bigl(w^\top f(x)\bigr)/Z(w)`$ with feature vector $`f`$ ([chapter 8](08-bayesian-networks-and-markov-networks.md#log-linear-models)), the average log-likelihood of the data is
 
 ```math
 \ell(w)=w^\top\hat{\mathbb E}[f]-\log Z(w),\qquad\nabla\ell(w)=\hat{\mathbb E}[f]-\mathbb E_{w}[f],
 ```
 
-because the gradient of $`\log Z`$ is the expected feature vector under the model ([Appendix B](#block-ai14-appendix-b)). The log-likelihood is concave, and at the maximum the model's expected features equal their empirical averages: **maximum likelihood is moment matching**. It is also, by convex duality, the **maximum-entropy** distribution among those that match the empirical moments. Each gradient step needs the model's expectations, an inference problem (chapters 9–10), so learning is at least as hard as inference and usually runs it in an inner loop, exactly where exact inference is infeasible.
+because the gradient of $`\log Z`$ is the expected feature vector under the model ([Appendix B](#block-ai14-appendix-b)). The log-likelihood is concave, and at the maximum the model's expected features equal their empirical averages: **maximum likelihood is moment matching**. It is also, by convex duality, the **maximum-entropy** distribution among those that match the empirical moments. Each gradient step needs the model's expectations, an inference problem ([chapters 9](09-exact-inference.md)–[10](10-approximate-inference.md)), so learning is at least as hard as inference and usually runs it in an inner loop, exactly where exact inference is infeasible.
 
 ### <a id="pseudolikelihood-and-contrastive-methods"></a>Pseudolikelihood and contrastive methods
 
-Several objectives avoid the partition function. **Pseudolikelihood** ([Besag, 1975](https://doi.org/10.2307/2987782)) maximizes $`\sum_i\log P(x_i\mid x_{-i};w)`$, the product of each variable's conditional given all the others, which involves only local normalizations over one variable's values. It is consistent: with enough data from the model family, its maximizer converges to the true parameters. **Contrastive divergence** approximates the model expectation by a few steps of Gibbs sampling started at the data, which trained the restricted Boltzmann machines of early deep learning; **score matching** and **noise-contrastive estimation**, which reappear in the Generative AI module (Generative AI chapter 6), avoid the normalizer by matching gradients of the log-density or by classifying data against noise.
+Several objectives avoid the partition function. **Pseudolikelihood** ([Besag, 1975](https://doi.org/10.2307/2987782)) maximizes $`\sum_i\log P(x_i\mid x_{-i};w)`$, the product of each variable's conditional given all the others, which involves only local normalizations over one variable's values. It is consistent: with enough data from the model family, its maximizer converges to the true parameters. **Contrastive divergence** approximates the model expectation by a few steps of Gibbs sampling started at the data, which trained the restricted Boltzmann machines of early deep learning; **score matching** and **noise-contrastive estimation**, which reappear in the Generative AI module ([Generative AI chapter 6](../generative-ai/06-energy-based-models-and-score-matching.md)), avoid the normalizer by matching gradients of the log-density or by classifying data against noise.
 
 ```python
 from itertools import product
@@ -117,11 +117,11 @@ With six spins, the 64 configurations can be enumerated, so the gradient is exac
 
 ### <a id="conditional-random-fields"></a>Conditional random fields
 
-A **conditional random field** models the conditional distribution of outputs $`y`$ given inputs $`x`$ as a log-linear model, $`P(y\mid x)\propto\exp\bigl(w^\top f(x,y)\bigr)`$, with a partition function $`Z(x)`$ for each input ([Lafferty, McCallum, and Pereira, 2001](https://repository.upenn.edu/entities/publication/c9aea099-b5c8-4fdd-901c-15b6f889e4a7)). The gradient is again empirical minus expected features, the expectation now over $`P(y\mid x)`$ for each training input. For **linear-chain** CRFs, in which each output variable interacts only with its neighbors, the expectations come from the forward–backward algorithm of chapter 11 and decoding uses Viterbi. Because they condition on the whole input, CRFs can use rich, overlapping features of it without modeling its distribution, and they were the leading method for sequence labeling tasks such as named-entity recognition and part-of-speech tagging until neural sequence models replaced their hand-built features with learned ones, often with a CRF layer kept on top.
+A **conditional random field** models the conditional distribution of outputs $`y`$ given inputs $`x`$ as a log-linear model, $`P(y\mid x)\propto\exp\bigl(w^\top f(x,y)\bigr)`$, with a partition function $`Z(x)`$ for each input ([Lafferty, McCallum, and Pereira, 2001](https://repository.upenn.edu/entities/publication/c9aea099-b5c8-4fdd-901c-15b6f889e4a7)). The gradient is again empirical minus expected features, the expectation now over $`P(y\mid x)`$ for each training input. For **linear-chain** CRFs, in which each output variable interacts only with its neighbors, the expectations come from the forward–backward algorithm of [chapter 11](11-temporal-probabilistic-models.md#smoothing) and decoding uses Viterbi. Because they condition on the whole input, CRFs can use rich, overlapping features of it without modeling its distribution, and they were the leading method for sequence labeling tasks such as named-entity recognition and part-of-speech tagging until neural sequence models replaced their hand-built features with learned ones, often with a CRF layer kept on top.
 
 ## <a id="incomplete-data"></a>Incomplete data
 
-With hidden variables or missing values, the log-likelihood sums over the unobserved values inside the logarithm and no longer decomposes. The **EM algorithm** handles this for any graphical model: the E-step runs inference to compute, for each example, the posterior over its unobserved variables, and accumulates **expected counts** $`\mathbb E[N_i(x,\mathrm{pa})]`$ of every family configuration; the M-step sets the parameters as if the expected counts were observed, the complete-data estimate above. Each iteration increases the likelihood, and it converges to a local maximum (ML chapter 14). Baum–Welch (chapter 11) is EM for HMMs, and Gaussian mixtures are EM for a network with one hidden parent. Hidden variables make models far more compact: a hidden "disease" variable with many symptoms as children replaces a dense network among the symptoms. But they also create symmetries and local optima, and their meaning is whatever the data make of them.
+With hidden variables or missing values, the log-likelihood sums over the unobserved values inside the logarithm and no longer decomposes. The **EM algorithm** handles this for any graphical model: the E-step runs inference to compute, for each example, the posterior over its unobserved variables, and accumulates **expected counts** $`\mathbb E[N_i(x,\mathrm{pa})]`$ of every family configuration; the M-step sets the parameters as if the expected counts were observed, the complete-data estimate above. Each iteration increases the likelihood, and it converges to a local maximum ([ML chapter 14](../ml/14-gaussian-mixtures-and-expectation-maximization.md#why-em-works)). Baum–Welch ([chapter 11](11-temporal-probabilistic-models.md#learning-with-baumwelch)) is EM for HMMs, and Gaussian mixtures are EM for a network with one hidden parent. Hidden variables make models far more compact: a hidden "disease" variable with many symptoms as children replaces a dense network among the symptoms. But they also create symmetries and local optima, and their meaning is whatever the data make of them.
 
 ## <a id="structure-learning"></a>Structure learning
 
@@ -180,7 +180,7 @@ for name, g in structures.items():
 # complete, A -> B -> C, A -> C   log-likelihood -1811.90, parameters 7, BIC -1836.08
 ```
 
-The likelihood of the complete graph, $`-1811.90`$, is higher than that of the true chain, $`-1811.95`$, by an amount that only reflects noise; BIC charges it two extra parameters, $`\tfrac12\log1000\approx3.45`$ each, and prefers the true chain. The other wrong structures lose on likelihood already. The chain $`A\to B\to C`$ is Markov equivalent to $`A\leftarrow B\leftarrow C`$ and $`A\leftarrow B\to C`$, which have the same score: as chapter 13 explains, observational data cannot distinguish them.
+The likelihood of the complete graph, $`-1811.90`$, is higher than that of the true chain, $`-1811.95`$, by an amount that only reflects noise; BIC charges it two extra parameters, $`\tfrac12\log1000\approx3.45`$ each, and prefers the true chain. The other wrong structures lose on likelihood already. The chain $`A\to B\to C`$ is Markov equivalent to $`A\leftarrow B\leftarrow C`$ and $`A\leftarrow B\to C`$, which have the same score: as [chapter 13](13-causal-inference.md#constraint-based-discovery) explains, observational data cannot distinguish them.
 
 ### <a id="chowliu-trees"></a>Chow–Liu trees
 
@@ -190,11 +190,11 @@ When the graph is restricted to a tree, the best structure can be found exactly 
 \log P(\mathcal D\mid\hat\theta_T,T)=n\sum_{(i,j)\in T}\hat I(X_i;X_j)-n\sum_i\hat H(X_i),
 ```
 
-where $`\hat I`$ is the empirical mutual information (Foundations chapter 5) and $`\hat H`$ the empirical entropy. The best tree is therefore the **maximum-weight spanning tree** of the complete graph with mutual information as edge weights ([Chow and Liu, 1968](https://doi.org/10.1109/TIT.1968.1054142); [Appendix C](#block-ai14-appendix-c)), computable in $`O(k^2n)`$ time for $`k`$ variables. The figure above shows it recovering almost every edge of a 20-variable tree from a hundred samples. Chow–Liu trees are useful in their own right, as tractable density models and as the starting point for richer structures, such as mixtures of trees.
+where $`\hat I`$ is the empirical mutual information ([Foundations chapter 5](../foundations/05-information-and-learning-theory.md#mutual-information-and-data-processing)) and $`\hat H`$ the empirical entropy. The best tree is therefore the **maximum-weight spanning tree** of the complete graph with mutual information as edge weights ([Chow and Liu, 1968](https://doi.org/10.1109/TIT.1968.1054142); [Appendix C](#block-ai14-appendix-c)), computable in $`O(k^2n)`$ time for $`k`$ variables. The figure above shows it recovering almost every edge of a 20-variable tree from a hundred samples. Chow–Liu trees are useful in their own right, as tractable density models and as the starting point for richer structures, such as mixtures of trees.
 
 ### <a id="constraint-based-learning"></a>Constraint-based learning
 
-The alternative to scoring is to test conditional independences and assemble a graph consistent with them, the PC algorithm of chapter 13. Constraint-based methods are fast on sparse graphs and make the independence assumptions explicit, but a single wrong test early on can propagate; score-based methods weigh all the evidence together but depend on the search. Hybrid methods, which restrict the search to edges that survive independence tests, combine the two. Whichever is used, the result is a Markov equivalence class, and learned edges should be read as causal only under the assumptions of chapter 13.
+The alternative to scoring is to test conditional independences and assemble a graph consistent with them, the PC algorithm of [chapter 13](13-causal-inference.md#constraint-based-discovery). Constraint-based methods are fast on sparse graphs and make the independence assumptions explicit, but a single wrong test early on can propagate; score-based methods weigh all the evidence together but depend on the search. Hybrid methods, which restrict the search to edges that survive independence tests, combine the two. Whichever is used, the result is a Markov equivalence class, and learned edges should be read as causal only under the assumptions of chapter 13.
 
 ## <a id="appendices"></a>Appendices
 

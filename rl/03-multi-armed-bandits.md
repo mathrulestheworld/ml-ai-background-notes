@@ -8,11 +8,11 @@
 
 ### <a id="one-state-many-actions"></a>One state, many actions
 
-A gambler faces a row of slot machines, one-armed bandits, each paying out according to its own unknown distribution. At each step the gambler pulls one arm and observes its reward, and wants to collect as much as possible over many pulls. This is the **multi-armed bandit** problem, reinforcement learning with a single state: actions have no effect on future situations, only on what the agent learns. It isolates the one difficulty that the full problem adds to supervised learning and that dynamic programming (chapter 2) ignores by assuming the model is known: the agent must **explore** to learn which action is best, and every pull spent exploring an inferior arm is reward given up by not **exploiting** the arm that currently looks best.
+A gambler faces a row of slot machines, one-armed bandits, each paying out according to its own unknown distribution. At each step the gambler pulls one arm and observes its reward, and wants to collect as much as possible over many pulls. This is the **multi-armed bandit** problem, reinforcement learning with a single state: actions have no effect on future situations, only on what the agent learns. It isolates the one difficulty that the full problem adds to supervised learning and that dynamic programming ([chapter 2](02-dynamic-programming.md)) ignores by assuming the model is known: the agent must **explore** to learn which action is best, and every pull spent exploring an inferior arm is reward given up by not **exploiting** the arm that currently looks best.
 
 Formally, a $`k`$-armed bandit has arms $`a\in\{1,\dots,k\}`$ with reward distributions $`\nu_a`$ and means $`\mu_a=q_*(a)=\mathbb E[R\mid A=a]`$. At each step $`t=1,\dots,T`$ the agent chooses $`A_t`$, based on its past actions and rewards, and receives $`R_t\sim\nu_{A_t}`$, independent of everything else. The best mean is $`\mu^*=\max_a\mu_a`$, and the **gap** of arm $`a`$ is $`\Delta_a=\mu^*-\mu_a`$.
 
-Bandits are also useful in their own right. Clinical trials that allocate patients adaptively to treatments were the original motivation ([Thompson, 1933](https://doi.org/10.2307/2332286)); online services choose which headline, advertisement, or recommendation to show; experimenters decide which variant of a website to test; hyperparameter searches allocate compute among configurations; and the selection step of Monte Carlo tree search treats each node's children as a bandit (AI chapter 4). Bayesian optimization (ML chapter 15) is a bandit with infinitely many correlated arms.
+Bandits are also useful in their own right. Clinical trials that allocate patients adaptively to treatments were the original motivation ([Thompson, 1933](https://doi.org/10.2307/2332286)); online services choose which headline, advertisement, or recommendation to show; experimenters decide which variant of a website to test; hyperparameter searches allocate compute among configurations; and the selection step of Monte Carlo tree search treats each node's children as a bandit ([AI chapter 4](../ai/04-adversarial-search-and-games.md#selection-with-uct)). Bayesian optimization ([ML chapter 15](../ml/15-gaussian-processes.md#bayesian-optimization)) is a bandit with infinitely many correlated arms.
 
 ### <a id="regret"></a>Regret
 
@@ -40,7 +40,7 @@ This has the form that recurs throughout the module,
 \text{new estimate}\leftarrow\text{old estimate}+\text{step size}\times\bigl(\text{target}-\text{old estimate}\bigr),
 ```
 
-where the bracket is an **error** that the update reduces. Temporal-difference learning (chapter 6) and Q-learning (chapter 7) are updates of exactly this form with other targets.
+where the bracket is an **error** that the update reduces. Temporal-difference learning ([chapter 6](06-temporal-difference-learning.md)) and Q-learning ([chapter 7](07-model-free-control.md)) are updates of exactly this form with other targets.
 
 ### <a id="step-sizes-and-nonstationarity"></a>Step sizes and nonstationarity
 
@@ -62,7 +62,7 @@ the steps must be large enough in total to overcome the initial value and any ea
 
 ### <a id="greedy-and-greedy"></a>Greedy and ε-greedy
 
-The **greedy** strategy always pulls the arm with the highest estimate. After an unlucky first reward, a good arm's estimate can fall below a mediocre arm's and never be revisited, so greedy action selection has linear regret. The simplest fix, **ε-greedy**, pulls a uniformly random arm with probability $`\varepsilon`$ and the greedy arm otherwise. Every arm is then pulled infinitely often and every estimate converges, but the random pulls never stop, so the regret still grows linearly, at least $`\varepsilon T\sum_a\Delta_a/k`$. Decaying $`\varepsilon_t`$ at the rate $`1/t`$ gives logarithmic regret, but only with a schedule tuned to the smallest gap, which is unknown ([Auer, Cesa-Bianchi, and Fischer, 2002](https://doi.org/10.1023/A:1013689704352)). Despite this, ε-greedy with a small constant or slowly decaying $`\varepsilon`$ is the default exploration strategy of many deep RL agents (chapter 16), because it is simple and needs no uncertainty estimates.
+The **greedy** strategy always pulls the arm with the highest estimate. After an unlucky first reward, a good arm's estimate can fall below a mediocre arm's and never be revisited, so greedy action selection has linear regret. The simplest fix, **ε-greedy**, pulls a uniformly random arm with probability $`\varepsilon`$ and the greedy arm otherwise. Every arm is then pulled infinitely often and every estimate converges, but the random pulls never stop, so the regret still grows linearly, at least $`\varepsilon T\sum_a\Delta_a/k`$. Decaying $`\varepsilon_t`$ at the rate $`1/t`$ gives logarithmic regret, but only with a schedule tuned to the smallest gap, which is unknown ([Auer, Cesa-Bianchi, and Fischer, 2002](https://doi.org/10.1023/A:1013689704352)). Despite this, ε-greedy with a small constant or slowly decaying $`\varepsilon`$ is the default exploration strategy of many deep RL agents ([chapter 16](16-deep-q-learning.md)), because it is simple and needs no uncertainty estimates.
 
 ### <a id="optimistic-initial-values"></a>Optimistic initial values
 
@@ -159,7 +159,7 @@ The greedy agent finds the best arm in only 35% of the problems and stays with i
 
 ### <a id="confidence-bounds"></a>Confidence bounds
 
-Optimism needs a measure of how uncertain each estimate is. For rewards in $`[0,1]`$, Hoeffding's inequality (Foundations chapter 4) bounds the probability that an average of $`n`$ independent rewards overestimates or underestimates its mean by $`\varepsilon`$:
+Optimism needs a measure of how uncertain each estimate is. For rewards in $`[0,1]`$, Hoeffding's inequality ([Foundations chapter 4](../foundations/04-probability-and-statistics.md#averages-limit-theorems-and-concentration)) bounds the probability that an average of $`n`$ independent rewards overestimates or underestimates its mean by $`\varepsilon`$:
 
 ```math
 \Pr\bigl(\hat\mu_n\ge\mu+\varepsilon\bigr)\le e^{-2n\varepsilon^2},\qquad\Pr\bigl(\hat\mu_n\le\mu-\varepsilon\bigr)\le e^{-2n\varepsilon^2}.
@@ -181,7 +181,7 @@ Its regret satisfies, for rewards in $`[0,1]`$ and every $`T`$,
 \mathcal R_T\le\sum_{a:\Delta_a>0}\frac{8\ln T}{\Delta_a}+\Bigl(1+\frac{\pi^2}3\Bigr)\sum_a\Delta_a.
 ```
 
-The proof ([Appendix A](#block-rl03-appendix-a)) shows that a suboptimal arm is pulled only while its confidence radius exceeds about half its gap, which happens about $`8\ln T/\Delta_a^2`$ times, and that failures of the confidence bounds are rare enough to contribute a constant. This is the rule that the UCT algorithm applies at every node of a search tree (AI chapter 4, Appendix B). The bound is logarithmic in $`T`$ but depends on the gaps, and it blows up as a gap goes to zero. A problem with a tiny gap is not hard, though, since pulling the wrong arm costs little; splitting the arms at a threshold $`\varepsilon`$, the arms with $`\Delta_a<\varepsilon`$ cost at most $`\varepsilon T`$ in total and the others at most $`\sum_a8\ln T/\Delta_a\le8k\ln T/\varepsilon`$ (plus a constant), and choosing $`\varepsilon=\sqrt{8k\ln T/T}`$ gives a **gap-free** bound of order $`\sqrt{kT\ln T}`$.
+The proof ([Appendix A](#block-rl03-appendix-a)) shows that a suboptimal arm is pulled only while its confidence radius exceeds about half its gap, which happens about $`8\ln T/\Delta_a^2`$ times, and that failures of the confidence bounds are rare enough to contribute a constant. This is the rule that the UCT algorithm applies at every node of a search tree ([AI chapter 4, Appendix B](../ai/04-adversarial-search-and-games.md#block-ai04-appendix-b)). The bound is logarithmic in $`T`$ but depends on the gaps, and it blows up as a gap goes to zero. A problem with a tiny gap is not hard, though, since pulling the wrong arm costs little; splitting the arms at a threshold $`\varepsilon`$, the arms with $`\Delta_a<\varepsilon`$ cost at most $`\varepsilon T`$ in total and the others at most $`\sum_a8\ln T/\Delta_a\le8k\ln T/\varepsilon`$ (plus a constant), and choosing $`\varepsilon=\sqrt{8k\ln T/T}`$ gives a **gap-free** bound of order $`\sqrt{kT\ln T}`$.
 
 The UCB rule in the testbed code, $`\hat\mu_a+c\sqrt{\ln t/N_a}`$ with $`c=2`$, has the same form with a tuned constant. In practice the constant in UCB1 is conservative, and variants that use the variance of the rewards (UCB-V; [Audibert, Munos, and Szepesvári, 2009](https://doi.org/10.1016/j.tcs.2009.01.016)) or tighter confidence sets explore less.
 
@@ -223,7 +223,7 @@ The oldest bandit algorithm is Bayesian. Put a prior on each arm's mean, update 
 \Pr(A_t=a\mid\text{history})=\Pr\bigl(a=\arg\max_b\mu_b\mid\text{history}\bigr),
 ```
 
-a property called **probability matching** (exercise 3.8). An arm that is certainly worse is almost never pulled; an arm with few observations has a wide posterior and is sampled high often enough to be tried. Unlike UCB, Thompson sampling needs no confidence bounds, and it extends naturally to any model with a posterior that can be sampled: contextual and linear bandits, and even MDPs (chapter 4, chapter 22).
+a property called **probability matching** (exercise 3.8). An arm that is certainly worse is almost never pulled; an arm with few observations has a wide posterior and is sampled high often enough to be tried. Unlike UCB, Thompson sampling needs no confidence bounds, and it extends naturally to any model with a posterior that can be sampled: contextual and linear bandits, and even MDPs ([chapter 4](04-contextual-bayesian-and-adversarial-bandits.md), [chapter 22](22-exploration-in-deep-rl.md)).
 
 ### <a id="regret-of-thompson-sampling"></a>Regret of Thompson sampling
 
@@ -324,11 +324,11 @@ Instead of estimating values, a **gradient bandit** learns a numerical **prefere
 H(a)\leftarrow H(a)+\alpha\,(R_t-\bar R_t)\bigl(\mathbb 1[a=A_t]-\pi(a)\bigr)\quad\text{for all }a,
 ```
 
-where $`\bar R_t`$ is the average of the rewards before step $`t`$. A reward above the baseline raises the preference of the chosen arm and lowers the others. The expected update is exactly the gradient of the expected reward $`\sum_a\pi(a)\mu_a`$ with respect to the preferences, so the algorithm is stochastic gradient ascent ([Appendix C](#block-rl03-appendix-c)). The baseline does not change the expected update but reduces its variance, and when the true values are near $`+4`$ an agent without it learns much more slowly (Sutton and Barto's Figure 2.5; exercise 3.5). This is the simplest instance of the **policy gradient** methods of chapter 13: the score-function estimator with a baseline, applied to a one-step problem.
+where $`\bar R_t`$ is the average of the rewards before step $`t`$. A reward above the baseline raises the preference of the chosen arm and lowers the others. The expected update is exactly the gradient of the expected reward $`\sum_a\pi(a)\mu_a`$ with respect to the preferences, so the algorithm is stochastic gradient ascent ([Appendix C](#block-rl03-appendix-c)). The baseline does not change the expected update but reduces its variance, and when the true values are near $`+4`$ an agent without it learns much more slowly (Sutton and Barto's Figure 2.5; exercise 3.5). This is the simplest instance of the **policy gradient** methods of [chapter 13](13-policy-gradient-and-actor-critic-methods.md): the score-function estimator with a baseline, applied to a one-step problem.
 
 ### <a id="nonstationary-bandits"></a>Nonstationary bandits
 
-When the arms' means drift, sample averages give old rewards too much weight, and constant step sizes, or averages over a sliding window, track the change (exercise 3.6). Confidence-bound algorithms adapt in the same way, with discounted or windowed counts; when the means may change abruptly, algorithms that detect changes and restart do better. In the extreme where rewards are chosen by an adversary, the stochastic assumptions fail altogether and randomization becomes essential, the subject of the adversarial bandits of chapter 4.
+When the arms' means drift, sample averages give old rewards too much weight, and constant step sizes, or averages over a sliding window, track the change (exercise 3.6). Confidence-bound algorithms adapt in the same way, with discounted or windowed counts; when the means may change abruptly, algorithms that detect changes and restart do better. In the extreme where rewards are chosen by an adversary, the stochastic assumptions fail altogether and randomization becomes essential, the subject of the adversarial bandits of [chapter 4](04-contextual-bayesian-and-adversarial-bandits.md).
 
 ### <a id="best-arm-identification"></a>Best-arm identification
 
@@ -336,7 +336,7 @@ Sometimes the goal is not to collect reward during the experiment but to find th
 
 ### <a id="bandits-in-practice"></a>Bandits in practice
 
-Deployed bandits face complications the basic model leaves out. Feedback is delayed and arrives in batches, so the algorithm cannot update after every pull; Thompson sampling, whose randomization keeps exploring between updates, degrades more gracefully than deterministic UCB rules ([Chapelle and Li, 2011](https://papers.nips.cc/paper_files/paper/2011/hash/e53a0a2978c28872a4505bdb51db06dc-Abstract.html)). Rewards drift with seasons and fashions. The data an adaptive algorithm collects are not a random sample: estimates of the arms' means from bandit data are biased, typically downward for arms that were abandoned after bad luck ([Nie et al., 2018](https://proceedings.mlr.press/v84/nie18a.html)), and standard confidence intervals are invalid, which matters when a bandit replaces an A/B test whose purpose is inference. Finally, the arms rarely have nothing in common: articles, patients, and users have features, which turns the problem into the **contextual bandit** of chapter 4. Lab 2 implements this chapter's algorithms and stress-tests them with change points and delayed feedback.
+Deployed bandits face complications the basic model leaves out. Feedback is delayed and arrives in batches, so the algorithm cannot update after every pull; Thompson sampling, whose randomization keeps exploring between updates, degrades more gracefully than deterministic UCB rules ([Chapelle and Li, 2011](https://papers.nips.cc/paper_files/paper/2011/hash/e53a0a2978c28872a4505bdb51db06dc-Abstract.html)). Rewards drift with seasons and fashions. The data an adaptive algorithm collects are not a random sample: estimates of the arms' means from bandit data are biased, typically downward for arms that were abandoned after bad luck ([Nie et al., 2018](https://proceedings.mlr.press/v84/nie18a.html)), and standard confidence intervals are invalid, which matters when a bandit replaces an A/B test whose purpose is inference. Finally, the arms rarely have nothing in common: articles, patients, and users have features, which turns the problem into the **contextual bandit** of [chapter 4](04-contextual-bayesian-and-adversarial-bandits.md). [Lab 2](labs/lab-02-bandit-algorithms-in-practice.md) implements this chapter's algorithms and stress-tests them with change points and delayed feedback.
 
 ## <a id="exercises"></a>Exercises
 
@@ -411,7 +411,7 @@ Show that replacing $`\bar R_t`$ by any baseline $`b`$ that does not depend on $
 <summary><b>Solution</b></summary>
 
 
-The baseline's contribution to the expected update of $`H(a)`$ is $`\alpha b\,\mathbb E[\mathbb 1[a=A_t]-\pi(a)]=\alpha b(\pi(a)-\pi(a))=0`$, since $`A_t\sim\pi`$ and $`b`$ does not depend on $`A_t`$. It does change the variance: the update multiplies $`\mathbb 1[a=A_t]-\pi(a)`$ by $`R_t-b`$, and a baseline near the typical reward keeps this factor small and centered. When all rewards are around $`+4`$ and there is no baseline, every pull raises the chosen arm's preference substantially regardless of its quality, so the preferences follow whichever arms happen to be chosen early, and the signal that distinguishes the arms, a difference of about 1 between their means, is buried in a common term of 4. This is Sutton and Barto's Figure 2.5, and the same reasoning motivates the critic in actor-critic methods (chapter 13).
+The baseline's contribution to the expected update of $`H(a)`$ is $`\alpha b\,\mathbb E[\mathbb 1[a=A_t]-\pi(a)]=\alpha b(\pi(a)-\pi(a))=0`$, since $`A_t\sim\pi`$ and $`b`$ does not depend on $`A_t`$. It does change the variance: the update multiplies $`\mathbb 1[a=A_t]-\pi(a)`$ by $`R_t-b`$, and a baseline near the typical reward keeps this factor small and centered. When all rewards are around $`+4`$ and there is no baseline, every pull raises the chosen arm's preference substantially regardless of its quality, so the preferences follow whichever arms happen to be chosen early, and the signal that distinguishes the arms, a difference of about 1 between their means, is buried in a common term of 4. This is Sutton and Barto's Figure 2.5, and the same reasoning motivates the critic in actor-critic methods ([chapter 13](13-policy-gradient-and-actor-critic-methods.md)).
 
 </details>
 
@@ -587,7 +587,7 @@ for any constant $`B`$, since $`\sum_b\pi(b)(\mathbb 1[a=b]-\pi(a))=0`$. The las
 \frac{\partial J}{\partial H(a)}=\mathbb E\Bigl[(R_t-B)\bigl(\mathbb 1[a=A_t]-\pi(a)\bigr)\Bigr].
 ```
 
-The update of the text is a sample of this expectation times $`\alpha`$, with $`B`$ replaced by the running average $`\bar R_t`$ (which depends on past rewards but not on $`A_t`$). The factor $`\mathbb 1[a=A_t]-\pi(a)`$ is $`\partial\ln\pi(A_t)/\partial H(a)`$, the **score** of the chosen action, and the whole construction is the REINFORCE estimator of chapter 13 in its simplest setting.
+The update of the text is a sample of this expectation times $`\alpha`$, with $`B`$ replaced by the running average $`\bar R_t`$ (which depends on past rewards but not on $`A_t`$). The factor $`\mathbb 1[a=A_t]-\pi(a)`$ is $`\partial\ln\pi(A_t)/\partial H(a)`$, the **score** of the chosen action, and the whole construction is the REINFORCE estimator of [chapter 13](13-policy-gradient-and-actor-critic-methods.md) in its simplest setting.
 
 </details>
 

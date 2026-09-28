@@ -18,4 +18,4 @@ Code resources complement the courses:
 | nanoGPT and minbpe | [nanoGPT](https://github.com/karpathy/nanoGPT) · [minbpe](https://github.com/karpathy/minbpe) | Minimal, readable implementations of a GPT training loop and a BPE tokenizer (chapters 1 and 4). |
 | CS336 assignments | [Course](https://cs336.stanford.edu/spring2025/) | The five assignments with tests and handouts, the most thorough exercises for chapters 1, 4, 6–7, and 11–12. |
 
-The reading plan maps individual lectures, slides, and readings to the study sequence. Video links arranges the recordings by chapter, and the NLP overview maps the reading-plan topics to the chapters.
+[The reading plan](../reading-plan.md) maps individual lectures, slides, and readings to the study sequence. [Video links](video-links.md) arranges the recordings by chapter, and the [NLP overview](../README.md) maps the reading-plan topics to the chapters.

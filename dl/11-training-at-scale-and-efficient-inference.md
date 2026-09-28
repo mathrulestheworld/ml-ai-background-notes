@@ -8,7 +8,7 @@
 
 ### <a id="compute-memory-traffic-and-overhead"></a>Compute, memory traffic, and overhead
 
-The cost of training a network is usually counted in floating-point operations: about $`6N`$ per training example (or token) for a network with $`N`$ parameters, $`2N`$ for the forward pass and $`4N`$ for the backward pass, which computes gradients with respect to both activations and weights (chapter 9). Llama 3 405B, trained on 15.6 trillion tokens, needed $`6\times405\times10^9\times15.6\times10^{12}\approx3.8\times10^{25}`$ operations, the figure its authors report ([Llama Team, 2024](https://arxiv.org/abs/2407.21783)). Dividing by the throughput of the hardware gives the time, but only if the hardware runs at its peak, and it rarely does.
+The cost of training a network is usually counted in floating-point operations: about $`6N`$ per training example (or token) for a network with $`N`$ parameters, $`2N`$ for the forward pass and $`4N`$ for the backward pass, which computes gradients with respect to both activations and weights ([chapter 9](09-attention-and-transformers.md#a-complete-model-and-its-size)). Llama 3 405B, trained on 15.6 trillion tokens, needed $`6\times405\times10^9\times15.6\times10^{12}\approx3.8\times10^{25}`$ operations, the figure its authors report ([Llama Team, 2024](https://arxiv.org/abs/2407.21783)). Dividing by the throughput of the hardware gives the time, but only if the hardware runs at its peak, and it rarely does.
 
 An accelerator such as a GPU spends time in three ways ([He, 2022](https://horace.io/brrr_intro.html)):
 
@@ -26,7 +26,7 @@ The multiplication of an $`m\times k`$ matrix by a $`k\times n`$ matrix performs
 
 ### <a id="fusion-and-compilation"></a>Fusion and compilation
 
-The remedy for memory-bound sequences of operations is **fusion**: computing, say, a bias addition, a GELU, and a dropout in one pass that reads the input once and writes the output once, instead of three passes that each read and write the whole tensor. FlashAttention (chapter 9) is fusion taken further: the whole attention computation, including the softmax, runs block by block in on-chip memory, so the $`T\times T`$ score matrix never travels to HBM. Compilers such as XLA and PyTorch's [`torch.compile`](https://pytorch.org/docs/stable/torch.compiler.html) trace a model, fuse elementwise operations automatically, and generate kernels, for example in the Triton language ([Tillet, Kung, and Cox, 2019](https://doi.org/10.1145/3315508.3329973)). Capturing a sequence of kernel launches as a CUDA graph and replaying it removes most of the launch overhead for small models.
+The remedy for memory-bound sequences of operations is **fusion**: computing, say, a bias addition, a GELU, and a dropout in one pass that reads the input once and writes the output once, instead of three passes that each read and write the whole tensor. FlashAttention ([chapter 9](09-attention-and-transformers.md#exact-attention-with-less-memory)) is fusion taken further: the whole attention computation, including the softmax, runs block by block in on-chip memory, so the $`T\times T`$ score matrix never travels to HBM. Compilers such as XLA and PyTorch's [`torch.compile`](https://pytorch.org/docs/stable/torch.compiler.html) trace a model, fuse elementwise operations automatically, and generate kernels, for example in the Triton language ([Tillet, Kung, and Cox, 2019](https://doi.org/10.1145/3315508.3329973)). Capturing a sequence of kernel launches as a CUDA graph and replaying it removes most of the launch overhead for small models.
 
 ### <a id="measuring-efficiency"></a>Measuring efficiency
 
@@ -36,7 +36,7 @@ The standard measure of training efficiency is **model FLOPs utilization** (MFU)
 
 ### <a id="floating-point-formats"></a>Floating-point formats
 
-A floating-point number stores a sign, an exponent, and a fraction (mantissa) (Foundations chapter 6). The exponent's width sets the range of representable magnitudes and the fraction's width the relative precision. Deep learning uses four formats:
+A floating-point number stores a sign, an exponent, and a fraction (mantissa) ([Foundations chapter 6](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#data-types-and-mathematical-domains)). The exponent's width sets the range of representable magnitudes and the fraction's width the relative precision. Deep learning uses four formats:
 
 | Format | Exponent bits | Fraction bits | Largest value | Relative precision |
 | --- | --- | --- | --- | --- |
@@ -221,7 +221,7 @@ print("numbers sent per worker:", per_worker, "= 2 (W - 1) / W x 1000")
 # numbers sent per worker: 1500.0 = 2 (W - 1) / W x 1000
 ```
 
-Frameworks such as PyTorch's `DistributedDataParallel` start the all-reduce of each layer's gradients as soon as the backward pass has produced them, overlapping communication with the computation of earlier layers. Data parallelism multiplies the batch size by the number of devices, and beyond the **critical batch size** of chapter 3, a larger batch no longer reduces the number of steps proportionally. Large-batch training therefore relies on scaling the learning rate with the batch size and on warmup ([Goyal et al., 2017](https://arxiv.org/abs/1706.02677)), and data parallelism alone cannot use arbitrarily many devices.
+Frameworks such as PyTorch's `DistributedDataParallel` start the all-reduce of each layer's gradients as soon as the backward pass has produced them, overlapping communication with the computation of earlier layers. Data parallelism multiplies the batch size by the number of devices, and beyond the **critical batch size** of [chapter 3](03-optimization-for-deep-networks.md#the-critical-batch-size), a larger batch no longer reduces the number of steps proportionally. Large-batch training therefore relies on scaling the learning rate with the batch size and on warmup ([Goyal et al., 2017](https://arxiv.org/abs/1706.02677)), and data parallelism alone cannot use arbitrarily many devices.
 
 ### <a id="sharded-data-parallelism"></a>Sharded data parallelism
 
@@ -288,7 +288,7 @@ How to divide a compute budget between model size and data, the subject of scali
 
 ### <a id="what-changes-at-inference"></a>What changes at inference
 
-A trained model is run many more times than it was trained, often under a latency budget and on cheaper hardware. Inference needs no gradients, optimizer state, or stored activations, so memory is dominated by the weights and, for generative transformers, the key–value cache (chapter 9). Generating one token at a time multiplies every weight matrix by a single vector, an operation with arithmetic intensity near 1, so decoding is memory-bound: its speed is set by how fast the weights can be read. Serving systems therefore batch many requests together, which reuses each weight read for every sequence in the batch, and manage the growing caches of requests of different lengths ([Kwon et al., 2023](https://arxiv.org/abs/2309.06180)). Every byte removed from the weights speeds up memory-bound decoding directly, which is why the three compression methods below matter.
+A trained model is run many more times than it was trained, often under a latency budget and on cheaper hardware. Inference needs no gradients, optimizer state, or stored activations, so memory is dominated by the weights and, for generative transformers, the key–value cache ([chapter 9](09-attention-and-transformers.md#generation-and-the-keyvalue-cache)). Generating one token at a time multiplies every weight matrix by a single vector, an operation with arithmetic intensity near 1, so decoding is memory-bound: its speed is set by how fast the weights can be read. Serving systems therefore batch many requests together, which reuses each weight read for every sequence in the batch, and manage the growing caches of requests of different lengths ([Kwon et al., 2023](https://arxiv.org/abs/2309.06180)). Every byte removed from the weights speeds up memory-bound decoding directly, which is why the three compression methods below matter.
 
 ### <a id="quantization"></a>Quantization
 
@@ -397,11 +397,11 @@ print("combined loss at T = 4:", round(distillation_loss(student, teacher, label
 # combined loss at T = 4: 4.173
 ```
 
-Distillation compressed BERT by 40% while keeping 97% of its language-understanding performance ([Sanh et al., 2019](https://arxiv.org/abs/1910.01108)), and small language models are now routinely trained on the outputs of larger ones, as discussed in NLP chapter 10. Distillation, quantization, and pruning combine: a distilled student can itself be quantized.
+Distillation compressed BERT by 40% while keeping 97% of its language-understanding performance ([Sanh et al., 2019](https://arxiv.org/abs/1910.01108)), and small language models are now routinely trained on the outputs of larger ones, as discussed in [NLP chapter 10](../nlp-llms/10-fine-tuning-and-parameter-efficient-adaptation.md#distillation). Distillation, quantization, and pruning combine: a distilled student can itself be quantized.
 
 Other techniques reduce the cost of generation specifically. In **speculative decoding** a small draft model proposes several tokens, and the large model checks them all in one parallel forward pass, accepting a prefix, with a sampling rule that leaves the large model's output distribution unchanged ([Leviathan, Kalman, and Matias, 2023](https://arxiv.org/abs/2211.17192)); since decoding is memory-bound, checking several tokens costs little more than generating one.
 
-UMich lecture 9, UNIGE section 6.6, the [*Ultra-Scale Playbook*](https://huggingface.co/spaces/nanotron/ultrascale-playbook), and Google DeepMind's [*How to Scale Your Model*](https://jax-ml.github.io/scaling-book/), listed in the reading plan, cover hardware and scale.
+UMich lecture 9, UNIGE section 6.6, the [*Ultra-Scale Playbook*](https://huggingface.co/spaces/nanotron/ultrascale-playbook), and Google DeepMind's [*How to Scale Your Model*](https://jax-ml.github.io/scaling-book/), listed in the [reading plan](reading-plan.md#11-training-at-scale-and-efficient-inference), cover hardware and scale.
 
 ## <a id="appendices"></a>Appendices
 

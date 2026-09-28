@@ -15,7 +15,7 @@ The Generative AI code blocks and figure scripts use PyTorch, NumPy, SciPy, Matp
 | Matplotlib | 3.8.4 |
 | scikit-learn | 1.4.2 |
 
-This is the environment of the DL and NLP and LLMs modules, so either of the following works.
+This is the environment of the [DL](../../dl/sources/computing-setup.md) and [NLP and LLMs](../../nlp-llms/sources/computing-setup.md) modules, so either of the following works.
 
 ## <a id="reuse-an-existing-environment"></a>Reuse an existing environment
 
@@ -36,7 +36,7 @@ python -m pip check
 
 ## <a id="running-the-code"></a>Running the code
 
-Each code block is self-contained: copy it into a file or a notebook cell and run it. No block reads files; the digits come with scikit-learn and every other distribution is generated in the code (Data sources). Random numbers come from seeded generators, and blocks that train PyTorch models call `torch.set_num_threads(1)` where their results would otherwise depend slightly on the number of threads, so the printed numbers are reproducible; all blocks were checked to print the same output with one and with two threads. Most blocks finish in a few seconds. The longest train small networks: the MADE of chapter 2, the VAE of chapter 3, the two-moons DDPM of chapter 7, the two flow-matching models of chapter 9, the latent diffusion model of chapter 11, and the masked diffusion model of chapter 12 each take 20 to 45 seconds on one core.
+Each code block is self-contained: copy it into a file or a notebook cell and run it. No block reads files; the digits come with scikit-learn and every other distribution is generated in the code ([Data sources](data-sources.md)). Random numbers come from seeded generators, and blocks that train PyTorch models call `torch.set_num_threads(1)` where their results would otherwise depend slightly on the number of threads, so the printed numbers are reproducible; all blocks were checked to print the same output with one and with two threads. Most blocks finish in a few seconds. The longest train small networks: the MADE of chapter 2, the VAE of chapter 3, the two-moons DDPM of chapter 7, the two flow-matching models of chapter 9, the latent diffusion model of chapter 11, and the masked diffusion model of chapter 12 each take 20 to 45 seconds on one core.
 
 The figures are regenerated from the `Sources/Figure code` folder, where the shared style module `genfig.py` lives:
 
@@ -46,8 +46,8 @@ python ch07_diffusion.py                # both figures of chapter 7
 python ch10_guidance.py                 # both figures of chapter 10
 ```
 
-The scripts write PNG files to `Sources/Images` and read no arguments. Most take seconds to two minutes; the longest train models on the digits, about three minutes for the VAEs of chapter 3, four for the DDPM of chapter 7, and six for the guided model of chapter 10, as noted at the top of each script and in Figure sources.
+The scripts write PNG files to `Sources/Images` and read no arguments. Most take seconds to two minutes; the longest train models on the digits, about three minutes for the VAEs of chapter 3, four for the DDPM of chapter 7, and six for the guided model of chapter 10, as noted at the top of each script and in [Figure sources](figure-sources.md).
 
 ## <a id="beyond-this-snapshot"></a>Beyond this snapshot
 
-The models here have at most about a million parameters, work on $`8\times8`$ images or points in the plane, and train in minutes on a laptop; the same code runs on a GPU after moving the model and the data to the device, and scales to images by replacing the multilayer perceptrons with U-Nets or transformers (chapter 7, chapter 11). Real work with generative models uses libraries that the notes do not require: Hugging Face Diffusers for pretrained pipelines, schedulers, guidance, ControlNet, and LoRA fine-tuning (chapter 10, chapter 11); k-diffusion and the EDM2 code for the samplers and training recipes of Karras et al. (chapter 8); the Flow Matching library and TorchCFM (chapter 9); AudioCraft for neural audio codecs and music generation (chapter 12); clean-fid and dgm-eval for evaluation (chapter 13); and LeRobot, RFdiffusion, and the WeatherNext repository for control, proteins, and weather (chapter 14). The book and documentation links point to them.
+The models here have at most about a million parameters, work on $`8\times8`$ images or points in the plane, and train in minutes on a laptop; the same code runs on a GPU after moving the model and the data to the device, and scales to images by replacing the multilayer perceptrons with U-Nets or transformers ([chapter 7](../07-denoising-diffusion-models.md#the-denoising-network), [chapter 11](../11-latent-diffusion-and-large-scale-generation.md#from-u-nets-to-transformers)). Real work with generative models uses libraries that the notes do not require: Hugging Face Diffusers for pretrained pipelines, schedulers, guidance, ControlNet, and LoRA fine-tuning ([chapter 10](../10-guidance-and-conditional-generation.md), [chapter 11](../11-latent-diffusion-and-large-scale-generation.md)); k-diffusion and the EDM2 code for the samplers and training recipes of Karras et al. ([chapter 8](../08-diffusion-sdes-and-fast-sampling.md)); the Flow Matching library and TorchCFM ([chapter 9](../09-flow-matching.md)); AudioCraft for neural audio codecs and music generation ([chapter 12](../12-discrete-tokens-and-multimodal-generation.md)); clean-fid and dgm-eval for evaluation ([chapter 13](../13-evaluating-generative-models.md)); and LeRobot, RFdiffusion, and the WeatherNext repository for control, proteins, and weather ([chapter 14](../14-generative-models-for-science-and-control.md)). The [book and documentation links](book-and-documentation-links.md) point to them.

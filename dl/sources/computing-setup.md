@@ -16,7 +16,7 @@ The DL code blocks and figure scripts use PyTorch, NumPy, SciPy, Matplotlib, sci
 | scikit-learn | 1.4.2 |
 | NetworkX | 3.7 |
 
-These are the versions of the Foundations environment (PyTorch, NumPy, SciPy, Matplotlib, and NetworkX, which PyTorch installs) plus the scikit-learn of the ML environment, so either of the following works.
+These are the versions of the [Foundations environment](../../foundations/sources/computing-setup.md) (PyTorch, NumPy, SciPy, Matplotlib, and NetworkX, which PyTorch installs) plus the scikit-learn of the [ML environment](../../ml/sources/computing-setup.md), so either of the following works.
 
 ## <a id="reuse-the-foundations-environment"></a>Reuse the Foundations environment
 
@@ -47,8 +47,8 @@ python ch09_attention.py        # all figures of chapter 9
 python ch09_attention.py 5      # only figure 5 (scripts for chapters 3 to 15 accept figure numbers)
 ```
 
-The scripts write PNG files to `Sources/Images`. Most figures take seconds; those that train many networks take several minutes each, as noted at the top of each script and in Figure sources. The longest, the self-supervised comparison of chapter 10 and the spectral-bias experiment of chapter 15, take about ten minutes on one core.
+The scripts write PNG files to `Sources/Images`. Most figures take seconds; those that train many networks take several minutes each, as noted at the top of each script and in [Figure sources](figure-sources.md). The longest, the self-supervised comparison of chapter 10 and the spectral-bias experiment of chapter 15, take about ten minutes on one core.
 
 ## <a id="beyond-this-snapshot"></a>Beyond this snapshot
 
-The examples are sized for a laptop CPU. The same code runs on a GPU after moving the model and the data to the device (`model.to("cuda")`, `x.to("cuda")`), and the chapters on scale (chapter 11) and methodology (chapter 12) describe what changes for real workloads: mixed precision, larger batches, data loaders with worker processes, and nondeterministic GPU kernels. Libraries used for larger work, such as torchvision, Hugging Face `transformers`, PyTorch Geometric, and experiment trackers, are not required by these notes.
+The examples are sized for a laptop CPU. The same code runs on a GPU after moving the model and the data to the device (`model.to("cuda")`, `x.to("cuda")`), and the chapters on scale ([chapter 11](../11-training-at-scale-and-efficient-inference.md)) and methodology ([chapter 12](../12-practical-methodology.md)) describe what changes for real workloads: mixed precision, larger batches, data loaders with worker processes, and nondeterministic GPU kernels. Libraries used for larger work, such as torchvision, Hugging Face `transformers`, PyTorch Geometric, and experiment trackers, are not required by these notes.

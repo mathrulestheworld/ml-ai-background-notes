@@ -43,7 +43,7 @@ Classical NLP pipelines normalized aggressively, lowercasing, stripping accents,
 
 ### <a id="words-types-and-tokens"></a>Words, types, and tokens
 
-Counting words distinguishes **tokens**, the running occurrences, from **types**, the distinct forms. The corpus used throughout this module's code is Tiny Shakespeare, about 1.1 MB of dialogue from the plays (data sources). Split into lowercase words, it has about 204,000 tokens but only 12,400 types, and the counts of those types are extremely uneven.
+Counting words distinguishes **tokens**, the running occurrences, from **types**, the distinct forms. The corpus used throughout this module's code is Tiny Shakespeare, about 1.1 MB of dialogue from the plays ([data sources](sources/data-sources.md)). Split into lowercase words, it has about 204,000 tokens but only 12,400 types, and the counts of those types are extremely uneven.
 
 <img src="sources/images/nlp-tok-zipf.png" alt="nlp-tok-zipf" width="880">
 
@@ -169,7 +169,7 @@ Vocabulary sizes have grown with model size and multilingual coverage: 30,522 Wo
 \operatorname{score}(a,b)=\frac{\operatorname{count}(ab)}{\operatorname{count}(a)\,\operatorname{count}(b)},
 ```
 
-a pointwise-mutual-information criterion (chapter 3) that favors pairs whose parts rarely occur apart over pairs that are merely frequent. BERT's WordPiece marks word-internal pieces with a `##` prefix, so *unhappily* might become `un`, `##happ`, `##ily`, and encodes each word greedily by taking the longest vocabulary entry that matches its beginning, then the longest that matches the rest. Greedy longest match is not the same as replaying BPE's merges, and neither is guaranteed to find the segmentation with the fewest tokens.
+a pointwise-mutual-information criterion ([chapter 3](03-word-embeddings.md)) that favors pairs whose parts rarely occur apart over pairs that are merely frequent. BERT's WordPiece marks word-internal pieces with a `##` prefix, so *unhappily* might become `un`, `##happ`, `##ily`, and encodes each word greedily by taking the longest vocabulary entry that matches its beginning, then the longest that matches the rest. Greedy longest match is not the same as replaying BPE's merges, and neither is guaranteed to find the segmentation with the fewest tokens.
 
 ### <a id="the-unigram-language-model"></a>The unigram language model
 
@@ -182,7 +182,7 @@ P(w)=\sum_{\mathbf s\in S(w)}\prod_{i=1}^{|\mathbf s|}p(s_i),
 where $`S(w)`$ is the set of ways to write $`w`$ as a concatenation of vocabulary pieces. Training maximizes $`\sum_wc_w\log P(w)`$ over the corpus word counts $`c_w`$ and prunes the vocabulary as it goes:
 
 1. Start from a large seed vocabulary, such as all frequent substrings, with probabilities proportional to their counts.
-2. Fit $`p`$ by **expectation–maximization** (ML chapter 14): the segmentation is the hidden variable, the E-step computes the expected number of times each piece is used, and the M-step sets $`p(s)`$ proportional to it. The expectations come from a forward–backward pass over the **segmentation lattice** of each word, whose nodes are character positions and whose edges are vocabulary pieces, the same dynamic program as for hidden Markov models (AI chapter 11; [Appendix B](#block-nlp01-appendix-b)).
+2. Fit $`p`$ by **expectation–maximization** ([ML chapter 14](../ml/14-gaussian-mixtures-and-expectation-maximization.md)): the segmentation is the hidden variable, the E-step computes the expected number of times each piece is used, and the M-step sets $`p(s)`$ proportional to it. The expectations come from a forward–backward pass over the **segmentation lattice** of each word, whose nodes are character positions and whose edges are vocabulary pieces, the same dynamic program as for hidden Markov models ([AI chapter 11](../ai/11-temporal-probabilistic-models.md); [Appendix B](#block-nlp01-appendix-b)).
 3. Remove the pieces whose loss would least reduce the likelihood, typically keeping 80% of them per round, but never single characters, which guarantee that every word stays segmentable.
 4. Repeat until the vocabulary reaches the target size.
 
@@ -299,7 +299,7 @@ On this corpus the two algorithms compress almost identically at every vocabular
 
 ### <a id="vocabulary-size-and-cost"></a>Vocabulary size and cost
 
-A vocabulary of $`V`$ tokens and a model width of $`d`$ costs $`Vd`$ parameters for the input embeddings and, unless the two are tied, another $`Vd`$ for the output layer, whose softmax over $`V`$ entries is computed at every position (chapter 4). At $`V=128{,}000`$ and $`d=4096`$ that is 524 million parameters per matrix, a large share of a small model and a small share of a large one. A larger vocabulary shortens sequences, which saves computation in every layer, and reduces the number of steps needed to generate a given text; but each additional token is rarer, so its embedding is trained on fewer examples. These pressures balance at larger vocabularies for larger models and for multilingual ones, which is why vocabularies have grown from about 32,000 to 100,000–260,000 tokens as models have grown.
+A vocabulary of $`V`$ tokens and a model width of $`d`$ costs $`Vd`$ parameters for the input embeddings and, unless the two are tied, another $`Vd`$ for the output layer, whose softmax over $`V`$ entries is computed at every position ([chapter 4](04-transformer-language-models.md)). At $`V=128{,}000`$ and $`d=4096`$ that is 524 million parameters per matrix, a large share of a small model and a small share of a large one. A larger vocabulary shortens sequences, which saves computation in every layer, and reduces the number of steps needed to generate a given text; but each additional token is rarer, so its embedding is trained on fewer examples. These pressures balance at larger vocabularies for larger models and for multilingual ones, which is why vocabularies have grown from about 32,000 to 100,000–260,000 tokens as models have grown.
 
 ### <a id="numbers-spelling-and-code"></a>Numbers, spelling, and code
 
@@ -312,7 +312,7 @@ A model sees token identifiers, not characters, and several well-known weaknesse
 
 ### <a id="languages-and-scripts"></a>Languages and scripts
 
-A tokenizer trained mostly on English allocates most of its merges to English. Text in other languages, and especially in other scripts, is split into many more tokens: three UTF-8 bytes per Devanagari character start a byte-level tokenizer at a disadvantage, and few merges are spent on Hindi. [Petrov et al. (2023)](https://arxiv.org/abs/2305.15425) found that translations of the same text can differ by up to a factor of 15 in token count across languages under common tokenizers. Speakers of those languages pay more per request to services priced by the token, fit less text into the same context window, and wait longer for generation, and the model has fewer training tokens' worth of each word. Multilingual tokenizers counter this by training on balanced data and enlarging the vocabulary (chapter 15).
+A tokenizer trained mostly on English allocates most of its merges to English. Text in other languages, and especially in other scripts, is split into many more tokens: three UTF-8 bytes per Devanagari character start a byte-level tokenizer at a disadvantage, and few merges are spent on Hindi. [Petrov et al. (2023)](https://arxiv.org/abs/2305.15425) found that translations of the same text can differ by up to a factor of 15 in token count across languages under common tokenizers. Speakers of those languages pay more per request to services priced by the token, fit less text into the same context window, and wait longer for generation, and the model has fewer training tokens' worth of each word. Multilingual tokenizers counter this by training on balanced data and enlarging the vocabulary ([chapter 15](15-machine-translation-and-multilingual-models.md)).
 
 ### <a id="strings-token-sequences-and-probabilities"></a>Strings, token sequences, and probabilities
 
@@ -320,7 +320,7 @@ A language model assigns probabilities to sequences of token identifiers, and to
 
 Canonical segmentation has a side effect at the boundary between a prompt and its continuation. If a prompt ends with a space, the model must continue with a token that has no leading space, which in training almost never followed a space token, because the space would have been merged into the next word. Generation then goes subtly wrong. Libraries correct this by **token healing**, which backs off the last prompt token and constrains the first generated token to begin with its text.
 
-The same issue governs comparisons of models. Per-token loss and perplexity (chapter 2; Foundations chapter 5) depend on how much text a token holds, so a model with a coarser tokenizer has a higher per-token loss for the same predictive quality. Dividing the total loss by the number of bytes instead gives **bits per byte**, which is comparable across tokenizers ([Appendix C](#block-nlp01-appendix-c); chapter 14).
+The same issue governs comparisons of models. Per-token loss and perplexity ([chapter 2](02-n-gram-language-models-and-perplexity.md); [Foundations chapter 5](../foundations/05-information-and-learning-theory.md#sequences-entropy-rates-and-language-model-loss)) depend on how much text a token holds, so a model with a coarser tokenizer has a higher per-token loss for the same predictive quality. Dividing the total loss by the number of bytes instead gives **bits per byte**, which is comparable across tokenizers ([Appendix C](#block-nlp01-appendix-c); [chapter 14](14-evaluating-language-models.md)).
 
 ### <a id="beyond-fixed-tokenizers"></a>Beyond fixed tokenizers
 

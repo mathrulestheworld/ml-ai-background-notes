@@ -6,12 +6,12 @@
 
 ## <a id="why-approximate"></a>Why approximate
 
-Exact inference, chapter 9, costs time exponential in the treewidth, and many models of interest have large treewidth: grids of pixels, dense networks built from data, relational models with many interacting objects, and models with continuous variables whose conditionals have no closed form. For them, two families of approximation are used, and they fail in different ways.
+Exact inference, [chapter 9](09-exact-inference.md), costs time exponential in the treewidth, and many models of interest have large treewidth: grids of pixels, dense networks built from data, relational models with many interacting objects, and models with continuous variables whose conditionals have no closed form. For them, two families of approximation are used, and they fail in different ways.
 
-- **Sampling** (Monte Carlo) methods draw samples whose frequencies approximate the target distribution. They are **consistent**: with enough samples the answer converges to the truth, and the error of an average of $`N`$ independent samples shrinks as $`1/\sqrt N`$ regardless of the number of variables (Foundations chapter 4). The difficulty is obtaining samples from the right distribution, especially under unlikely evidence.
+- **Sampling** (Monte Carlo) methods draw samples whose frequencies approximate the target distribution. They are **consistent**: with enough samples the answer converges to the truth, and the error of an average of $`N`$ independent samples shrinks as $`1/\sqrt N`$ regardless of the number of variables ([Foundations chapter 4](../foundations/04-probability-and-statistics.md#monte-carlo-integration)). The difficulty is obtaining samples from the right distribution, especially under unlikely evidence.
 - **Variational** methods replace inference by optimization: they search a tractable family of distributions for the member closest to the target. They are fast and deterministic, but **biased**, since the answer is only as good as the family, and the error does not vanish with more computation.
 
-The running examples are the burglary network of chapter 8, small enough to check against exact answers, and the Ising model, the simplest model in which approximate inference is both necessary and hard.
+The running examples are the burglary network of [chapter 8](08-bayesian-networks-and-markov-networks.md), small enough to check against exact answers, and the Ising model, the simplest model in which approximate inference is both necessary and hard.
 
 ## <a id="sampling-from-bayesian-networks"></a>Sampling from Bayesian networks
 
@@ -79,7 +79,7 @@ When $`p`$ is known only up to a constant, such as a posterior $`p(x\mid e)\prop
 N_{\mathrm{eff}}=\frac{\bigl(\sum_kw_k\bigr)^2}{\sum_kw_k^2},
 ```
 
-which equals $`N`$ when all weights are equal and 1 when one weight dominates. The variance of importance sampling is small when $`q`$ is close to $`p`$ and enormous, even infinite, when $`q`$ has lighter tails than $`p`$. In high dimensions a product of many per-variable weight ratios almost always degenerates, which is why **sequential** importance sampling with resampling, the particle filter of chapter 11, periodically discards low-weight samples and duplicates high-weight ones.
+which equals $`N`$ when all weights are equal and 1 when one weight dominates. The variance of importance sampling is small when $`q`$ is close to $`p`$ and enormous, even infinite, when $`q`$ has lighter tails than $`p`$. In high dimensions a product of many per-variable weight ratios almost always degenerates, which is why **sequential** importance sampling with resampling, the particle filter of [chapter 11](11-temporal-probabilistic-models.md#particle-filtering), periodically discards low-weight samples and duplicates high-weight ones.
 
 ## <a id="markov-chain-monte-carlo"></a>Markov chain Monte Carlo
 
@@ -95,7 +95,7 @@ which says that in equilibrium the flow from $`x`$ to $`x'`$ equals the flow bac
 
 ### <a id="gibbs-sampling"></a>Gibbs sampling
 
-**Gibbs sampling** ([Geman and Geman, 1984](https://doi.org/10.1109/TPAMI.1984.4767596)) updates one variable at a time, resampling it from its conditional distribution given all the others. In a graphical model that conditional depends only on the variable's **Markov blanket** (chapter 8):
+**Gibbs sampling** ([Geman and Geman, 1984](https://doi.org/10.1109/TPAMI.1984.4767596)) updates one variable at a time, resampling it from its conditional distribution given all the others. In a graphical model that conditional depends only on the variable's **Markov blanket** ([chapter 8](08-bayesian-networks-and-markov-networks.md#the-local-markov-property)):
 
 ```math
 P(x_i\mid x_{-i})\propto P\bigl(x_i\mid\mathrm{parents}(X_i)\bigr)\prod_{Y_j\in\mathrm{children}(X_i)}P\bigl(y_j\mid\mathrm{parents}(Y_j)\bigr)
@@ -117,7 +117,7 @@ Gibbs sampling fails when variables are strongly coupled. If two variables are a
 A(x\to x')=\min\left(1,\;\frac{\pi(x')\,q(x\mid x')}{\pi(x)\,q(x'\mid x)}\right),
 ```
 
-otherwise stay at $`x`$. The normalizing constant of $`\pi`$ cancels in the ratio, and the acceptance rule enforces detailed balance for any proposal (Appendix B). Gibbs sampling is the special case whose proposal is the exact conditional, for which the acceptance probability is always 1; the simulated annealing of chapter 3 is the case $`\pi\propto e^{-E/T}`$ with a symmetric proposal and a falling temperature.
+otherwise stay at $`x`$. The normalizing constant of $`\pi`$ cancels in the ratio, and the acceptance rule enforces detailed balance for any proposal (Appendix B). Gibbs sampling is the special case whose proposal is the exact conditional, for which the acceptance probability is always 1; the simulated annealing of [chapter 3](03-constraint-satisfaction-and-local-search.md#simulated-annealing) is the case $`\pi\propto e^{-E/T}`$ with a symmetric proposal and a falling temperature.
 
 The proposal's scale governs efficiency. Small steps are almost always accepted but move slowly; large steps are almost always rejected; the best is in between, and for random-walk proposals in high dimensions theory suggests tuning the scale for an acceptance rate of about 0.23 ([Roberts, Gelman, and Gilks, 1997](https://doi.org/10.1214/aoap/1034625254)).
 
@@ -184,7 +184,7 @@ Variational methods choose a family $`\mathcal Q`$ of tractable distributions an
 \mathrm{KL}(q\,\|\,p)=\sum_xq(x)\log\frac{q(x)}{p(x)}=\log Z-\underbrace{\Bigl(\mathbb E_q[\log\tilde p(x)]+H(q)\Bigr)}_{\mathrm{ELBO}(q)}.
 ```
 
-Since the divergence is nonnegative (Foundations chapter 5), the bracketed quantity is a lower bound on $`\log Z`$, the **evidence lower bound**, and maximizing it over $`q`$ minimizes the divergence without knowing $`Z`$. The same bound, with $`q`$ the distribution of the hidden variables, underlies EM (ML chapter 14), and in the Generative AI module it becomes the training objective of variational autoencoders, where $`q`$ is produced by a network (Generative AI chapter 3). The reverse divergence penalizes $`q`$ for putting mass where $`p`$ has little, not for missing mass where $`p`$ has some, so its minimizers are **mode-seeking**: a unimodal $`q`$ fitted to a bimodal $`p`$ locks onto one mode and underestimates the variance.
+Since the divergence is nonnegative ([Foundations chapter 5](../foundations/05-information-and-learning-theory.md#cross-entropy-divergence-and-log-loss)), the bracketed quantity is a lower bound on $`\log Z`$, the **evidence lower bound**, and maximizing it over $`q`$ minimizes the divergence without knowing $`Z`$. The same bound, with $`q`$ the distribution of the hidden variables, underlies EM ([ML chapter 14](../ml/14-gaussian-mixtures-and-expectation-maximization.md#a-lower-bound-on-the-log-likelihood)), and in the Generative AI module it becomes the training objective of variational autoencoders, where $`q`$ is produced by a network ([Generative AI chapter 3](../generative-ai/03-variational-autoencoders.md#the-evidence-lower-bound)). The reverse divergence penalizes $`q`$ for putting mass where $`p`$ has little, not for missing mass where $`p`$ has some, so its minimizers are **mode-seeking**: a unimodal $`q`$ fitted to a bimodal $`p`$ locks onto one mode and underestimates the variance.
 
 ### <a id="mean-field"></a>Mean field
 
@@ -198,7 +198,7 @@ and cycling through the factors, **coordinate ascent variational inference**, in
 
 ### <a id="loopy-belief-propagation"></a>Loopy belief propagation
 
-The sum-product messages of chapter 9 are local, so they can be computed on a graph with cycles too, iterating the message updates until they stop changing. The result, **loopy belief propagation**, is not guaranteed to converge or to be exact, but when it converges it is often remarkably accurate ([Murphy, Weiss, and Jordan, 1999](https://arxiv.org/abs/1301.6725)). It explained the success of turbo codes and low-density parity-check codes, whose decoders turned out to be loopy belief propagation on graphs with long cycles ([McEliece, MacKay, and Cheng, 1998](https://doi.org/10.1109/49.661103)). Its fixed points are the stationary points of the **Bethe free energy** ([Yedidia, Freeman, and Weiss, 2005](https://doi.org/10.1109/TIT.2005.850085)), a variational approximation that, unlike mean field, keeps pairwise marginals but only enforces their local consistency, so it is exact on trees. Damping, which averages new messages with old ones, helps convergence; convergent double-loop algorithms minimize the Bethe free energy directly, and **expectation propagation** generalizes the idea to continuous and non-conjugate models.
+The sum-product messages of [chapter 9](09-exact-inference.md#message-passing-on-trees) are local, so they can be computed on a graph with cycles too, iterating the message updates until they stop changing. The result, **loopy belief propagation**, is not guaranteed to converge or to be exact, but when it converges it is often remarkably accurate ([Murphy, Weiss, and Jordan, 1999](https://arxiv.org/abs/1301.6725)). It explained the success of turbo codes and low-density parity-check codes, whose decoders turned out to be loopy belief propagation on graphs with long cycles ([McEliece, MacKay, and Cheng, 1998](https://doi.org/10.1109/49.661103)). Its fixed points are the stationary points of the **Bethe free energy** ([Yedidia, Freeman, and Weiss, 2005](https://doi.org/10.1109/TIT.2005.850085)), a variational approximation that, unlike mean field, keeps pairwise marginals but only enforces their local consistency, so it is exact on trees. Damping, which averages new messages with old ones, helps convergence; convergent double-loop algorithms minimize the Bethe free energy directly, and **expectation propagation** generalizes the idea to continuous and non-conjugate models.
 
 ```python
 from itertools import product

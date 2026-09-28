@@ -6,10 +6,10 @@
 
 ## <a id="overview"></a>Overview
 
-This lab puts chapter 10 to work. You will add planning to a learning agent and measure how much real experience it saves and how much computation it costs, plan with a model learned in a stochastic world, use a simulator for decision-time planning with rollouts and Monte Carlo tree search, and run real-time dynamic programming on a map too large to sweep comfortably.
+This lab puts [chapter 10](../10-planning-and-learning-with-tabular-models.md) to work. You will add planning to a learning agent and measure how much real experience it saves and how much computation it costs, plan with a model learned in a stochastic world, use a simulator for decision-time planning with rollouts and Monte Carlo tree search, and run real-time dynamic programming on a map too large to sweep comfortably.
 
 - **Environments:** `Taxi-v3`; the slippery $`8\times8`$ `FrozenLake-v1`; `Blackjack-v1` with Sutton and Barto's rules; and a random $`40\times40`$ FrozenLake made with Gymnasium's `generate_random_map`.
-- **Prerequisites:** chapters 7 and 10, and Lab 1 for reading the model `env.unwrapped.P`; NumPy and Gymnasium.
+- **Prerequisites:** chapters 7 and 10, and [Lab 1](lab-01-dynamic-programming-on-frozenlake-and-taxi.md) for reading the model `env.unwrapped.P`; NumPy and Gymnasium.
 - **Reference solution:** [lab04_planning.py](code/lab04_planning.py), about a minute and a half on one core. Try each part yourself before reading it.
 
 ## <a id="part-1-dyna-and-prioritized-sweeping-on-taxi"></a>Part 1 — Dyna and prioritized sweeping on Taxi

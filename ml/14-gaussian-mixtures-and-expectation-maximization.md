@@ -8,17 +8,17 @@
 
 ### <a id="a-latent-class-label"></a>A latent class label
 
-A **finite mixture model** explains each observation as coming from one of $`K`$ unobserved groups. Its generative story has two steps: draw a latent label $`z\in\{1,\ldots,K\}`$ with probabilities $`\pi_1,\ldots,\pi_K`$, then draw $`x`$ from the component distribution of that group. The **mixing weights** $`\pi_k`$ are nonnegative and sum to one. In a **Gaussian mixture**, the components are multivariate normal, and $`\mathcal N(x\mid\mu_k,\Sigma_k)`$ denotes the density of $`\mathcal N(\mu_k,\Sigma_k)`$ at $`x\in\mathbb R^d`$, given in Probability and Statistics. Summing the joint density of $`z=k`$ and $`x`$ over the unobserved label gives the density of an observation,
+A **finite mixture model** explains each observation as coming from one of $`K`$ unobserved groups. Its generative story has two steps: draw a latent label $`z\in\{1,\ldots,K\}`$ with probabilities $`\pi_1,\ldots,\pi_K`$, then draw $`x`$ from the component distribution of that group. The **mixing weights** $`\pi_k`$ are nonnegative and sum to one. In a **Gaussian mixture**, the components are multivariate normal, and $`\mathcal N(x\mid\mu_k,\Sigma_k)`$ denotes the density of $`\mathcal N(\mu_k,\Sigma_k)`$ at $`x\in\mathbb R^d`$, given in [Probability and Statistics](../foundations/04-probability-and-statistics.md#gaussian-vectors-and-conditioning). Summing the joint density of $`z=k`$ and $`x`$ over the unobserved label gives the density of an observation,
 
 ```math
 p(x\mid\theta)=\sum_{k=1}^K\pi_k\,\mathcal N(x\mid\mu_k,\Sigma_k),\qquad \theta=\{\pi_k,\mu_k,\Sigma_k\}_{k=1}^K ,
 ```
 
-where $`\theta`$ collects all the parameters. Conditioning on $`z`$ also gives the mixture's moments. By the tower property and the law of total covariance of Probability and Statistics, whose worked example is a two-component mixture, the mean is $`\bar\mu=\sum_k\pi_k\mu_k`$ and the covariance is $`\sum_k\pi_k\Sigma_k+\sum_k\pi_k(\mu_k-\bar\mu)(\mu_k-\bar\mu)^\top`$, the average spread within components plus the spread of the component means. The mixture itself is not Gaussian: its density can have several modes, be skewed, or have heavier tails than a Gaussian.
+where $`\theta`$ collects all the parameters. Conditioning on $`z`$ also gives the mixture's moments. By the tower property and the law of total covariance of [Probability and Statistics](../foundations/04-probability-and-statistics.md#conditional-expectation-and-total-variance), whose worked example is a two-component mixture, the mean is $`\bar\mu=\sum_k\pi_k\mu_k`$ and the covariance is $`\sum_k\pi_k\Sigma_k+\sum_k\pi_k(\mu_k-\bar\mu)(\mu_k-\bar\mu)^\top`$, the average spread within components plus the spread of the component means. The mixture itself is not Gaussian: its density can have several modes, be skewed, or have heavier tails than a Gaussian.
 
-This is the model of quadratic discriminant analysis in chapter 4 with the class label hidden. When the labels are observed, maximum likelihood separates by class, as chapter 4 shows, and has closed-form answers: class frequencies, class means, and class covariances. When they are not, the same parameters must be estimated from $`x`$ alone, which is the subject of this chapter.
+This is the model of quadratic discriminant analysis in [chapter 4](04-generative-classifiers.md#quadratic-discriminant-analysis) with the class label hidden. When the labels are observed, maximum likelihood separates by class, as [chapter 4](04-generative-classifiers.md#estimation-separates-by-class) shows, and has closed-form answers: class frequencies, class means, and class covariances. When they are not, the same parameters must be estimated from $`x`$ alone, which is the subject of this chapter.
 
-Mixtures serve two purposes. As a **clustering** method, they generalize k-means (chapter 13): each component is a cluster with its own shape, size, and orientation, and membership is probabilistic. As a **density estimator**, they approximate complicated densities by sums of simple ones. With enough components, Gaussian mixtures can approximate any smooth density, which makes them useful for anomaly detection and as building blocks of larger probabilistic models.
+Mixtures serve two purposes. As a **clustering** method, they generalize k-means ([chapter 13](13-clustering.md)): each component is a cluster with its own shape, size, and orientation, and membership is probabilistic. As a **density estimator**, they approximate complicated densities by sums of simple ones. With enough components, Gaussian mixtures can approximate any smooth density, which makes them useful for anomaly detection and as building blocks of larger probabilistic models.
 
 ### <a id="responsibilities"></a>Responsibilities
 
@@ -42,7 +42,7 @@ In two dimensions the same soft assignment can be shown by color.
 
 ### <a id="the-likelihood-and-its-difficulties"></a>The likelihood and its difficulties
 
-For iid observations the log-likelihood, in the sense of Probability and Statistics, is
+For iid observations the log-likelihood, in the sense of [Probability and Statistics](../foundations/04-probability-and-statistics.md#likelihood-and-maximum-likelihood), is
 
 ```math
 \ell(\theta)=\sum_{i=1}^n\log\sum_{k=1}^K\pi_k\,\mathcal N(x_i\mid\mu_k,\Sigma_k).
@@ -97,7 +97,7 @@ Q(\theta\mid\theta^{(t)})=\mathbb E_{z\sim p(z\mid x,\theta^{(t)})}\bigl[\log p(
 
 The E-step computes the expectation, which amounts to computing the responsibilities; the M-step maximizes it over $`\theta`$, which gives the weighted estimates above.
 
-The implementation below runs EM from a fixed starting point and matches scikit-learn's [`GaussianMixture`](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html) started from the same parameters. The log-sum-exp step computes $`\log p(x_i)`$ without underflow, as in Numerical Computing.
+The implementation below runs EM from a fixed starting point and matches scikit-learn's [`GaussianMixture`](https://scikit-learn.org/stable/modules/generated/sklearn.mixture.GaussianMixture.html) started from the same parameters. The log-sum-exp step computes $`\log p(x_i)`$ without underflow, as in [Numerical Computing](../foundations/06-numerical-computing-with-numpy-and-pytorch.md#stable-probability-calculations).
 
 ```python
 import numpy as np
@@ -159,13 +159,13 @@ The data were generated with weights $`0.5,0.3,0.2`$ and means $`(0,0)`$, $`(4,3
 
 ### <a id="a-lower-bound-on-the-log-likelihood"></a>A lower bound on the log-likelihood
 
-Let $`q`$ be any distribution over the latent labels of one observation, positive wherever the posterior $`p(z\mid x,\theta)`$ is. Because $`\log`$ is concave, Jensen's inequality (Probability and Statistics), $`\log\mathbb E\,Y\ge\mathbb E\log Y`$, applied to the random variable $`Y=p(x,z\mid\theta)/q(z)`$ with $`z`$ drawn from $`q`$, gives
+Let $`q`$ be any distribution over the latent labels of one observation, positive wherever the posterior $`p(z\mid x,\theta)`$ is. Because $`\log`$ is concave, Jensen's inequality ([Probability and Statistics](../foundations/04-probability-and-statistics.md#two-moment-inequalities)), $`\log\mathbb E\,Y\ge\mathbb E\log Y`$, applied to the random variable $`Y=p(x,z\mid\theta)/q(z)`$ with $`z`$ drawn from $`q`$, gives
 
 ```math
 \log p(x\mid\theta)=\log\sum_zq(z)\frac{p(x,z\mid\theta)}{q(z)}\ \ge\ \sum_zq(z)\log\frac{p(x,z\mid\theta)}{q(z)}\ =:\ F(q,\theta).
 ```
 
-The sums run over the $`K`$ values of $`z`$. The gap is exactly a Kullback–Leibler divergence (Information and Learning Theory):
+The sums run over the $`K`$ values of $`z`$. The gap is exactly a Kullback–Leibler divergence ([Information and Learning Theory](../foundations/05-information-and-learning-theory.md#cross-entropy-divergence-and-log-loss)):
 
 ```math
 \log p(x\mid\theta)=F(q,\theta)+D_{\mathrm{KL}}\bigl(q\,\big\|\,p(z\mid x,\theta)\bigr).
@@ -200,7 +200,7 @@ The proof also splits each improvement into two nonnegative parts: the M-step's 
 
 Monotonicity is a guarantee about the sequence of likelihood values, not about where they end. The sequence converges whenever the likelihood is bounded along the path, and under regularity conditions the limit points of the parameters are stationary points of $`\ell`$ ([Wu, 1983](https://projecteuclid.org/journals/annals-of-statistics/volume-11/issue-1/On-the-Convergence-Properties-of-the-EM-Algorithm/10.1214/aos/1176346060.full)). A stationary point can be a local maximum or a saddle point, and nothing guarantees the global maximum, which for Gaussian mixtures does not even exist. The right panel shows the practical consequence: the answer depends on the starting point, and several starts are needed.
 
-EM's convergence is also slow when components overlap. Near a local maximum $`\hat\theta`$, the error shrinks by a roughly constant factor per iteration, and that factor is the fraction of information about $`\theta`$ that is missing because the labels are unobserved. Dempster, Laird, and Rubin make this precise. Let $`J_n(\hat\theta)=-\nabla^2\ell(\hat\theta)`$ be the observed information of Probability and Statistics, and let $`I_c(\hat\theta)=-\nabla_\theta^2Q(\theta\mid\hat\theta)`$ at $`\theta=\hat\theta`$ be the information the complete data would carry, averaged over the posterior of the labels. Their difference $`I_m=I_c-J_n`$ is the **missing information**; it equals the posterior covariance of the complete-data score $`\nabla_\theta\log p(x,z\mid\theta)`$ at $`\hat\theta`$, so it is positive semidefinite. Near $`\hat\theta`$ the EM update is approximately linear:
+EM's convergence is also slow when components overlap. Near a local maximum $`\hat\theta`$, the error shrinks by a roughly constant factor per iteration, and that factor is the fraction of information about $`\theta`$ that is missing because the labels are unobserved. Dempster, Laird, and Rubin make this precise. Let $`J_n(\hat\theta)=-\nabla^2\ell(\hat\theta)`$ be the observed information of [Probability and Statistics](../foundations/04-probability-and-statistics.md#score-information-and-asymptotic-uncertainty), and let $`I_c(\hat\theta)=-\nabla_\theta^2Q(\theta\mid\hat\theta)`$ at $`\theta=\hat\theta`$ be the information the complete data would carry, averaged over the posterior of the labels. Their difference $`I_m=I_c-J_n`$ is the **missing information**; it equals the posterior covariance of the complete-data score $`\nabla_\theta\log p(x,z\mid\theta)`$ at $`\hat\theta`$, so it is positive semidefinite. Near $`\hat\theta`$ the EM update is approximately linear:
 
 ```math
 \theta^{(t+1)}-\hat\theta\ \approx\ I_c(\hat\theta)^{-1}I_m(\hat\theta)\,\bigl(\theta^{(t)}-\hat\theta\bigr).
@@ -218,7 +218,7 @@ For heavily overlapping components, quasi-Newton methods or acceleration schemes
 
 ### <a id="initialization"></a>Initialization
 
-Common practice runs k-means first and initializes the means, covariances, and weights from its clusters; scikit-learn does this by default. Several restarts from different initializations, keeping the fit with the largest likelihood, protect against poor local optima. The k-means++ seeding of chapter 13 works well for the initial means.
+Common practice runs k-means first and initializes the means, covariances, and weights from its clusters; scikit-learn does this by default. Several restarts from different initializations, keeping the fit with the largest likelihood, protect against poor local optima. The k-means++ seeding of [chapter 13](13-clustering.md#seeding-with-k-means) works well for the initial means.
 
 ### <a id="degenerate-solutions"></a>Degenerate solutions
 
@@ -270,7 +270,7 @@ Full covariance matrices cost $`d(d+1)/2`$ parameters per component, which is pr
 | Tied, $`\Sigma_k=\Sigma`$ | Identical ellipsoids at different locations | $`d(d+1)/2`$ |
 | Full | Arbitrary ellipsoids | $`Kd(d+1)/2`$ |
 
-The means add $`Kd`$ parameters and the weights $`K-1`$. The tied model gives linear boundaries between components, like LDA, and the full model quadratic ones, like QDA; chapter 4 compares the same assumptions for classifiers.
+The means add $`Kd`$ parameters and the weights $`K-1`$. The tied model gives linear boundaries between components, like LDA, and the full model quadratic ones, like QDA; [chapter 4](04-generative-classifiers.md#three-covariance-assumptions-compared) compares the same assumptions for classifiers.
 
 <img src="sources/images/gmm-covariance-types.png" alt="gmm-covariance-types" width="760">
 
@@ -278,13 +278,13 @@ The means add $`Kd`$ parameters and the weights $`K-1`$. The tied model gives li
 
 ### <a id="choosing-the-number-of-components"></a>Choosing the number of components
 
-The likelihood always increases with $`K`$, so $`K`$ and the covariance type are chosen by a penalized criterion or by held-out likelihood. The **Bayesian information criterion** of chapter 6, $`\operatorname{BIC}=-2\ell(\hat\theta)+p\log n`$ with $`p`$ the number of free parameters, is the most common choice. Its derivation assumes regularity conditions that mixtures violate, because a model with fewer components sits on the boundary of the larger model's parameter space; it nonetheless works well in practice for choosing the number of components.
+The likelihood always increases with $`K`$, so $`K`$ and the covariance type are chosen by a penalized criterion or by held-out likelihood. The **Bayesian information criterion** of [chapter 6](06-losses-model-selection-and-evaluation.md#analytic-criteria), $`\operatorname{BIC}=-2\ell(\hat\theta)+p\log n`$ with $`p`$ the number of free parameters, is the most common choice. Its derivation assumes regularity conditions that mixtures violate, because a model with fewer components sits on the boundary of the larger model's parameter space; it nonetheless works well in practice for choosing the number of components.
 
 <img src="sources/images/gmm-bic.png" alt="gmm-bic" width="680">
 
 *BIC for mixtures with one to six components and four covariance structures, fitted to the 600 points of the figure in [Responsibilities](#responsibilities). BIC selects three components with full covariances, the model that generated the data. The restricted covariance types need more components to describe the tilted, elongated groups; their BIC is still decreasing at six components, the largest number tried, and remains above that of the selected model.*
 
-The scikit-learn example [Gaussian Mixture Model Selection](https://scikit-learn.org/stable/auto_examples/mixture/plot_gmm_selection.html) from the reading plan performs the same comparison. Held-out log-likelihood, computed by cross-validation as for probabilistic PCA in chapter 12, is an alternative that targets density estimation rather than recovery of a true $`K`$.
+The scikit-learn example [Gaussian Mixture Model Selection](https://scikit-learn.org/stable/auto_examples/mixture/plot_gmm_selection.html) from the reading plan performs the same comparison. Held-out log-likelihood, computed by cross-validation as for probabilistic PCA in [chapter 12](12-principal-components-and-dimensionality-reduction.md#a-probabilistic-model), is an alternative that targets density estimation rather than recovery of a true $`K`$.
 
 ## <a id="mixtures-and-k-means"></a>Mixtures and k-means
 
@@ -306,9 +306,9 @@ The objectives match as well. With $`d`$ the dimension, the expected complete-da
 Q(\theta\mid\theta^{(t)})=\sum_i\sum_kr_{ik}\Bigl[-\log K-\frac d2\log(2\pi\sigma^2)-\frac{\|x_i-\mu_k\|^2}{2\sigma^2}\Bigr].
 ```
 
-Multiply by $`\sigma^2`$ and let $`\sigma^2\to0`$. The first two terms vanish, the second because $`\sigma^2\log\sigma^2\to0`$, and each $`r_{ik}`$ becomes the indicator that $`\mu_k^{(t)}`$ is the current mean nearest to $`x_i`$, so $`\sigma^2Q`$ tends to $`-\frac12`$ times the within-cluster sum of squares $`W`$ of chapter 13, evaluated at that nearest-mean partition. Lloyd's algorithm is therefore **hard EM** for this restricted mixture, an EM whose E-step assigns each point entirely to its most responsible component.
+Multiply by $`\sigma^2`$ and let $`\sigma^2\to0`$. The first two terms vanish, the second because $`\sigma^2\log\sigma^2\to0`$, and each $`r_{ik}`$ becomes the indicator that $`\mu_k^{(t)}`$ is the current mean nearest to $`x_i`$, so $`\sigma^2Q`$ tends to $`-\frac12`$ times the within-cluster sum of squares $`W`$ of [chapter 13](13-clustering.md#the-objective), evaluated at that nearest-mean partition. Lloyd's algorithm is therefore **hard EM** for this restricted mixture, an EM whose E-step assigns each point entirely to its most responsible component.
 
-The comparison explains the failures of k-means in chapter 13. k-means implicitly assumes spherical clusters with equal spread, and it assigns each point entirely to one cluster. A mixture with full covariances drops both assumptions. On the two datasets where k-means failed, the adjusted Rand index rises from 0.58 and 0.13 to 1.00 and 0.94.
+The comparison explains the failures of k-means in [chapter 13](13-clustering.md#lloyd-s-algorithm). k-means implicitly assumes spherical clusters with equal spread, and it assigns each point entirely to one cluster. A mixture with full covariances drops both assumptions. On the two datasets where k-means failed, the adjusted Rand index rises from 0.58 and 0.13 to 1.00 and 0.94.
 
 <img src="sources/images/gmm-vs-kmeans.png" alt="gmm-vs-kmeans" width="760">
 
@@ -320,14 +320,14 @@ The flexibility has costs. A mixture has more parameters, more local optima, and
 
 The derivation of EM used nothing specific to Gaussians. It applies whenever a model has latent variables whose posterior can be computed, so that the E-step is tractable, and whose complete-data likelihood is easy to maximize.
 
-The M-step is simplest when the complete-data model is an exponential family. Its log-likelihood is then linear in the summed sufficient statistic $`T=\sum_it(x_i,z_i)`$, so the E-step only needs the conditional expectation $`\mathbb E[T\mid x,\theta^{(t)}]`$, and the M-step is the complete-data maximum likelihood estimate with $`T`$ replaced by that expectation: it matches the model's expected value of $`t(x_i,z_i)`$ to the average $`\mathbb E[T\mid x,\theta^{(t)}]/n`$. For a Gaussian mixture, $`T`$ collects the counts, sums, and sums of outer products $`\sum_i\mathbf 1\{z_i=k\}\,(1,\ x_i,\ x_ix_i^\top)`$ for each component, and its conditional expectation is $`(N_k,\ \sum_ir_{ik}x_i,\ \sum_ir_{ik}x_ix_i^\top)`$, from which the M-step formulas follow.
+The M-step is simplest when the complete-data model is an [exponential family](../foundations/04-probability-and-statistics.md#exponential-families-and-moment-matching). Its log-likelihood is then linear in the summed sufficient statistic $`T=\sum_it(x_i,z_i)`$, so the E-step only needs the conditional expectation $`\mathbb E[T\mid x,\theta^{(t)}]`$, and the M-step is the complete-data maximum likelihood estimate with $`T`$ replaced by that expectation: it matches the model's expected value of $`t(x_i,z_i)`$ to the average $`\mathbb E[T\mid x,\theta^{(t)}]/n`$. For a Gaussian mixture, $`T`$ collects the counts, sums, and sums of outer products $`\sum_i\mathbf 1\{z_i=k\}\,(1,\ x_i,\ x_ix_i^\top)`$ for each component, and its conditional expectation is $`(N_k,\ \sum_ir_{ik}x_i,\ \sum_ir_{ik}x_ix_i^\top)`$, from which the M-step formulas follow.
 
 - **Other mixtures.** Mixtures of Bernoulli distributions cluster binary data such as black-and-white images; mixtures of multinomials cluster documents by word counts; mixtures of Student $`t`$ distributions resist outliers.
-- **Missing data.** When some entries of $`x`$ are missing at random, EM treats them as latent variables. For a multivariate Gaussian, the E-step fills in conditional expectations of the missing entries and of their squares and products, using the conditional-Gaussian formulas of Probability and Statistics.
-- **Latent factor models.** Probabilistic PCA and factor analysis (chapter 12) are fitted by EM when no closed form exists, and hidden Markov models (AI chapter 11) are fitted by an EM algorithm whose E-step is a dynamic program.
-- **Intractable posteriors.** When the posterior over latent variables cannot be computed, the E-step can maximize $`F`$ over a restricted family of distributions instead. This **variational EM**, and its amortized form in variational autoencoders, belongs to the Generative AI module.
+- **Missing data.** When some entries of $`x`$ are missing at random, EM treats them as latent variables. For a multivariate Gaussian, the E-step fills in conditional expectations of the missing entries and of their squares and products, using the conditional-Gaussian formulas of [Probability and Statistics](../foundations/04-probability-and-statistics.md#gaussian-vectors-and-conditioning).
+- **Latent factor models.** Probabilistic PCA and factor analysis ([chapter 12](12-principal-components-and-dimensionality-reduction.md#a-probabilistic-model)) are fitted by EM when no closed form exists, and hidden Markov models ([AI chapter 11](../ai/11-temporal-probabilistic-models.md)) are fitted by an EM algorithm whose E-step is a dynamic program.
+- **Intractable posteriors.** When the posterior over latent variables cannot be computed, the E-step can maximize $`F`$ over a restricted family of distributions instead. This **variational EM**, and its amortized form in [variational autoencoders](../generative-ai/03-variational-autoencoders.md), belongs to the Generative AI module.
 
-General inference in graphical models with many interacting latent variables belongs to the AI module (AI chapters 9 and 10), and AI chapter 14 fits such models with EM. [ESL §8.5](https://hastie.su.domains/ElemStatLearn/) presents EM with a two-component example, and [Bishop's *Pattern Recognition and Machine Learning*](https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/), chapter 9, develops mixtures and EM in the lower-bound form used here.
+General inference in graphical models with many interacting latent variables belongs to the AI module ([AI chapters 9](../ai/09-exact-inference.md) and [10](../ai/10-approximate-inference.md)), and [AI chapter 14](../ai/14-learning-graphical-models.md) fits such models with EM. [ESL §8.5](https://hastie.su.domains/ElemStatLearn/) presents EM with a two-component example, and [Bishop's *Pattern Recognition and Machine Learning*](https://www.microsoft.com/en-us/research/publication/pattern-recognition-machine-learning/), chapter 9, develops mixtures and EM in the lower-bound form used here.
 
 ## <a id="appendices"></a>Appendices
 

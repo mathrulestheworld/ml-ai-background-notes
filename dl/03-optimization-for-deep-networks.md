@@ -6,13 +6,13 @@
 
 ## <a id="what-is-different-about-deep-networks"></a>What is different about deep networks
 
-Foundations chapter 3 developed the optimizers used in deep learning, from gradient descent and its convergence rates through momentum, Nesterov acceleration, AdaGrad, RMSProp, Adam, and AdamW, together with the mechanics of schedules, gradient accumulation, and clipping. Its guarantees assume smoothness and often convexity. Deep networks satisfy neither in a useful sense, and they add three features that change how the same algorithms behave.
+[Foundations chapter 3](../foundations/03-calculus-and-optimization.md) developed the optimizers used in deep learning, from gradient descent and its convergence rates through momentum, Nesterov acceleration, AdaGrad, RMSProp, Adam, and AdamW, together with the mechanics of schedules, gradient accumulation, and clipping. Its guarantees assume smoothness and often convexity. Deep networks satisfy neither in a useful sense, and they add three features that change how the same algorithms behave.
 
-- **Nonconvexity with symmetry.** The loss has many equivalent minimizers (chapter 1), saddle points, and flat directions. The object of interest is not the global minimizer but a solution with low loss that generalizes.
+- **Nonconvexity with symmetry.** The loss has many equivalent minimizers ([chapter 1](01-deep-feedforward-networks.md#nonconvexity-and-symmetry)), saddle points, and flat directions. The object of interest is not the global minimizer but a solution with low loss that generalizes.
 - **Severe ill-conditioning.** The Hessian of a trained network has a few large eigenvalues, a bulk of eigenvalues near zero, and some negative ones ([Sagun, Evci, Güney, Dauphin, and Bottou, 2017](https://arxiv.org/abs/1706.04454); [Ghorbani, Krishnan, and Xiao, 2019](https://arxiv.org/abs/1901.10159)). A step size small enough for the sharpest direction makes progress along the flat ones very slow.
 - **Stochastic gradients by design.** The data are too large for full-batch gradients, so every step uses a minibatch. The resulting noise affects which solutions are found, not only how fast.
 
-These features shift attention from convergence proofs to empirical regularities: how the batch size and learning rate trade off, why schedules and warmup help, how the curvature evolves during training, and what the loss surface looks like between solutions. This chapter covers those regularities. The optimizer's interaction with generalization is taken up in chapter 5.
+These features shift attention from convergence proofs to empirical regularities: how the batch size and learning rate trade off, why schedules and warmup help, how the curvature evolves during training, and what the loss surface looks like between solutions. This chapter covers those regularities. The optimizer's interaction with generalization is taken up in [chapter 5](05-regularization-and-generalization-in-deep-networks.md).
 
 The Hessian's shape can be seen directly in a small network. Hessian-vector products cost about two backward passes and never form the matrix, which is how curvature is measured in networks with millions of parameters; for a network with 41 parameters the full Hessian can be computed for comparison.
 
@@ -74,7 +74,7 @@ Even this small network, fitted to low loss, has more than half of its curvature
 
 ### <a id="the-noise-in-a-stochastic-gradient"></a>The noise in a stochastic gradient
 
-A minibatch gradient $`g_B=\frac1B\sum_{i\in\mathcal B}\nabla\ell_i(\theta)`$, with examples drawn independently, is an unbiased estimate of the full gradient $`G=\nabla\widehat R_n(\theta)`$ with covariance $`\Sigma/B`$, where $`\Sigma`$ is the covariance of the per-example gradients (Foundations chapter 3). A step of size $`\eta`$ therefore moves the parameters by $`-\eta G`$ plus noise with covariance $`\eta^2\Sigma/B`$. Over many small steps, the drift scales with $`\eta`$ and the accumulated noise variance with $`\eta^2/B`$ per step, so the ratio $`\eta/B`$ acts like a temperature: SGD behaves approximately like a diffusion that samples low-loss regions, with fluctuations growing with $`\eta/B`$ ([Mandt, Hoffman, and Blei, 2017](https://arxiv.org/abs/1704.04289); [Smith and Le, 2018](https://arxiv.org/abs/1710.06451)).
+A minibatch gradient $`g_B=\frac1B\sum_{i\in\mathcal B}\nabla\ell_i(\theta)`$, with examples drawn independently, is an unbiased estimate of the full gradient $`G=\nabla\widehat R_n(\theta)`$ with covariance $`\Sigma/B`$, where $`\Sigma`$ is the covariance of the per-example gradients ([Foundations chapter 3](../foundations/03-calculus-and-optimization.md#stochastic-gradients-and-convergence-in-expectation)). A step of size $`\eta`$ therefore moves the parameters by $`-\eta G`$ plus noise with covariance $`\eta^2\Sigma/B`$. Over many small steps, the drift scales with $`\eta`$ and the accumulated noise variance with $`\eta^2/B`$ per step, so the ratio $`\eta/B`$ acts like a temperature: SGD behaves approximately like a diffusion that samples low-loss regions, with fluctuations growing with $`\eta/B`$ ([Mandt, Hoffman, and Blei, 2017](https://arxiv.org/abs/1704.04289); [Smith and Le, 2018](https://arxiv.org/abs/1710.06451)).
 
 This picture explains the **linear scaling rule** of [Goyal et al. (2017)](https://arxiv.org/abs/1706.02677): when the batch size is multiplied by $`k`$, multiply the learning rate by $`k`$, which keeps $`\eta/B`$ fixed and makes $`k`$ small steps approximately equal to one large step. With a gradual warmup of the learning rate, they trained ResNet-50 on ImageNet with batches of 8,192 images in one hour, matching the accuracy of batch 256. The rule has a limit. A $`k`$-fold larger step is equivalent to $`k`$ small ones only while the gradient changes little over the displacement, and beyond some batch size the learning rate cannot grow further without instability.
 
@@ -144,13 +144,13 @@ During the phase that determines the steps to reach a loss of 0.05, the measured
 
 ### <a id="does-noise-help-generalization"></a>Does noise help generalization?
 
-[Keskar et al. (2017)](https://arxiv.org/abs/1609.04836) observed that large-batch training generalized worse and converged to sharper minima, suggesting that minibatch noise steers SGD toward flat, better-generalizing regions. Later work found that much of the gap disappears when the learning rate, schedule, and training length are retuned for each batch size ([Shallue et al., 2019](https://jmlr.org/papers/v20/18-789.html)); what remains depends on the problem. The temperature $`\eta/B`$ is still a useful knob, and chapter 5 returns to the relation between flatness and generalization.
+[Keskar et al. (2017)](https://arxiv.org/abs/1609.04836) observed that large-batch training generalized worse and converged to sharper minima, suggesting that minibatch noise steers SGD toward flat, better-generalizing regions. Later work found that much of the gap disappears when the learning rate, schedule, and training length are retuned for each batch size ([Shallue et al., 2019](https://jmlr.org/papers/v20/18-789.html)); what remains depends on the problem. The temperature $`\eta/B`$ is still a useful knob, and [chapter 5](05-regularization-and-generalization-in-deep-networks.md) returns to the relation between flatness and generalization.
 
 ## <a id="learning-rate-schedules"></a>Learning-rate schedules
 
 ### <a id="why-the-rate-should-decay"></a>Why the rate should decay
 
-With a constant learning rate, SGD does not converge: on a quadratic with gradient noise it settles into a stationary distribution whose width grows with $`\eta`$ (Foundations chapter 3). A large rate early makes fast progress across the landscape; a small rate late lets the iterates settle into the bottom of a basin. Every schedule in common use implements this in a different shape.
+With a constant learning rate, SGD does not converge: on a quadratic with gradient noise it settles into a stationary distribution whose width grows with $`\eta`$ ([Foundations chapter 3](../foundations/03-calculus-and-optimization.md#a-basic-stochastic-convergence-bound)). A large rate early makes fast progress across the landscape; a small rate late lets the iterates settle into the bottom of a basin. Every schedule in common use implements this in a different shape.
 
 - **Step decay** divides the rate by 10 at fixed epochs, the standard for convolutional networks trained with SGD for many years.
 - **Cosine decay** $`\eta_t=\eta_{\min}+\frac12(\eta_{\max}-\eta_{\min})\bigl(1+\cos(\pi t/T)\bigr)`$ ([Loshchilov and Hutter, 2017](https://arxiv.org/abs/1608.03983)) decays smoothly, slowly at first and last. It is the default for transformers, usually decaying to about a tenth of the peak.
@@ -169,7 +169,7 @@ In this example the peak rate is deliberately large, so the differences are exag
 
 - Adam's second-moment estimate $`\hat v_t`$ is based on few gradients at the start, so its denominator is noisy and the effective step erratic. [Liu et al. (2020)](https://arxiv.org/abs/1908.03265) showed that warmup compensates for this variance.
 - The loss surface at initialization is often sharp, and a full-size step would exceed the stability threshold $`2/\lambda_{\max}`$ discussed below. During warmup the network moves to flatter regions where the peak rate is stable ([Gilmer et al., 2022](https://arxiv.org/abs/2110.04369); [Kalra and Barkeshli, 2024](https://arxiv.org/abs/2406.09405)).
-- In transformers with normalization after the residual addition, gradients near the output are large at initialization; placing normalization before the sublayers reduces the need for warmup ([Xiong et al., 2020](https://arxiv.org/abs/2002.04745); chapter 4).
+- In transformers with normalization after the residual addition, gradients near the output are large at initialization; placing normalization before the sublayers reduces the need for warmup ([Xiong et al., 2020](https://arxiv.org/abs/2002.04745); [chapter 4](04-normalization-and-residual-connections.md)).
 
 In PyTorch a schedule is a function of the step count wrapped in a scheduler, which must be advanced once per optimizer update. The multiplier below implements linear warmup followed by cosine decay to a tenth of the peak.
 
@@ -202,7 +202,7 @@ print("learning rate at steps 0, 49, 99, 100, 550, 999:", [f"{lrs[s]:.2e}" for s
 
 ### <a id="the-stability-threshold"></a>The stability threshold
 
-On a quadratic, gradient descent with step $`\eta`$ diverges along any direction whose curvature exceeds $`2/\eta`$ (Foundations chapter 3). Classical analysis therefore chooses $`\eta<2/L`$ for an $`L`$-smooth loss. In a neural network the curvature is not fixed; the largest Hessian eigenvalue $`\lambda_{\max}`$, the **sharpness**, changes as the parameters move. [Cohen et al. (2021)](https://arxiv.org/abs/2103.00065) found two consistent regularities in full-batch gradient descent:
+On a quadratic, gradient descent with step $`\eta`$ diverges along any direction whose curvature exceeds $`2/\eta`$ ([Foundations chapter 3](../foundations/03-calculus-and-optimization.md#quadratics-expose-the-stability-threshold)). Classical analysis therefore chooses $`\eta<2/L`$ for an $`L`$-smooth loss. In a neural network the curvature is not fixed; the largest Hessian eigenvalue $`\lambda_{\max}`$, the **sharpness**, changes as the parameters move. [Cohen et al. (2021)](https://arxiv.org/abs/2103.00065) found two consistent regularities in full-batch gradient descent:
 
 1. **Progressive sharpening.** When the step size is small relative to the curvature, the sharpness increases during training.
 2. **Edge of stability.** Once it reaches $`2/\eta`$, it stops increasing and hovers just above that value. The loss keeps decreasing, but no longer monotonically: short spikes alternate with rapid descent.
@@ -235,9 +235,9 @@ Much of the barrier is an artifact of the permutation symmetry of chapter 1. Two
 
 *Training loss along straight segments for one-hidden-layer networks with 512 units trained on digits. From initialization to a trained network the loss falls monotonically. Between two networks trained from different seeds, the loss at the midpoint is 0.097, about 20 times the endpoints' 0.005. After the hidden units of network B are permuted to maximize the correlation of their activations with those of network A, the peak drops to 0.010.*
 
-These observations have practical uses. Averaging the weights of several points along one training run, as in stochastic weight averaging, works because those points lie in one connected low-loss region; so does fine-tuning several copies of one pretrained model and averaging their weights (chapter 5). One-dimensional and two-dimensional slices of the loss can also mislead: their appearance depends on the scale of the chosen directions, which [Li et al. (2018)](https://arxiv.org/abs/1712.09913) normalize filter by filter to make slices comparable.
+These observations have practical uses. Averaging the weights of several points along one training run, as in stochastic weight averaging, works because those points lie in one connected low-loss region; so does fine-tuning several copies of one pretrained model and averaging their weights ([chapter 5](05-regularization-and-generalization-in-deep-networks.md)). One-dimensional and two-dimensional slices of the loss can also mislead: their appearance depends on the scale of the chosen directions, which [Li et al. (2018)](https://arxiv.org/abs/1712.09913) normalize filter by filter to make slices comparable.
 
-UDL chapter 6, DLB chapter 8, UMich lectures 4 and 11, and UNIGE sections 5.2 and 5.3, listed in the reading plan, cover the optimizers and their practical use.
+UDL chapter 6, DLB chapter 8, UMich lectures 4 and 11, and UNIGE sections 5.2 and 5.3, listed in the [reading plan](reading-plan.md#3-optimization-for-deep-networks), cover the optimizers and their practical use.
 
 ## <a id="appendices"></a>Appendices
 

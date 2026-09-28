@@ -22,4 +22,4 @@ Code resources complement the courses:
 | Jakub Tomczak, code for *Deep Generative Modeling* | [Repository](https://github.com/jmtomczak/intro_dgm) | Short, self-contained notebooks for each family of models (chapters 2–7). |
 | Flow Matching Guide and Code | [Paper](https://arxiv.org/abs/2412.06264) · [Library](https://github.com/facebookresearch/flow_matching) | A PyTorch library for continuous, discrete, and Riemannian flow matching with worked examples (chapters 9 and 12). |
 
-The reading plan maps individual lectures, slides, and readings to the study sequence. Video links arranges the recordings by chapter, and the Generative AI overview maps the reading-plan topics to the chapters.
+[The reading plan](../reading-plan.md) maps individual lectures, slides, and readings to the study sequence. [Video links](video-links.md) arranges the recordings by chapter, and the [Generative AI overview](../README.md) maps the reading-plan topics to the chapters.

@@ -15,7 +15,7 @@ The NLP code blocks and figure scripts use PyTorch, NumPy, SciPy, Matplotlib, an
 | Matplotlib | 3.8.4 |
 | scikit-learn | 1.4.2 |
 
-This is the environment of the DL module, so either of the following works.
+This is the environment of the [DL module](../../dl/sources/computing-setup.md), so either of the following works.
 
 ## <a id="reuse-the-dl-or-foundations-environment"></a>Reuse the DL or Foundations environment
 
@@ -36,7 +36,7 @@ python -m pip check
 
 ## <a id="running-the-code"></a>Running the code
 
-Each code block is self-contained: copy it into a file or a notebook cell and run it **from the `4. NLP&LLMs` folder**, since blocks that read Tiny Shakespeare or the trained character model open them by the relative paths `Sources/Data/tinyshakespeare.txt` and `Sources/Data/shakespeare-char-transformer.pt` (Data sources). Random numbers come from seeded generators, so the printed numbers are reproducible, and all blocks were checked to print the same output with one and with two threads. Most blocks finish in a few seconds. The longest, which train the small character transformer of chapter 4, takes about 50 seconds on one core; the tokenizer training of chapter 1, the skip-gram training of chapter 3, the mixture-of-experts load-balancing comparison of chapter 4, and the fine-tuning comparisons of chapter 10 take 20 to 30 seconds each.
+Each code block is self-contained: copy it into a file or a notebook cell and run it **from the `4. NLP&LLMs` folder**, since blocks that read Tiny Shakespeare or the trained character model open them by the relative paths `Sources/Data/tinyshakespeare.txt` and `Sources/Data/shakespeare-char-transformer.pt` ([Data sources](data-sources.md)). Random numbers come from seeded generators, so the printed numbers are reproducible, and all blocks were checked to print the same output with one and with two threads. Most blocks finish in a few seconds. The longest, which train the small character transformer of chapter 4, takes about 50 seconds on one core; the tokenizer training of chapter 1, the skip-gram training of chapter 3, the mixture-of-experts load-balancing comparison of chapter 4, and the fine-tuning comparisons of chapter 10 take 20 to 30 seconds each.
 
 The figures are regenerated from the `Sources/Figure code` folder, where the shared style module `nlpfig.py` lives:
 
@@ -46,8 +46,8 @@ python ch04_transformer_lm.py           # the chapter 4 figure; trains and saves
 python ch12_reasoning.py 2              # only figure 2 of chapter 12
 ```
 
-The scripts write PNG files to `Sources/Images`. Chapter 4's script must run before those of chapters 5, 8, and 10 if the checkpoint is missing. Most figures take seconds to a few minutes; the longest are training the character transformer, about 20 minutes on two CPU cores, and the parity experiment of chapter 12, about ten minutes, as noted at the top of each script and in Figure sources.
+The scripts write PNG files to `Sources/Images`. Chapter 4's script must run before those of chapters 5, 8, and 10 if the checkpoint is missing. Most figures take seconds to a few minutes; the longest are training the character transformer, about 20 minutes on two CPU cores, and the parity experiment of chapter 12, about ten minutes, as noted at the top of each script and in [Figure sources](figure-sources.md).
 
 ## <a id="beyond-this-snapshot"></a>Beyond this snapshot
 
-The models here have at most about a million parameters and train in minutes on a laptop; the same code runs on a GPU after moving the model and the data to the device. Real work with language models uses libraries that the notes do not require: Hugging Face `transformers`, `tokenizers`, and `datasets` for pretrained models and data; `tiktoken` and SentencePiece for production tokenizers; vLLM and similar servers for efficient inference (chapter 8); PEFT for LoRA and other adapters (chapter 10); TRL for preference tuning and reinforcement learning (chapter 11); FAISS for vector search (chapter 13); the Language Model Evaluation Harness for benchmarks (chapter 14); and SacreBLEU and Stanza for translation metrics and parsing (chapter 15 and chapter 16). The book and documentation links point to their documentation.
+The models here have at most about a million parameters and train in minutes on a laptop; the same code runs on a GPU after moving the model and the data to the device. Real work with language models uses libraries that the notes do not require: Hugging Face `transformers`, `tokenizers`, and `datasets` for pretrained models and data; `tiktoken` and SentencePiece for production tokenizers; vLLM and similar servers for efficient inference ([chapter 8](../08-decoding-and-text-generation.md#the-cost-of-generation)); PEFT for LoRA and other adapters ([chapter 10](../10-fine-tuning-and-parameter-efficient-adaptation.md)); TRL for preference tuning and reinforcement learning ([chapter 11](../11-learning-from-human-preferences.md)); FAISS for vector search ([chapter 13](../13-retrieval-tools-and-agents.md)); the Language Model Evaluation Harness for benchmarks ([chapter 14](../14-evaluating-language-models.md)); and SacreBLEU and Stanza for translation metrics and parsing ([chapter 15](../15-machine-translation-and-multilingual-models.md) and [chapter 16](../16-syntactic-parsing.md)). The [book and documentation links](book-and-documentation-links.md) point to their documentation.

@@ -15,7 +15,7 @@ Many inputs are sequences: sentences, speech, sensor readings, prices, genomes, 
 - **sequence to sequence**: map one sequence to another of different length, as in translation or summarization;
 - **generation**: predict each element from the previous ones, which defines a probability distribution over sequences.
 
-A fully connected network needs a fixed input size. A one-dimensional convolutional network (chapter 6) handles any length but sees only a window as wide as its receptive field. A **recurrent neural network** (RNN) instead maintains a state that summarizes everything seen so far and updates it one element at a time, with the same weights at every step.
+A fully connected network needs a fixed input size. A one-dimensional convolutional network ([chapter 6](06-convolutional-networks.md)) handles any length but sees only a window as wide as its receptive field. A **recurrent neural network** (RNN) instead maintains a state that summarizes everything seen so far and updates it one element at a time, with the same weights at every step.
 
 ### <a id="the-recurrent-update"></a>The recurrent update
 
@@ -84,13 +84,13 @@ Training an RNN is ordinary backpropagation on the unrolled network, called **ba
 \frac{\partial h_T}{\partial h_t}=\prod_{k=t+1}^{T}\frac{\partial h_k}{\partial h_{k-1}}=\prod_{k=t+1}^{T}\operatorname{diag}\bigl(1-h_k^2\bigr)\,W_{hh},
 ```
 
-which the code above verifies. This is the product-of-Jacobians problem of chapter 2 with two aggravations: the same matrix $`W_{hh}`$ appears in every factor, and the depth equals the sequence length, often hundreds or thousands of steps. If the largest singular value of $`W_{hh}`$ times the largest activation derivative is below 1, the product shrinks geometrically in the lag $`T-t`$, and if the relevant eigenvalues exceed 1 it can grow geometrically ([Bengio, Simard, and Frasconi, 1994](https://doi.org/10.1109/72.279181); [Pascanu, Mikolov, and Bengio, 2013](https://arxiv.org/abs/1211.5063); [Appendix A](#block-dl8-appendix-a)).
+which the code above verifies. This is the product-of-Jacobians problem of [chapter 2](02-initialization-and-signal-propagation.md) with two aggravations: the same matrix $`W_{hh}`$ appears in every factor, and the depth equals the sequence length, often hundreds or thousands of steps. If the largest singular value of $`W_{hh}`$ times the largest activation derivative is below 1, the product shrinks geometrically in the lag $`T-t`$, and if the relevant eigenvalues exceed 1 it can grow geometrically ([Bengio, Simard, and Frasconi, 1994](https://doi.org/10.1109/72.279181); [Pascanu, Mikolov, and Bengio, 2013](https://arxiv.org/abs/1211.5063); [Appendix A](#block-dl8-appendix-a)).
 
 <img src="sources/images/dl-rnn-gradients.png" alt="dl-rnn-gradients" width="880">
 
 *Norm of $`\partial h_T/\partial h_{T-k}`$ applied to random unit vectors, for recurrences with 64 hidden units driven by random inputs. Left: a linear recurrence with orthogonal weights scaled by 0.9, 1.0, or 1.1 multiplies the gradient by exactly that factor per step. Right: a tanh RNN with orthogonal weights of scale 1 loses a factor of $`10^{12}`$ over 100 steps, because $`\tanh'<1`$; at scale 1.5 the saturation and the larger weights roughly balance; at scale 3 the gradient explodes. The cell state of an LSTM whose forget gates start near 1 passes gradients back almost unchanged.*
 
-Vanishing gradients mean that the network cannot learn dependencies over long gaps: the signal linking an early input to a late error is buried under the contributions of recent steps. Exploding gradients produce sudden huge updates. The standard remedy for the second is **gradient clipping** (Foundations chapter 3), which rescales the gradient whenever its norm exceeds a threshold and was introduced for RNNs for this reason. The first requires a change of architecture.
+Vanishing gradients mean that the network cannot learn dependencies over long gaps: the signal linking an early input to a late error is buried under the contributions of recent steps. Exploding gradients produce sudden huge updates. The standard remedy for the second is **gradient clipping** ([Foundations chapter 3](../foundations/03-calculus-and-optimization.md#schedules-batches-and-clipping)), which rescales the gradient whenever its norm exceeds a threshold and was introduced for RNNs for this reason. The first requires a change of architecture.
 
 ### <a id="truncated-backpropagation-through-time"></a>Truncated backpropagation through time
 
@@ -109,7 +109,7 @@ g_t&=\tanh(W_gx_t+U_gh_{t-1}+b_g), & c_t&=f_t\odot c_{t-1}+i_t\odot g_t, & h_t&=
 \end{aligned}
 ```
 
-The **input gate** $`i_t`$ decides how much of the candidate $`g_t`$ to write, the **forget gate** $`f_t`$ how much of the old cell to keep, and the **output gate** $`o_t`$ how much of the cell to expose. The key is the cell update. Its Jacobian with respect to the previous cell, along the direct path, is the diagonal matrix $`\operatorname{diag}(f_t)`$: when the forget gates are near 1, the gradient passes back through many steps without shrinking, just as through the identity path of a residual network (chapter 4). The network learns when to open and close this path. Initializing the forget-gate bias to a positive value, such as 1, makes remembering the default at the start of training ([Jozefowicz, Zaremba, and Sutskever, 2015](https://proceedings.mlr.press/v37/jozefowicz15.html)).
+The **input gate** $`i_t`$ decides how much of the candidate $`g_t`$ to write, the **forget gate** $`f_t`$ how much of the old cell to keep, and the **output gate** $`o_t`$ how much of the cell to expose. The key is the cell update. Its Jacobian with respect to the previous cell, along the direct path, is the diagonal matrix $`\operatorname{diag}(f_t)`$: when the forget gates are near 1, the gradient passes back through many steps without shrinking, just as through the identity path of a residual network ([chapter 4](04-normalization-and-residual-connections.md#why-the-shortcut-helps)). The network learns when to open and close this path. Initializing the forget-gate bias to a positive value, such as 1, makes remembering the default at the start of training ([Jozefowicz, Zaremba, and Sutskever, 2015](https://proceedings.mlr.press/v37/jozefowicz15.html)).
 
 ```python
 import torch
@@ -170,13 +170,13 @@ RNNs are combined in a few standard ways. **Stacked** RNNs feed the state sequen
 
 For sequence-to-sequence tasks, an **encoder–decoder** model ([Sutskever, Vinyals, and Le, 2014](https://arxiv.org/abs/1409.3215); [Cho et al., 2014](https://arxiv.org/abs/1406.1078)) reads the input with an encoder RNN, passes its final state to a decoder RNN, and generates the output one element at a time, feeding each generated element back as the next input. During training the decoder is usually given the true previous element instead of its own prediction, which is called **teacher forcing**. It makes training parallel over output positions and stable, at the cost of a mismatch between training and generation, where the model must condition on its own possibly erroneous outputs (**exposure bias**; [Bengio, Vinyals, Jaitly, and Shazeer, 2015](https://arxiv.org/abs/1506.03099)).
 
-Squeezing an entire input sentence into one fixed-size vector is a bottleneck: translation quality of early encoder–decoder models dropped for long sentences. **Attention** lets the decoder look back at all encoder states at every step, which removed the bottleneck and led to the transformer (chapter 9).
+Squeezing an entire input sentence into one fixed-size vector is a bottleneck: translation quality of early encoder–decoder models dropped for long sentences. **Attention** lets the decoder look back at all encoder states at every step, which removed the bottleneck and led to the transformer ([chapter 9](09-attention-and-transformers.md)).
 
 ### <a id="practical-details"></a>Practical details
 
 - **Variable lengths.** Sequences in a batch are padded to a common length, and the padded positions are masked out of the loss; PyTorch's `pack_padded_sequence` skips them in the recurrence itself.
-- **Regularization.** Dropout applied only between layers, not on the recurrent connections, works well ([Zaremba, Sutskever, and Vinyals, 2014](https://arxiv.org/abs/1409.2329)); dropping the same units at every time step also on the recurrent path is a principled alternative ([Gal and Ghahramani, 2016](https://arxiv.org/abs/1512.05287)). Layer normalization inside the recurrence stabilizes training (chapter 4).
-- **Initialization.** Orthogonal recurrent weights (chapter 2) and identity initialization for ReLU RNNs ([Le, Jaitly, and Hinton, 2015](https://arxiv.org/abs/1504.00941)) preserve gradient norms at the start of training.
+- **Regularization.** Dropout applied only between layers, not on the recurrent connections, works well ([Zaremba, Sutskever, and Vinyals, 2014](https://arxiv.org/abs/1409.2329)); dropping the same units at every time step also on the recurrent path is a principled alternative ([Gal and Ghahramani, 2016](https://arxiv.org/abs/1512.05287)). Layer normalization inside the recurrence stabilizes training ([chapter 4](04-normalization-and-residual-connections.md#normalizing-over-other-axes)).
+- **Initialization.** Orthogonal recurrent weights ([chapter 2](02-initialization-and-signal-propagation.md#the-whole-jacobian-not-just-its-average)) and identity initialization for ReLU RNNs ([Le, Jaitly, and Hinton, 2015](https://arxiv.org/abs/1504.00941)) preserve gradient norms at the start of training.
 - **Sequential computation.** Each step depends on the previous one, so an RNN cannot be parallelized over time during training. This, more than accuracy, is why transformers displaced RNNs for large-scale training.
 
 Language modeling with RNNs, including character-level text generation ([Graves, 2013](https://arxiv.org/abs/1308.0850); [Karpathy, 2015](https://karpathy.github.io/2015/05/21/rnn-effectiveness/)), is developed in the NLP and LLMs module.
@@ -224,7 +224,7 @@ print("parallel scan gives the same states:", torch.allclose(Bx @ C, y_rec, atol
 
 The linear recurrence gives up the nonlinearity in the state update; expressiveness comes from stacking such layers with nonlinear feedforward layers between them, as in a transformer. Whether state-space models or attention will dominate long-sequence modeling is an open question, and hybrids of the two are common.
 
-DLB chapter 10, UMich lecture 12, and UNIGE sections 12.1 and 12.2, listed in the reading plan, cover recurrent networks; [Olah's essay on LSTMs](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) illustrates the gates.
+DLB chapter 10, UMich lecture 12, and UNIGE sections 12.1 and 12.2, listed in the [reading plan](reading-plan.md#8-recurrent-networks), cover recurrent networks; [Olah's essay on LSTMs](https://colah.github.io/posts/2015-08-Understanding-LSTMs/) illustrates the gates.
 
 ## <a id="appendices"></a>Appendices
 

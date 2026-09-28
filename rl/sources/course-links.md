@@ -33,4 +33,4 @@ Code resources complement the courses:
 | ShangtongZhang, *reinforcement-learning-an-introduction* | [Repository](https://github.com/ShangtongZhang/reinforcement-learning-an-introduction) | Sutton and Barto's figures reproduced in Python (chapters 1–3 and 5–13). |
 | CleanRL | [Documentation](https://docs.cleanrl.dev/) | Single-file, benchmarked implementations of DQN, C51, Rainbow, PQN, PPO, DDPG, TD3, SAC, and RND (chapters 16–18 and 20–22). |
 
-The reading plan maps individual lectures, slides, and readings to the study sequence; its topic N is chapter N. Video links arranges the recordings by chapter, Books and documentation maps the reference books, libraries, and tutorials to the chapters, and the RL overview lists the chapters and labs.
+[The reading plan](../reading-plan.md) maps individual lectures, slides, and readings to the study sequence; its topic N is chapter N. [Video links](video-links.md) arranges the recordings by chapter, [Books and documentation](book-and-documentation-links.md) maps the reference books, libraries, and tutorials to the chapters, and the [RL overview](../README.md) lists the chapters and labs.

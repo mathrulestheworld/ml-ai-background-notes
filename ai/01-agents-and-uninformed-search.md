@@ -8,15 +8,15 @@
 
 ### <a id="agents-and-environments"></a>Agents and environments
 
-This module treats artificial intelligence as the design of **agents**: systems that perceive an environment and act on it. At each step the agent receives a **percept**, and its behavior is described by an **agent function** that maps the whole percept sequence seen so far to an action. An **agent program** implements that function on a physical machine with limited memory and time; the function is the specification, the program is the implementation. A thermostat, a chess engine, a spam filter, a self-driving car, and a language model answering questions all fit the description, which is why it serves as a common frame for methods as different as search, logic, and probabilistic inference. Foundations chapter 1 places AI among its neighboring disciplines; this module develops its classical methods.
+This module treats artificial intelligence as the design of **agents**: systems that perceive an environment and act on it. At each step the agent receives a **percept**, and its behavior is described by an **agent function** that maps the whole percept sequence seen so far to an action. An **agent program** implements that function on a physical machine with limited memory and time; the function is the specification, the program is the implementation. A thermostat, a chess engine, a spam filter, a self-driving car, and a language model answering questions all fit the description, which is why it serves as a common frame for methods as different as search, logic, and probabilistic inference. [Foundations chapter 1](../foundations/01-terminology-and-mathematical-language.md#artificial-intelligence) places AI among its neighboring disciplines; this module develops its classical methods.
 
 ### <a id="rationality"></a>Rationality
 
 Whether an agent behaves well is judged by a **performance measure** on the sequence of environment states that its actions produce, fixed by the designer and not by the agent. A **rational agent** chooses, for each percept sequence, an action that maximizes the *expected* value of the performance measure, given that percept sequence and whatever knowledge the agent was built with. Three features of the definition matter throughout the module:
 
 - Rationality is about expectation, not outcome. An agent that crosses a street after looking both ways and is hit by a falling object has acted rationally; omniscience is not required.
-- It is relative to what the agent can perceive and knows. Gathering information is itself an action, and chapter 12 computes when it is worth taking.
-- It is a property of the agent function. Real programs have bounded computation, and choosing a good action *within a time budget* (**bounded rationality**) is a recurring theme: depth-limited game search (chapter 4), approximate inference (chapter 10), and satisficing rather than optimal planning (chapter 7) are all responses to it.
+- It is relative to what the agent can perceive and knows. Gathering information is itself an action, and [chapter 12](12-decision-theory-and-the-value-of-information.md) computes when it is worth taking.
+- It is a property of the agent function. Real programs have bounded computation, and choosing a good action *within a time budget* (**bounded rationality**) is a recurring theme: depth-limited game search ([chapter 4](04-adversarial-search-and-games.md)), approximate inference ([chapter 10](10-approximate-inference.md)), and satisficing rather than optimal planning ([chapter 7](07-automated-planning.md)) are all responses to it.
 
 Specifying the performance measure is harder than it looks. A vacuum-cleaning robot rewarded for the amount of dirt it picks up can do well by dumping dirt and picking it up again; the measure should reward a clean floor, not the activity. The gap between the objective a designer writes down and the one intended returns in the RL and Safety and Frontier modules.
 
@@ -39,9 +39,9 @@ The chapters of this module move along these dimensions. Chapters 1–3 and 7 as
 Agent programs of increasing generality are commonly distinguished:
 
 - **Simple reflex agents** act on the current percept through condition–action rules. They are fast but fail when the right action depends on history, as in any partially observable environment.
-- **Model-based agents** maintain an internal **belief state** that summarizes the percept history, updated with a model of how the world evolves and how percepts arise. The filters of chapter 11 are the probabilistic version.
+- **Model-based agents** maintain an internal **belief state** that summarizes the percept history, updated with a model of how the world evolves and how percepts arise. The filters of [chapter 11](11-temporal-probabilistic-models.md) are the probabilistic version.
 - **Goal-based agents** combine the model with a description of desirable states and *search* or *plan* for action sequences that reach them. This chapter begins their study.
-- **Utility-based agents** rank outcomes by a numerical utility and maximize its expectation, which lets them trade off conflicting goals and uncertain success (chapter 12).
+- **Utility-based agents** rank outcomes by a numerical utility and maximize its expectation, which lets them trade off conflicting goals and uncertain success ([chapter 12](12-decision-theory-and-the-value-of-information.md)).
 - **Learning agents** improve any of these components from experience, the subject of the ML, DL, and RL modules.
 
 ## <a id="problem-solving-as-search"></a>Problem solving as search
@@ -105,7 +105,7 @@ UCS expands nodes in order of nondecreasing path cost, so when a goal node is re
 
 **Depth-first search** (DFS) expands the deepest node first, using a last-in, first-out stack. It dives along one path until a dead end and then backs up to the most recent node with unexplored children. Its virtue is memory: a tree-like DFS stores only the current path and the unexpanded siblings along it, $`O(bm)`$ nodes, and the **backtracking** variant, which generates one child at a time and undoes the change to a single state representation on return, stores only $`O(m)`$. Its faults are that it returns the first solution it meets, whatever its cost, and that a tree-like DFS can descend forever into an infinite branch or a cycle; checking the states on the current path removes cycles but not infinite spaces. Graph-search DFS is complete in finite spaces but gives up the memory advantage. In the worst case DFS generates $`O(b^m)`$ nodes, which is much worse than $`b^d`$ when $`m\gg d`$.
 
-DFS is the method of choice when solutions are plentiful and deep and any solution will do, which is the situation of the constraint satisfaction problems of chapter 3; there, every complete assignment lies at the same depth and the search is a backtracking DFS over partial assignments.
+DFS is the method of choice when solutions are plentiful and deep and any solution will do, which is the situation of the constraint satisfaction problems of [chapter 3](03-constraint-satisfaction-and-local-search.md); there, every complete assignment lies at the same depth and the search is a backtracking DFS over partial assignments.
 
 <img src="sources/images/ai-search-grid.png" alt="ai-search-grid" width="900">
 
@@ -141,7 +141,7 @@ for b, d in [(10, 5), (2, 20), (3, 12)]:
 # b= 3, d=12: BFS   797,160  IDS 1,195,722  ratio 1.49998  limit b/(b-1) = 1.50000
 ```
 
-With ten children per node, iterative deepening does 11% more work than BFS while using memory proportional to the depth instead of the whole layer; even with $`b=2`$ it only doubles the work. When the state space is large, the solution depth is unknown, and action costs are equal, iterative deepening is the preferred uninformed method. The analogous **iterative lengthening** for varying costs, which raises a limit on path cost, pays a much higher overhead when costs are diverse, because each new limit may admit only a few new nodes; the informed version, IDA*, appears in chapter 2.
+With ten children per node, iterative deepening does 11% more work than BFS while using memory proportional to the depth instead of the whole layer; even with $`b=2`$ it only doubles the work. When the state space is large, the solution depth is unknown, and action costs are equal, iterative deepening is the preferred uninformed method. The analogous **iterative lengthening** for varying costs, which raises a limit on path cost, pays a much higher overhead when costs are diverse, because each new limit may admit only a few new nodes; the informed version, IDA*, appears in [chapter 2](02-heuristic-search.md#memory-bounded-search).
 
 ### <a id="bidirectional-search"></a>Bidirectional search
 
@@ -227,7 +227,7 @@ The table assumes a tree. Most state spaces are graphs with many paths to each s
 
 The figure also shows the finite-space effect on the left: the number of states at distance $`k`$ grows by a factor between 1.25 and 2 per move over the first fifteen moves, far below the branching factor of up to 4, because many moves lead back toward states already counted, and it collapses beyond 26 moves. Branching factors estimated from the first few layers overstate the size of a search.
 
-In practice the two regimes combine. A **transposition table**, a bounded hash table of recently reached states, catches most duplicates at a fixed memory cost; chess programs use one within iterative deepening, and it reappears in chapter 4. Graph search is also the only safe option in a space with cycles and no depth bound.
+In practice the two regimes combine. A **transposition table**, a bounded hash table of recently reached states, catches most duplicates at a fixed memory cost; chess programs use one within iterative deepening, and it reappears in [chapter 4](04-adversarial-search-and-games.md). Graph search is also the only safe option in a space with cycles and no depth bound.
 
 A compact implementation makes the common structure explicit. The same loop runs breadth-first, depth-first, and uniform-cost search; only the rule for removing a node from the frontier changes.
 
@@ -288,7 +288,7 @@ for kind in ["bfs", "dfs", "ucs"]:
 
 Breadth-first search returns a three-road route of 28 minutes, the fewest roads but not the fastest; depth-first search commits to the last-listed neighbor, F, and finds a 29-minute route after only four expansions; uniform-cost search finds the 25-minute route through four roads. The implementation stores a whole path in every frontier entry for readability; real implementations store parent pointers, and use a `deque` for BFS, since removing the first element of a Python list takes time proportional to its length. For clarity the BFS here tests for the goal on expansion; testing on generation would stop one layer earlier.
 
-The strategies of this chapter are exhaustive: in the worst case each examines a large fraction of the space before reaching the goal, because nothing tells them which direction is promising. Chapter 2 adds that information in the form of a heuristic estimate of the remaining cost, and shows how much of the space it can save while keeping the guarantees of uniform-cost search.
+The strategies of this chapter are exhaustive: in the worst case each examines a large fraction of the space before reaching the goal, because nothing tells them which direction is promising. [Chapter 2](02-heuristic-search.md) adds that information in the form of a heuristic estimate of the remaining cost, and shows how much of the space it can save while keeping the guarantees of uniform-cost search.
 
 ## <a id="appendices"></a>Appendices
 

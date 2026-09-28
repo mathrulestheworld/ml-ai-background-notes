@@ -12,7 +12,7 @@ Many data are relations between entities: atoms joined by bonds, users who follo
 
 Learning tasks come at three levels:
 
-- **node-level**: classify each user or paper, often with labels for only a few nodes of one large graph and predictions for the rest (**transductive** learning, related to the semi-supervised methods of ML chapter 16);
+- **node-level**: classify each user or paper, often with labels for only a few nodes of one large graph and predictions for the rest (**transductive** learning, related to the semi-supervised methods of [ML chapter 16](../ml/16-semi-supervised-and-active-learning.md));
 - **edge-level**: predict missing links, such as future friendships or interactions between drugs;
 - **graph-level**: predict a property of a whole graph, such as the toxicity or solubility of a molecule, from a dataset of many small graphs (**inductive** learning).
 
@@ -23,7 +23,7 @@ The numbering of the nodes is arbitrary. Renumbering them with a permutation mat
 - a node-level model must be **permutation equivariant**, $`f(PAP^\top,PX)=Pf(A,X)`$: renumbering the nodes renumbers the predictions;
 - a graph-level model must be **permutation invariant**, $`f(PAP^\top,PX)=f(A,X)`$.
 
-A fully connected network applied to the flattened adjacency matrix has neither property, needs a fixed number of nodes, and would have to learn the $`n!`$ equivalent orderings from data. The situation parallels convolutional networks, which build in translation equivariance (chapter 6), and transformers without position encodings, which build in permutation equivariance over a set of tokens (chapter 9). A graph neural network builds in permutation equivariance while letting only neighboring nodes interact.
+A fully connected network applied to the flattened adjacency matrix has neither property, needs a fixed number of nodes, and would have to learn the $`n!`$ equivalent orderings from data. The situation parallels convolutional networks, which build in translation equivariance ([chapter 6](06-convolutional-networks.md)), and transformers without position encodings, which build in permutation equivariance over a set of tokens ([chapter 9](09-attention-and-transformers.md#queries-keys-and-values-from-the-same-sequence)). A graph neural network builds in permutation equivariance while letting only neighboring nodes interact.
 
 ## <a id="message-passing"></a>Message passing
 
@@ -47,7 +47,7 @@ H^{(l+1)}=\sigma\bigl(\hat AH^{(l)}W^{(l)}\bigr),\qquad \hat A=\tilde D^{-1/2}\t
 
 Each node averages the transformed states of itself and its neighbors, with the weight $`1/\sqrt{\tilde d_u\tilde d_v}`$ on the edge between $`u`$ and $`v`$, and applies a nonlinearity. The symmetric normalization keeps high-degree nodes from dominating and makes $`\hat A`$ a symmetric matrix with eigenvalues in $`(-1,1]`$.
 
-The name comes from spectral graph theory. The eigenvectors of the graph Laplacian $`L=I-D^{-1/2}AD^{-1/2}`$ play the role of a Fourier basis on the graph, and the eigenvectors with small eigenvalues vary slowly along edges, which is why spectral clustering uses them (ML chapter 13). A graph convolution multiplies each frequency component by a learned response. Early spectral networks ([Bruna et al., 2014](https://arxiv.org/abs/1312.6203)) learned the response directly, which required an eigendecomposition and did not transfer between graphs; ChebNet ([Defferrard, Bresson, and Vandergheynst, 2016](https://arxiv.org/abs/1606.09375)) used polynomials of the Laplacian, which act locally, and the GCN is the first-order case with a simplified normalization ([Appendix A](#block-dl13-appendix-a)). Since $`\hat A`$ keeps low frequencies and damps high ones, a GCN layer is a low-pass filter: it smooths features along the graph.
+The name comes from spectral graph theory. The eigenvectors of the graph Laplacian $`L=I-D^{-1/2}AD^{-1/2}`$ play the role of a Fourier basis on the graph, and the eigenvectors with small eigenvalues vary slowly along edges, which is why spectral clustering uses them ([ML chapter 13](../ml/13-clustering.md#beyond-k-means-and-hierarchies)). A graph convolution multiplies each frequency component by a learned response. Early spectral networks ([Bruna et al., 2014](https://arxiv.org/abs/1312.6203)) learned the response directly, which required an eigendecomposition and did not transfer between graphs; ChebNet ([Defferrard, Bresson, and Vandergheynst, 2016](https://arxiv.org/abs/1606.09375)) used polynomials of the Laplacian, which act locally, and the GCN is the first-order case with a simplified normalization ([Appendix A](#block-dl13-appendix-a)). Since $`\hat A`$ keeps low frequencies and damps high ones, a GCN layer is a low-pass filter: it smooths features along the graph.
 
 ```python
 import networkx as nx
@@ -199,7 +199,7 @@ A few rounds of averaging help, because they pool noisy features over nodes that
 
 *A graph of 400 nodes in four communities (edge probability 0.1 within and 0.01 between), with 16 node features that carry a weak class signal under strong noise. Left: propagating the features with $`\hat A`$ and no weights. The distance between the class centroids of the normalized features grows by 60% in the first two steps, as averaging removes noise, then collapses, while the mean cosine similarity of all node pairs rises from 0.06 to 0.96 after 8 steps and to 1 after 32. Right: test accuracy of trained networks of increasing depth with 80 labeled nodes, averaged over three seeds. Without message passing the features alone give 71%; one to four layers give between 97% and 99.6%, with or without residual connections; at 8 layers and beyond, plain GCNs fall to chance, while networks with residual connections keep 94% or more even at 32 layers.*
 
-The collapse of the plain networks at depth 8 is not only oversmoothing: eight steps of averaging still leave some class information, and part of the failure is the difficulty of optimizing a deep network without residual connections or normalization ([Cong, Ramezani, and Mahdavi, 2021](https://arxiv.org/abs/2110.15174)). The remedies are those of chapter 4: residual connections, connections back to the input features ([Chen et al., 2020](https://arxiv.org/abs/2007.02133)), and normalization.
+The collapse of the plain networks at depth 8 is not only oversmoothing: eight steps of averaging still leave some class information, and part of the failure is the difficulty of optimizing a deep network without residual connections or normalization ([Cong, Ramezani, and Mahdavi, 2021](https://arxiv.org/abs/2110.15174)). The remedies are those of [chapter 4](04-normalization-and-residual-connections.md): residual connections, connections back to the input features ([Chen et al., 2020](https://arxiv.org/abs/2007.02133)), and normalization.
 
 **Oversquashing** is the opposite problem. For a node to use information from $`L`$ hops away, messages from a neighborhood that can grow exponentially with $`L`$ must pass through fixed-size vectors and through the few edges that connect parts of the graph, so distant information is compressed away ([Alon and Yahav, 2021](https://arxiv.org/abs/2006.05205)). Adding edges across bottlenecks ("rewiring"; [Topping et al., 2022](https://arxiv.org/abs/2111.14522)), a virtual node connected to all nodes, and global attention in graph transformers all shorten these paths.
 
@@ -207,7 +207,7 @@ The collapse of the plain networks at depth 8 is not only oversmoothing: eight s
 
 Graph networks predict molecular properties and helped find new antibiotics by screening millions of molecules ([Stokes et al., 2020](https://doi.org/10.1016/j.cell.2020.01.021)), estimate travel times in Google Maps from road-segment graphs ([Derrow-Pinion et al., 2021](https://arxiv.org/abs/2108.11482)), simulate fluids and deformable materials as particles connected to their neighbors ([Sanchez-Gonzalez et al., 2020](https://arxiv.org/abs/2002.09405)), and forecast the weather on a mesh over the globe ([Lam et al., 2023](https://arxiv.org/abs/2212.12794)). For atoms in space, the network must also respect rotations and translations of the coordinates: **equivariant** graph networks build this in, updating vectors that rotate with the input ([Satorras, Hoogeboom, and Welling, 2021](https://arxiv.org/abs/2102.09844)). Convolutional networks, transformers, and graph networks are all instances of one idea, architectures derived from the symmetries of their domain, which the *geometric deep learning* program of [Bronstein et al. (2021)](https://arxiv.org/abs/2104.13478) develops systematically.
 
-UDL chapter 13 and lectures 6 to 9 of Stanford CS224W, listed in the reading plan, cover graph neural networks.
+UDL chapter 13 and lectures 6 to 9 of Stanford CS224W, listed in the [reading plan](reading-plan.md#13-graph-neural-networks-optional), cover graph neural networks.
 
 ## <a id="appendices"></a>Appendices
 

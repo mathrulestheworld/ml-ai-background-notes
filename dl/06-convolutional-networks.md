@@ -73,11 +73,11 @@ for k, s, p, d in [(3, 1, 1, 1), (5, 1, 0, 1), (3, 2, 1, 1), (7, 2, 3, 1), (3, 1
 # k=3 s=1 p=2 d=2: output (32, 32), formula 32; parameters 448 = 16 x (3 x 3^2 + 1)
 ```
 
-[Dumoulin and Visin (2016)](https://arxiv.org/abs/1603.07285) illustrate every combination of these settings, including the transposed convolutions used for upsampling (chapter 14).
+[Dumoulin and Visin (2016)](https://arxiv.org/abs/1603.07285) illustrate every combination of these settings, including the transposed convolutions used for upsampling ([chapter 14](14-detection-and-segmentation.md)).
 
 ### <a id="channels-and-1-1-convolutions"></a>Channels and 1 × 1 convolutions
 
-A $`1\times1`$ convolution mixes channels at each position without looking at neighbors: it is a fully connected layer applied independently at every pixel ([Lin, Chen, and Yan, 2014](https://arxiv.org/abs/1312.4400)). It changes the number of channels cheaply and adds a nonlinearity per position, and it appears in almost every modern architecture as a bottleneck or expansion layer (chapter 7).
+A $`1\times1`$ convolution mixes channels at each position without looking at neighbors: it is a fully connected layer applied independently at every pixel ([Lin, Chen, and Yan, 2014](https://arxiv.org/abs/1312.4400)). It changes the number of channels cheaply and adds a nonlinearity per position, and it appears in almost every modern architecture as a bottleneck or expansion layer ([chapter 7](07-convolutional-architectures-and-transfer-learning.md)).
 
 ## <a id="equivariance-pooling-and-invariance"></a>Equivariance, pooling, and invariance
 
@@ -93,7 +93,7 @@ Pooling with stride 2 is not equivariant to shifts by one pixel: the $`2\times2`
 
 *Test accuracy on digits, padded to $`14\times14`$, after shifting every test image by $`(dx,dy)`$ pixels; both networks were trained on unshifted images only. The fully connected network collapses to chance for shifts of two pixels. The convolutional network, with one $`2\times2`$ max pooling and a final global max pooling, is far more robust, and its accuracy has a striped pattern: shifts by even numbers of pixels in both directions, which commute with the pooling, keep accuracy between 0.93 and 0.97, while odd vertical shifts drop it to between 0.54 and 0.84. Odd horizontal shifts cost less on these digits.*
 
-Other symmetries can be built in the same way. **Group-equivariant networks** ([Cohen and Welling, 2016](https://arxiv.org/abs/1602.07576)) share weights across rotations and reflections as well as translations, which helps for data such as microscopy or satellite images, where orientation carries no information. Graph neural networks (chapter 13) apply the same principle to permutations of the nodes of a graph.
+Other symmetries can be built in the same way. **Group-equivariant networks** ([Cohen and Welling, 2016](https://arxiv.org/abs/1602.07576)) share weights across rotations and reflections as well as translations, which helps for data such as microscopy or satellite images, where orientation carries no information. Graph neural networks ([chapter 13](13-graph-neural-networks.md)) apply the same principle to permutations of the nodes of a graph.
 
 ## <a id="receptive-fields"></a>Receptive fields
 
@@ -195,13 +195,13 @@ print(f"ratio {p_sep / p_std:.3f}; formula 1/C_out + 1/k^2 = {1 / C_out + 1 / k 
 # ratio 0.119; formula 1/C_out + 1/k^2 = 0.119
 ```
 
-The saving, about a factor of eight for $`3\times3`$ kernels, is what makes convolutional networks practical on phones. Arithmetic is not the whole cost, however: depthwise convolutions do little work per byte of memory moved, and on accelerators they often run far below peak throughput (chapter 11).
+The saving, about a factor of eight for $`3\times3`$ kernels, is what makes convolutional networks practical on phones. Arithmetic is not the whole cost, however: depthwise convolutions do little work per byte of memory moved, and on accelerators they often run far below peak throughput ([chapter 11](11-training-at-scale-and-efficient-inference.md)).
 
 ## <a id="what-the-layers-learn"></a>What the layers learn
 
-Visualizations of trained image networks confirm the hierarchy the architecture was designed for. First-layer filters are oriented edge and color-contrast detectors resembling Gabor functions. Units in intermediate layers respond to textures and simple shapes, and units in late layers to object parts and whole objects ([Zeiler and Fergus, 2014](https://arxiv.org/abs/1311.2901); [Olah, Mordvintsev, and Schubert, 2017](https://distill.pub/2017/feature-visualization/)). Because late-layer features are general-purpose descriptions of images, a network trained on one large dataset can be reused for many others, the basis of transfer learning in chapter 7. Interpreting what individual units compute, and how reliable such interpretations are, belongs to the Safety and Frontier module.
+Visualizations of trained image networks confirm the hierarchy the architecture was designed for. First-layer filters are oriented edge and color-contrast detectors resembling Gabor functions. Units in intermediate layers respond to textures and simple shapes, and units in late layers to object parts and whole objects ([Zeiler and Fergus, 2014](https://arxiv.org/abs/1311.2901); [Olah, Mordvintsev, and Schubert, 2017](https://distill.pub/2017/feature-visualization/)). Because late-layer features are general-purpose descriptions of images, a network trained on one large dataset can be reused for many others, the basis of transfer learning in [chapter 7](07-convolutional-architectures-and-transfer-learning.md). Interpreting what individual units compute, and how reliable such interpretations are, belongs to the Safety and Frontier module.
 
-UDL chapter 10, DLB chapter 9, UMich lecture 7, UNIGE sections 4.4 and 4.5, and the CS231n notes, listed in the reading plan, cover convolutional layers.
+UDL chapter 10, DLB chapter 9, UMich lecture 7, UNIGE sections 4.4 and 4.5, and the CS231n notes, listed in the [reading plan](reading-plan.md#6-convolutional-networks), cover convolutional layers.
 
 ## <a id="appendices"></a>Appendices
 

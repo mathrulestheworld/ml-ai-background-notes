@@ -8,9 +8,9 @@
 
 ### <a id="degrees-of-belief"></a>Degrees of belief
 
-Logical agents, chapters 5 and 6, represent what is known as true or false. Real agents are rarely in that position. A diagnostic rule such as "a toothache implies a cavity" is wrong in both directions: toothaches have other causes, and most cavities cause no pain. Listing every exception is impossible (**laziness**), the complete theory is unknown (**theoretical ignorance**), and even a complete theory could not be applied without tests that were never run (**practical ignorance**). An agent in such a domain can still act rationally if it holds **degrees of belief**, and probability theory is the calculus of degrees of belief: the probability of an event given the evidence summarizes the uncertainty from all these sources. Combined with utilities, it yields the decision theory of chapter 12.
+Logical agents, [chapters 5](05-propositional-logic-and-satisfiability.md) and [6](06-first-order-logic-and-knowledge-representation.md), represent what is known as true or false. Real agents are rarely in that position. A diagnostic rule such as "a toothache implies a cavity" is wrong in both directions: toothaches have other causes, and most cavities cause no pain. Listing every exception is impossible (**laziness**), the complete theory is unknown (**theoretical ignorance**), and even a complete theory could not be applied without tests that were never run (**practical ignorance**). An agent in such a domain can still act rationally if it holds **degrees of belief**, and probability theory is the calculus of degrees of belief: the probability of an event given the evidence summarizes the uncertainty from all these sources. Combined with utilities, it yields the decision theory of [chapter 12](12-decision-theory-and-the-value-of-information.md).
 
-The probabilistic vocabulary is that of Foundations chapter 4: random variables, joint and conditional distributions, the product rule, marginalization, and Bayes' rule. A **possible world** assigns a value to every variable, and a **full joint distribution** gives the probability of every world; any query, $`P(X\mid e)`$ for a query variable $`X`$ and evidence $`e`$, follows by summing the joint over the worlds consistent with $`e`$ and normalizing:
+The probabilistic vocabulary is that of [Foundations chapter 4](../foundations/04-probability-and-statistics.md): random variables, joint and conditional distributions, the product rule, marginalization, and Bayes' rule. A **possible world** assigns a value to every variable, and a **full joint distribution** gives the probability of every world; any query, $`P(X\mid e)`$ for a query variable $`X`$ and evidence $`e`$, follows by summing the joint over the worlds consistent with $`e`$ and normalizing:
 
 ```math
 P(X\mid e)=\alpha\,P(X,e)=\alpha\sum_yP(X,e,y),
@@ -26,7 +26,7 @@ Structure is what makes probabilistic reasoning possible. Two variables are **in
 P(X,Y\mid Z)=P(X\mid Z)\,P(Y\mid Z),\qquad\text{equivalently}\qquad P(X\mid Y,Z)=P(X\mid Z).
 ```
 
-A toothache and a probe catching in a tooth are dependent, since both indicate a cavity, but once the presence of a cavity is known, neither tells anything more about the other. When a single cause has many conditionally independent effects, the joint factors as $`P(\mathit{Cause})\prod_iP(\mathit{Effect}_i\mid\mathit{Cause})`$, which needs a number of parameters linear in the number of effects: the naive Bayes model of ML chapter 4. Graphical models generalize this to arbitrary patterns of conditional independence, and make the patterns visible in a graph.
+A toothache and a probe catching in a tooth are dependent, since both indicate a cavity, but once the presence of a cavity is known, neither tells anything more about the other. When a single cause has many conditionally independent effects, the joint factors as $`P(\mathit{Cause})\prod_iP(\mathit{Effect}_i\mid\mathit{Cause})`$, which needs a number of parameters linear in the number of effects: the naive Bayes model of [ML chapter 4](../ml/04-generative-classifiers.md#naive-bayes). Graphical models generalize this to arbitrary patterns of conditional independence, and make the patterns visible in a graph.
 
 ## <a id="bayesian-networks"></a>Bayesian networks
 
@@ -105,13 +105,13 @@ Even with few parents, a CPT grows exponentially in their number, and several **
 - **Deterministic nodes** have values that are functions of their parents, such as logical OR or a sum.
 - **Noisy-OR** models a cause that produces an effect unless an independent inhibitor intervenes: each true parent $`U_j`$ fails to cause $`X`$ with probability $`q_j`$, independently, so $`P(X=\text{false}\mid u)=\prod_{j:\,u_j\text{ true}}q_j`$, with $`k`$ parameters instead of $`2^k`$, plus a **leak** probability for causes not modeled. Medical diagnosis networks with hundreds of diseases and thousands of findings rely on it.
 - **Context-specific independence**: a variable may depend on a parent only for some values of another parent, which a tree or rule structure represents compactly.
-- **Continuous variables** use parametric families. In a **linear Gaussian** model, $`X\mid u\sim\mathcal N(w^\top u+b,\sigma^2)`$; a network of such nodes represents a multivariate Gaussian, whose conditioning rules are those of Foundations chapter 4. Discrete children of continuous parents use logistic or probit links.
+- **Continuous variables** use parametric families. In a **linear Gaussian** model, $`X\mid u\sim\mathcal N(w^\top u+b,\sigma^2)`$; a network of such nodes represents a multivariate Gaussian, whose conditioning rules are those of [Foundations chapter 4](../foundations/04-probability-and-statistics.md#gaussian-vectors-and-conditioning). Discrete children of continuous parents use logistic or probit links.
 
 ## <a id="conditional-independence-in-bayesian-networks"></a>Conditional independence in Bayesian networks
 
 ### <a id="the-local-markov-property"></a>The local Markov property
 
-The factorization implies, and is equivalent to, the **local Markov property**: each variable is conditionally independent of its non-descendants given its parents. A second local statement is often more useful: each variable is conditionally independent of all other variables given its **Markov blanket**, its parents, its children, and its children's other parents. The Markov blanket is what a Gibbs sampler must look at to resample a variable (chapter 10).
+The factorization implies, and is equivalent to, the **local Markov property**: each variable is conditionally independent of its non-descendants given its parents. A second local statement is often more useful: each variable is conditionally independent of all other variables given its **Markov blanket**, its parents, its children, and its children's other parents. The Markov blanket is what a Gibbs sampler must look at to resample a variable ([chapter 10](10-approximate-inference.md#gibbs-sampling)).
 
 Which other independences hold? Three structures on three variables decide the matter.
 
@@ -127,7 +127,7 @@ Which other independences hold? Three structures on three variables decide the m
 
 *Left: posterior probabilities in the burglary network. A burglary and an earthquake are independent a priori; both become more probable when the neighbors call or the alarm sounds, and when the earthquake is then observed, the probability of a burglary drops from 0.374 back to 0.003. Right: Berkson's paradox, the same collider effect in data. Talent and looks are independent standard normal variables, with correlation $`-0.02`$ among 2,000 people; among the 272 selected because their sum exceeds 1.5, as for admission to a school that requires one or the other, the correlation is $`-0.69`$.*
 
-Collider bias is a common trap in data analysis: conditioning on a variable caused by both the treatment and the outcome, or selecting a sample by such a variable, creates associations that do not exist in the population. Chapter 13 returns to it.
+Collider bias is a common trap in data analysis: conditioning on a variable caused by both the treatment and the outcome, or selecting a sample by such a variable, creates associations that do not exist in the population. [Chapter 13](13-causal-inference.md) returns to it.
 
 ### <a id="d-separation"></a>d-separation
 
@@ -229,7 +229,7 @@ In the eight-variable Asia network ([Lauritzen and Spiegelhalter, 1988](https://
 
 A graph is an **I-map** of a distribution if every independence it implies holds in the distribution. The complete graph is a trivial I-map of everything, and the useful graphs are **minimal** I-maps, from which no arc can be removed. A distribution whose independences are exactly those of the graph is **faithful** to it, and the graph is then a **perfect map**. Not every distribution has one: some independence patterns, such as those of four variables on a cycle, cannot be represented by any directed graph.
 
-Different graphs can imply the same independences. $`A\to B\to C`$, $`A\leftarrow B\leftarrow C`$, and $`A\leftarrow B\to C`$ all say exactly $`A\perp C\mid B`$, while $`A\to B\leftarrow C`$ says $`A\perp C`$ instead. Two DAGs are **I-equivalent** if and only if they have the same skeleton (the undirected graph) and the same v-structures ([Verma and Pearl, 1990](https://arxiv.org/abs/1304.1108)). Data about the observed variables alone can therefore determine a network only up to its equivalence class, which limits what arrows can mean: learning the direction of an arc from observational data is possible only when it is part of a v-structure, or forced by the others. Chapter 13 makes the causal reading of arrows precise, and chapter 14 learns structures from data.
+Different graphs can imply the same independences. $`A\to B\to C`$, $`A\leftarrow B\leftarrow C`$, and $`A\leftarrow B\to C`$ all say exactly $`A\perp C\mid B`$, while $`A\to B\leftarrow C`$ says $`A\perp C`$ instead. Two DAGs are **I-equivalent** if and only if they have the same skeleton (the undirected graph) and the same v-structures ([Verma and Pearl, 1990](https://arxiv.org/abs/1304.1108)). Data about the observed variables alone can therefore determine a network only up to its equivalence class, which limits what arrows can mean: learning the direction of an arc from observational data is possible only when it is part of a v-structure, or forced by the others. [Chapter 13](13-causal-inference.md) makes the causal reading of arrows precise, and [chapter 14](14-learning-graphical-models.md) learns structures from data.
 
 ## <a id="markov-networks"></a>Markov networks
 
@@ -255,7 +255,7 @@ Separation in undirected graphs is simpler than d-separation: $`X\perp Y\mid Z`$
 
 ### <a id="factor-graphs"></a>Factor graphs
 
-A **factor graph** is a bipartite graph with a node for each variable and a node for each factor, and an edge between a factor and each variable in its scope. It describes a product of factors, $`\prod_a f_a(x_a)`$, without committing to directed or undirected semantics: a Bayesian network gives one factor per CPT, a Markov network one per potential, and the constraint networks of chapter 3 one 0/1 factor per constraint. Factor graphs are also finer grained than undirected graphs: three pairwise factors on $`A,B,C`$ and one factor on all three have the same undirected graph, a triangle, but different factor graphs, and different costs for inference. The message-passing algorithms of chapter 9 and chapter 10 are defined on factor graphs.
+A **factor graph** is a bipartite graph with a node for each variable and a node for each factor, and an edge between a factor and each variable in its scope. It describes a product of factors, $`\prod_a f_a(x_a)`$, without committing to directed or undirected semantics: a Bayesian network gives one factor per CPT, a Markov network one per potential, and the constraint networks of [chapter 3](03-constraint-satisfaction-and-local-search.md#constraints-as-factors) one 0/1 factor per constraint. Factor graphs are also finer grained than undirected graphs: three pairwise factors on $`A,B,C`$ and one factor on all three have the same undirected graph, a triangle, but different factor graphs, and different costs for inference. The message-passing algorithms of [chapter 9](09-exact-inference.md) and [chapter 10](10-approximate-inference.md) are defined on factor graphs.
 
 ### <a id="converting-between-representations"></a>Converting between representations
 
@@ -269,7 +269,7 @@ Writing each potential as the exponential of a weighted sum of features gives a 
 P(x)=\frac1{Z(w)}\exp\Bigl(\sum_kw_kf_k(x_{c_k})\Bigr),
 ```
 
-an exponential family whose sufficient statistics are the features. Features can be much sparser than full potential tables, such as an indicator that two neighboring words are both capitalized. Conditioning a log-linear model on observed inputs $`x`$ gives a **conditional random field** (CRF), $`P(y\mid x)\propto\exp\bigl(\sum_kw_kf_k(y,x)\bigr)`$, which models the dependencies among outputs, such as the tags of a sentence, without modeling the inputs, the discriminative counterpart of a hidden Markov model (chapter 11). Learning log-linear models and CRFs is the subject of chapter 14.
+an exponential family whose sufficient statistics are the features. Features can be much sparser than full potential tables, such as an indicator that two neighboring words are both capitalized. Conditioning a log-linear model on observed inputs $`x`$ gives a **conditional random field** (CRF), $`P(y\mid x)\propto\exp\bigl(\sum_kw_kf_k(y,x)\bigr)`$, which models the dependencies among outputs, such as the tags of a sentence, without modeling the inputs, the discriminative counterpart of a hidden Markov model ([chapter 11](11-temporal-probabilistic-models.md)). Learning log-linear models and CRFs is the subject of [chapter 14](14-learning-graphical-models.md#log-linear-models-and-the-moment-matching-gradient).
 
 ## <a id="appendices"></a>Appendices
 

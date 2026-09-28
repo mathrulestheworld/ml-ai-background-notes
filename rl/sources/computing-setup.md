@@ -19,7 +19,7 @@ The RL code blocks, figure scripts, and labs use NumPy, SciPy, Matplotlib, PyTor
 | box2d-py | 2.3.5 |
 | MinAtar | 1.0.15 |
 
-This is the environment of the DL, NLP and LLMs, and Generative AI modules with four additions: Gymnasium, MuJoCo, Box2D, and MinAtar.
+This is the environment of the [DL](../../dl/sources/computing-setup.md), [NLP and LLMs](../../nlp-llms/sources/computing-setup.md), and [Generative AI](../../generative-ai/sources/computing-setup.md) modules with four additions: Gymnasium, MuJoCo, Box2D, and MinAtar.
 
 ## <a id="extend-an-existing-environment"></a>Extend an existing environment
 
@@ -31,7 +31,7 @@ python -m pip install "gymnasium[box2d,mujoco]==1.2.2" MinAtar==1.0.15
 python -m pip check
 ```
 
-`swig` must be installed first, because `box2d-py` compiles against it; only Lab 10, with `LunarLander-v3`, uses Box2D, so the lab can be skipped if the build fails. MuJoCo is used by Labs 10 and 11 (`HalfCheetah-v5`) and MinAtar by Lab 8. The chapters' code blocks need only NumPy, SciPy, PyTorch, and Gymnasium's basic environments.
+`swig` must be installed first, because `box2d-py` compiles against it; only [Lab 10](../labs/lab-10-proximal-policy-optimization-from-scratch.md), with `LunarLander-v3`, uses Box2D, so the lab can be skipped if the build fails. MuJoCo is used by Labs 10 and 11 (`HalfCheetah-v5`) and MinAtar by [Lab 8](../labs/lab-08-deep-q-networks-on-cartpole-and-minatar.md). The chapters' code blocks need only NumPy, SciPy, PyTorch, and Gymnasium's basic environments.
 
 ## <a id="or-create-a-separate-environment"></a>Or create a separate environment
 
@@ -69,8 +69,8 @@ python ch16_dqn.py                   # both figures of chapter 16
 python ch31_realworld.py             # the figure of chapter 31
 ```
 
-The scripts write PNG files to `Sources/Images` and read no arguments. Most take seconds; the longest train agents and take one to a few minutes, as noted at the top of each script and in Figure sources.
+The scripts write PNG files to `Sources/Images` and read no arguments. Most take seconds; the longest train agents and take one to a few minutes, as noted at the top of each script and in [Figure sources](figure-sources.md).
 
 ## <a id="beyond-this-snapshot"></a>Beyond this snapshot
 
-The code here trains agents with at most a few hundred thousand parameters on environments that simulate in microseconds, so that every experiment runs on a laptop. Research-scale RL separates acting from learning and simulates thousands of environments in parallel, often on accelerators. The tools the notes point to, without requiring them, are: [CleanRL](https://docs.cleanrl.dev/) and Stable-Baselines3 for tested single-agent implementations (chapter 21); EnvPool, Brax, and Isaac Gym for batched simulation (chapter 19, chapter 31); the Arcade Learning Environment and the DeepMind Control Suite for standard benchmarks (chapter 16, chapter 21); `mctx` for batched tree search (chapter 24); D4RL, Minari, and OGBench for offline data (chapter 26); OpenSpiel and PettingZoo for games and multi-agent RL (chapter 27); and TRL and verl for reinforcement learning of language models (chapter 28). The book and documentation links point to them.
+The code here trains agents with at most a few hundred thousand parameters on environments that simulate in microseconds, so that every experiment runs on a laptop. Research-scale RL separates acting from learning and simulates thousands of environments in parallel, often on accelerators. The tools the notes point to, without requiring them, are: [CleanRL](https://docs.cleanrl.dev/) and Stable-Baselines3 for tested single-agent implementations ([chapter 21](../21-continuous-control-and-maximum-entropy-rl.md)); EnvPool, Brax, and Isaac Gym for batched simulation ([chapter 19](../19-deep-actor-critic-and-distributed-rl.md), [chapter 31](../31-reinforcement-learning-in-the-real-world.md)); the Arcade Learning Environment and the DeepMind Control Suite for standard benchmarks ([chapter 16](../16-deep-q-learning.md), [chapter 21](../21-continuous-control-and-maximum-entropy-rl.md)); `mctx` for batched tree search ([chapter 24](../24-planning-with-learned-models.md)); D4RL, Minari, and OGBench for offline data ([chapter 26](../26-offline-reinforcement-learning.md)); OpenSpiel and PettingZoo for games and multi-agent RL ([chapter 27](../27-multi-agent-rl-and-self-play.md)); and TRL and verl for reinforcement learning of language models ([chapter 28](../28-reinforcement-learning-for-language-models-and-reasoning.md)). The [book and documentation links](book-and-documentation-links.md) point to them.

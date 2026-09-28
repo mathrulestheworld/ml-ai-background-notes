@@ -20,7 +20,7 @@ A sentence $`\alpha`$ is **entailed** by a knowledge base, written $`\mathrm{KB}
 \mathrm{KB}\models\alpha\quad\Longleftrightarrow\quad M(\mathrm{KB})\subseteq M(\alpha).
 ```
 
-The more a knowledge base says, the fewer models it has, and the more it entails. An inference procedure $`i`$ derives sentences, written $`\mathrm{KB}\vdash_i\alpha`$. It is **sound** if it derives only entailed sentences and **complete** if it derives every entailed sentence. Soundness is essential; completeness is desirable but, as chapter 6 shows, not always attainable. If the knowledge base is true of the real world, every sentence derived soundly from it is also true of the world, which is what makes logical reasoning useful to an agent: conclusions about parts of the world it cannot perceive follow from what it knows.
+The more a knowledge base says, the fewer models it has, and the more it entails. An inference procedure $`i`$ derives sentences, written $`\mathrm{KB}\vdash_i\alpha`$. It is **sound** if it derives only entailed sentences and **complete** if it derives every entailed sentence. Soundness is essential; completeness is desirable but, as [chapter 6](06-first-order-logic-and-knowledge-representation.md) shows, not always attainable. If the knowledge base is true of the real world, every sentence derived soundly from it is also true of the world, which is what makes logical reasoning useful to an agent: conclusions about parts of the world it cannot perceive follow from what it knows.
 
 ## <a id="propositional-logic"></a>Propositional logic
 
@@ -112,7 +112,7 @@ Three of the 32 models satisfy the four sentences. The unicorn is horned and mag
 
 ### <a id="inference-rules"></a>Inference rules
 
-Model checking ignores the structure of the sentences. **Theorem proving** instead applies **inference rules** directly to sentences, which can find a short proof even when the number of models is astronomical. The best-known rule is **modus ponens**: from $`\alpha\Rightarrow\beta`$ and $`\alpha`$, infer $`\beta`$. Others are and-elimination, from $`\alpha\wedge\beta`$ infer $`\alpha`$, and all the standard logical equivalences, such as De Morgan's laws, contraposition $`(\alpha\Rightarrow\beta)\equiv(\neg\beta\Rightarrow\neg\alpha)`$, and the elimination of implication $`(\alpha\Rightarrow\beta)\equiv(\neg\alpha\vee\beta)`$. Searching for a proof is a search problem in the sense of chapter 1: states are sets of derived sentences, actions apply rules, and the goal is the query.
+Model checking ignores the structure of the sentences. **Theorem proving** instead applies **inference rules** directly to sentences, which can find a short proof even when the number of models is astronomical. The best-known rule is **modus ponens**: from $`\alpha\Rightarrow\beta`$ and $`\alpha`$, infer $`\beta`$. Others are and-elimination, from $`\alpha\wedge\beta`$ infer $`\alpha`$, and all the standard logical equivalences, such as De Morgan's laws, contraposition $`(\alpha\Rightarrow\beta)\equiv(\neg\beta\Rightarrow\neg\alpha)`$, and the elimination of implication $`(\alpha\Rightarrow\beta)\equiv(\neg\alpha\vee\beta)`$. Searching for a proof is a search problem in the sense of [chapter 1](01-agents-and-uninformed-search.md): states are sets of derived sentences, actions apply rules, and the goal is the query.
 
 Propositional logic, like the first-order logic of chapter 6, is **monotonic**: adding sentences to a knowledge base can only add to what it entails. Once a conclusion is proved, no further information can retract it; defaults and exceptions ("birds fly, but penguins do not") require nonmonotonic reasoning or the probabilistic methods of chapters 8–12.
 
@@ -137,13 +137,13 @@ Many knowledge bases need only a restricted form of clause. A **definite clause*
 - **Forward chaining** starts from the known facts and fires every rule whose premises are all known, adding its conclusion, until the query is derived or nothing new can be added. Keeping, for each rule, a count of premises not yet known makes each rule fire at most once, and the whole procedure linear ([Appendix C](#block-ai05-appendix-c)). It is **data-driven**, like an agent that updates its beliefs as percepts arrive.
 - **Backward chaining** starts from the query and works back through the rules that conclude it, proving their premises recursively. It is **goal-directed**, touching only relevant facts, and usually costs much less than linear in the size of the knowledge base.
 
-Horn-clause reasoning is the basis of logic programming and of Datalog, the first-order versions of which appear in chapter 6. Other polynomial fragments are **2-CNF**, clauses of at most two literals, solvable in linear time through the strongly connected components of an implication graph, and **XOR-SAT**, systems of parity constraints, solvable by Gaussian elimination over $`\mathbb F_2`$.
+Horn-clause reasoning is the basis of logic programming and of Datalog, the first-order versions of which appear in [chapter 6](06-first-order-logic-and-knowledge-representation.md#forward-chaining-and-datalog). Other polynomial fragments are **2-CNF**, clauses of at most two literals, solvable in linear time through the strongly connected components of an implication graph, and **XOR-SAT**, systems of parity constraints, solvable by Gaussian elimination over $`\mathbb F_2`$.
 
 ## <a id="satisfiability-solvers"></a>Satisfiability solvers
 
 ### <a id="dpll"></a>DPLL
 
-The **Davis–Putnam–Logemann–Loveland** algorithm ([Davis, Logemann, and Loveland, 1962](https://doi.org/10.1145/368273.368557)) decides satisfiability of a CNF formula by backtracking search over truth assignments, the constraint-satisfaction backtracking of chapter 3 specialized to Boolean variables and clauses. It improves on enumeration in three ways:
+The **Davis–Putnam–Logemann–Loveland** algorithm ([Davis, Logemann, and Loveland, 1962](https://doi.org/10.1145/368273.368557)) decides satisfiability of a CNF formula by backtracking search over truth assignments, the constraint-satisfaction backtracking of [chapter 3](03-constraint-satisfaction-and-local-search.md) specialized to Boolean variables and clauses. It improves on enumeration in three ways:
 
 - **Early termination.** A clause is true as soon as one of its literals is true, and the formula is false as soon as one clause has all its literals false, so partial assignments are evaluated.
 - **Unit propagation.** A clause with all literals but one false, a **unit clause**, forces that literal true. Assigning it can create further unit clauses, and propagating them to a fixed point is the Boolean form of forward checking and arc consistency; it performs most of the work of a modern solver.
@@ -153,7 +153,7 @@ When no rule applies, DPLL **branches**: it chooses an unassigned variable, assi
 
 ### <a id="conflict-driven-clause-learning"></a>Conflict-driven clause learning
 
-**Conflict-driven clause learning** (CDCL) solvers, from GRASP ([Marques-Silva and Sakallah, 1999](https://doi.org/10.1109/12.769433)) and Chaff ([Moskewicz et al., 2001](https://doi.org/10.1145/378239.379017)) to their current descendants, extend DPLL with the intelligent backtracking of chapter 3:
+**Conflict-driven clause learning** (CDCL) solvers, from GRASP ([Marques-Silva and Sakallah, 1999](https://doi.org/10.1109/12.769433)) and Chaff ([Moskewicz et al., 2001](https://doi.org/10.1145/378239.379017)) to their current descendants, extend DPLL with the intelligent backtracking of [chapter 3](03-constraint-satisfaction-and-local-search.md#intelligent-backtracking):
 
 - **Implication graph and learning.** Each propagated literal records the clause that forced it. When a clause becomes false, the solver traces the conflict back through these reasons to a small set of decisions and propagations that caused it, and adds a **learned clause** that forbids that combination. The learned clause is a resolvent of the clauses involved, so it is entailed and adding it is sound. The usual choice, the **first unique implication point**, yields a clause with exactly one literal from the current decision level.
 - **Non-chronological backjumping.** After learning, the solver jumps back to the decision level at which the learned clause becomes a unit clause, often many levels up, and propagation immediately sets the literal it forces.
@@ -161,11 +161,11 @@ When no rule applies, DPLL **branches**: it chooses an unassigned variable, assi
 - **Restarts and clause deletion.** Solvers restart from the root frequently while keeping learned clauses and activities, which escapes early bad decisions, and delete learned clauses that are rarely used.
 - **Watched literals.** Unit propagation watches only two literals per clause, since a clause can only become unit or false when one of its watched literals becomes false; this makes propagation fast enough for millions of clauses.
 
-With these techniques, CDCL solvers routinely decide industrial instances with millions of variables and clauses, from hardware verification, software model checking, scheduling, and cryptanalysis, and they are the engine inside many planners (chapter 7), theorem provers, and constraint solvers. When a CDCL solver reports unsatisfiability, its learned clauses form a resolution refutation, which can be output and checked independently.
+With these techniques, CDCL solvers routinely decide industrial instances with millions of variables and clauses, from hardware verification, software model checking, scheduling, and cryptanalysis, and they are the engine inside many planners ([chapter 7](07-automated-planning.md#planning-as-satisfiability)), theorem provers, and constraint solvers. When a CDCL solver reports unsatisfiability, its learned clauses form a resolution refutation, which can be output and checked independently.
 
 ### <a id="local-search-walksat"></a>Local search: WalkSAT
 
-For satisfiable instances, local search over complete assignments is often much faster than systematic search. **WalkSAT** ([Selman, Kautz, and Cohen, 1994](https://cdn.aaai.org/AAAI/1994/AAAI94-051.pdf)) starts from a random assignment and repeatedly picks a random unsatisfied clause and flips one of its variables: with probability $`p`$, a random one of them (a **random walk** step); otherwise the one whose flip breaks the fewest currently satisfied clauses (a **greedy** step). The random steps prevent it from being trapped in local minima, the min-conflicts idea of chapter 3 with added noise. WalkSAT cannot prove unsatisfiability: when it fails to find a model within its budget, the formula may still be satisfiable.
+For satisfiable instances, local search over complete assignments is often much faster than systematic search. **WalkSAT** ([Selman, Kautz, and Cohen, 1994](https://cdn.aaai.org/AAAI/1994/AAAI94-051.pdf)) starts from a random assignment and repeatedly picks a random unsatisfied clause and flips one of its variables: with probability $`p`$, a random one of them (a **random walk** step); otherwise the one whose flip breaks the fewest currently satisfied clauses (a **greedy** step). The random steps prevent it from being trapped in local minima, the min-conflicts idea of [chapter 3](03-constraint-satisfaction-and-local-search.md#complete-state-formulations) with added noise. WalkSAT cannot prove unsatisfiability: when it fails to find a model within its budget, the formula may still be satisfiable.
 
 ```python
 import random
@@ -272,7 +272,7 @@ On a random formula with 150 variables and 600 clauses, DPLL finds a model after
 
 ### <a id="hard-and-easy-instances"></a>Hard and easy instances
 
-Random 3-SAT formulas with $`n`$ variables and $`m`$ clauses show the phase transition of chapter 3 in its best-studied form. When the ratio $`m/n`$ is small, almost every formula is satisfiable and easily solved; when it is large, almost every formula is unsatisfiable and quickly refuted; the transition sharpens with $`n`$ around $`m/n\approx4.27`$, a value computed by statistical-physics methods ([Mézard, Parisi, and Zecchina, 2002](https://doi.org/10.1126/science.1073287)), and the hardest instances cluster there ([Mitchell, Selman, and Levesque, 1992](https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf)).
+Random 3-SAT formulas with $`n`$ variables and $`m`$ clauses show the phase transition of [chapter 3](03-constraint-satisfaction-and-local-search.md#where-the-hard-problems-are) in its best-studied form. When the ratio $`m/n`$ is small, almost every formula is satisfiable and easily solved; when it is large, almost every formula is unsatisfiable and quickly refuted; the transition sharpens with $`n`$ around $`m/n\approx4.27`$, a value computed by statistical-physics methods ([Mézard, Parisi, and Zecchina, 2002](https://doi.org/10.1126/science.1073287)), and the hardest instances cluster there ([Mitchell, Selman, and Levesque, 1992](https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf)).
 
 <img src="sources/images/ai-sat-phase.png" alt="ai-sat-phase" width="880">
 
@@ -292,9 +292,9 @@ A logical agent can use propositional inference to track the state of a partiall
 F^{t+1}\;\Leftrightarrow\;\mathit{ActionCausesF}^t\vee\bigl(F^t\wedge\neg\mathit{ActionCausesNotF}^t\bigr).
 ```
 
-With the percepts added as they arrive, asking whether a fluent is entailed at time $`t`$ performs **logical state estimation**, the deterministic counterpart of the probabilistic filtering of chapter 11. Asking for a model of the axioms together with an initial state and a goal at time $`T`$ produces a plan: the action symbols true in the model. This is **SATPlan**, the subject of chapter 7.
+With the percepts added as they arrive, asking whether a fluent is entailed at time $`t`$ performs **logical state estimation**, the deterministic counterpart of the probabilistic filtering of [chapter 11](11-temporal-probabilistic-models.md). Asking for a model of the axioms together with an initial state and a goal at time $`T`$ produces a plan: the action symbols true in the model. This is **SATPlan**, the subject of [chapter 7](07-automated-planning.md#planning-as-satisfiability).
 
-The propositional encoding has an obvious limitation. A grid world with $`k`$ squares needs separate symbols, and separate axioms, for every square and every time step, and the knowledge base grows accordingly. Statements such as "every square adjacent to a pit is breezy" must be written out once per square. Chapter 6 adds objects, relations, and quantifiers to say such things once.
+The propositional encoding has an obvious limitation. A grid world with $`k`$ squares needs separate symbols, and separate axioms, for every square and every time step, and the knowledge base grows accordingly. Statements such as "every square adjacent to a pit is breezy" must be written out once per square. [Chapter 6](06-first-order-logic-and-knowledge-representation.md) adds objects, relations, and quantifiers to say such things once.
 
 ## <a id="appendices"></a>Appendices
 

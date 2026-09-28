@@ -6,7 +6,7 @@
 
 ## <a id="overview"></a>Overview
 
-This lab turns chapter 3 and chapter 4 into working code: a small library of bandit algorithms with a common interface, stress tests that break the stochastic assumptions, a contextual bandit built from a real dataset, and off-policy evaluation of logged decisions.
+This lab turns [chapter 3](../03-multi-armed-bandits.md) and [chapter 4](../04-contextual-bayesian-and-adversarial-bandits.md) into working code: a small library of bandit algorithms with a common interface, stress tests that break the stochastic assumptions, a contextual bandit built from a real dataset, and off-policy evaluation of logged decisions.
 
 - **Data:** Bernoulli arms generated in the code, and the $`8\times8`$ handwritten digits bundled with scikit-learn, used as a 10-action contextual bandit.
 - **Prerequisites:** chapters 3–4; NumPy and scikit-learn.

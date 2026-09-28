@@ -8,7 +8,7 @@
 
 ### <a id="batch-normalization"></a>Batch normalization
 
-Chapter 2 chose the initial weights so that activations keep a stable scale. Once training starts, the weights change and that property is lost. **Normalization layers** restore it at every step by standardizing activations inside the network, which makes training far less sensitive to initialization and to the learning rate.
+[Chapter 2](02-initialization-and-signal-propagation.md) chose the initial weights so that activations keep a stable scale. Once training starts, the weights change and that property is lost. **Normalization layers** restore it at every step by standardizing activations inside the network, which makes training far less sensitive to initialization and to the learning rate.
 
 **Batch normalization** ([Ioffe and Szegedy, 2015](https://arxiv.org/abs/1502.03167)) standardizes each feature over the examples of a minibatch. For a batch of pre-activations $`z_1,\ldots,z_B`$ of one unit (or one channel of a convolutional layer, pooled over all spatial positions),
 
@@ -120,7 +120,7 @@ print(f"|W|^2 grew from {W.pow(2).sum().item():.0f} to {Wt.pow(2).sum().item():.
 # |W|^2 grew from 165 to 211; sum of squared step lengths 46
 ```
 
-Since only the direction $`W/\|W\|`$ matters, the relevant step size is the change in direction, about $`\eta\|g\|/\|W\|`$, and with $`\|g\|\propto1/\|W\|`$ the **effective learning rate** is proportional to $`\eta/\|W\|^2`$. Without weight decay the norm grows and the effective rate decays automatically. With weight decay, which shrinks the norm, the two forces reach an equilibrium in which weight decay mainly acts to keep the effective learning rate high, not to regularize in the classical sense ([van Laarhoven, 2017](https://arxiv.org/abs/1706.05350); [Li and Arora, 2020](https://arxiv.org/abs/1910.07454)). This is one reason the best weight decay depends on the learning rate and schedule (chapter 5).
+Since only the direction $`W/\|W\|`$ matters, the relevant step size is the change in direction, about $`\eta\|g\|/\|W\|`$, and with $`\|g\|\propto1/\|W\|`$ the **effective learning rate** is proportional to $`\eta/\|W\|^2`$. Without weight decay the norm grows and the effective rate decays automatically. With weight decay, which shrinks the norm, the two forces reach an equilibrium in which weight decay mainly acts to keep the effective learning rate high, not to regularize in the classical sense ([van Laarhoven, 2017](https://arxiv.org/abs/1706.05350); [Li and Arora, 2020](https://arxiv.org/abs/1910.07454)). This is one reason the best weight decay depends on the learning rate and schedule ([chapter 5](05-regularization-and-generalization-in-deep-networks.md)).
 
 ### <a id="normalizing-over-other-axes"></a>Normalizing over other axes
 
@@ -132,7 +132,7 @@ Batch normalization couples the examples of a batch, which causes problems: stat
 
 - **Layer normalization** ([Ba, Kiros, and Hinton, 2016](https://arxiv.org/abs/1607.06450)) standardizes each example over its features. It behaves identically in training and evaluation and does not depend on the batch, which makes it the standard choice for recurrent networks and transformers.
 - **RMS normalization** ([Zhang and Sennrich, 2019](https://arxiv.org/abs/1910.07467)) divides by the root mean square of the features without subtracting the mean, $`y=\gamma\odot z/\sqrt{\frac1d\|z\|^2+\epsilon}`$. It is cheaper and performs as well in transformers, where it has largely replaced layer normalization.
-- **Group normalization** ([Wu and He, 2018](https://arxiv.org/abs/1803.08494)) standardizes groups of channels within each example; **instance normalization** ([Ulyanov, Vedaldi, and Lempitsky, 2016](https://arxiv.org/abs/1607.08022)) is the case of one channel per group. Group normalization matches batch normalization for convolutional networks trained with small batches, as in detection and segmentation (chapter 14).
+- **Group normalization** ([Wu and He, 2018](https://arxiv.org/abs/1803.08494)) standardizes groups of channels within each example; **instance normalization** ([Ulyanov, Vedaldi, and Lempitsky, 2016](https://arxiv.org/abs/1607.08022)) is the case of one channel per group. Group normalization matches batch normalization for convolutional networks trained with small batches, as in detection and segmentation ([chapter 14](14-detection-and-segmentation.md)).
 - **Weight normalization** ([Salimans and Kingma, 2016](https://arxiv.org/abs/1602.07868)) normalizes the weights rather than the activations, writing $`w=g\,v/\|v\|`$; it achieves the scale invariance without depending on the data.
 
 Normalization is not indispensable. Careful initialization and signal-preserving architectures can match it, as in the normalizer-free ResNets of [Brock, De, Smith, and Simonyan (2021)](https://arxiv.org/abs/2102.06171), and [Zhu et al. (2025)](https://arxiv.org/abs/2503.10622) replaced the layer normalizations of transformers with an elementwise $`\tanh(\alpha z)`$ with learned $`\alpha`$.
@@ -149,7 +149,7 @@ A **residual block** makes the identity the default:
 x_{l+1}=x_l+F_l(x_l),
 ```
 
-where the **residual branch** $`F_l`$ is a small network, typically two or three layers with normalization. If a block is not useful, the branch only needs to output zero. He et al. trained residual networks with 152 layers on ImageNet and over 1,000 on CIFAR-10, and residual connections are now part of almost every deep architecture, including transformers (chapter 9). Earlier, **highway networks** ([Srivastava, Greff, and Schmidhuber, 2015](https://arxiv.org/abs/1505.00387)) used gated shortcuts, and DenseNets ([Huang et al., 2017](https://arxiv.org/abs/1608.06993)) concatenate the outputs of all earlier layers instead of adding them.
+where the **residual branch** $`F_l`$ is a small network, typically two or three layers with normalization. If a block is not useful, the branch only needs to output zero. He et al. trained residual networks with 152 layers on ImageNet and over 1,000 on CIFAR-10, and residual connections are now part of almost every deep architecture, including transformers ([chapter 9](09-attention-and-transformers.md)). Earlier, **highway networks** ([Srivastava, Greff, and Schmidhuber, 2015](https://arxiv.org/abs/1505.00387)) used gated shortcuts, and DenseNets ([Huang et al., 2017](https://arxiv.org/abs/1608.06993)) concatenate the outputs of all earlier layers instead of adding them.
 
 <img src="sources/images/dl-residual-depth.png" alt="dl-residual-depth" width="880">
 
@@ -187,7 +187,7 @@ De and Smith also explain part of batch normalization's success in residual netw
 
 Where the normalization sits relative to the shortcut matters. The original transformer used **post-normalization**, $`x_{l+1}=\mathrm{LN}\bigl(x_l+F_l(x_l)\bigr)`$, which normalizes the stream itself after every block. **Pre-normalization**, $`x_{l+1}=x_l+F_l\bigl(\mathrm{LN}(x_l)\bigr)`$, normalizes only the branch input and leaves an uninterrupted identity path from input to output, with one final normalization before the output layer. Pre-normalization trains stably without warmup and at larger depth ([Xiong et al., 2020](https://arxiv.org/abs/2002.04745)), and it is the default in modern transformers. Post-normalization can reach slightly better results when it trains, and schemes such as DeepNet ([Wang et al., 2022](https://arxiv.org/abs/2203.00555)) rescale its shortcut to make it stable at a thousand layers. For convolutional networks, [He, Zhang, Ren, and Sun (2016)](https://arxiv.org/abs/1603.05027) made the analogous change, moving normalization and activation into the branch before each convolution ("pre-activation" ResNets), and found that it eased the training of networks with over 1,000 layers.
 
-UDL chapter 11, UMich lecture 8, and UNIGE sections 6.4 and 6.5, listed in the reading plan, cover residual networks and normalization.
+UDL chapter 11, UMich lecture 8, and UNIGE sections 6.4 and 6.5, listed in the [reading plan](reading-plan.md#4-normalization-and-residual-connections), cover residual networks and normalization.
 
 ## <a id="appendices"></a>Appendices
 

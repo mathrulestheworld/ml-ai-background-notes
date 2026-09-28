@@ -48,7 +48,7 @@ The converter preserves literal inline and fenced code when replacing Obsidian w
 
 ## <a id="regenerate-the-added-figures"></a>Regenerate the added figures
 
-The code in `Sources/Figure code` regenerates the figures added to chapters 1 to 6. The chapter 1 script also prints the numbers that chapter quotes from its figures, and it needs scikit-learn; add it to this environment as described in the ML computing setup. Then, from the `0. Foundations` folder:
+The code in `Sources/Figure code` regenerates the figures added to chapters 1 to 6. The chapter 1 script also prints the numbers that chapter quotes from its figures, and it needs scikit-learn; add it to this environment as described in [the ML computing setup](../../ml/sources/computing-setup.md#add-scikit-learn-to-the-foundations-environment). Then, from the `0. Foundations` folder:
 
 ```bash
 python "Sources/Figure code/ch01_terminology.py"
@@ -65,4 +65,4 @@ npm run render
 
 `npm install` creates a `node_modules` folder that contains Markdown files of its own; add `node_modules` to Obsidian's excluded files (Settings → Files and links → Excluded files) to keep them out of search and the graph. From the `0. Foundations` folder, `python "Sources/Figure code/ch03_capture_distill.py"` and `python "Sources/Figure code/ch03_crop_baydin.py"` refresh the imported Distill and survey figures of chapter 3; they need Python Playwright with Chromium, Pillow, `curl`, Poppler's `pdftoppm`, and network access. Inside the Foundations environment, `python "Sources/Figure code/ch06_training_curve.py"` reruns the chapter 6 training example and prints the data embedded in its training-curve figure.
 
-Each figure script writes its image files into `Sources/Images`, replacing the stored versions; the chapter 6 script only prints data. The chapter 1 script was tested with Python 3.12.3, NumPy 1.26.4, SciPy 1.11.4, Matplotlib 3.8.4, and scikit-learn 1.4.2. Figure sources lists what each script produces and the versions used for the drawn figures.
+Each figure script writes its image files into `Sources/Images`, replacing the stored versions; the chapter 6 script only prints data. The chapter 1 script was tested with Python 3.12.3, NumPy 1.26.4, SciPy 1.11.4, Matplotlib 3.8.4, and scikit-learn 1.4.2. [Figure sources](figure-sources.md#reproducing-the-figures) lists what each script produces and the versions used for the drawn figures.

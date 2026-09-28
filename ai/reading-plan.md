@@ -193,7 +193,7 @@ CS188 slide links are original PDFs and the notes are the course's own; the vide
 
 - The [CS188 projects](https://inst.eecs.berkeley.edu/~cs188/sp24/projects/) implement search, adversarial search, logic, and Bayesian-network and HMM tracking in Python for a Pacman world, with autograders; the machine-learning project repeats ML and DL material, and the reinforcement-learning project belongs with RL. Past exams with solutions are linked from the course site and cover every block through 12.
 - The [AIMA Python repository](https://github.com/aimacode/aima-python) implements most algorithms of the textbook, with notebooks.
-- Foundations supplies probability, Monte Carlo, and information theory; ML supplies naive Bayes, Gaussian mixtures, and EM; DL supplies the networks used as learned heuristics and evaluation functions.
+- [Foundations](../foundations/README.md) supplies probability, Monte Carlo, and information theory; [ML](../ml/README.md) supplies naive Bayes, Gaussian mixtures, and EM; [DL](../dl/README.md) supplies the networks used as learned heuristics and evaluation functions.
 
 ## <a id="connections-to-later-modules"></a>Connections to later modules
 

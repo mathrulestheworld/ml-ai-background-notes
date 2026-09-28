@@ -15,7 +15,7 @@ The ML code blocks and figure scripts use Python, NumPy, SciPy, and scikit-learn
 | scikit-learn | 1.4.2 |
 | joblib / threadpoolctl | 1.6.0 / 3.7.0 |
 
-NumPy, SciPy, and Matplotlib have the same versions as in the Foundations environment, so either of the following works.
+NumPy, SciPy, and Matplotlib have the same versions as in the [Foundations environment](../../foundations/sources/computing-setup.md), so either of the following works.
 
 ## <a id="add-scikit-learn-to-the-foundations-environment"></a>Add scikit-learn to the Foundations environment
 
@@ -50,7 +50,7 @@ Random seeds are fixed, so the results are repeatable within this environment. O
 
 ## <a id="regenerating-the-figures"></a>Regenerating the figures
 
-All figures are drawn with D3 and KaTeX, using the drawing library and packages of the Foundations figures. They need Node.js 22 or later. Install the Foundations figure packages once, as described in the Foundations computing setup.
+All figures are drawn with D3 and KaTeX, using the drawing library and packages of the Foundations figures. They need Node.js 22 or later. Install the Foundations figure packages once, as described in [the Foundations computing setup](../../foundations/sources/computing-setup.md#regenerate-the-added-figures).
 
 Each chapter has a script in `Sources/Figure code`, from `ch01_nearest_neighbors.py` to `ch17_smoothing.py`. With the Python environment active, a script writes the data of the chapter's figures that show fitted models (scikit-learn estimators, EM runs, Gaussian-process fits, and the like) to `js/data/<name>.js`, and prints every number that the chapter and its captions quote from its figures:
 
@@ -67,4 +67,4 @@ sh build.sh
 node render.js                    # all figures; or name some: node render.js svm-rbf-grid svm-cv-heatmap
 ```
 
-`build.sh` wraps each `src/<name>.js`, preceded by `data/<name>.js` when that file exists, into `build/<name>.html`. `render.js` renders each page at twice its CSS size into `Sources/Images`, reporting any overlapping or clipped labels and any label crossed by a drawn line. Figure sources records the data and construction of each figure. The module `mlfig.py` belonged to the earlier Matplotlib versions of the figures and is no longer used.
+`build.sh` wraps each `src/<name>.js`, preceded by `data/<name>.js` when that file exists, into `build/<name>.html`. `render.js` renders each page at twice its CSS size into `Sources/Images`, reporting any overlapping or clipped labels and any label crossed by a drawn line. [Figure sources](figure-sources.md) records the data and construction of each figure. The module `mlfig.py` belonged to the earlier Matplotlib versions of the figures and is no longer used.

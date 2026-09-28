@@ -6,7 +6,7 @@
 
 ## <a id="overview"></a>Overview
 
-This lab puts chapter 1 and chapter 2 to work on real Gymnasium environments. You will extract the exact model of an environment, solve it with policy iteration and value iteration, check the answer by simulation, and discover that the discount factor, the time limit, and the objective you actually care about can disagree.
+This lab puts [chapter 1](../01-markov-decision-processes.md) and [chapter 2](../02-dynamic-programming.md) to work on real Gymnasium environments. You will extract the exact model of an environment, solve it with policy iteration and value iteration, check the answer by simulation, and discover that the discount factor, the time limit, and the objective you actually care about can disagree.
 
 - **Environments:** `FrozenLake-v1` (4×4 and 8×8, slippery), `Taxi-v3`.
 - **Prerequisites:** chapters 1–2; NumPy.
@@ -24,7 +24,7 @@ Gymnasium's toy-text environments expose their dynamics: `env.unwrapped.P[s][a]`
 
 ## <a id="part-2-policy-iteration-and-value-iteration"></a>Part 2 — Policy iteration and value iteration
 
-1. Implement exact policy evaluation by a linear solve, policy iteration with greedy improvement that keeps the current action on ties, and value iteration with the stopping rule of chapter 2.
+1. Implement exact policy evaluation by a linear solve, policy iteration with greedy improvement that keeps the current action on ties, and value iteration with the stopping rule of [chapter 2](../02-dynamic-programming.md#error-bounds-and-stopping).
 2. Solve both maps for $`\gamma=0.9`$, $`0.99`$, and $`0.9999`$. Confirm that the two algorithms give policies with the same value, and compare the number of policy-iteration evaluations with the number of value-iteration sweeps.
 3. Print the policy on the map. Explain the famous first move on the 4×4 map: why does the optimal agent start by pushing **left**, into the wall?
 4. Compute the probability of ever reaching the goal under each policy, by evaluating it with $`\gamma\to1`$. Why is $`v(\text{start})`$ with $`\gamma=0.9`$ so much smaller than this probability?
@@ -35,7 +35,7 @@ The quantity a user of the environment sees is the success rate within Gymnasium
 
 1. Compute it exactly for each of your policies by running the policy's Bellman backup for 100 steps from zero (backward induction with a fixed policy), and check one value by simulating 2,000 episodes in the real environment.
 2. Compute the best **time-dependent** policy for the 100-step limit by backward induction with the optimality backup and $`\gamma=1`$.
-3. On the 8×8 map, which discount factor gives the best stationary policy for the time-limited task? Explain why the policy that is optimal as $`\gamma\to1`$ is the worst of the three here, and relate this to finite horizons and time limits.
+3. On the 8×8 map, which discount factor gives the best stationary policy for the time-limited task? Explain why the policy that is optimal as $`\gamma\to1`$ is the worst of the three here, and relate this to [finite horizons and time limits](../01-markov-decision-processes.md#finite-horizons-and-time-limits).
 
 ## <a id="part-4-many-maps-and-taxi"></a>Part 4 — Many maps, and Taxi
 
@@ -84,14 +84,14 @@ Things to notice:
 - **The cautious first move.** Pushing left into the wall means the agent either stays put or slips up or down, never toward the hole on its right. With enough patience, slow and safe beats fast and risky, and on the 8×8 map the $`\gamma\to1`$ policy reaches the goal with probability 1.0000 to four decimals: it has a way to avoid the holes almost surely, at the cost of many steps.
 - **Discounting changes the objective.** With $`\gamma=0.9`$ the value of the start state is only 0.069 on the 4×4 map, because a success after 25 steps is worth $`0.9^{24}\approx0.08`$. The policy trades a little success probability for speed.
 - **The time limit changes it again.** Within 100 steps, the patient $`\gamma=0.9999`$ policy succeeds only 51% of the time on the 8×8 map, while the $`\gamma=0.99`$ policy succeeds 63% of the time and the best time-dependent policy 64%. The discount factor is acting as a knob that trades patience against the deadline the environment imposes but the state does not show.
-- **Policy iteration needs few iterations**, 6 to 12 evaluations, while value iteration's sweeps grow with the effective horizon, as in the figure of chapter 2. Taxi is deterministic with short episodes, so value information propagates in about as many sweeps as the longest optimal route.
-- **Taxi's optimal return**, about 7.9, is the benchmark a learning agent should approach in chapter 7.
+- **Policy iteration needs few iterations**, 6 to 12 evaluations, while value iteration's sweeps grow with the effective horizon, as in the figure of [chapter 2](../02-dynamic-programming.md#error-bounds-and-stopping). Taxi is deterministic with short episodes, so value information propagates in about as many sweeps as the longest optimal route.
+- **Taxi's optimal return**, about 7.9, is the benchmark a learning agent should approach in [chapter 7](../07-model-free-control.md).
 
 ## <a id="going-further"></a>Going further
 
 1. **Add the time to the state.** Build an MDP whose state is (cell, steps remaining) for the 100-step limit, solve it with $`\gamma=1`$, and confirm that its value at the start equals the backward-induction result. How many states does it have, and what does its policy do differently near the deadline?
 2. **Modified policy iteration.** Implement it with $`m`$ evaluation sweeps and plot the total number of backups to reach a fixed accuracy against $`m`$ on the 8×8 map with $`\gamma=0.999`$.
-3. **Asynchronous updates.** Implement Gauss–Seidel value iteration, and then a version that updates states in order of decreasing Bellman error (a priority queue). Count backups to convergence. This is prioritized sweeping without learning (chapter 10).
+3. **Asynchronous updates.** Implement Gauss–Seidel value iteration, and then a version that updates states in order of decreasing Bellman error (a priority queue). Count backups to convergence. This is prioritized sweeping without learning ([chapter 10](../10-planning-and-learning-with-tabular-models.md)).
 4. **The linear program.** Solve the 8×8 map with `scipy.optimize.linprog` in primal and dual form and read the optimal occupancy measure from the dual. Which cells does the optimal agent spend most of its discounted time in?
 5. **A harder map.** Make the ice more slippery by editing the model: the intended move with probability 0.2 and each other direction with probability 0.8/3. How does the optimal success probability change, and does the cautious strategy survive?
 

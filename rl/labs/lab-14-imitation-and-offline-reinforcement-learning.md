@@ -6,9 +6,9 @@
 
 ## <a id="overview"></a>Overview
 
-This lab puts chapter 25 and chapter 26 to work on one small problem. You will train an expert, collect datasets of different quality from it and from weaker policies, and then learn from them without further reward: first by imitating the expert, with behavioral cloning and with DAgger, and then from fixed datasets with rewards, with behavioral cloning, a naive off-policy agent, TD3+BC, and implicit Q-learning. The point is to see each method's characteristic failure, and to see that which method wins depends on the data.
+This lab puts [chapter 25](../25-imitation-learning-and-inverse-rl.md) and [chapter 26](../26-offline-reinforcement-learning.md) to work on one small problem. You will train an expert, collect datasets of different quality from it and from weaker policies, and then learn from them without further reward: first by imitating the expert, with behavioral cloning and with DAgger, and then from fixed datasets with rewards, with behavioral cloning, a naive off-policy agent, TD3+BC, and implicit Q-learning. The point is to see each method's characteristic failure, and to see that which method wins depends on the data.
 
-- **Environment:** `Pendulum-v1`, as in Lab 11: swing a pendulum up and hold it with a torque in $`[-2,2]`$; 200-step episodes, and a return above about $`-200`$ means the pendulum is swung up and held. The environment never terminates, so every transition bootstraps.
+- **Environment:** `Pendulum-v1`, as in [Lab 11](lab-11-off-policy-actor-critics-for-continuous-control.md): swing a pendulum up and hold it with a torque in $`[-2,2]`$; 200-step episodes, and a return above about $`-200`$ means the pendulum is swung up and held. The environment never terminates, so every transition bootstraps.
 - **Prerequisites:** chapters 25 and 26, and the SAC and TD3 of Lab 11; PyTorch and Gymnasium.
 - **Reference solution:** [lab14_offline.py](code/lab14_offline.py), about 25 minutes on two cores, most of it in part 3. Try each part yourself before reading it.
 
