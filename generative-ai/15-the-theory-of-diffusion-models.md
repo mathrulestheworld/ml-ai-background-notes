@@ -14,9 +14,9 @@ Diffusion models work far better than a naive reading of their ingredients sugge
 
 Suppose the score of every noisy marginal is known up to an error $`\varepsilon_{\text{score}}`$ in mean square. [Chen et al. (2023)](https://arxiv.org/abs/2209.11215) showed that the DDPM sampler then produces a distribution close to the data in total variation, with a number of steps polynomial in the dimension and the accuracy, under two mild assumptions: the score of every forward marginal is $`L`$-Lipschitz, and the data have a finite second moment. For the variance-preserving process run to time $`T`$ with step size $`h`$, the bound has three terms,
 
-$$
+```math
 \operatorname{TV}\lesssim\underbrace{\sqrt{D_{\mathrm{KL}}(q\,\|\,\gamma)}\,e^{-T}}_{\text{initialization}}+\underbrace{\bigl(L\sqrt{dh}+Lm_2h\bigr)\sqrt T}_{\text{discretization}}+\underbrace{\varepsilon_{\text{score}}\sqrt T}_{\text{score error}},
-$$
+```
 
 where $`\gamma`$ is the standard Gaussian, $`d`$ the dimension, and $`m_2`$ the data's second moment: the first term because the process is started from a Gaussian rather than the true noisy marginal, the second from the finite steps, the third from the learned score ([Appendix B](#block-gen15-appendix-b)). With a small enough score error, about $`L^2d/\varepsilon^2`$ steps give accuracy $`\varepsilon`$. The striking part is what is not assumed: no log-concavity, no isoperimetric inequality, nothing that excludes separated modes. Langevin dynamics needs such conditions because it must travel between modes at a single noise level; the diffusion sampler never has to, since it starts at a noise level where the modes have merged and follows them as they separate, the annealing of chapter 6 made continuous. [Benton et al. (2024)](https://arxiv.org/abs/2308.03686) sharpened the bound to about $`d\log^2(1/\delta)/\varepsilon^2`$ steps, linear in the dimension up to logarithms, assuming only a finite second moment, for the data smoothed by Gaussian noise of variance $`\delta`$. The smoothing, which corresponds to stopping the sampler slightly before $`\sigma=0`$, is needed when the data lie on a lower-dimensional manifold, where the score of the clean data does not exist, a setting analyzed by [De Bortoli (2022)](https://arxiv.org/abs/2208.05314).
 
@@ -88,9 +88,9 @@ The guarantees above assume an accurate score; how accurately a score can be lea
 
 The denoising loss on a training set $`\{x_i\}_{i=1}^N`$ is minimized exactly by the denoiser of the **empirical distribution**, which puts mass $`1/N`$ on each training point. Its noisy version is a mixture of Gaussians centered on the training points, so its optimal denoiser is a softmax-weighted average of them,
 
-$$
+```math
 D^\star(x;\sigma)=\sum_{i=1}^N\frac{\exp\bigl(-\|x-x_i\|^2/2\sigma^2\bigr)}{\sum_j\exp\bigl(-\|x-x_j\|^2/2\sigma^2\bigr)}\,x_i,
-$$
+```
 
 and a sampler that follows it ends, at $`\sigma=0`$, exactly on a training point ([Appendix A](#block-gen15-appendix-a)). A perfectly trained diffusion model is a lookup table of its training set. The code samples a 16-dimensional Gaussian from its exact score and from the empirical score of training sets of three sizes, and records the noise level below which each trajectory has committed to one training point, with more than 90% of the posterior weight.
 
@@ -249,9 +249,9 @@ Compare two processes on paths: the true reverse process, which starts at the tr
 
 Let an image of $`n\times n`$ pixels have a power spectrum $`P(k)=Ck^{-\alpha}`$ per frequency, and add independent Gaussian noise of variance $`\sigma^2`$ per pixel, whose power is $`\sigma^2`$ at every frequency in the same normalization. The signal-to-noise ratio at frequency $`k`$ is $`Ck^{-\alpha}/\sigma^2`$, which equals one at
 
-$$
+```math
 k_c=\Bigl(\frac C{\sigma^2}\Bigr)^{1/\alpha}\propto\sigma^{-2/\alpha}.
-$$
+```
 
 For $`\alpha=2`$, $`k_c\propto1/\sigma`$: doubling the noise halves the crossing frequency, as in the code. The variance below $`k_c`$ is $`\int_1^{k_c}Ck^{-\alpha}\,2\pi k\,dk`$, which for $`\alpha=2`$ grows as $`\log k_c`$, so each halving of $`k_c`$ removes the same amount of variance from the part of the image that survives, a constant share per octave of frequency. Coarse structure is not only more powerful than fine structure; under this spectrum each octave carries equal variance, and noise removes the octaves one at a time from the top.
 

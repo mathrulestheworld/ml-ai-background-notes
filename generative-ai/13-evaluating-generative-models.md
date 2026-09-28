@@ -79,9 +79,9 @@ Likelihood has another blind spot: it is dominated by low-level statistics. [Nal
 
 Models without likelihoods, above all adversarial networks, needed measures computed from samples alone. The **Inception score** ([Salimans et al., 2016](https://arxiv.org/abs/1606.03498)) passes samples through an ImageNet classifier, the Inception network, and computes
 
-$$
+```math
 \operatorname{IS}=\exp\Bigl(\mathbb E_x\,D_{\mathrm{KL}}\bigl(p(y\mid x)\,\big\|\,p(y)\bigr)\Bigr),
-$$
+```
 
 which is large when each sample is classified confidently and the samples together cover many classes. Real CIFAR-10 images score 11.24. The score never looks at real data, so it cannot tell whether the samples resemble the training set; it ignores diversity within a class; it depends on the particular weights and implementation of the classifier; and small adversarial changes to samples can push it near its maximum without making them any more natural ([Barratt and Sharma, 2018](https://arxiv.org/abs/1801.01973)). It is still reported for class-conditional ImageNet models, usually beside the FID.
 
@@ -89,9 +89,9 @@ which is large when each sample is classified confidently and the samples togeth
 
 The **Fréchet inception distance** (FID; [Heusel et al., 2017](https://arxiv.org/abs/1706.08500)) compares samples with real data in the feature space of the same network. It fits a Gaussian to the features, the 2,048-dimensional activations of the last pooling layer, of real images and of generated images, and computes the Fréchet or Wasserstein-2 distance between the two Gaussians,
 
-$$
+```math
 \operatorname{FID}=\|\mu_r-\mu_g\|^2+\operatorname{tr}\Bigl(\Sigma_r+\Sigma_g-2\bigl(\Sigma_r\Sigma_g\bigr)^{1/2}\Bigr)
-$$
+```
 
 ([Appendix A](#block-gen13-appendix-a)). It sees both fidelity and diversity, since missing modes and poor samples both change the mean and covariance, it agrees with human judgments better than the Inception score, and it has been the main benchmark number for image generation since 2017, computed with 50,000 samples. Its flaws are now well documented. It is **biased**: estimated from finite samples, it is positive even for two samples from the same distribution, the bias shrinks roughly as $`1/N`$, and it depends on the model being evaluated, so comparisons at a fixed sample size can rank models wrongly ([Chong and Forsyth, 2020](https://arxiv.org/abs/1911.07023)). It is sensitive to details of preprocessing, such as the filter used to resize images and whether they were compressed as JPEG ([Parmar, Zhang, and Zhu, 2022](https://arxiv.org/abs/2104.11222)). And it inherits the biases of its feature space: Inception features encode ImageNet classes, and [Kynkäänniemi et al. (2023)](https://arxiv.org/abs/2203.06026) reduced the FID of a face generator by two thirds, from 5.30 to 1.78, merely by choosing which of its samples to report, with weights optimized in the Inception feature space; no image improved, and the gain largely disappeared in feature spaces not trained to recognize ImageNet classes.
 
@@ -249,9 +249,9 @@ No metric suffices, so evaluations combine them. For a new image model, a reason
 
 For a kernel $`k`$, the squared maximum mean discrepancy is $`\mathbb E\,k(x,x')+\mathbb E\,k(y,y')-2\,\mathbb E\,k(x,y)`$ for independent $`x,x'\sim P`$ and $`y,y'\sim Q`$. The U-statistic
 
-$$
+```math
 \widehat{\operatorname{MMD}}{}^2=\frac1{m(m-1)}\sum_{i\ne i'}k(x_i,x_{i'})+\frac1{n(n-1)}\sum_{j\ne j'}k(y_j,y_{j'})-\frac2{mn}\sum_{i,j}k(x_i,y_j)
-$$
+```
 
 leaves out the diagonal terms $`k(x_i,x_i)`$, whose expectation differs from that of $`k(x,x')`$, and is therefore unbiased: its expectation is the population value for every $`m`$ and $`n`$, which is zero when $`P=Q`$. It can be negative for a finite sample, as in the code. KID uses $`k(x,y)=(x^\top y/d+1)^3`$ on $`d`$-dimensional features, which compares the first three moments of the two distributions.
 
@@ -265,9 +265,9 @@ leaves out the diagonal terms $`k(x_i,x_i)`$, whose expectation differs from tha
 
 Let $`R`$ be the real features and $`G`$ the generated ones, and for a set $`S`$ and a point $`s\in S`$ let $`r_k(s)`$ be the distance from $`s`$ to its $`k`$-th nearest neighbor in $`S`$. The estimated support of $`S`$ is $`\bigcup_{s\in S}B(s,r_k(s))`$. Then
 
-$$
+```math
 \operatorname{precision}=\frac1{|G|}\sum_{g\in G}\mathbb 1\Bigl[g\in\textstyle\bigcup_{r\in R}B(r,r_k(r))\Bigr],\qquad\operatorname{recall}=\frac1{|R|}\sum_{r\in R}\mathbb 1\Bigl[r\in\textstyle\bigcup_{g\in G}B(g,r_k(g))\Bigr].
-$$
+```
 
 With $`k=3`$ and tens of thousands of samples, the union of balls follows the support of each distribution closely where it is dense. An outlier in either set has a large $`k`$-NN ball, which can cover much of the space and inflate the other set's score; density counts how many real balls contain each sample instead of whether any does, and coverage uses only the balls around real points, which makes both more robust.
 

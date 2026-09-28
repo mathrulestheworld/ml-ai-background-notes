@@ -10,9 +10,9 @@
 
 Training starts from random weights, and the first question is whether a signal can pass through the network at all. The forward pass applies $`L`$ weight matrices in sequence, and the backward pass of chapter 1 applies their transposes in reverse:
 
-$$
+```math
 \delta^{(l)}=\sigma'\bigl(z^{(l)}\bigr)\odot\Bigl(W^{(l+1)\top}\delta^{(l+1)}\Bigr).
-$$
+```
 
 Each layer multiplies the size of the signal by a factor that depends on the weight scale and on the activation. If that factor is $`0.9`$, fifty layers shrink the signal by $`0.9^{50}\approx0.005`$; if it is $`1.1`$, they amplify it by $`117`$. Gradients that shrink geometrically with depth leave the early layers untrained, the **vanishing gradient** problem; gradients that grow geometrically make any fixed learning rate unstable, the **exploding gradient** problem. The problem was first analyzed for recurrent networks, where depth is the length of the sequence ([Bengio, Simard, and Frasconi, 1994](https://doi.org/10.1109/72.279181); chapter 8). For feedforward networks it was a main obstacle to training deep models until about 2010.
 
@@ -22,15 +22,15 @@ Initialization cannot solve every trainability problem, but it controls the star
 
 Take a layer $`z=Wh+b`$ with $`W\in\mathbb R^{d_{\text{out}}\times d_{\text{in}}}`$, and assume the weights are independent with mean zero and variance $`\sigma_w^2`$, independent of the input $`h`$, and that the biases are zero. Each pre-activation is a sum of $`d_{\text{in}}`$ independent terms, so
 
-$$
+```math
 \operatorname{Var}(z_i)=d_{\text{in}}\,\sigma_w^2\,\mathbb E\bigl[h_j^2\bigr].
-$$
+```
 
 The activation determines $`\mathbb E[h_j^2]`$ from the distribution of the previous pre-activations. For ReLU with a pre-activation symmetric about zero, half of the mass is zeroed and $`\mathbb E[\mathrm{ReLU}(z)^2]=\frac12\operatorname{Var}(z)`$. Hence, for a ReLU network,
 
-$$
+```math
 \operatorname{Var}\bigl(z^{(l)}\bigr)=\tfrac12\,d_{l-1}\,\sigma_{w,l}^2\,\operatorname{Var}\bigl(z^{(l-1)}\bigr),
-$$
+```
 
 and the scale is preserved when $`\sigma_{w,l}^2=2/d_{l-1}`$. For an activation that is linear with unit slope near zero, such as tanh at small inputs, the same argument gives $`\sigma_w^2=1/d_{\text{in}}`$. [Appendix A](#block-dl2-appendix-a) states the assumptions precisely and derives both recursions.
 
@@ -38,9 +38,9 @@ and the scale is preserved when $`\sigma_{w,l}^2=2/d_{l-1}`$. For an activation 
 
 The backward signal obeys an analogous recursion. The derivative $`\partial\ell/\partial h^{(l-1)}=W^{(l)\top}\delta^{(l)}`$ is a sum of $`d_l`$ terms, and for ReLU the factor $`\sigma'(z)\in\{0,1\}`$ keeps half of them on average:
 
-$$
+```math
 \operatorname{Var}\Bigl(\frac{\partial\ell}{\partial h^{(l-1)}}\Bigr)=\tfrac12\,d_l\,\sigma_{w,l}^2\,\operatorname{Var}\Bigl(\frac{\partial\ell}{\partial h^{(l)}}\Bigr).
-$$
+```
 
 The backward pass therefore prefers $`\sigma_w^2=2/d_{\text{out}}`$. For square layers both conditions coincide. When the widths differ, one can preserve the forward scale (fan-in mode) or the backward scale (fan-out mode), not both. The mismatch is mild: with fan-in scaling, the backward factor of layer $`l`$ is $`d_l/d_{l-1}`$, and the product over layers telescopes to the ratio of the last and first widths rather than growing geometrically with depth.
 
@@ -110,9 +110,9 @@ For tanh and the sigmoid, scale matters in both directions. Weights that are too
 
 Preserving the variance of each unit is not enough: the network must also keep different inputs distinguishable. For two inputs whose pre-activations at layer $`l-1`$ have correlation $`\rho`$, the next layer's correlation in an infinitely wide ReLU network with He initialization is
 
-$$
+```math
 \rho\ \mapsto\ \frac{\sqrt{1-\rho^2}+(\pi-\arccos\rho)\,\rho}{\pi},
-$$
+```
 
 the normalized **arc-cosine kernel** of [Cho and Saul (2009)](https://proceedings.neurips.cc/paper/2009/hash/5751ec3e9a4feab575962e78e006250d-Abstract.html), derived in [Appendix B](#block-dl2-appendix-b). This map pushes every correlation toward 1: each layer makes the representations of different inputs more alike. The approach is slow, with $`1-\rho_l\approx9\pi^2/(2l^2)`$ for large $`l`$, but after a few dozen layers a deep ReLU network at initialization maps all inputs to nearly parallel vectors. Its output then hardly depends on the input, and gradients for different examples point in nearly the same direction.
 
@@ -221,17 +221,17 @@ UDL chapter 7, UMich lecture 10, and UNIGE sections 5.5 and 6.2, listed in the r
 
 **Forward.** Conditionally on $`h^{(l-1)}`$, the pre-activation $`z^{(l)}_i=\sum_jW^{(l)}_{ij}h^{(l-1)}_j`$ has mean zero and variance $`\sigma_l^2\|h^{(l-1)}\|^2`$. Taking expectations over the earlier layers,
 
-$$
+```math
 \mathbb E\bigl[(z^{(l)}_i)^2\bigr]=\sigma_l^2\,\mathbb E\,\|h^{(l-1)}\|^2=\sigma_l^2\,d_{l-1}\,q_{l-1},\qquad q_{l-1}=\frac1{d_{l-1}}\,\mathbb E\,\|h^{(l-1)}\|^2 .
-$$
+```
 
 Moreover $`z^{(l)}_i`$ is symmetric about zero, because $`W^{(l)}`$ and $`-W^{(l)}`$ have the same distribution and are independent of $`h^{(l-1)}`$. For ReLU, $`\mathbb E[\mathrm{ReLU}(z)^2]=\mathbb E[z^2\mathbf 1\{z>0\}]=\frac12\mathbb E[z^2]`$ for any symmetric $`z`$. Hence $`q_l=\frac12\sigma_l^2d_{l-1}q_{l-1}`$, and $`q_l`$ is constant exactly when $`\sigma_l^2=2/d_{l-1}`$. No Gaussian assumption is needed for this step. For tanh the relation is only approximate: $`\mathbb E[\tanh(z)^2]\le\mathbb E[z^2]`$ with near-equality for small $`z`$, which is why variance $`1/d_{\text{in}}`$ gives a slowly shrinking signal, as in the middle panel of the tanh figure.
 
 **Backward.** Let $`g^{(l)}=\partial\ell/\partial h^{(l)}`$. Then $`g^{(l-1)}=W^{(l)\top}\bigl(\mathbf 1\{z^{(l)}>0\}\odot g^{(l)}\bigr)`$ for ReLU. Treating $`W^{(l)}`$ in this expression as independent of the masked vector, an approximation that becomes exact in the infinite-width limit, each coordinate of $`g^{(l-1)}`$ is a sum of $`d_l`$ terms with variance $`\sigma_l^2\,\mathbb E\bigl[\mathbf 1\{z^{(l)}_i>0\}(g^{(l)}_i)^2\bigr]`$. With the mask independent of $`g^{(l)}_i`$ and active with probability $`\frac12`$,
 
-$$
+```math
 \mathbb E\bigl[(g^{(l-1)}_j)^2\bigr]=\tfrac12\,d_l\,\sigma_l^2\,\mathbb E\bigl[(g^{(l)}_i)^2\bigr],
-$$
+```
 
 which is preserved when $`\sigma_l^2=2/d_l`$. The gradient with respect to the weights is $`\partial\ell/\partial W^{(l)}=\bigl(\mathbf 1\{z^{(l)}>0\}\odot g^{(l)}\bigr)h^{(l-1)\top}`$, the product of a backward and a forward quantity, so its scale is stable across layers exactly when both recursions are.
 
@@ -245,27 +245,27 @@ which is preserved when $`\sigma_l^2=2/d_l`$. The gradient with respect to the w
 
 Let $`(u,v)`$ be jointly Gaussian with mean zero, unit variances, and correlation $`\rho=\cos\theta`$ for $`\theta\in[0,\pi]`$. Write $`u=\|a\|\cos\alpha`$ and $`v=\|a\|\cos(\alpha-\theta)`$ for a standard Gaussian vector $`a`$ in the plane with polar angle $`\alpha`$, uniform on $`[0,2\pi)`$ and independent of $`\|a\|`$. Then
 
-$$
+```math
 \mathbb E\bigl[\mathrm{ReLU}(u)\,\mathrm{ReLU}(v)\bigr]=\mathbb E\|a\|^2\cdot\frac1{2\pi}\int\cos\alpha\,\cos(\alpha-\theta)\,\mathbf 1\{\cos\alpha>0,\ \cos(\alpha-\theta)>0\}\,d\alpha .
-$$
+```
 
 Here $`\mathbb E\|a\|^2=2`$, and both cosines are positive on an arc of length $`\pi-\theta`$, over which $`\int\cos\alpha\cos(\alpha-\theta)\,d\alpha=\frac12\bigl[(\pi-\theta)\cos\theta+\sin\theta\bigr]`$. Hence
 
-$$
+```math
 \mathbb E\bigl[\mathrm{ReLU}(u)\,\mathrm{ReLU}(v)\bigr]=\frac{\sin\theta+(\pi-\theta)\cos\theta}{2\pi}.
-$$
+```
 
 With $`\theta=0`$ this gives $`\mathbb E[\mathrm{ReLU}(u)^2]=\frac12`$. In the infinite-width limit the pre-activations of the next layer for two inputs are jointly Gaussian with covariance proportional to the inner product of the current activations, so their correlation is the ratio
 
-$$
+```math
 \rho'=\frac{\sin\theta+(\pi-\theta)\cos\theta}{\pi}=\frac{\sqrt{1-\rho^2}+(\pi-\arccos\rho)\,\rho}{\pi}.
-$$
+```
 
 The map satisfies $`\rho'\ge\rho`$ with equality only at $`\rho=1`$. Writing $`\varepsilon=1-\rho`$ and expanding, $`\arccos(1-\varepsilon)=\sqrt{2\varepsilon}\bigl(1+\varepsilon/12\bigr)+O(\varepsilon^{5/2})`$ and $`\sqrt{1-\rho^2}=\sqrt{2\varepsilon}\bigl(1-\varepsilon/4\bigr)+O(\varepsilon^{5/2})`$, so
 
-$$
+```math
 \varepsilon'=\varepsilon-\frac{2\sqrt2}{3\pi}\,\varepsilon^{3/2}+O(\varepsilon^{5/2}).
-$$
+```
 
 Hence $`\varepsilon_l^{-1/2}`$ grows by about $`\sqrt2/(3\pi)`$ per layer, and $`\varepsilon_l\approx9\pi^2/(2l^2)`$ for large $`l`$: correlations approach 1 polynomially in depth.
 

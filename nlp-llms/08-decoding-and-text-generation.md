@@ -140,9 +140,9 @@ Even for tasks with correct answers, the mode can be wrong. In translation, beam
 
 Dividing the logits $`z`$ by a **temperature** $`\tau`$ before the softmax,
 
-$$
+```math
 p_\tau(y_t=i)=\frac{\exp(z_i/\tau)}{\sum_j\exp(z_j/\tau)},
-$$
+```
 
 sharpens the distribution for $`\tau<1`$ and flattens it for $`\tau>1`$; $`\tau\to0`$ gives greedy decoding and $`\tau\to\infty`$ the uniform distribution. It is the Boltzmann distribution of statistical physics with energies $`-z_i`$, and the entropy of $`p_\tau`$ increases with $`\tau`$ ([Appendix C](#block-nlp08-appendix-c)). Temperature changes the probabilities of all tokens, including those in the tail, and does not remove any.
 
@@ -416,15 +416,15 @@ A serving system is judged by the **time to first token**, dominated by prefill,
 
 Fix a prefix and let $`p`$ and $`q`$ be the target's and draft's next-token distributions. The draft proposes $`X\sim q`$; it is accepted with probability $`\min(1,p(X)/q(X))`$; otherwise a replacement is drawn from $`r(x)=\max(p(x)-q(x),0)/Z`$, where $`Z=\sum_x\max(p(x)-q(x),0)`$. The probability that the procedure outputs a token $`x`$ is
 
-$$
+```math
 P(x)=q(x)\min\Bigl(1,\frac{p(x)}{q(x)}\Bigr)+P(\text{reject})\,r(x)=\min\bigl(p(x),q(x)\bigr)+P(\text{reject})\,r(x).
-$$
+```
 
 The rejection probability is $`1-\sum_x\min(p(x),q(x))=\sum_x\bigl(p(x)-\min(p(x),q(x))\bigr)=\sum_x\max(p(x)-q(x),0)=Z`$. Hence
 
-$$
+```math
 P(x)=\min\bigl(p(x),q(x)\bigr)+\max\bigl(p(x)-q(x),0\bigr)=p(x),
-$$
+```
 
 since $`\min(a,b)+\max(a-b,0)=a`$. Each emitted token therefore has the target's conditional distribution given the tokens before it. Proposals after the first rejection are discarded, so later positions are always conditioned on tokens with the correct distribution, and the extra token sampled when all proposals are accepted comes directly from $`p`$. By induction over positions, the whole generated sequence has the target model's distribution. The acceptance probability, $`\sum_x\min(p(x),q(x))=1-\mathrm{TV}(p,q)`$, is the only place the draft's quality enters.
 
@@ -438,9 +438,9 @@ since $`\min(a,b)+\max(a-b,0)=a`$. Each emitted token therefore has the target's
 
 **Speculation.** If each proposal is accepted independently with probability $`\alpha`$, a round with $`\gamma`$ proposals emits $`j+1`$ tokens when the first $`j`$ are accepted and the next rejected ($`j<\gamma`$), and $`\gamma+1`$ when all are accepted. The expected number is
 
-$$
+```math
 \sum_{j=0}^{\gamma-1}(j+1)\alpha^j(1-\alpha)+(\gamma+1)\alpha^\gamma=\sum_{j=0}^{\gamma}\alpha^j=\frac{1-\alpha^{\gamma+1}}{1-\alpha},
-$$
+```
 
 using $`P(\text{at least }m\text{ tokens})=\alpha^{m-1}`$ for $`m=1,\dots,\gamma+1`$ and $`\mathbb E[M]=\sum_mP(M\ge m)`$. It never exceeds $`1/(1-\alpha)`$. Each round costs one target pass plus $`\gamma`$ draft passes, so with a draft costing a fraction $`c`$ of the target, the speedup is $`\frac{1-\alpha^{\gamma+1}}{(1-\alpha)(1+c\gamma)}`$, which has an optimum at a finite $`\gamma`$.
 
@@ -458,9 +458,9 @@ using $`P(\text{at least }m\text{ tokens})=\alpha^{m-1}`$ for $`m=1,\dots,\gamma
 
 **Temperature.** Write $`p_\tau(i)\propto e^{z_i/\tau}`$ and $`\beta=1/\tau`$. The entropy $`H(\beta)=\log Z(\beta)-\beta\,\mathbb E_\beta[z]`$ with $`Z(\beta)=\sum_ie^{\beta z_i}`$ has derivative
 
-$$
+```math
 \frac{dH}{d\beta}=\mathbb E_\beta[z]-\mathbb E_\beta[z]-\beta\frac{d\,\mathbb E_\beta[z]}{d\beta}=-\beta\operatorname{Var}_\beta(z)\le0,
-$$
+```
 
 using $`\frac{d}{d\beta}\log Z=\mathbb E_\beta[z]`$ and $`\frac{d}{d\beta}\mathbb E_\beta[z]=\operatorname{Var}_\beta(z)`$. So the entropy decreases as $`\beta`$ grows, that is, increases with temperature, strictly unless all logits are equal, from $`\log V`$ at $`\tau=\infty`$ to the log of the number of tied maxima at $`\tau=0`$.
 

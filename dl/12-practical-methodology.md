@@ -296,9 +296,9 @@ Suppose the validation score depends on only one of $`D`$ hyperparameters, each 
 
 **Random search** with $`n`$ independent trials finds at least one good trial with probability
 
-$$
+```math
 1-(1-q)^n .
-$$
+```
 
 For $`q=0.05`$ this is 37% with 9 trials, 64% with 20, and 95% with 59, whatever $`D`$ is.
 
@@ -316,9 +316,9 @@ If several hyperparameters matter, random search still tries $`n`$ distinct valu
 
 Let $`V_1,\ldots,V_n`$ be the validation scores of $`n`$ independent random trials with distribution function $`F`$. The best score $`\max_iV_i`$ has distribution function $`F^n`$, since the maximum is at most $`v`$ exactly when every trial is. Given $`N`$ observed trials with sorted scores $`v_{(1)}\le\cdots\le v_{(N)}`$, replacing $`F`$ by the empirical distribution function $`\hat F(v_{(i)})=i/N`$ gives the estimate
 
-$$
+```math
 \mathbb E\Bigl[\max_{i\le n}V_i\Bigr]\approx\sum_{i=1}^Nv_{(i)}\Bigl[\Bigl(\frac iN\Bigr)^n-\Bigl(\frac{i-1}N\Bigr)^n\Bigr],
-$$
+```
 
 the expected maximum of $`n`$ draws with replacement from the observed scores. This is the random-search curve in the figure above, computed from the 625 runs, and the quantity [Dodge et al. (2019)](https://arxiv.org/abs/1909.03004) recommend reporting as a function of $`n`$, so that a method's advantage can be judged at the budget a reader can afford.
 

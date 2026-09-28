@@ -16,15 +16,15 @@ The idea is old. The perceptron of ML chapter 2 is a single linear unit; network
 
 A **multilayer perceptron** (MLP), or fully connected feedforward network, with $`L`$ layers maps an input $`x\in\mathbb R^{d_0}`$ through hidden layers of widths $`d_1,\ldots,d_{L-1}`$ to an output in $`\mathbb R^{d_L}`$:
 
-$$
+```math
 h^{(0)}=x,\qquad z^{(l)}=W^{(l)}h^{(l-1)}+b^{(l)},\qquad h^{(l)}=\sigma\bigl(z^{(l)}\bigr)\quad(l=1,\ldots,L-1),\qquad f(x)=W^{(L)}h^{(L-1)}+b^{(L)}.
-$$
+```
 
 Here $`W^{(l)}\in\mathbb R^{d_l\times d_{l-1}}`$ and $`b^{(l)}\in\mathbb R^{d_l}`$ are the **weights** and **biases** of layer $`l`$, $`z^{(l)}`$ are its **pre-activations**, and the **activation function** $`\sigma`$ acts elementwise. Each coordinate of $`h^{(l)}`$ is a **unit** or neuron. The last layer has no nonlinearity; its outputs are the scores that the loss interprets. A network with $`L-1`$ hidden layers is said to have depth $`L`$ (counting the layers with weights), and the parameters $`\theta=\{W^{(l)},b^{(l)}\}`$ number
 
-$$
+```math
 \sum_{l=1}^Ld_l\,(d_{l-1}+1).
-$$
+```
 
 For a batch of $`n`$ inputs stored as rows of $`X\in\mathbb R^{n\times d_0}`$, layer $`l`$ computes $`H^{(l)}=\sigma\bigl(H^{(l-1)}W^{(l)\top}+\mathbf 1b^{(l)\top}\bigr)`$, the row convention of Foundations. PyTorch's `nn.Linear(d_in, d_out)` stores its weight with shape `(d_out, d_in)` for this reason, as described in Foundations chapter 6.
 
@@ -34,11 +34,11 @@ The nonlinearity is essential. Without it, the composition of affine maps is aff
 
 Training minimizes an empirical risk $`\widehat R_n(\theta)=\frac1n\sum_i\ell\bigl(y_i,f_\theta(x_i)\bigr)`$ by stochastic gradient methods. The gradient with respect to every weight comes from one backward pass through the network, the reverse-mode differentiation derived in Foundations chapter 3. For the MLP it takes a compact form. Write $`\delta^{(l)}=\partial\ell/\partial z^{(l)}`$ for the gradient of the loss with respect to the pre-activations of layer $`l`$, as a column. Then
 
-$$
+```math
 \delta^{(l)}=\sigma'\bigl(z^{(l)}\bigr)\odot\Bigl(W^{(l+1)\top}\delta^{(l+1)}\Bigr),\qquad
 \frac{\partial\ell}{\partial W^{(l)}}=\delta^{(l)}h^{(l-1)\top},\qquad
 \frac{\partial\ell}{\partial b^{(l)}}=\delta^{(l)} .
-$$
+```
 
 The backward pass multiplies by the transposed weight matrices in reverse order, scaled at each layer by the derivative of the activation. Two consequences recur in the next chapters. First, the backward pass needs every $`z^{(l)}`$ and $`h^{(l-1)}`$ from the forward pass, so memory grows with depth and batch size (chapter 11). Second, the gradient reaching early layers is a product of many matrices and derivative factors, which can shrink or grow geometrically with depth (chapter 2).
 
@@ -65,17 +65,17 @@ A network with a single hidden layer computes $`f(x)=\sum_{j=1}^Na_j\,\sigma(w_j
 
 **Theorem (universal approximation).** Let $`\sigma`$ be continuous and not a polynomial. For every continuous function $`g`$ on a compact set $`K\subset\mathbb R^d`$ and every $`\varepsilon>0`$ there are $`N`$ and parameters $`a_j,w_j,b_j,c`$ such that
 
-$$
+```math
 \sup_{x\in K}\Bigl|g(x)-c-\sum_{j=1}^Na_j\,\sigma(w_j^\top x+b_j)\Bigr|<\varepsilon .
-$$
+```
 
 Versions for sigmoidal activations are due to [Cybenko (1989)](https://doi.org/10.1007/BF02551274) and [Hornik, Stinchcombe, and White (1989)](https://www.sciencedirect.com/science/article/abs/pii/0893608089900208); the characterization by non-polynomiality is due to [Leshno, Lin, Pinkus, and Schocken (1993)](https://www.sciencedirect.com/science/article/abs/pii/S0893608005801315). The polynomial exception is necessary: if $`\sigma`$ is a polynomial of degree $`p`$, every such network is a polynomial of degree at most $`p`$ in $`x`$, and polynomials of bounded degree are not dense.
 
 For ReLU in one dimension the theorem has a transparent proof. A width-$`N`$ network
 
-$$
+```math
 f_N(x)=g(t_0)+\sum_{j=0}^{N-1}a_j\,\mathrm{ReLU}(x-t_j)
-$$
+```
 
 is a continuous piecewise-linear function with kinks at the $`t_j`$: each unit adds a hinge, and $`a_j`$ is the change of slope at $`t_j`$. Choosing $`a_0`$ as the slope of the first segment and $`a_j`$ as the difference of consecutive slopes makes $`f_N`$ the linear interpolant of $`g`$ at the knots $`t_0<\cdots<t_N`$. For twice-differentiable $`g`$ on $`[0,1]`$ with equally spaced knots, the interpolation error is at most $`\max|g''|/(8N^2)`$. [Appendix A](#block-dl1-appendix-a) proves this and extends the construction to $`d`$ dimensions.
 
@@ -120,9 +120,9 @@ The width needed can be enormous. Approximating an arbitrary function with $`s`$
 
 A ReLU network is a continuous piecewise-linear function: each pattern of active and inactive units fixes a linear map, and the input space is partitioned into **linear regions** on which the pattern is constant. A single hidden layer of $`m`$ units in one dimension has at most $`m+1`$ pieces, and in $`d`$ dimensions its regions are those of an arrangement of $`m`$ hyperplanes, at most $`\sum_{i=0}^d\binom mi`$. Depth multiplies instead of adding. The tent map
 
-$$
+```math
 \tau(x)=2\,\mathrm{ReLU}(x)-4\,\mathrm{ReLU}\bigl(x-\tfrac12\bigr),
-$$
+```
 
 which maps $`[0,1]`$ onto itself with two pieces, uses two ReLU units. Composing it $`k`$ times gives a sawtooth with $`2^k`$ pieces from a network of depth $`k`$ and only $`2k`$ units.
 
@@ -294,9 +294,9 @@ Nonconvexity is less damaging in practice than the worst case suggests. Gradient
 
 **One dimension.** Let $`g`$ be continuous on $`[0,1]`$ and let $`0=t_0<t_1<\cdots<t_N=1`$. Let $`s_j=\bigl(g(t_{j+1})-g(t_j)\bigr)/(t_{j+1}-t_j)`$ be the slope of the chord on $`[t_j,t_{j+1}]`$, and set $`a_0=s_0`$ and $`a_j=s_j-s_{j-1}`$ for $`1\le j\le N-1`$. The network
 
-$$
+```math
 f_N(x)=g(t_0)+\sum_{j=0}^{N-1}a_j\,\mathrm{ReLU}(x-t_j)
-$$
+```
 
 has slope $`a_0+\cdots+a_j=s_j`$ on $`[t_j,t_{j+1}]`$ and value $`g(t_0)`$ at $`t_0`$, so it is the piecewise-linear interpolant of $`g`$. Since $`g`$ is uniformly continuous, the interpolant converges uniformly as the mesh $`\max_j(t_{j+1}-t_j)`$ tends to zero.
 
@@ -316,18 +316,17 @@ The same argument works for any continuous $`\sigma`$ that can approximate a one
 
 **Counting pieces.** Consider a ReLU network with scalar input, $`L`$ hidden layers of width at most $`m`$, and a linear output. Let $`B_l`$ be the set of breakpoints of all functions $`x\mapsto h^{(l)}_j(x)`$ computed in layers $`1,\ldots,l`$, with $`B_0=\varnothing`$. Every pre-activation $`z^{(l+1)}_j`$ is an affine combination of layer-$`l`$ outputs, so it is affine on each of the at most $`|B_l|+1`$ intervals between consecutive points of $`B_l`$. On each such interval, $`\mathrm{ReLU}(z^{(l+1)}_j)`$ adds at most one breakpoint, where $`z^{(l+1)}_j`$ changes sign. Hence
 
-$$
-
+```math
 |B_{l+1}|\le|B_l|+m\bigl(|B_l|+1\bigr),\qquad\text{so}\qquad |B_{l+1}|+1\le(m+1)\bigl(|B_l|+1\bigr),
-$$
+```
 
 and the network output, an affine combination of the last layer, has at most $`(m+1)^L`$ pieces. With one hidden layer this is $`m+1`$.
 
 **The sawtooth is hard to approximate with few pieces.** The $`k`$-fold composition $`g_k`$ of the tent map consists of $`2^{k-1}`$ triangles, each rising from 0 to 1 and falling back to 0 over an interval of length $`2^{1-k}`$. On each triangle, $`g_k>1/2`$ on the middle half of the interval and $`g_k<1/2`$ on the two outer quarters. Let $`f`$ be piecewise linear with $`p`$ pieces. Each piece crosses the level $`1/2`$ at most once, so $`f-1/2`$ changes sign at most $`p`$ times in total. Consider a triangle on whose interval $`f-1/2`$ does not change sign. If $`f\le1/2`$ there, then $`|f-g_k|\ge g_k-1/2`$ on the middle half, contributing at least the area of a triangle with base $`2^{-k}`$ and height $`1/2`$, which is $`2^{-k-2}`$. If $`f\ge1/2`$ there, the two outer quarters contribute the same amount. At least $`2^{k-1}-p`$ triangles are of this kind, so
 
-$$
+```math
 \int_0^1|f(x)-g_k(x)|\,dx\ \ge\ \bigl(2^{k-1}-p\bigr)\,2^{-k-2}.
-$$
+```
 
 If $`p\le2^{k-2}`$, the right side is at least $`2^{k-2}\cdot2^{-k-2}=1/16`$.
 

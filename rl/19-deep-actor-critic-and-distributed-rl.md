@@ -12,9 +12,9 @@ Chapter 13 derived the policy gradient and the actor–critic with linear functi
 
 An **advantage actor–critic** (A2C) agent has a policy network $`\pi(a\mid s;\boldsymbol\theta)`$ and a value network $`\hat v(s;\mathbf w)`$, often two heads on a shared torso. It runs $`N`$ environments for $`T`$ steps each, computes an advantage estimate $`\hat A_{i,t}`$ for each of the $`NT`$ transitions from the rewards and the critic's values ([below](#generalized-advantage-estimation)), and takes one gradient step on
 
-$$
+```math
 \mathcal L(\boldsymbol\theta,\mathbf w)=\frac1{NT}\sum_{i,t}\Bigl[-\hat A_{i,t}\ln\pi(A_{i,t}\mid S_{i,t};\boldsymbol\theta)-\beta\,\mathcal H\bigl(\pi(\cdot\mid S_{i,t};\boldsymbol\theta)\bigr)+\frac{c_v}{2}\bigl(\hat v(S_{i,t};\mathbf w)-\hat G_{i,t}\bigr)^2\Bigr],
-$$
+```
 
 where the advantages and the value targets $`\hat G_{i,t}=\hat A_{i,t}+\hat v(S_{i,t};\mathbf w)`$ are treated as constants. The first term is the policy gradient of chapter 13 with the critic as a baseline; the second, an **entropy bonus** with coefficient $`\beta`$, discourages the policy from becoming deterministic too early; the third trains the critic by regression on bootstrapped returns, with a weight $`c_v`$ that matters when the two share parameters. Then the environments continue from where they stopped, the new policy collects the next $`T`$ steps, and the old data are discarded.
 
@@ -34,15 +34,15 @@ Scaling data collection forces a choice. A synchronous system waits for its slow
 
 The advantage estimate decides the bias and variance of the policy gradient. With the TD errors $`\delta_t=R_{t+1}+\gamma\hat v(S_{t+1})-\hat v(S_t)`$, the $`n`$-step estimates
 
-$$
+```math
 \hat A^{(n)}_t=\sum_{l=0}^{n-1}\gamma^l\delta_{t+l}=\sum_{l=0}^{n-1}\gamma^lR_{t+l+1}+\gamma^n\hat v(S_{t+n})-\hat v(S_t)
-$$
+```
 
 range from the one-step TD error, which has low variance but is biased whenever $`\hat v`$ is wrong, to the return minus the baseline, which is unbiased and noisy. The **generalized advantage estimate** ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)) averages them with the weights of the λ-return of chapter 8:
 
-$$
+```math
 \hat A^{\mathrm{GAE}(\gamma,\lambda)}_t=(1-\lambda)\sum_{n\ge1}\lambda^{n-1}\hat A^{(n)}_t=\sum_{l\ge0}(\gamma\lambda)^l\delta_{t+l},
-$$
+```
 
 computed backward over a rollout by $`\hat A_t=\delta_t+\gamma\lambda\hat A_{t+1}`$. It equals the λ-return minus the value, so the same computation gives the critic's targets, $`\hat G_t=\hat A_t+\hat v(S_t)`$, which are TD(λ) targets. GAE(γ, 0) is the one-step TD error and GAE(γ, 1) the discounted return minus the value.
 
@@ -146,21 +146,21 @@ Once acting and learning run on different machines, the data are off-policy. An 
 
 Given a trajectory $`(x_t,a_t,r_t)_{t=s}^{s+n}`$ from $`\mu`$, with the truncated ratios $`\rho_t=\min\bigl(\bar\rho,\pi(a_t\mid x_t)/\mu(a_t\mid x_t)\bigr)`$ and $`c_i=\min\bigl(\bar c,\pi(a_i\mid x_i)/\mu(a_i\mid x_i)\bigr)`$, $`\bar\rho\ge\bar c`$, the **V-trace target** for $`V(x_s)`$ is
 
-$$
+```math
 v_s=V(x_s)+\sum_{t=s}^{s+n-1}\gamma^{t-s}\Bigl(\prod_{i=s}^{t-1}c_i\Bigr)\rho_t\bigl(r_t+\gamma V(x_{t+1})-V(x_t)\bigr),
-$$
+```
 
 computed backward by $`v_s-V(x_s)=\rho_s\delta_s+\gamma c_s\bigl(v_{s+1}-V(x_{s+1})\bigr)`$. On-policy, with $`\pi=\mu`$ and $`\bar c\ge1`$, all the ratios are 1 and $`v_s`$ is the $`n`$-step return; a factor λ in the $`c_i`$ turns it into the λ-return. The two truncation levels play different roles. The traces $`c_i`$ are the truncated traces of Retrace (chapter 9): they cut the product of ratios, whose variance would otherwise grow with $`n`$, and they affect only how fast the targets converge. The ratio $`\rho_t`$ decides what they converge to: the fixed point is the value of the policy
 
-$$
+```math
 \pi_{\bar\rho}(a\mid x)=\frac{\min\bigl(\bar\rho\,\mu(a\mid x),\pi(a\mid x)\bigr)}{\sum_b\min\bigl(\bar\rho\,\mu(b\mid x),\pi(b\mid x)\bigr)},
-$$
+```
 
 which is $`\pi`$ when $`\bar\rho`$ is infinite, $`\mu`$ as $`\bar\rho\to0`$, and in between for $`\bar\rho=1`$, the usual choice (appendix B). The critic regresses $`V(x_s)`$ toward $`v_s`$, and the actor follows
 
-$$
+```math
 \rho_s\nabla_{\boldsymbol\theta}\ln\pi(a_s\mid x_s;\boldsymbol\theta)\bigl(r_s+\gamma v_{s+1}-V(x_s)\bigr),
-$$
+```
 
 a truncated importance-weighted policy gradient whose advantage uses the next state's V-trace target, plus an entropy bonus. The next code computes the expected V-trace operator exactly on a small MDP.
 
@@ -325,9 +325,9 @@ For an episode ending at time $`T`$, with $`\delta_t=0`$ for $`t\ge T`$ and $`\h
 
 The λ-return satisfies the recursion $`G^\lambda_t=R_{t+1}+\gamma\bigl((1-\lambda)\hat v(S_{t+1})+\lambda G^\lambda_{t+1}\bigr)`$ of chapter 8, with $`G^\lambda_T=0`$. Subtracting $`\hat v(S_t)`$ and adding and subtracting $`\gamma\lambda\hat v(S_{t+1})`$,
 
-$$
+```math
 G^\lambda_t-\hat v(S_t)=\underbrace{R_{t+1}+\gamma\hat v(S_{t+1})-\hat v(S_t)}_{\delta_t}+\gamma\lambda\bigl(G^\lambda_{t+1}-\hat v(S_{t+1})\bigr),
-$$
+```
 
 which is the recursion of GAE; the two agree at $`T`$, so they agree everywhere by backward induction. With λ = 0 only $`\delta_t`$ remains; with λ = 1, $`G^1_t=G_t`$ and the estimate is $`G_t-\hat v(S_t)`$: the sum of discounted TD errors telescopes to the return minus the value.
 
@@ -426,9 +426,9 @@ for N in (1, 8, 64, 512):
 
 (b) Condition on the history up to $`x_t`$. The factor $`\gamma^{t-s}\prod_{i<t}c_i`$ is then fixed, and the remaining expectation is
 
-$$
+```math
 \mathbb E_{a\sim\mu}\bigl[\rho_t\delta_t\mid x_t\bigr]=\sum_a\min\bigl(\bar\rho\,\mu(a\mid x_t),\pi(a\mid x_t)\bigr)\bigl(r(x_t,a)+\gamma\,\mathbb E[V(x_{t+1})\mid x_t,a]-V(x_t)\bigr)=Z(x_t)\bigl((\mathcal T^{\pi_{\bar\rho}}V)(x_t)-V(x_t)\bigr),
-$$
+```
 
 with $`Z(x)=\sum_b\min(\bar\rho\,\mu(b\mid x),\pi(b\mid x))`$. At $`V=V^{\pi_{\bar\rho}}`$ the Bellman equation makes it 0 for every $`x_t`$, so every term of the sum has zero expectation and the operator leaves $`V`$ unchanged. The traces $`c_i`$ only weight these zero terms, which is why $`\bar c`$ cannot move the fixed point.
 
@@ -499,9 +499,9 @@ The flags need care with library conventions. Gymnasium 1.x vector environments 
 
 For a fixed trajectory length $`n`$, the expected V-trace update defines an operator
 
-$$
+```math
 \mathcal RV(x)=V(x)+\mathbb E_\mu\Bigl[\sum_{t=0}^{n-1}\gamma^t\Bigl(\prod_{i<t}c_i\Bigr)\rho_t\bigl(r_t+\gamma V(x_{t+1})-V(x_t)\bigr)\Bigm|x_0=x\Bigr].
-$$
+```
 
 Exercise 19.6 shows that $`V^{\pi_{\bar\rho}}`$ is a fixed point. [Espeholt et al. (2018)](https://arxiv.org/abs/1802.01561) show, for the infinite-horizon operator (the $`n`$-step case is similar), that it is the only one: if $`\bar\rho\ge\bar c`$ and every state has $`\mathbb E_\mu[\rho_0\mid x]\ge\beta>0`$, then $`\mathcal R`$ is a contraction in the maximum norm with modulus at most $`1-(1-\gamma)\beta`$. The bound explains the slow contraction in this chapter's code: $`\mathbb E_\mu[\rho_0\mid x]=\sum_a\min(\bar\rho\,\mu(a\mid x),\pi(a\mid x))`$ is small when the two policies disagree, and the modulus approaches 1. In the tabular case, the operator is affine, $`\mathcal RV=MV+\mathbf b`$ with $`M=I+K(\gamma P_\rho-D_\rho)`$, where $`K=\sum_{t<n}(\gamma M_c)^t`$, $`M_c`$ is the transition matrix under $`\mu`$ weighted by the traces, $`P_\rho`$ the one weighted by the ratios, and $`D_\rho`$ the diagonal of $`\mathbb E_\mu[\rho_0\mid x]`$; the code computes it this way. The requirement $`\bar\rho\ge\bar c`$ makes every trace $`c_i`$ at most the corresponding ratio $`\rho_i`$, so the traces are cut at least as much as the ratios, which keeps the coefficients of the operator nonnegative, as the contraction argument needs. With $`\bar\rho=\infty`$, V-trace becomes the $`n`$-step off-policy estimator with per-decision importance sampling of chapter 9, with traces truncated at $`\bar c`$, like Retrace applied to state values.
 

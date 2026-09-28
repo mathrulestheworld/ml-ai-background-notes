@@ -16,9 +16,9 @@ A time-dependent velocity field $`v_t(x)`$ defines a **flow**: the solution of $
 
 A velocity field and a path of densities are consistent when probability is conserved as it moves: the rate at which density at a point changes equals the net rate at which the velocity carries probability into it,
 
-$$
+```math
 \frac{\partial p_t}{\partial t}+\nabla\cdot\bigl(p_t\,v_t\bigr)=0.
-$$
+```
 
 When the **continuity equation** holds, the flow of $`v_t`$ applied to samples of $`p_0`$ produces samples of $`p_t`$ at every time, and one says that $`v_t`$ **generates** the path. It is the Fokker–Planck equation of chapter 8 without its diffusion term, and the probability-flow ODE was obtained by rewriting that term as a velocity. Many fields generate the same path, since adding any flow that circulates without changing the density, $`\nabla\cdot(p_tw)=0`$, leaves the equation intact, so a path can be chosen first and a field that generates it found afterwards.
 
@@ -28,15 +28,15 @@ When the **continuity equation** holds, the flow of $`v_t`$ applied to samples o
 
 Designing a path between a Gaussian and an unknown data distribution directly is hopeless, but designing one between the Gaussian and a single data point is easy. Flow matching builds the path of distributions as a mixture of **conditional paths**, one for each data point $`x_1`$:
 
-$$
+```math
 p_t(x)=\int p_t(x\mid x_1)\,p_{\text{data}}(x_1)\,dx_1,\qquad p_0(x\mid x_1)=\mathcal N(x;0,I),\qquad p_1(x\mid x_1)\approx\delta(x-x_1).
-$$
+```
 
 Each conditional path has a simple velocity field $`u_t(x\mid x_1)`$ that generates it. The field that generates the mixture is the average of the conditional fields at each point, weighted by how likely each data point is to have produced it,
 
-$$
+```math
 u_t(x)=\mathbb E\bigl[u_t(x\mid x_1)\,\big|\,x_t=x\bigr]=\int u_t(x\mid x_1)\,\frac{p_t(x\mid x_1)\,p_{\text{data}}(x_1)}{p_t(x)}\,dx_1
-$$
+```
 
 ([Appendix A](#block-gen09-appendix-a)). The **marginal velocity** $`u_t`$ is what a sampler needs, and it cannot be computed, since it averages over the whole data distribution, just as the score of the noisy data distribution could not be computed in chapter 6.
 
@@ -44,9 +44,9 @@ $$
 
 The flow matching loss $`\mathbb E_{t,x_t}\|v_\theta(x_t,t)-u_t(x_t)\|^2`$ would train a network toward the marginal velocity if its target were available. The **conditional flow matching** (CFM) loss replaces the unknown target by the known conditional one:
 
-$$
+```math
 \mathcal L_{\text{CFM}}(\theta)=\mathbb E_{t\sim\mathcal U[0,1],\ x_1\sim p_{\text{data}},\ x_t\sim p_t(\cdot\mid x_1)}\bigl\|v_\theta(x_t,t)-u_t(x_t\mid x_1)\bigr\|^2 .
-$$
+```
 
 Lipman et al. showed that the two losses differ by a constant that does not depend on $`\theta`$, so they have the same gradients and the same minimizer ([Appendix B](#block-gen09-appendix-b)). The argument is the one behind denoising score matching (chapter 6): a squared-error regression on a noisy target is minimized by the conditional mean of the target, and here the conditional mean of the conditional velocity given $`x_t`$ is the marginal velocity. The code checks this for a model that is linear in fixed random features of $`(x,t)`$, on the one-dimensional mixture of chapters 6 and 8, whose marginal velocity is known exactly.
 
@@ -99,9 +99,9 @@ At three random settings of the parameters, the conditional loss exceeds the mar
 
 For Gaussian conditional paths $`p_t(x\mid x_1)=\mathcal N(x;\mu_t(x_1),\sigma_t^2I)`$, a sample is $`x_t=\mu_t(x_1)+\sigma_t\,x_0`$ with $`x_0\sim\mathcal N(0,I)`$, and the conditional velocity is the time derivative of this expression with $`x_0`$ held fixed, $`u_t=\dot\mu_t(x_1)+\dot\sigma_t\,x_0`$. The simplest choice moves each noise sample in a straight line at constant speed to its data point:
 
-$$
+```math
 x_t=(1-t)\,x_0+t\,x_1,\qquad u_t(x_t\mid x_1)=x_1-x_0 .
-$$
+```
 
 Lipman et al. called it the **optimal-transport path**, since it moves the conditional Gaussian at one end to the one at the other by their optimal-transport map, and used a small minimum width $`\sigma_{\min}`$ at $`t=1`$; with $`\sigma_{\min}=0`$ it is the linear interpolation of rectified flow. Training is a loop of a few lines: draw a data point, a noise vector, and a time; form $`x_t`$; and regress the network's output on $`x_1-x_0`$. Sampling integrates $`dx/dt=v_\theta(x,t)`$ from a Gaussian sample at $`t=0`$ to $`t=1`$ with any ODE solver. Trained this way with a U-Net, flow matching reached an FID of 6.35 and 2.99 bits per dimension on CIFAR-10 and an FID of 14.45 on ImageNet $`64\times64`$, better than the same network trained with a diffusion path by flow matching, and its samples needed fewer steps of an adaptive solver, 138 against 187 on ImageNet $`64\times64`$.
 
@@ -109,9 +109,9 @@ Lipman et al. called it the **optimal-transport path**, since it moves the condi
 
 Diffusion is a special case. The noising processes of chapters 7 and 8 are Gaussian conditional paths, with the data scaled by $`\sqrt{\bar\alpha}`$ and noise of standard deviation $`\sqrt{1-\bar\alpha}`$ in place of $`t`$ and $`1-t`$, and for every Gaussian path the marginal velocity is an affine function of the score of $`p_t`$. For the straight path,
 
-$$
+```math
 u_t(x)=\frac{x+(1-t)\,\nabla\log p_t(x)}{t},
-$$
+```
 
 the conversion formula of the 6.S184 notes ([Holderrieth and Erives, 2025](https://arxiv.org/abs/2506.02070); [Appendix C](#block-gen09-appendix-c)). A trained velocity network is therefore a score network and a denoiser in other units, and a diffusion model can be sampled as a flow and a flow as a diffusion, with noise added by the conversion. Even the samplers coincide: Euler's method for the straight path is exactly DDIM with the matching noise schedule. As [Gao et al. (2024)](https://diffusionflow.github.io/) put it, diffusion with Gaussian noise and flow matching are two sides of the same coin. What differs in practice are the choices that chapters 7 and 8 already identified: the schedule of signal-to-noise ratios along the path, the quantity the network predicts, velocity rather than noise, and the weighting of the loss over time; the straight path with uniformly sampled $`t`$ weights the noise levels as velocity prediction does under a cosine schedule. It spends more of its time near equal signal and noise than the linear schedule of DDPM, and velocity prediction is well behaved at both ends, which is much of why flow matching trains well.
 
@@ -211,9 +211,9 @@ Flow matching with straight paths is the objective of many recent large image an
 
 **Marginal velocity.** Each conditional path satisfies $`\partial_tp_t(x\mid x_1)=-\nabla\cdot\bigl(p_t(x\mid x_1)\,u_t(x\mid x_1)\bigr)`$. Integrating against $`p_{\text{data}}(x_1)`$ and exchanging the integral with the divergence,
 
-$$
+```math
 \partial_tp_t(x)=-\nabla\cdot\int p_t(x\mid x_1)\,u_t(x\mid x_1)\,p_{\text{data}}(x_1)\,dx_1=-\nabla\cdot\bigl(p_t(x)\,u_t(x)\bigr),
-$$
+```
 
 with $`u_t(x)=\int u_t(x\mid x_1)\,p_t(x\mid x_1)\,p_{\text{data}}(x_1)\,dx_1/p_t(x)`$, the posterior average of the conditional velocities. So the marginal velocity generates the marginal path, and its flow carries $`p_0`$ to $`p_1`$.
 
@@ -227,9 +227,9 @@ with $`u_t(x)=\int u_t(x\mid x_1)\,p_t(x\mid x_1)\,p_{\text{data}}(x_1)\,dx_1/p_
 
 Expand both losses at a fixed $`t`$. The terms $`\mathbb E\|v_\theta(x_t,t)\|^2`$ are identical, since $`x_t`$ has the same distribution in both. The cross terms are equal:
 
-$$
+```math
 \mathbb E_{x_1,x_t}\bigl[v_\theta(x_t,t)^\top u_t(x_t\mid x_1)\bigr]=\mathbb E_{x_t}\Bigl[v_\theta(x_t,t)^\top\,\mathbb E\bigl[u_t(x_t\mid x_1)\mid x_t\bigr]\Bigr]=\mathbb E_{x_t}\bigl[v_\theta(x_t,t)^\top u_t(x_t)\bigr].
-$$
+```
 
 The remaining terms, $`\mathbb E\|u_t(x_t\mid x_1)\|^2`$ and $`\mathbb E\|u_t(x_t)\|^2`$, do not involve $`\theta`$. The difference of the losses is $`\mathbb E\|u_t(x_t\mid x_1)\|^2-\mathbb E\|u_t(x_t)\|^2=\mathbb E\,\operatorname{tr}\operatorname{Cov}\bigl(u_t(x_t\mid x_1)\mid x_t\bigr)`$, the average conditional variance of the target, which is the constant of 3.6 that the code measures.
 
@@ -243,9 +243,9 @@ The remaining terms, $`\mathbb E\|u_t(x_t\mid x_1)\|^2`$ and $`\mathbb E\|u_t(x_
 
 **Velocity and score.** With $`x_t=(1-t)\,x_0+t\,x_1`$, linearity gives $`x_t=(1-t)\,\hat x_0+t\,\hat x_1`$ for the conditional means $`\hat x_0=\mathbb E[x_0\mid x_t]`$ and $`\hat x_1=\mathbb E[x_1\mid x_t]`$, and the marginal velocity is $`u_t=\hat x_1-\hat x_0`$. Given $`x_1`$, $`x_t`$ is Gaussian with mean $`t\,x_1`$ and covariance $`(1-t)^2I`$, so Tweedie's formula gives $`\hat x_0=-(1-t)\,\nabla\log p_t(x_t)`$. Eliminating $`\hat x_1=(x_t-(1-t)\hat x_0)/t`$,
 
-$$
+```math
 u_t(x)=\frac{x-\hat x_0}{t}=\frac{x+(1-t)\,\nabla\log p_t(x)}{t}.
-$$
+```
 
 **DDIM.** An Euler step from $`t`$ to $`t'`$ gives $`x_t+(t'-t)(\hat x_1-\hat x_0)=(1-t')\,\hat x_0+t'\,\hat x_1`$. DDIM predicts the clean data $`\hat x_1`$ and the noise $`\hat x_0`$ at the current point and recombines them at the new noise level, which for this path is the same expression. In the variables of chapter 7, Appendix C, $`x_t/t=x_1+\frac{1-t}t\,x_0`$ is the variance-exploding state with noise level $`\sigma=(1-t)/t`$, the reciprocal square root of the signal-to-noise ratio.
 

@@ -31,9 +31,9 @@ A fully connected network applied to the flattened adjacency matrix has neither 
 
 Almost all graph neural networks are **message-passing** networks ([Gilmer et al., 2017](https://arxiv.org/abs/1704.01212); [Battaglia et al., 2018](https://arxiv.org/abs/1806.01261)). Each node $`v`$ keeps a state $`h_v^{(l)}`$, initialized with its features, and every layer updates all nodes in parallel:
 
-$$
+```math
 m_v^{(l)}=\bigoplus_{u\in\mathcal N(v)}\psi^{(l)}\bigl(h_v^{(l)},h_u^{(l)},e_{uv}\bigr),\qquad h_v^{(l+1)}=\phi^{(l)}\bigl(h_v^{(l)},m_v^{(l)}\bigr).
-$$
+```
 
 Each neighbor $`u`$ sends a **message** computed by a learned function $`\psi`$ from the two states and the edge features; the messages are combined by an **aggregation** $`\bigoplus`$ that ignores their order, such as a sum, mean, or maximum; and a learned **update** $`\phi`$ combines the result with the node's own state. Because $`\psi`$ and $`\phi`$ are shared by all nodes and the aggregation is symmetric, the layer is permutation equivariant and works on graphs of any size. After $`L`$ layers, a node's state depends on its $`L`$-hop neighborhood, its receptive field. For graph-level tasks a **readout** sums or averages the final node states into one vector.
 
@@ -41,9 +41,9 @@ Each neighbor $`u`$ sends a **message** computed by a learned function $`\psi`$ 
 
 The **graph convolutional network** (GCN) of [Kipf and Welling (2017)](https://arxiv.org/abs/1609.02907) is the simplest widely used instance. With $`\tilde A=A+I`$, which adds a self-loop to every node, and its degree matrix $`\tilde D`$, one layer computes
 
-$$
+```math
 H^{(l+1)}=\sigma\bigl(\hat AH^{(l)}W^{(l)}\bigr),\qquad \hat A=\tilde D^{-1/2}\tilde A\tilde D^{-1/2}.
-$$
+```
 
 Each node averages the transformed states of itself and its neighbors, with the weight $`1/\sqrt{\tilde d_u\tilde d_v}`$ on the edge between $`u`$ and $`v`$, and applies a nonlinearity. The symmetric normalization keeps high-degree nodes from dominating and makes $`\hat A`$ a symmetric matrix with eigenvalues in $`(-1,1]`$.
 
@@ -220,9 +220,9 @@ Let $`L=I-D^{-1/2}AD^{-1/2}=U\Lambda U^\top`$ be the normalized Laplacian of a g
 
 Kipf and Welling take $`K=1`$, approximate $`\lambda_{\max}\approx2`$, and tie the two coefficients, $`\theta=\theta_0=-\theta_1`$. Then
 
-$$
+```math
 \theta_0x+\theta_1(L-I)x=\theta\bigl(I+D^{-1/2}AD^{-1/2}\bigr)x .
-$$
+```
 
 The matrix $`I+D^{-1/2}AD^{-1/2}`$ has eigenvalues in $`[0,2]`$, and repeated application can make activations grow or vanish. The **renormalization trick** replaces it by $`\tilde D^{-1/2}(A+I)\tilde D^{-1/2}`$, whose eigenvalues lie in $`(-1,1]`$. For multichannel features, the scalar $`\theta`$ becomes a matrix $`W`$, giving $`\hat AHW`$. As a filter, $`\hat A=I-\tilde L`$, where $`\tilde L`$ is the normalized Laplacian of the graph with self-loops, has response $`1-\tilde\lambda`$: it passes the smooth components ($`\tilde\lambda`$ near 0) and damps the oscillating ones, the low-pass behavior behind oversmoothing.
 
@@ -252,9 +252,9 @@ An aggregator maps the multiset of neighbor states to a vector. For message pass
 
 For a connected graph, $`\hat A=\tilde D^{-1/2}\tilde A\tilde D^{-1/2}`$ is symmetric with eigenvalues $`1=\mu_1>|\mu_2|\ge\cdots\ge|\mu_n|`$. The top eigenvalue is 1 with eigenvector $`u\propto\tilde D^{1/2}\mathbf 1`$, since $`\hat A\tilde D^{1/2}\mathbf 1=\tilde D^{-1/2}\tilde A\mathbf 1=\tilde D^{-1/2}\tilde d=\tilde D^{1/2}\mathbf 1`$. It is simple because the graph is connected (Perron–Frobenius), and every other eigenvalue is larger than $`-1`$ because the self-loops make the graph non-bipartite. Writing $`X=uu^\top X+R`$ with $`u^\top R=0`$,
 
-$$
+```math
 \hat A^kX=uu^\top X+\hat A^kR,\qquad\|\hat A^kR\|\le|\mu_2|^k\|R\|,
-$$
+```
 
 so $`\hat A^kX`$ approaches the rank-one matrix $`uu^\top X`$, in which the features of node $`v`$ are $`\sqrt{\tilde d_v}`$ times a common vector, geometrically fast. The rate $`|\mu_2|`$ is close to 1 for graphs with bottlenecks, which converge slowly, and small for well-connected graphs, which smooth out in a few steps. A GCN interleaves the averaging with weight matrices and nonlinearities, which can counteract it, but [Oono and Suzuki (2020)](https://arxiv.org/abs/1905.10947) show that with ReLU and weights of bounded norm the distance to the corresponding low-dimensional subspace still shrinks exponentially with depth.
 

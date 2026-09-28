@@ -26,9 +26,9 @@ These assumptions are about the world, not about the algorithm: whether they hol
 
 If the classes are modeled generatively, as in chapter 4, unlabeled data enter the likelihood naturally. A labeled example contributes its joint density $`p(x_i,y_i\mid\theta)`$. An unlabeled input contributes its marginal density, the mixture $`p(x_j\mid\theta)=\sum_cp(x_j,c\mid\theta)`$ over the classes $`c`$ it might belong to. The log-likelihood of all the data is therefore
 
-$$
+```math
 \log p(L,U\mid\theta)=\sum_{i=1}^{\ell}\log p(x_i,y_i\mid\theta)+\sum_{j=\ell+1}^{\ell+u}\log\sum_cp(x_j,c\mid\theta).
-$$
+```
 
 The first sum alone would be maximized class by class, in closed form (chapter 4). The second sum is the log-likelihood of a mixture model whose latent variable is the class, which couples the classes, and the EM algorithm of chapter 14 carries over to the combined likelihood with one change. The E-step computes responsibilities $`r_{jc}=P(y_j=c\mid x_j,\theta)`$ for the unlabeled points only, while each labeled point keeps responsibility one for its known class. The M-step then fits the class models to all the points, counting each unlabeled point fractionally in every class according to its responsibilities. No iteration decreases the likelihood, and under regularity conditions the iterates converge to a stationary point that need not be the global maximum (chapter 14). [Nigam, McCallum, Thrun, and Mitchell (2000)](https://link.springer.com/article/10.1023/A:1007692713085) used this approach with naive Bayes to classify text and reduced classification error substantially when labeled documents were scarce.
 
@@ -48,23 +48,23 @@ The danger is misspecification. The likelihood has $`\ell`$ labeled terms and $`
 
 Graph methods encode the cluster and manifold assumptions directly. Build a similarity graph on all $`\ell+u`$ inputs, for example by connecting each point to its $`k`$ nearest neighbors and symmetrizing, with weights $`w_{ij}=\exp\bigl(-\|x_i-x_j\|^2/2\sigma^2\bigr)`$ on the edges and $`w_{ij}=0`$ between points that are not connected. The bandwidth $`\sigma`$ sets the distance over which similarity decays; the code below takes the median edge length. Labels should vary little between strongly connected points. The **harmonic function** method ([Zhu, Ghahramani, and Lafferty, 2003](https://dl.acm.org/doi/10.5555/3041838.3041953)) finds real values $`f_i`$ on all nodes that minimize
 
-$$
+```math
 E(f)=\frac12\sum_{i,j}w_{ij}(f_i-f_j)^2=f^\top(D-W)f,
-$$
+```
 
 subject to $`f_i=y_i`$ on the labeled nodes. Here $`W`$ is the symmetric matrix of weights, $`D`$ is the diagonal matrix of **degrees** $`d_i=\sum_jw_{ij}`$, and $`\Delta=D-W`$ is the **graph Laplacian**. It is often written $`L`$, a letter reserved here for the labeled set, and spectral clustering uses its eigenvectors (chapter 13). The energy $`E(f)`$ is a quadratic form in $`f`$ that is never negative, so $`\Delta`$ is positive semidefinite (Linear Algebra).
 
 Setting the gradient with respect to the unlabeled values to zero gives a linear system ([Appendix A](#block-ssl-appendix-a)):
 
-$$
+```math
 f_U=(D_{UU}-W_{UU})^{-1}W_{UL}\,f_L .
-$$
+```
 
 The solution is **harmonic**: every unlabeled value is the weighted average of its neighbors' values,
 
-$$
+```math
 f_i=\frac1{d_i}\sum_jw_{ij}f_j\qquad\text{for every unlabeled node }i.
-$$
+```
 
 With labels coded 0 and 1, $`f_i`$ is the probability that a random walk on the graph, started at node $`i`$ and moving to a neighbor chosen with probability proportional to the edge weight, reaches a node labeled 1 before a node labeled 0. Labels therefore flow along dense regions of the graph and stop at sparse gaps. The harmonic equations also give a way to compute $`f`$ without solving the system directly: start from any values on the unlabeled nodes and repeatedly replace each by the weighted average of its neighbors' values, holding the labeled values fixed. This is the Jacobi method for the linear system, and it converges to the harmonic solution whenever every connected component of the graph contains a labeled node ([Appendix A](#block-ssl-appendix-a)). The small example below shows both the averaging property and the iteration.
 
@@ -208,9 +208,9 @@ An actively chosen training set is not a random sample: it is chosen by the curr
 
 Three practices reduce the risk. Mixing a fraction of random queries into the active ones ensures that every region is eventually sampled. Weighting each queried example by the inverse of its probability of being queried makes the labeled set an unbiased sample for estimating risk, the idea of importance-weighted active learning ([Beygelzimer, Dasgupta, and Langford, 2009](https://arxiv.org/abs/0812.4952)). Suppose inputs $`x_1,\ldots,x_n`$ arrive independently from the target distribution, input $`x_t`$ is queried with a probability $`p_t>0`$ that may depend on the labels seen so far, and $`Q_t`$ is 1 if it is queried and 0 otherwise. The estimate
 
-$$
+```math
 \widehat R_{\mathrm{IW}}(h)=\frac1n\sum_{t=1}^n\frac{Q_t}{p_t}\,\mathbf 1\{h(x_t)\ne y_t\}
-$$
+```
 
 needs a label only when $`Q_t=1`$. Given the past and $`x_t`$, the factor $`Q_t/p_t`$ has expectation one, so each term has the same expectation as the unweighted error indicator, and $`\widehat R_{\mathrm{IW}}(h)`$ is an unbiased estimate of the error rate $`R(h)`$. This is the importance sampling of Probability and Statistics, and as there, probabilities $`p_t`$ close to zero produce large weights and a highly variable estimate, so they are kept bounded below. Finally, the performance of an actively trained model must be measured on a separate test set drawn at random from the target distribution, never on the actively labeled examples, which are deliberately unrepresentative. Actively collected labels also depend on the model used to choose them: a dataset chosen by uncertainty sampling for logistic regression is not necessarily a good training set for a random forest.
 
@@ -227,9 +227,9 @@ The two approaches are complementary: active learning decides which points to la
 
 **Derivation.** Write $`f=(f_L,f_U)`$ and partition the Laplacian $`\Delta=D-W`$ into blocks. The energy
 
-$$
+```math
 E(f)=\frac12\sum_{i,j}w_{ij}(f_i-f_j)^2=\sum_id_if_i^2-\sum_{i,j}w_{ij}f_if_j=f^\top\Delta f
-$$
+```
 
 is a convex quadratic; the middle expression follows by expanding the square and using the symmetry $`w_{ij}=w_{ji}`$. In blocks, $`E(f)=f_U^\top\Delta_{UU}f_U+2f_U^\top\Delta_{UL}f_L+f_L^\top\Delta_{LL}f_L`$. With $`f_L`$ fixed, its gradient with respect to $`f_U`$ is $`2(\Delta_{UU}f_U+\Delta_{UL}f_L)`$, by the rule $`\nabla_x(x^\top Ax)=(A+A^\top)x`$ of Linear Algebra. Since $`\Delta_{UL}=-W_{UL}`$ and $`\Delta_{UU}=D_{UU}-W_{UU}`$, setting it to zero gives $`(D_{UU}-W_{UU})f_U=W_{UL}f_L`$. Because the energy is convex, this stationary point is the minimizer (Calculus and Optimization). Row $`i`$ of this equation reads $`d_if_i=\sum_jw_{ij}f_j`$: each unlabeled value is the weighted average of its neighbors.
 
@@ -255,15 +255,15 @@ Let inputs be uniform on $`[0,1]`$, labels $`y=\mathbf 1\{x\ge t^\ast\}`$, and c
 
 **The expected number of passive labels.** Suppose $`\varepsilon<\min(t^\ast,1-t^\ast)`$, and let $`G_m`$ be the length of the region of uncertainty after $`m`$ labels. A region of length $`s\le\varepsilon`$ cannot reach 0 or 1, so both of its endpoints are inputs. Choosing the two endpoint inputs in $`m(m-1)`$ ordered ways, placing the left endpoint anywhere in the interval of length $`s`$ that keeps $`t^\ast`$ inside the region, and keeping the other $`m-2`$ inputs outside it gives $`G_m`$ the density $`m(m-1)s(1-s)^{m-2}`$ on $`[0,\varepsilon]`$. Integrating,
 
-$$
+```math
 P(G_m>\varepsilon)=1-\int_0^\varepsilon m(m-1)s(1-s)^{m-2}\,ds=(1-\varepsilon)^m+m\varepsilon(1-\varepsilon)^{m-1},
-$$
+```
 
 as differentiating the right side confirms. The region only shrinks as labels arrive, so the number $`M`$ of labels needed exceeds $`m`$ exactly when $`G_m>\varepsilon`$, and
 
-$$
+```math
 \mathbb E M=\sum_{m\ge0}P(G_m>\varepsilon)=\sum_{m\ge0}(1-\varepsilon)^m+\varepsilon\sum_{m\ge1}m(1-\varepsilon)^{m-1}=\frac1\varepsilon+\frac1\varepsilon=\frac2\varepsilon .
-$$
+```
 
 For the three levels of the code this is 20, 200, and 2000. The simulated averages, 20, 207, and 2262, are close to these values: with 200 runs their standard errors are about 1, 11, and 113, and 10,000 runs at $`\varepsilon=0.01`$ average 200.9. The code draws from a finite pool without replacement, which makes no noticeable difference with 100,000 pool points.
 

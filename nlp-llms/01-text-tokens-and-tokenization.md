@@ -165,9 +165,9 @@ Vocabulary sizes have grown with model size and multilingual coverage: 30,522 Wo
 
 **WordPiece** ([Schuster and Nakajima, 2012](https://doi.org/10.1109/ICASSP.2012.6289079)), used by BERT, also grows a vocabulary by merging pairs but chooses merges differently. The original description picks the merge that most increases the likelihood of the training data under a unigram model of the current units; the widely used Hugging Face implementation scores a pair by
 
-$$
+```math
 \operatorname{score}(a,b)=\frac{\operatorname{count}(ab)}{\operatorname{count}(a)\,\operatorname{count}(b)},
-$$
+```
 
 a pointwise-mutual-information criterion (chapter 3) that favors pairs whose parts rarely occur apart over pairs that are merely frequent. BERT's WordPiece marks word-internal pieces with a `##` prefix, so *unhappily* might become `un`, `##happ`, `##ily`, and encodes each word greedily by taking the longest vocabulary entry that matches its beginning, then the longest that matches the rest. Greedy longest match is not the same as replaying BPE's merges, and neither is guaranteed to find the segmentation with the fewest tokens.
 
@@ -175,9 +175,9 @@ a pointwise-mutual-information criterion (chapter 3) that favors pairs whose par
 
 The **unigram language model** tokenizer ([Kudo, 2018](https://arxiv.org/abs/1804.10959)) works top down and treats segmentation probabilistically. It assumes that a word $`w`$ is produced by drawing pieces independently from a distribution $`p`$ over a vocabulary $`\mathcal V`$ and concatenating them. A segmentation $`\mathbf s=(s_1,\dots,s_k)`$ of $`w`$ has probability $`\prod_ip(s_i)`$, and the word's probability sums over all segmentations,
 
-$$
+```math
 P(w)=\sum_{\mathbf s\in S(w)}\prod_{i=1}^{|\mathbf s|}p(s_i),
-$$
+```
 
 where $`S(w)`$ is the set of ways to write $`w`$ as a concatenation of vocabulary pieces. Training maximizes $`\sum_wc_w\log P(w)`$ over the corpus word counts $`c_w`$ and prunes the vocabulary as it goes:
 
@@ -335,16 +335,16 @@ Tokenizers are trained separately from the model, frozen, and cannot adapt to a 
 
 Suppose word types are drawn independently with probabilities $`p_r=r^{-\alpha}/\zeta(\alpha)`$ for ranks $`r=1,2,\dots`$, with $`\alpha>1`$ so that the probabilities sum to one ($`\zeta`$ is the Riemann zeta function). After $`N`$ draws, type $`r`$ has been seen with probability $`1-(1-p_r)^N`$, so the expected vocabulary is
 
-$$
+```math
 \mathbb E[V(N)]=\sum_{r\ge1}\bigl[1-(1-p_r)^N\bigr].
-$$
+```
 
 The summand is close to 1 when $`Np_r\gg1`$ and close to $`Np_r`$ when $`Np_r\ll1`$; the transition happens at the rank $`r^*`$ where $`Np_{r^*}=1`$, that is, $`r^*=(N/\zeta(\alpha))^{1/\alpha}`$. Approximating the sum by an integral with $`u=Np_r`$, which changes variables through $`r=(N/(\zeta(\alpha)u))^{1/\alpha}`$ and $`dr=-\frac1\alpha(N/\zeta(\alpha))^{1/\alpha}u^{-1/\alpha-1}du`$, gives
 
-$$
+```math
 \mathbb E[V(N)]\approx\Bigl(\frac N{\zeta(\alpha)}\Bigr)^{1/\alpha}\frac1\alpha\int_0^\infty\bigl(1-e^{-u}\bigr)u^{-1/\alpha-1}\,du
 =\Gamma\Bigl(1-\frac1\alpha\Bigr)\Bigl(\frac N{\zeta(\alpha)}\Bigr)^{1/\alpha},
-$$
+```
 
 using $`(1-p)^N\approx e^{-Np}`$ for small $`p`$ and integrating by parts. The integral converges because $`1/\alpha<1`$. Hence $`V(N)\propto N^{1/\alpha}`$: Heaps' exponent is $`\beta=1/\alpha`$. For $`\alpha\le1`$ the probabilities cannot sum to one over infinitely many types, so a pure power law needs a finite vocabulary and the relation breaks down; this is one reason measured exponents on finite corpora match the formula only approximately.
 
@@ -358,10 +358,10 @@ using $`(1-p)^N\approx e^{-Np}`$ for small $`p`$ and integrating by parts. The i
 
 For a word $`w=w_1\cdots w_n`$, let $`A_i`$ be the total probability of all segmentations of the prefix $`w_{1:i}`$ and $`B_j`$ that of the suffix $`w_{j+1:n}`$, with $`A_0=B_n=1`$. Every segmentation of $`w`$ either ends a piece at position $`i`$ or does not, so
 
-$$
+```math
 A_i=\sum_{j<i:\ w_{j+1:i}\in\mathcal V}A_j\,p(w_{j+1:i}),\qquad
 B_j=\sum_{i>j:\ w_{j+1:i}\in\mathcal V}p(w_{j+1:i})\,B_i,
-$$
+```
 
 and $`P(w)=A_n=B_0`$. The segmentations that use the piece $`w_{j+1:i}`$ at that position have total probability $`A_j\,p(w_{j+1:i})\,B_i`$, so the posterior probability of that edge of the lattice is $`A_jp(w_{j+1:i})B_i/P(w)`$.
 
@@ -379,9 +379,9 @@ The Viterbi segmentation replaces the sum in the recursion for $`A_i`$ by a maxi
 
 Let a text of $`B`$ bytes be tokenized into $`T`$ tokens, and let a model assign it total negative log-likelihood $`\mathcal L=-\sum_{t=1}^T\log q(x_t\mid x_{<t})`$ in nats. The per-token loss is $`\mathcal L/T`$ and the per-token perplexity is $`\mathrm{PPL}_{\mathrm{tok}}=e^{\mathcal L/T}`$. The total $`\mathcal L`$ is the ideal code length of the whole text, which does not depend on how it was cut into tokens, so the tokenizer-independent quantity is the code length per byte,
 
-$$
+```math
 \mathrm{BPB}=\frac{\mathcal L}{B\ln2}=\frac TB\cdot\frac{\mathcal L/T}{\ln2}.
-$$
+```
 
 Two models with tokenizers compressing at $`B/T_1`$ and $`B/T_2`$ bytes per token and equal bits per byte have per-token losses in the ratio $`T_2/T_1`$, and per-token perplexities related by $`\mathrm{PPL}_1=\mathrm{PPL}_2^{\,T_2/T_1}`$. A tokenizer twice as coarse therefore squares the per-token perplexity at equal quality. The identity assumes the model's probability of the text is computed from the canonical tokenization, as it is in practice.
 

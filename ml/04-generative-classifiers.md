@@ -10,21 +10,21 @@
 
 The Bayes classifier of chapter 1 predicts the most probable class given the input, and no rule has a smaller probability of error. A **generative classifier** obtains that conditional probability indirectly. It models the class proportions and the distribution of inputs within each class,
 
-$$
+```math
 \pi_k=P(Y=k),\qquad p_k(x)=p(x\mid Y=k),\qquad k=1,\ldots,K,
-$$
+```
 
 where $`\pi_k`$, the **prior probability** of class $`k`$, is the share of the population that belongs to it before any input is seen, and $`p_k`$ is the **class-conditional density** of the inputs in class $`k`$, a probability mass function when the features are discrete. The model combines them by Bayes' rule into the posterior probability of each class:
 
-$$
+```math
 P(Y=k\mid X=x)=\frac{\pi_k\,p_k(x)}{\sum_{j=1}^K\pi_j\,p_j(x)}.
-$$
+```
 
 The denominator is the density $`p(x)=\sum_j\pi_jp_j(x)`$ of the inputs over all classes together. It is the same for every class, and the logarithm is increasing, so the class with the largest posterior is the class with the largest **discriminant function**:
 
-$$
+```math
 \delta_k(x)=\log\pi_k+\log p_k(x),\qquad \hat y(x)=\operatorname*{arg\,max}_k\ \delta_k(x).
-$$
+```
 
 Throughout the chapter, $`\log`$ is the natural logarithm. The boundary between classes $`j`$ and $`k`$ is the set where $`\delta_j(x)=\delta_k(x)`$.
 
@@ -42,10 +42,10 @@ A generative model describes more than the decision: it assigns a probability to
 
 Given labeled data $`(x_1,y_1),\ldots,(x_n,y_n)`$, the joint model assigns the pair $`(x_i,y_i)`$ the probability $`\pi_{y_i}\,p_{y_i}(x_i\mid\theta_{y_i})`$. The log-likelihood of the joint model is therefore
 
-$$
+```math
 \sum_{i=1}^n\log\pi_{y_i}+\sum_{i=1}^n\log p_{y_i}(x_i\mid\theta_{y_i})
 =\sum_{k=1}^K n_k\log\pi_k+\sum_{k=1}^K\sum_{i:\,y_i=k}\log p_k(x_i\mid\theta_k),
-$$
+```
 
 where $`n_k`$ counts class $`k`$ and $`\theta_k`$ denotes the parameters of class $`k`$'s input distribution. The right-hand side regroups the sums by class, and the terms decouple: the class proportions appear only in the first sum, and each $`\theta_k`$ only in the terms of class $`k`$. Maximizing the first sum subject to $`\sum_k\pi_k=1`$ gives the class frequencies $`\hat\pi_k=n_k/n`$, by a Lagrange-multiplier argument or by Gibbs' inequality ([Appendix A](#block-gen-appendix-a) gives both). Each $`\theta_k`$ is fitted by maximum likelihood on the examples of class $`k`$ alone. Fitting is therefore cheap, often a single pass that computes counts, means, or covariances.
 
@@ -53,9 +53,9 @@ The plug-in classifier uses $`\hat\pi_k`$ and $`\hat p_k`$ in place of the unkno
 
 **Changed class proportions.** Suppose the input distribution within each class stays fixed but the class proportions change from $`\pi_k`$ to $`\pi_k'`$. Bayes' rule with the new priors gives $`P'(Y=k\mid x)\propto\pi_k'\,p_k(x)=\frac{\pi_k'}{\pi_k}\,\pi_kp_k(x)`$, and $`\pi_kp_k(x)`$ is proportional to the old posterior, so the correct posterior is
 
-$$
+```math
 P'(Y=k\mid x)\propto\frac{\pi_k'}{\pi_k}\,P(Y=k\mid x).
-$$
+```
 
 A generative model makes this correction explicit: replace the prior and keep $`p_k`$. With two classes, the log-odds shift by the constant $`\log(\pi_1'/\pi_0')-\log(\pi_1/\pi_0)`$, which moves the boundary as in the right panel of the figure above. This situation, called **label shift**, arises when a classifier trained on balanced data is deployed where one class is rare.
 
@@ -69,15 +69,15 @@ The class-conditional distribution $`p_k(x)`$ is a density on the whole input sp
 
 The **naive Bayes** assumption is that the features are independent given the class:
 
-$$
+```math
 p_k(x)=\prod_{j=1}^dp_{kj}(x_j).
-$$
+```
 
 Here $`p_{kj}`$ is the distribution of the $`j`$th feature within class $`k`$. With binary features this needs only $`d`$ probabilities per class, instead of $`2^d-1`$. The discriminant is a sum of per-feature terms,
 
-$$
+```math
 \delta_k(x)=\log\pi_k+\sum_{j=1}^d\log p_{kj}(x_j),
-$$
+```
 
 and each factor $`p_{kj}`$ is fitted separately from one feature's values in one class. The assumption is almost never literally true. Words in a document, pixels in an image, and symptoms of a disease are dependent even within a class. The method is nonetheless a strong baseline for high-dimensional discrete data, and understanding why requires separating its classifications from its probabilities.
 
@@ -94,9 +94,9 @@ The factor $`p_{kj}`$ depends on the feature type. In the table, $`\theta_{kj}`$
 
 The **multinomial** model treats a document as a sequence of independent word draws from a class-specific distribution $`\theta_k=(\theta_{k1},\ldots,\theta_{kd})`$ over a vocabulary of $`d`$ words. The probability of a document with counts $`x=(x_1,\ldots,x_d)`$ and length $`\ell=\sum_jx_j`$ is
 
-$$
+```math
 p_k(x)=\frac{\ell!}{\prod_jx_j!}\prod_{j=1}^d\theta_{kj}^{x_j},
-$$
+```
 
 where the multinomial coefficient does not depend on the class and cancels in the discriminants. Strictly, this is not a product of separate factors $`p_{kj}(x_j)`$, because the counts are tied together by the length $`\ell`$. The model takes the distribution of the length to be the same in every class, so that it cancels too, and the class-dependent part $`\prod_j\theta_{kj}^{x_j}`$ then has the product form of the naive Bayes discriminant. The **Bernoulli** model instead records which words appear, and it penalizes a class for words that are *absent* from a document as well as rewarding it for words that are present. For text, the multinomial model is usually better when documents are long ([McCallum and Nigam, 1998](https://aaai.org/papers/041-ws98-05-007/)). Mitchell's chapter [*Generative and Discriminative Classifiers: Naive Bayes and Logistic Regression*](https://www.cs.cmu.edu/~tom/mlbook/NBayesLogReg.pdf) develops the Bernoulli and Gaussian cases.
 
@@ -104,9 +104,9 @@ where the multinomial coefficient does not depend on the class and cancels in th
 
 Maximum likelihood assigns probability zero to any word never seen in a class's training documents. A single such word in a new document then makes $`p_k(x)=0`$, eliminating class $`k`$ regardless of all other evidence. **Additive smoothing** replaces the estimate by
 
-$$
+```math
 \hat\theta_{kj}=\frac{N_{kj}+\alpha}{N_k+\alpha d},\qquad N_k=\sum_{j=1}^dN_{kj},
-$$
+```
 
 where $`N_{kj}`$ is the total count of word $`j`$ in class $`k`$, $`N_k`$ is the total number of words in class $`k`$, and $`\alpha>0`$ is a pseudo-count added to every word. With $`\alpha=1`$ this is **Laplace smoothing**. It is the posterior mean of $`\theta_k`$ under a symmetric $`\operatorname{Dirichlet}(\alpha,\ldots,\alpha)`$ prior, as derived in Probability and Statistics, Appendix H, where it appears as the posterior predictive probability of the next word. The Bernoulli model is smoothed the same way: if $`m_{kj}`$ of the $`n_k`$ examples of class $`k`$ have $`x_j=1`$, the estimate $`(m_{kj}+\alpha)/(n_k+2\alpha)`$ is the posterior mean under a $`\operatorname{Beta}(\alpha,\alpha)`$ prior (Probability and Statistics). The value of $`\alpha`$ is a hyperparameter. With a large vocabulary, $`\alpha=1`$ can move substantial probability to unseen words, since each of them receives $`\alpha/(N_k+\alpha d)`$, and smaller values often classify better.
 
@@ -114,11 +114,11 @@ where $`N_{kj}`$ is the total count of word $`j`$ in class $`k`$, $`N_k`$ is the
 
 For two classes with multinomial features, subtracting the two discriminants gives the log-odds
 
-$$
+```math
 \log\frac{P(Y=1\mid x)}{P(Y=0\mid x)}
 =\sum_{j=1}^dx_j\log\frac{\theta_{1j}}{\theta_{0j}}+\log\frac{\pi_1}{\pi_0}
 =w^\top x+b.
-$$
+```
 
 The multinomial coefficient has cancelled, and what remains is linear in the counts, with weight $`w_j=\log(\theta_{1j}/\theta_{0j})`$ on word $`j`$ and intercept $`b=\log(\pi_1/\pi_0)`$. The Bernoulli model gives the same form, with $`w_j=\log\frac{\theta_{1j}(1-\theta_{0j})}{\theta_{0j}(1-\theta_{1j})}`$ and an intercept that includes the absent-feature terms, $`b=\log\frac{\pi_1}{\pi_0}+\sum_j\log\frac{1-\theta_{1j}}{1-\theta_{0j}}`$. Naive Bayes on discrete features is therefore a linear classifier whose weights are set by counting, rather than by optimizing classification performance, and its class probability is a logistic function of the linear score, $`\eta(x)=\sigma(w^\top x+b)`$. Logistic regression has exactly the same functional form and chooses the weights by maximizing the conditional likelihood instead; chapter 5 compares the two. Gaussian naive Bayes with class-specific variances has quadratic discriminants with no cross terms, because each factor contributes $`-(x_j-\mu_{kj})^2/(2\sigma_{kj}^2)`$; if each feature's variance is shared across classes, the $`x_j^2`$ terms cancel and it is linear.
 
@@ -126,9 +126,9 @@ The multinomial coefficient has cancelled, and what remains is linear in the cou
 
 Products of hundreds of probabilities underflow in floating point. Every implementation works with log probabilities, and posterior probabilities are obtained by normalizing with the log-sum-exp function, as in Stable probability calculations:
 
-$$
+```math
 \log P(Y=k\mid x)=\delta_k(x)-\log\sum_{j=1}^K\exp\delta_j(x).
-$$
+```
 
 The following code fits multinomial naive Bayes to the 8×8 handwritten digit images in scikit-learn, treating each pixel's intensity, an integer from 0 to 16, as the count of that pixel's "word". Fitting computes the smoothed log probabilities $`\log\hat\theta_{kj}`$; prediction is a single matrix product, because the log joint probability is linear in the counts.
 
@@ -177,9 +177,9 @@ The classifier is right about 90% of the time, yet it reports probability above 
 
 The same effect appears in its simplest form when a feature is duplicated. Suppose one Gaussian feature has class means $`\pm1`$ and standard deviation $`1.5`$, with equal priors, as in the first figure of the chapter. Copying the feature $`c`$ times adds no information, but naive Bayes treats the copies as independent evidence. With $`\hat p_k`$ the fitted density of one copy in class $`k`$, its log-odds are
 
-$$
+```math
 c\,\log\frac{\hat p_1(x)}{\hat p_0(x)}+\log\frac{\hat\pi_1}{\hat\pi_0}.
-$$
+```
 
 Naive Bayes multiplies the likelihood ratio by itself $`c`$ times, so the log-odds is multiplied by about $`c`$.
 
@@ -222,9 +222,9 @@ The predicted probability moves from 0.69 toward 1, while accuracy is essentiall
 
 Suppose each class-conditional distribution is Gaussian, $`X\mid Y=k\sim\mathcal N(\mu_k,\Sigma_k)`$, with mean vector $`\mu_k`$ and a positive definite covariance matrix $`\Sigma_k`$. Using the density from Gaussian vectors and conditioning, the discriminant is
 
-$$
+```math
 \delta_k(x)=\log\pi_k-\frac12\log\det\Sigma_k-\frac12(x-\mu_k)^\top\Sigma_k^{-1}(x-\mu_k),
-$$
+```
 
 after dropping the constant $`-\frac d2\log2\pi`$ shared by all classes. The last term is minus one half of the squared Mahalanobis distance from $`x`$ to the class mean, the distance measured in units of the class's own spread (Whitening and Mahalanobis distance). **Quadratic discriminant analysis** (QDA) classifies by these discriminants; the boundaries $`\delta_j=\delta_k`$ are quadratic surfaces, because the quadratic forms of different classes no longer cancel. The maximum-likelihood estimates are the class frequencies, class means, and class covariance matrices, as derived in [Appendix A](#block-gen-appendix-a).
 
@@ -234,22 +234,22 @@ A class with a larger covariance occupies more of the space far from all means, 
 
 If all classes share one covariance, $`\Sigma_k=\Sigma`$, expanding the quadratic form as $`x^\top\Sigma^{-1}x-2x^\top\Sigma^{-1}\mu_k+\mu_k^\top\Sigma^{-1}\mu_k`$ shows that the quadratic term $`x^\top\Sigma^{-1}x`$ and the log-determinant are the same for every class and cancel from comparisons. The **linear discriminant analysis** (LDA) discriminants are
 
-$$
+```math
 \delta_k(x)=x^\top\Sigma^{-1}\mu_k-\frac12\mu_k^\top\Sigma^{-1}\mu_k+\log\pi_k,
-$$
+```
 
 linear in $`x`$. The boundaries are hyperplanes. For two classes, the log-odds is
 
-$$
+```math
 \log\frac{P(Y=1\mid x)}{P(Y=0\mid x)}
 =(\mu_1-\mu_0)^\top\Sigma^{-1}x-\frac12\bigl(\mu_1^\top\Sigma^{-1}\mu_1-\mu_0^\top\Sigma^{-1}\mu_0\bigr)+\log\frac{\pi_1}{\pi_0}.
-$$
+```
 
 This is again an affine function $`w^\top x+b`$ with $`w=\Sigma^{-1}(\mu_1-\mu_0)`$, so the posterior probability is a logistic function of a linear score, $`\eta(x)=\sigma(w^\top x+b)`$. The shared covariance is estimated by pooling the within-class scatter,
 
-$$
+```math
 \hat\Sigma=\frac1{n-K}\sum_{k=1}^K\sum_{i:\,y_i=k}(x_i-\hat\mu_k)(x_i-\hat\mu_k)^\top,
-$$
+```
 
 with denominator $`n-K`$ for unbiasedness, since $`K`$ class means $`\hat\mu_k`$ are estimated from the same data. The MLE uses $`n`$, which multiplies $`\hat\Sigma^{-1}`$ by $`n/(n-K)`$. That factor rescales every term of the discriminants except $`\log\pi_k`$, so it does not change the classifier's boundaries except through the constant terms: the hyperplanes keep their orientation, and with equal class frequencies they do not move at all. The derivation is in [Appendix A](#block-gen-appendix-a).
 
@@ -326,11 +326,11 @@ QDA is the most flexible and has the lowest bias when the Gaussian assumption ho
 
 Between these extremes, **regularized discriminant analysis** shrinks each class covariance toward the pooled covariance, and the pooled covariance toward a multiple of the identity:
 
-$$
+```math
 \hat\Sigma_k(\alpha)=\alpha\hat\Sigma_k+(1-\alpha)\hat\Sigma,
 \qquad
 \hat\Sigma(\gamma)=\gamma\hat\Sigma+(1-\gamma)\hat\sigma^2I,
-$$
+```
 
 with $`\alpha,\gamma\in[0,1]`$ chosen by cross-validation ([Friedman, 1989](https://www.tandfonline.com/doi/abs/10.1080/01621459.1989.10478752)). This $`\alpha`$ is unrelated to the smoothing constant of naive Bayes, and $`\hat\sigma^2`$ is a scalar variance, usually the average diagonal entry $`\operatorname{tr}(\hat\Sigma)/d`$, so that $`\hat\sigma^2I`$ has the same trace as $`\hat\Sigma`$. The value $`\alpha=1`$ gives QDA, and $`\alpha=0`$ with $`\gamma=1`$ gives LDA. Shrinking toward the identity makes the covariance invertible even when $`d\ge n`$, because for $`\gamma<1`$ every eigenvalue of $`\hat\Sigma(\gamma)`$ is at least $`(1-\gamma)\hat\sigma^2>0`$, and it stabilizes the small eigenvalues that dominate $`\Sigma^{-1}`$. [Ledoit and Wolf (2004)](https://www.sciencedirect.com/science/article/pii/S0047259X03000964) derived a data-driven shrinkage intensity for $`\gamma`$, available in scikit-learn as `LinearDiscriminantAnalysis(solver="lsqr", shrinkage="auto")`. The effect is analogous to ridge regression: the smallest eigenvalues of $`\hat\Sigma`$ are the most underestimated, and adding a multiple of the identity counteracts this.
 
@@ -348,25 +348,25 @@ The shrinkage target $`\hat\sigma^2I`$ depends on the scales of the features. Sh
 
 [Fisher (1936)](https://onlinelibrary.wiley.com/doi/10.1111/j.1469-1809.1936.tb02137.x) derived a linear discriminant without assuming Gaussian classes, by asking for the one-dimensional projection $`w^\top x`$ that best separates the classes. For two classes, a good projection places the projected class means far apart relative to the spread within each class. In this section $`\mu_0`$ and $`\mu_1`$ denote the class means of the sample, written $`\hat\mu_k`$ above. Define the **between-class** and **within-class** scatter matrices
 
-$$
+```math
 S_B=(\mu_1-\mu_0)(\mu_1-\mu_0)^\top,
 \qquad
 S_W=\sum_{k\in\{0,1\}}\ \sum_{i:\,y_i=k}(x_i-\mu_k)(x_i-\mu_k)^\top,
-$$
+```
 
 and maximize the **Fisher criterion**
 
-$$
+```math
 J(w)=\frac{w^\top S_Bw}{w^\top S_Ww}=\frac{\bigl(w^\top(\mu_1-\mu_0)\bigr)^2}{w^\top S_Ww}.
-$$
+```
 
 The numerator is the squared distance between the projected class means. The denominator, $`w^\top S_Ww=\sum_k\sum_{i:\,y_i=k}(w^\top x_i-w^\top\mu_k)^2`$, is the scatter of the projected points around their projected class means. Rescaling $`w`$ does not change $`J`$, so only the direction of $`w`$ matters.
 
 With $`S_W\succ0`$ and the substitution $`v=S_W^{1/2}w`$, where $`S_W^{1/2}`$ is the symmetric square root of Linear Algebra, the criterion becomes $`(v^\top S_W^{-1/2}(\mu_1-\mu_0))^2/\|v\|^2`$. The Cauchy–Schwarz inequality $`(a^\top v)^2\le\|a\|^2\|v\|^2`$, with equality exactly when $`v`$ is parallel to $`a`$, shows that this ratio is maximized at $`v\propto S_W^{-1/2}(\mu_1-\mu_0)`$. Hence
 
-$$
+```math
 w^\star\propto S_W^{-1}(\mu_1-\mu_0).
-$$
+```
 
 This is the direction of the Gaussian LDA weight vector, since $`S_W=(n-2)\hat\Sigma`$ is proportional to the pooled covariance. Fisher's derivation shows that the LDA direction is sensible whenever separation of projected means relative to within-class variance is a good criterion, whether or not the classes are Gaussian. The threshold on $`w^\top x`$ is a separate choice; the Gaussian model supplies one through the priors.
 
@@ -378,9 +378,9 @@ This is the direction of the Gaussian LDA weight vector, since $`S_W=(n-2)\hat\S
 
 With $`K`$ classes, let $`\bar\mu`$ be the overall mean and define $`S_B=\sum_kn_k(\mu_k-\bar\mu)(\mu_k-\bar\mu)^\top`$, with $`S_W`$ now summed over all $`K`$ classes. For $`K=2`$ this $`S_B`$ equals $`\frac{n_0n_1}{n}(\mu_1-\mu_0)(\mu_1-\mu_0)^\top`$, a multiple of the two-class matrix, so it leads to the same direction. Maximizing the same ratio over directions leads to the generalized eigenvalue problem
 
-$$
+```math
 S_Bw=\lambda S_Ww.
-$$
+```
 
 The substitution $`v=S_W^{1/2}w`$ turns the ratio into the Rayleigh quotient of the symmetric matrix $`S_W^{-1/2}S_BS_W^{-1/2}`$, which a top eigenvector maximizes (Linear Algebra); written in terms of $`w`$, the eigenvector equation is the problem above, and $`\lambda`$ is the value of the ratio. The successive eigenvectors give the **discriminant coordinates**: each maximizes the ratio among directions whose projections are uncorrelated within classes with the earlier ones, $`w_i^\top S_Ww_j=0`$.
 
@@ -415,15 +415,15 @@ Maximize $`\sum_kn_k\log\pi_k`$ subject to $`\sum_k\pi_k=1`$. With a Lagrange mu
 
 For class $`k`$ with covariance $`\Sigma_k`$, the log-likelihood of its examples is, up to constants,
 
-$$
+```math
 \ell_k=-\frac{n_k}2\log\det\Sigma_k-\frac12\sum_{i:\,y_i=k}(x_i-\mu_k)^\top\Sigma_k^{-1}(x_i-\mu_k).
-$$
+```
 
 Setting the gradient in $`\mu_k`$ to zero gives $`\Sigma_k^{-1}\sum_i(x_i-\mu_k)=0`$, so $`\hat\mu_k`$ is the class mean. Write the quadratic term as a trace, $`\frac12\operatorname{tr}(\Sigma_k^{-1}S_k)`$ with $`S_k=\sum_i(x_i-\hat\mu_k)(x_i-\hat\mu_k)^\top`$, and parameterize by the precision $`\Lambda_k=\Sigma_k^{-1}`$, using $`\log\det\Sigma_k=-\log\det\Lambda_k`$:
 
-$$
+```math
 \ell_k=\frac{n_k}2\log\det\Lambda_k-\frac12\operatorname{tr}(\Lambda_kS_k).
-$$
+```
 
 Using $`\nabla_\Lambda\log\det\Lambda=\Lambda^{-1}`$ and $`\nabla_\Lambda\operatorname{tr}(\Lambda S)=S`$ for symmetric matrices, from Linear Algebra, Appendix B, stationarity gives $`\frac{n_k}2\Lambda_k^{-1}=\frac12S_k`$, so $`\hat\Sigma_k=S_k/n_k`$. The function is concave in $`\Lambda_k`$, so this is the maximum when $`S_k`$ is positive definite. If $`S_k`$ is singular, the likelihood is unbounded: a density can be made arbitrarily tall along the flat directions.
 

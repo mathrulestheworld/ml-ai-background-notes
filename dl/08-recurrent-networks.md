@@ -21,9 +21,9 @@ A fully connected network needs a fixed input size. A one-dimensional convolutio
 
 A simple (Elman) RNN ([Elman, 1990](https://doi.org/10.1207/s15516709cog1402_1)) computes, for inputs $`x_1,\ldots,x_T`$,
 
-$$
+```math
 h_t=\tanh\bigl(W_{hh}h_{t-1}+W_{xh}x_t+b\bigr),\qquad\hat y_t=W_{hy}h_t+c,
-$$
+```
 
 starting from a state $`h_0`$, usually zero. The hidden state $`h_t\in\mathbb R^H`$ is the network's memory. **Unrolling** the recurrence over the length of a particular sequence turns it into a deep feedforward network with one layer per time step, in which every layer shares the same weights.
 
@@ -80,9 +80,9 @@ print("product of Jacobians matches autograd:", torch.allclose(g @ J, auto, atol
 
 Training an RNN is ordinary backpropagation on the unrolled network, called **backpropagation through time** (BPTT; [Werbos, 1990](https://doi.org/10.1109/5.58337)). The loss is usually a sum over time steps, and because the weights are shared, the gradient of each weight matrix is a sum of contributions from every step. The contribution of an input at time $`t`$ to a loss at time $`T`$ passes through the chain of state Jacobians
 
-$$
+```math
 \frac{\partial h_T}{\partial h_t}=\prod_{k=t+1}^{T}\frac{\partial h_k}{\partial h_{k-1}}=\prod_{k=t+1}^{T}\operatorname{diag}\bigl(1-h_k^2\bigr)\,W_{hh},
-$$
+```
 
 which the code above verifies. This is the product-of-Jacobians problem of chapter 2 with two aggravations: the same matrix $`W_{hh}`$ appears in every factor, and the depth equals the sequence length, often hundreds or thousands of steps. If the largest singular value of $`W_{hh}`$ times the largest activation derivative is below 1, the product shrinks geometrically in the lag $`T-t`$, and if the relevant eigenvalues exceed 1 it can grow geometrically ([Bengio, Simard, and Frasconi, 1994](https://doi.org/10.1109/72.279181); [Pascanu, Mikolov, and Bengio, 2013](https://arxiv.org/abs/1211.5063); [Appendix A](#block-dl8-appendix-a)).
 
@@ -102,12 +102,12 @@ For very long sequences, such as a text corpus treated as one stream, BPTT over 
 
 The **long short-term memory** (LSTM) network of [Hochreiter and Schmidhuber (1997)](https://doi.org/10.1162/neco.1997.9.8.1735), with the forget gate added by [Gers, Schmidhuber, and Cummins (2000)](https://doi.org/10.1162/089976600300015015), adds a second state, the **cell** $`c_t`$, which is updated additively and controlled by multiplicative **gates**:
 
-$$
+```math
 \begin{aligned}
 i_t&=\sigma(W_ix_t+U_ih_{t-1}+b_i), & f_t&=\sigma(W_fx_t+U_fh_{t-1}+b_f), & o_t&=\sigma(W_ox_t+U_oh_{t-1}+b_o),\\
 g_t&=\tanh(W_gx_t+U_gh_{t-1}+b_g), & c_t&=f_t\odot c_{t-1}+i_t\odot g_t, & h_t&=o_t\odot\tanh(c_t).
 \end{aligned}
-$$
+```
 
 The **input gate** $`i_t`$ decides how much of the candidate $`g_t`$ to write, the **forget gate** $`f_t`$ how much of the old cell to keep, and the **output gate** $`o_t`$ how much of the cell to expose. The key is the cell update. Its Jacobian with respect to the previous cell, along the direct path, is the diagonal matrix $`\operatorname{diag}(f_t)`$: when the forget gates are near 1, the gradient passes back through many steps without shrinking, just as through the identity path of a residual network (chapter 4). The network learns when to open and close this path. Initializing the forget-gate bias to a positive value, such as 1, makes remembering the default at the start of training ([Jozefowicz, Zaremba, and Sutskever, 2015](https://proceedings.mlr.press/v37/jozefowicz15.html)).
 
@@ -146,9 +146,9 @@ With PyTorch's default initialization the forget gates start near one half, so t
 
 The **gated recurrent unit** (GRU; [Cho et al., 2014](https://arxiv.org/abs/1406.1078)) merges the cell and hidden state and uses two gates:
 
-$$
+```math
 z_t=\sigma(W_zx_t+U_zh_{t-1}),\quad r_t=\sigma(W_rx_t+U_rh_{t-1}),\quad \tilde h_t=\tanh\bigl(W_hx_t+U_h(r_t\odot h_{t-1})\bigr),\quad h_t=(1-z_t)\odot h_{t-1}+z_t\odot\tilde h_t .
-$$
+```
 
 The **update gate** $`z_t`$ interpolates between keeping the old state and writing the candidate, playing the roles of both the input and the forget gate; the **reset gate** $`r_t`$ controls how much of the old state enters the candidate. With three weight matrices instead of four, GRUs are cheaper, and large comparisons found no consistent winner between GRUs and LSTMs across tasks ([Chung et al., 2014](https://arxiv.org/abs/1412.3555); [Greff et al., 2017](https://arxiv.org/abs/1503.04069)).
 
@@ -237,9 +237,9 @@ Let $`D_k=\operatorname{diag}\bigl(\sigma'(z_k)\bigr)`$ with $`z_k=W_{hh}h_{k-1}
 
 **Vanishing.** Suppose $`|\sigma'|\le\gamma`$ (for tanh, $`\gamma=1`$; for the logistic sigmoid, $`\gamma=1/4`$). Then $`\|D_kW_{hh}\|_2\le\gamma\,s_{\max}(W_{hh})`$, where $`s_{\max}`$ is the largest singular value, and by submultiplicativity
 
-$$
+```math
 \Bigl\|\frac{\partial h_T}{\partial h_t}\Bigr\|_2\le\bigl(\gamma\,s_{\max}(W_{hh})\bigr)^{T-t}.
-$$
+```
 
 If $`\gamma\,s_{\max}(W_{hh})<1`$, the gradient from time $`T`$ to time $`t`$ vanishes exponentially in the lag, whatever the inputs. This is the sufficient condition of [Pascanu, Mikolov, and Bengio (2013)](https://arxiv.org/abs/1211.5063).
 

@@ -206,9 +206,9 @@ A sample from a large model costs tens of forward passes of a network with billi
 
 **The shift of Stable Diffusion 3.** For rectified flow, $`x_t=(1-t)\,x_0+t\,\epsilon`$ and $`\operatorname{SNR}(t)=(1-t)^2/t^2`$. With $`t'=\alpha t/(1+(\alpha-1)t)`$,
 
-$$
+```math
 \frac{1-t'}{t'}=\frac{1+(\alpha-1)t-\alpha t}{\alpha t}=\frac1\alpha\cdot\frac{1-t}t,
-$$
+```
 
 so $`\operatorname{SNR}(t')=\operatorname{SNR}(t)/\alpha^2`$: the shifted schedule at $`t`$ has the signal-to-noise ratio that the base schedule has at a later time. With $`\alpha=\sqrt{m/n}`$, the pixel-count ratio, and $`m/n=k^2`$ for images $`k`$ times larger on each side, this is the division by $`k^2`$ that pooling requires.
 
@@ -234,9 +234,9 @@ so $`\operatorname{SNR}(t')=\operatorname{SNR}(t)/\alpha^2`$: the shifted schedu
 
 For an encoder $`q_\phi(z\mid x)`$, a decoder $`p_\psi(x\mid z)`$, and a prior $`p_\theta(z)`$, the evidence lower bound of chapter 3 is
 
-$$
+```math
 \log p(x)\ge\mathbb E_{q_\phi}\log p_\psi(x\mid z)+\mathbb H\bigl(q_\phi(z\mid x)\bigr)+\mathbb E_{q_\phi}\log p_\theta(z),
-$$
+```
 
 writing the KL divergence as the negative entropy of the encoder minus the cross-entropy of the prior. With a diffusion model as the prior, $`\log p_\theta(z)`$ is replaced by its own variational bound, the sum of denoising losses of chapter 7, and all three parts can be trained together, as in LSGM. The two-stage recipe trains the first two terms with a nearly flat prior, a KL weight of $`10^{-6}`$, freezes them, and then fits the prior to the aggregate posterior of the encoder by maximizing the third term alone, which is exactly the diffusion loss on the encoded latents. It gives up joint optimality for simplicity: the autoencoder can be trained with perceptual and adversarial losses that are not likelihoods, and it can be reused by many diffusion models.
 

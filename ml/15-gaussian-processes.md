@@ -12,25 +12,25 @@ The regression methods of earlier chapters return a single fitted function. A Ba
 
 Model the response as $`y=\phi(x)^\top w+\varepsilon`$ with features $`\phi(x)\in\mathbb R^p`$, noise $`\varepsilon\sim\mathcal N(0,\sigma^2)`$ independent across observations, and a Gaussian prior $`w\sim\mathcal N(0,\Sigma_p)`$ with prior covariance $`\Sigma_p`$. Let $`\Phi`$ be the $`n\times p`$ matrix of training features, whose $`i`$th row is $`\phi(x_i)^\top`$, and $`y`$ the vector of training responses. Up to terms that do not involve $`w`$, the logarithm of prior times likelihood is
 
-$$
+```math
 -\frac1{2\sigma^2}\|y-\Phi w\|^2-\frac12w^\top\Sigma_p^{-1}w
 =-\frac12w^\top Aw+\sigma^{-2}w^\top\Phi^\top y+\text{const}
 =-\frac12(w-\bar w)^\top A(w-\bar w)+\text{const},
-$$
+```
 
 with $`A`$ and $`\bar w`$ as below. Completing the square in this way shows that the posterior is Gaussian:
 
-$$
+```math
 w\mid y\sim\mathcal N\bigl(\bar w,\;A^{-1}\bigr),\qquad
 A=\sigma^{-2}\Phi^\top\Phi+\Sigma_p^{-1},\qquad
 \bar w=\sigma^{-2}A^{-1}\Phi^\top y .
-$$
+```
 
 Precisions add, as in the scalar case: the posterior precision $`A`$ is the prior precision plus the information in the data. For $`\Sigma_p=\tau^2I`$, the posterior mean is the ridge estimate with $`\lambda=\sigma^2/\tau^2`$, as noted in chapter 3. At a new input $`x_\ast`$, the function value $`f(x_\ast)=\phi(x_\ast)^\top w`$ is a linear function of $`w`$, so by the rule for linear maps of Gaussian vectors its posterior is Gaussian, with mean and variance obtained from those of $`w`$. Averaging over the posterior of $`w`$ in this way gives the **predictive distribution**
 
-$$
+```math
 f(x_\ast)\mid y\sim\mathcal N\bigl(\phi_\ast^\top\bar w,\;\phi_\ast^\top A^{-1}\phi_\ast\bigr),\qquad \phi_\ast=\phi(x_\ast),
-$$
+```
 
 and a new observation adds the noise variance $`\sigma^2`$. The first variance term is **epistemic**: it reflects uncertainty about $`w`$ and shrinks as data accumulate. The noise term is **aleatoric** and does not. These are the two terms of the total-variance decomposition in the same section of Probability and Statistics.
 
@@ -42,10 +42,10 @@ and a new observation adds the noise variance $`\sigma^2`$. The first variance t
 
 The same model can be described without mentioning $`w`$. At any finite set of inputs, the vector of function values $`f=\Phi w`$ is a linear transformation of a Gaussian vector, hence Gaussian:
 
-$$
+```math
 f\sim\mathcal N\bigl(0,\;\Phi\Sigma_p\Phi^\top\bigr),\qquad
 \operatorname{Cov}\bigl(f(x),f(x')\bigr)=\phi(x)^\top\Sigma_p\,\phi(x')=:k(x,x').
-$$
+```
 
 The prior over functions is determined by the **covariance function** $`k`$. It is the inner product of the transformed features $`\Sigma_p^{1/2}\phi(x)`$ and $`\Sigma_p^{1/2}\phi(x')`$, so $`k`$ is a kernel in the sense of chapter 8. Predictions computed by conditioning the joint Gaussian distribution of training and test function values agree exactly with the weight-space answer ([Appendix A](#block-gp-appendix-a)). As in chapter 8, the features need never be formed: specifying a positive semidefinite $`k`$ directly specifies a prior over functions, possibly one with infinitely many implicit features.
 
@@ -55,9 +55,9 @@ The prior over functions is determined by the **covariance function** $`k`$. It 
 
 A **Gaussian process** is a collection of random variables $`\{f(x)\}_{x\in\mathcal X}`$, any finite number of which have a joint Gaussian distribution. It is specified by a mean function and a covariance function,
 
-$$
+```math
 f\sim\mathcal{GP}(m,k),\qquad m(x)=\mathbb E f(x),\qquad k(x,x')=\operatorname{Cov}\bigl(f(x),f(x')\bigr).
-$$
+```
 
 For any inputs $`x_1,\ldots,x_n`$, the vector $`\bigl(f(x_1),\ldots,f(x_n)\bigr)`$ is $`\mathcal N(m,K)`$, where $`m`$ now denotes the vector $`\bigl(m(x_1),\ldots,m(x_n)\bigr)`$ and $`K`$ is the $`n\times n`$ matrix with entries $`K_{ij}=k(x_i,x_j)`$. These finite-dimensional distributions are consistent, since marginalizing a Gaussian drops rows and columns of its mean and covariance. For $`K`$ to be a covariance matrix it must be positive semidefinite for every choice of inputs, which is exactly the condition that $`k`$ be a positive semidefinite kernel. Conversely, every positive semidefinite kernel defines a Gaussian process: by Kolmogorov's extension theorem, any consistent family of finite-dimensional distributions is the family of finite-dimensional distributions of some stochastic process. The mean is usually taken to be zero after centering the responses; structure is expressed through the kernel. [Rasmussen and Williams's *Gaussian Processes for Machine Learning*](https://gaussianprocess.org/gpml/chapters/), whose chapter 2 is the reading plan's main text, is the standard reference.
 
@@ -91,17 +91,17 @@ The **amplitude** $`s^2`$ sets the prior variance of $`f(x)`$, and the **length 
 
 Observe $`y_i=f(x_i)+\varepsilon_i`$ with independent noise $`\varepsilon_i\sim\mathcal N(0,\sigma_n^2)`$. The noise variance, written $`\sigma^2`$ in the weight-space section, is from now on written $`\sigma_n^2`$, with the subscript $`n`$ for noise, to keep it apart from the amplitude $`s^2`$ of the kernel. Let $`X`$ collect the $`n`$ training inputs and $`X_\ast`$ the test inputs, and write $`k(A,B)`$ for the matrix of kernel values between the inputs in $`A`$ and those in $`B`$. Under a zero-mean prior, the training responses and the test function values $`f_\ast=f(X_\ast)`$ are jointly Gaussian:
 
-$$
+```math
 \begin{pmatrix}y\\f_\ast\end{pmatrix}\sim\mathcal N\left(0,\begin{pmatrix}K+\sigma_n^2I&K_\ast\\K_\ast^\top&K_{\ast\ast}\end{pmatrix}\right),
-$$
+```
 
 where $`K=k(X,X)`$, $`K_\ast=k(X,X_\ast)`$, and $`K_{\ast\ast}=k(X_\ast,X_\ast)`$. The noise is independent of $`f`$, so it adds $`\sigma_n^2I`$ to the covariance of $`y`$ and nothing to the cross-covariance $`K_\ast`$. The conditioning formula of Probability and Statistics gives the posterior
 
-$$
+```math
 f_\ast\mid y\sim\mathcal N\bigl(\bar f_\ast,\operatorname{cov}(f_\ast)\bigr),\qquad
 \bar f_\ast=K_\ast^\top(K+\sigma_n^2I)^{-1}y,\qquad
 \operatorname{cov}(f_\ast)=K_{\ast\ast}-K_\ast^\top(K+\sigma_n^2I)^{-1}K_\ast .
-$$
+```
 
 Adding $`\sigma_n^2I`$ to the covariance gives the predictive distribution of new observations rather than of the function. Two features of these formulas deserve emphasis. The posterior mean is a linear combination of the training responses, with weights depending on the inputs. The posterior covariance does not depend on the responses at all: for fixed hyperparameters, where the model is uncertain is determined by where the data are, not by what they say.
 
@@ -117,9 +117,9 @@ The posterior mean $`\bar f(x_\ast)=k(X,x_\ast)^\top(K+\sigma_n^2I)^{-1}y`$ is e
 
 The standard algorithm factorizes $`K+\sigma_n^2I=LL^\top`$ once and reuses the factor ([GPML, Algorithm 2.1](https://gaussianprocess.org/gpml/chapters/RW2.pdf)):
 
-$$
+```math
 \alpha=L^{-\top}L^{-1}y,\qquad \bar f_\ast=K_\ast^\top\alpha,\qquad v=L^{-1}K_\ast,\qquad \operatorname{cov}(f_\ast)=K_{\ast\ast}-v^\top v .
-$$
+```
 
 Here $`L^{-1}b`$ means the solution of the triangular system $`Lz=b`$, and $`L^{-\top}=(L^\top)^{-1}`$. Two triangular solves replace any explicit inverse, which is more stable and cheaper, as discussed in Numerical Computing. The factorization costs $`O(n^3)`$ time and $`O(n^2)`$ memory, after which each predictive mean costs $`O(n)`$ and each variance $`O(n^2)`$. Exact Gaussian-process regression is therefore practical up to roughly ten thousand observations on a single machine.
 
@@ -176,9 +176,9 @@ In scikit-learn's [`GaussianProcessRegressor`](https://scikit-learn.org/stable/m
 
 The kernel's parameters, together with the noise variance, are **hyperparameters** $`\theta`$. Integrating out the latent function values, $`p(y\mid X,\theta)=\int p(y\mid f)\,p(f\mid X,\theta)\,df`$, gives $`y\sim\mathcal N(0,K_\theta+\sigma_n^2I)`$, because $`y`$ is the sum of the independent Gaussian vectors $`f(X)\sim\mathcal N(0,K_\theta)`$ and $`\varepsilon\sim\mathcal N(0,\sigma_n^2I)`$. The hyperparameters can therefore be fitted by maximizing the **marginal likelihood**, also called the evidence, which is the normalizing constant of the posterior in Bayesian inference. With natural logarithms, as throughout the chapter,
 
-$$
+```math
 \log p(y\mid X,\theta)=-\frac12y^\top K_y^{-1}y-\frac12\log\det K_y-\frac n2\log2\pi,\qquad K_y=K_\theta+\sigma_n^2I .
-$$
+```
 
 The first term rewards fitting the data. The second penalizes flexibility: a kernel that can explain many different datasets spreads its probability thinly and has a large determinant. The marginal likelihood therefore trades fit against complexity automatically, a form of Occam's razor, without a validation set. Its gradient has a closed form ([Appendix B](#block-gp-appendix-b)), so standard optimizers apply, with the Cholesky factor giving $`\log\det K_y=2\sum_i\log L_{ii}`$. Summing logarithms avoids forming the determinant itself, which can overflow or underflow already for moderate $`n`$; `np.linalg.slogdet`, described in Linear Algebra, avoids it in the same way.
 
@@ -239,9 +239,9 @@ This section is an optional extension. **Bayesian optimization** minimizes a fun
 
 The most common acquisition function is **expected improvement** ([Jones, Schonlau, and Welch, 1998](https://link.springer.com/article/10.1023/A:1008306431147)). With $`g_{\text{best}}`$ the smallest value observed so far and the posterior $`g(x)\sim\mathcal N\bigl(\mu(x),\sigma(x)^2\bigr)`$, where $`\mu(x)`$ and $`\sigma(x)`$ are the posterior mean and standard deviation,
 
-$$
+```math
 \operatorname{EI}(x)=\mathbb E\bigl[\max\{0,\,g_{\text{best}}-g(x)\}\bigr]=\bigl(g_{\text{best}}-\mu(x)\bigr)\Phi(z)+\sigma(x)\varphi(z),\qquad z=\frac{g_{\text{best}}-\mu(x)}{\sigma(x)},
-$$
+```
 
 where $`\Phi`$ and $`\varphi`$ now denote the standard normal distribution and density functions, not the feature matrix and feature map of the first section ([Appendix B](#block-gp-appendix-b)). The first term is large where the mean is low; the second where the uncertainty is high. The **upper confidence bound** rule instead minimizes $`\mu(x)-\beta\sigma(x)`$. With $`\beta`$ growing slowly with the number of evaluations, it has guarantees on its regret, the total excess of the evaluated values over the minimum, in the sense of the online learning of chapter 7 ([Srinivas, Krause, Kakade, and Seeger, 2010](https://arxiv.org/abs/0912.3995)).
 
@@ -260,17 +260,17 @@ Bayesian optimization is effective for tuning machine-learning models when each 
 
 **The two views agree.** In weight space, $`\bar f_\ast=\phi_\ast^\top\bar w=\sigma^{-2}\phi_\ast^\top A^{-1}\Phi^\top y`$ with $`A=\sigma^{-2}\Phi^\top\Phi+\Sigma_p^{-1}`$. The identity
 
-$$
+```math
 \sigma^{-2}A^{-1}\Phi^\top=\Sigma_p\Phi^\top\bigl(\Phi\Sigma_p\Phi^\top+\sigma^2I\bigr)^{-1}
-$$
+```
 
 follows by multiplying both sides on the left by $`A`$ and on the right by $`\Phi\Sigma_p\Phi^\top+\sigma^2I`$: both sides become $`\sigma^{-2}\Phi^\top\Phi\Sigma_p\Phi^\top+\Phi^\top`$. Hence $`\bar f_\ast=k_\ast^\top(K+\sigma^2I)^{-1}y`$ with $`K=\Phi\Sigma_p\Phi^\top`$ and $`k_\ast=\Phi\Sigma_p\phi_\ast`$, the function-space mean. For the variance, the Woodbury identity, applied to $`A=\Sigma_p^{-1}+\Phi^\top(\sigma^{-2}I)\Phi`$, gives $`A^{-1}=\Sigma_p-\Sigma_p\Phi^\top(K+\sigma^2I)^{-1}\Phi\Sigma_p`$, and therefore $`\phi_\ast^\top A^{-1}\phi_\ast=k(x_\ast,x_\ast)-k_\ast^\top(K+\sigma^2I)^{-1}k_\ast`$. The weight-space computation inverts a $`p\times p`$ matrix and the function-space one an $`n\times n`$ matrix, the same trade as the two forms of ridge regression.
 
 **Leave-one-out predictions.** Let $`C=K+\sigma_n^2I`$, the covariance of $`y`$, and $`P=C^{-1}`$. For a zero-mean Gaussian vector, the conditional distribution of $`y_i`$ given the other coordinates has variance $`1/P_{ii}`$ and mean $`-\sum_{j\ne i}(P_{ij}/P_{ii})y_j`$. This follows by writing the density as proportional to $`\exp(-\frac12y^\top Py)`$ and completing the square in $`y_i`$: as a function of $`y_i`$, the exponent is $`-\frac12P_{ii}y_i^2-y_i\sum_{j\ne i}P_{ij}y_j`$ plus terms free of $`y_i`$. Since $`\sum_{j\ne i}P_{ij}y_j=(Py)_i-P_{ii}y_i`$, the leave-one-out predictive mean is
 
-$$
+```math
 \mu_{-i}=y_i-\frac{(Py)_i}{P_{ii}},\qquad \sigma_{-i}^2=\frac1{P_{ii}} .
-$$
+```
 
 This is the predictive distribution of $`y_i`$ from a Gaussian process fitted to the other $`n-1`$ observations with the same hyperparameters, so all $`n`$ leave-one-out predictions cost one matrix inversion.
 
@@ -286,17 +286,17 @@ The formula is the shortcut $`(y_i-\hat y_i)/(1-S_{ii})`$ of chapter 6 for the l
 
 **Gradient.** Write $`K_y=K_\theta+\sigma_n^2I`$ and $`\alpha=K_y^{-1}y`$. Differentiating $`K_yK_y^{-1}=I`$ gives $`\partial K_y^{-1}=-K_y^{-1}(\partial K_y)K_y^{-1}`$, and the matrix gradient identities of Linear Algebra give $`\partial\log\det K_y=\operatorname{tr}(K_y^{-1}\partial K_y)`$. Hence
 
-$$
+```math
 \frac{\partial}{\partial\theta_j}\log p(y\mid X,\theta)=\frac12y^\top K_y^{-1}\frac{\partial K_y}{\partial\theta_j}K_y^{-1}y-\frac12\operatorname{tr}\Bigl(K_y^{-1}\frac{\partial K_y}{\partial\theta_j}\Bigr)=\frac12\operatorname{tr}\Bigl((\alpha\alpha^\top-K_y^{-1})\frac{\partial K_y}{\partial\theta_j}\Bigr),
-$$
+```
 
 where the last step writes the quadratic form as $`\alpha^\top(\partial K_y/\partial\theta_j)\alpha=\operatorname{tr}\bigl(\alpha\alpha^\top\partial K_y/\partial\theta_j\bigr)`$. After the $`O(n^3)`$ computation of $`K_y^{-1}`$, each hyperparameter's derivative costs $`O(n^2)`$. Hyperparameters are usually optimized on a log scale, which enforces positivity.
 
 **Expected improvement.** Let $`g\sim\mathcal N(\mu,\sigma^2)`$ with $`\sigma>0`$, write $`g=\mu+\sigma Z`$ with $`Z`$ standard normal, and let $`z=(g_{\text{best}}-\mu)/\sigma`$. The improvement $`\max\{0,g_{\text{best}}-g\}=\sigma\max\{0,z-Z\}`$ is positive exactly when $`Z<z`$, so
 
-$$
+```math
 \mathbb E\bigl[\max\{0,g_{\text{best}}-g\}\bigr]=\sigma\int_{-\infty}^{z}(z-t)\varphi(t)\,dt=\sigma\bigl[z\Phi(z)+\varphi(z)\bigr],
-$$
+```
 
 using $`\int_{-\infty}^zt\,\varphi(t)\,dt=-\varphi(z)`$, since $`\varphi'(t)=-t\varphi(t)`$. Substituting $`\sigma z=g_{\text{best}}-\mu`$ gives the formula in the main text. Where $`\sigma(x)=0`$, at points already evaluated without noise, the expected improvement is $`\max\{0,g_{\text{best}}-\mu(x)\}=0`$.
 

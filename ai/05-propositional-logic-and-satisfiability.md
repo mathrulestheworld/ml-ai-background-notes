@@ -16,9 +16,9 @@ A logic has three parts. The **syntax** says which sentences are well formed. Th
 
 A sentence $`\alpha`$ is **entailed** by a knowledge base, written $`\mathrm{KB}\models\alpha`$, if $`\alpha`$ is true in every model in which KB is true. Writing $`M(\alpha)`$ for the set of models of $`\alpha`$,
 
-$$
+```math
 \mathrm{KB}\models\alpha\quad\Longleftrightarrow\quad M(\mathrm{KB})\subseteq M(\alpha).
-$$
+```
 
 The more a knowledge base says, the fewer models it has, and the more it entails. An inference procedure $`i`$ derives sentences, written $`\mathrm{KB}\vdash_i\alpha`$. It is **sound** if it derives only entailed sentences and **complete** if it derives every entailed sentence. Soundness is essential; completeness is desirable but, as chapter 6 shows, not always attainable. If the knowledge base is true of the real world, every sentence derived soundly from it is also true of the world, which is what makes logical reasoning useful to an agent: conclusions about parts of the world it cannot perceive follow from what it knows.
 
@@ -122,9 +122,9 @@ One rule suffices for a complete procedure if sentences are first put in a norma
 
 The **resolution rule** takes two clauses containing complementary literals and produces a clause with all the other literals:
 
-$$
+```math
 \frac{\ell_1\vee\dots\vee\ell_k,\qquad m_1\vee\dots\vee m_n}{\ell_1\vee\dots\vee\ell_{i-1}\vee\ell_{i+1}\vee\dots\vee\ell_k\vee m_1\vee\dots\vee m_{j-1}\vee m_{j+1}\vee\dots\vee m_n}\quad\text{where }\ell_i=\neg m_j,
-$$
+```
 
 with duplicate literals removed (**factoring**). Resolution is sound: in any model, one of $`\ell_i`$ and $`m_j`$ is false, so the rest of that clause must be true. A **resolution refutation** proves $`\mathrm{KB}\models\alpha`$ by converting $`\mathrm{KB}\wedge\neg\alpha`$ to CNF and resolving pairs of clauses until the **empty clause**, a disjunction of nothing, which is false, appears. The **ground resolution theorem** states that if a set of clauses is unsatisfiable, its resolution closure contains the empty clause: resolution is **refutation complete** ([Appendix B](#block-ai05-appendix-b)).
 
@@ -288,9 +288,9 @@ Industrial instances are not random: they have structure, small backdoors of var
 
 A logical agent can use propositional inference to track the state of a partially observable world and to plan. Because a propositional symbol cannot refer to a time, facts that change are written as **fluents** indexed by time step, such as $`\mathit{At}_{1,1}^0`$ and $`\mathit{At}_{2,1}^1`$, and actions as symbols such as $`\mathit{Forward}^0`$. The **transition model** must then say not only what actions change but also what they leave unchanged, the **frame problem**. Listing, for every action, every fluent it does not affect needs a number of axioms proportional to the number of actions times the number of fluents. **Successor-state axioms** avoid this by stating, for each fluent, exactly when it is true at the next step:
 
-$$
+```math
 F^{t+1}\;\Leftrightarrow\;\mathit{ActionCausesF}^t\vee\bigl(F^t\wedge\neg\mathit{ActionCausesNotF}^t\bigr).
-$$
+```
 
 With the percepts added as they arrive, asking whether a fluent is entailed at time $`t`$ performs **logical state estimation**, the deterministic counterpart of the probabilistic filtering of chapter 11. Asking for a model of the axioms together with an initial state and a goal at time $`T`$ produces a plan: the action symbols true in the model. This is **SATPlan**, the subject of chapter 7.
 
@@ -305,9 +305,9 @@ The propositional encoding has an obvious limitation. A grid world with $`k`$ sq
 
 Converting a formula to an equivalent CNF by distribution can blow up exponentially: $`(x_1\wedge y_1)\vee(x_2\wedge y_2)\vee\dots\vee(x_n\wedge y_n)`$ has $`2^n`$ clauses in CNF. The Tseitin transformation introduces a fresh symbol $`z_\phi`$ for each non-atomic subformula $`\phi`$ and adds clauses stating $`z_\phi\Leftrightarrow\phi`$ in terms of the symbols of its immediate subformulas. For $`\phi=a\wedge b`$:
 
-$$
+```math
 (\neg z\vee a)\wedge(\neg z\vee b)\wedge(z\vee\neg a\vee\neg b),
-$$
+```
 
 for $`\phi=a\vee b`$: $`(\neg z\vee a\vee b)\wedge(z\vee\neg a)\wedge(z\vee\neg b)`$, and for $`\phi=\neg a`$: $`(\neg z\vee\neg a)\wedge(z\vee a)`$. Finally, the unit clause $`z_{\text{root}}`$ asserts the whole formula.
 

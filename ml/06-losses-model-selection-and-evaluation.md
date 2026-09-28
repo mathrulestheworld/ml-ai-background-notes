@@ -10,9 +10,9 @@
 
 Most methods in this module fit a predictor by **regularized empirical risk minimization**,
 
-$$
+```math
 \hat f\in\operatorname*{arg\,min}_{f\in\mathcal F}\ \frac1n\sum_{i=1}^n\ell\bigl(y_i,f(x_i)\bigr)+\lambda J(f),
-$$
+```
 
 with a loss $`\ell`$, a model class $`\mathcal F`$, and a penalty $`J`$. The first term is the empirical risk $`\widehat R_n(f)`$ of chapter 1. The penalty $`J(f)`$ measures the complexity of $`f`$, for example a squared norm of its coefficients, and the weight $`\lambda\ge0`$ sets how much that complexity costs. Information and Learning Theory explains why the penalty belongs to the fitting criterion rather than to the loss by which predictions are finally judged.
 
@@ -28,9 +28,9 @@ With labels $`y\in\{-1,+1\}`$ and a score $`f(x)`$, each common classification l
 
 To see what a loss estimates, minimize its conditional risk at a single input. Write $`\eta(x)=P(Y=+1\mid X=x)`$, the class probability of chapter 1 with the label $`1`$ now coded as $`+1`$. At an input where $`\eta(x)=\eta`$, a score $`a`$ produces the margin $`a`$ with probability $`\eta`$ and the margin $`-a`$ with probability $`1-\eta`$, so its conditional risk is
 
-$$
+```math
 C_\eta(a)=\eta\,\phi(a)+(1-\eta)\,\phi(-a).
-$$
+```
 
 Minimizing over $`a`$, separately at every input, gives the population-optimal score $`f^\ast(x)`$, which minimizes the surrogate risk $`R_\phi(f)=\mathbb E\,\phi\bigl(Yf(X)\bigr)`$ over all functions. For a differentiable loss the minimizer solves $`C_\eta'(a)=0`$. For the logistic loss this equation is $`-\eta\,\sigma(-a)+(1-\eta)\,\sigma(a)=0`$, where $`\sigma(t)=1/(1+e^{-t})`$ is the logistic function, so $`\sigma(a)=\eta`$. The other rows follow in the same way:
 
@@ -50,15 +50,15 @@ For the hinge loss, $`C_\eta(a)`$ is piecewise linear with kinks at $`a=\pm1`$. 
 
 A minimal requirement on a surrogate is that minimizing it gets the sign right. A loss is **classification-calibrated** if, for every $`\eta\ne1/2`$, scores of the wrong sign cannot come arbitrarily close to the smallest conditional risk:
 
-$$
+```math
 \inf_{a:\,a(2\eta-1)\le0}C_\eta(a)>\inf_aC_\eta(a).
-$$
+```
 
 When the minimum is attained, this says that every minimizer of the conditional risk has the sign of $`2\eta-1`$. For convex $`\phi`$ there is a simple test ([Bartlett, Jordan, and McAuliffe, 2006](https://www.tandfonline.com/doi/abs/10.1198/016214505000000907)): $`\phi`$ is classification-calibrated exactly when it is differentiable at $`0`$ with $`\phi'(0)<0`$. The logistic, exponential, squared, and hinge losses pass; the perceptron loss, with a kink at $`0`$, fails. The same paper shows that calibration yields an explicit inequality
 
-$$
+```math
 \psi\bigl(R(f)-R^*\bigr)\le R_\phi(f)-R_\phi^*
-$$
+```
 
 between the excess zero–one risk and the excess surrogate risk, for a nondecreasing function $`\psi`$ with $`\psi(0)=0`$. Here $`R(f)`$ is the zero–one risk of the classifier $`\operatorname{sign}f`$, $`R^\ast`$ is the Bayes risk, and $`R_\phi^\ast`$ is the smallest surrogate risk over all measurable scores. For the hinge loss $`\psi(\theta)=\lvert\theta\rvert`$; for the squared loss $`\psi(\theta)=\theta^2`$; for the exponential loss $`\psi(\theta)=1-\sqrt{1-\theta^2}`$, which behaves like $`\theta^2/2`$ near zero. With the squared loss, for instance, an excess surrogate risk of $`0.01`$ guarantees an excess classification error of at most $`0.1`$. Driving the surrogate risk to its minimum over a sufficiently rich class therefore drives the classification error to the Bayes error. Consistency of surrogate minimization is also analyzed by [Zhang (2004)](https://www.semanticscholar.org/paper/Statistical-behavior-and-consistency-of-methods-on-Zhang/7678da8b2eb70a5383f203d948564d8f48c0c62a).
 
@@ -89,14 +89,14 @@ The **pinball loss** is the basis of quantile regression: fitting the $`0.1`$ an
 
 Consider regression with $`Y=m(X)+\varepsilon`$, where $`\mathbb E[\varepsilon\mid X]=0`$ and $`\operatorname{Var}(\varepsilon\mid X=x)=\sigma^2(x)`$. Let $`\hat f_D`$ be fitted on a random training sample $`D`$ and evaluated at a fixed input $`x`$ against a fresh target $`Y`$, independent of $`D`$. Write $`\bar f(x)=\mathbb E_D\hat f_D(x)`$ for the average fit at $`x`$ over training samples; it is a fixed function, not something computed from one sample. Then
 
-$$
+```math
 \boxed{
 \mathbb E_{D,Y}\bigl[(Y-\hat f_D(x))^2\bigr]
 =\underbrace{\sigma^2(x)}_{\text{noise}}
 +\underbrace{\bigl(\bar f(x)-m(x)\bigr)^2}_{\text{squared bias}}
 +\underbrace{\mathbb E_D\bigl[(\hat f_D(x)-\bar f(x))^2\bigr]}_{\text{variance}}.
 }
-$$
+```
 
 To prove it, write $`Y-\hat f_D(x)=\varepsilon+(m(x)-\bar f(x))+(\bar f(x)-\hat f_D(x))`$ and expand the square. The three squared terms give the three components, and the three cross terms vanish: $`\varepsilon=Y-m(x)`$ has mean zero and is independent of $`D`$, $`m(x)-\bar f(x)`$ is a constant, and $`\hat f_D(x)-\bar f(x)`$ has mean zero over $`D`$. Averaging over $`X`$ gives the decomposition of the expected test error. The last two terms are the decomposition of mean squared error into squared bias and variance from Probability and Statistics, applied to $`\hat f_D(x)`$ as an estimator of the number $`m(x)`$.
 
@@ -120,13 +120,13 @@ The U-shaped test-error curve assumes that flexibility is measured by something 
 
 This **double descent** was documented across model classes by [Belkin, Hsu, Ma, and Mandal (2019)](https://www.pnas.org/doi/abs/10.1073/pnas.1903070116) and analyzed exactly for linear models by [Hastie, Montanari, Rosset, and Tibshirani (2022)](https://arxiv.org/abs/1903.08560). The peak is a variance phenomenon: near $`p=n`$, fitting noise exactly requires enormous coefficients. For the Gaussian features of the figure the expected risk has a closed form ([Belkin, Hsu, and Xu, 2020](https://arxiv.org/abs/1903.07571)), derived in [Appendix C](#block-select-appendix-c). Let $`\beta_{1:p}`$ be the coefficients of the features used, and let $`s^2=\|\beta_{p+1:d}\|^2+\sigma^2`$ be the variance of everything the model cannot fit, the omitted signal plus the noise, where $`d=400`$ is the total number of features. Then
 
-$$
+```math
 \mathbb E\,R(\hat\beta)=
 \begin{cases}
 s^2\,\dfrac{n-1}{n-p-1}, & p\le n-2,\\[1.5ex]
 \Bigl(1-\dfrac np\Bigr)\|\beta_{1:p}\|^2+s^2\Bigl(1+\dfrac n{p-n-1}\Bigr), & p\ge n+2,
 \end{cases}
-$$
+```
 
 and the expectation is infinite for $`n-1\le p\le n+1`$. Both variance factors blow up at the threshold. Beyond it, the factor $`n/(p-n-1)`$ decreases because the minimum-norm solution spreads the noise over many coordinates, so the minimum-norm constraint acts as an implicit regularizer. For the spread signal at $`p=400`$ the formula gives $`1.178`$, close to the simulated median $`1.177`$ and below the risk $`1.25`$ of predicting zero. For the concentrated signal the best model uses $`p=7`$ features and has median risk $`0.392`$, far below anything the overparameterized fits achieve. The bias–variance decomposition still holds; what fails is the assumption that the number of parameters is the right measure of flexibility. An explicit ridge penalty chosen by cross-validation removes the peak. These phenomena are central to understanding overparameterized neural networks in the DL module.
 
@@ -136,17 +136,17 @@ and the expectation is infinite for $`n-1\le p\le n+1`$. Both variance factors b
 
 The training error of a fitted model underestimates its error on new data, because the model was chosen to fit those observations. For squared loss this can be quantified. Suppose $`y_i=\mu_i+\varepsilon_i`$, where $`\mu_i`$ is the mean response at the $`i`$th input and the noise terms are independent with mean zero and variance $`\sigma^2`$. Let $`\hat y=\hat y(y)`$ be any vector of fitted values computed from the responses, and consider new responses $`y'_i=\mu_i+\varepsilon'_i`$ at the **same inputs**, with fresh noise. Then
 
-$$
+```math
 \mathbb E\Bigl[\frac1n\sum_i(y'_i-\hat y_i)^2\Bigr]
 -\mathbb E\Bigl[\frac1n\sum_i(y_i-\hat y_i)^2\Bigr]
 =\frac2n\sum_{i=1}^n\operatorname{Cov}(\hat y_i,y_i).
-$$
+```
 
 The first expectation is the **in-sample prediction error**, and the difference is the **optimism** of the training error. It is large when each fitted value depends strongly on its own response. The proof, in [Appendix A](#block-select-appendix-a), needs only the expansion of two squares. This motivates the general definition of **effective degrees of freedom**,
 
-$$
+```math
 \operatorname{df}=\frac1{\sigma^2}\sum_{i=1}^n\operatorname{Cov}(\hat y_i,y_i),
-$$
+```
 
 so that the optimism is $`2\sigma^2\operatorname{df}/n`$. For a linear smoother $`\hat y=Sy`$, whose matrix $`S`$ does not depend on $`y`$, the covariance is $`\sigma^2S_{ii}`$ and $`\operatorname{df}=\operatorname{tr}S`$. This is the number of coefficients for least squares, $`\sum_j\sigma_j^2/(\sigma_j^2+\lambda)`$ for ridge, where $`\sigma_j`$ are the singular values of the design matrix (chapter 3), and $`n/k`$ for $`k`$-NN regression with fixed neighborhoods, where each fitted value gives weight $`1/k`$ to its own response. Chapter 3 verifies the least-squares case by simulation, and [Efron (2004)](https://www.tandfonline.com/doi/abs/10.1198/016214504000000692) develops this covariance-penalty view.
 
@@ -154,9 +154,9 @@ so that the optimism is $`2\sigma^2\operatorname{df}/n`$. For a linear smoother 
 
 Adding an estimate of the optimism to the training error gives **Mallows' $`C_p`$**,
 
-$$
+```math
 C_p=\frac1n\sum_i(y_i-\hat y_i)^2+\frac{2\operatorname{df}}n\hat\sigma^2,
-$$
+```
 
 an unbiased estimate of in-sample prediction error when $`\hat\sigma^2`$ is unbiased. The noise variance is usually estimated from the residuals of a large model with little bias. In the polynomial example of the bias–variance section, $`\operatorname{df}`$ is the degree plus one, so each added coefficient raises the optimism by $`2\sigma^2/n=0.0072`$.
 
@@ -166,9 +166,9 @@ an unbiased estimate of in-sample prediction error when $`\hat\sigma^2`$ is unbi
 
 For models fitted by maximum likelihood with $`k`$ parameters and maximized likelihood $`\hat L`$ (Probability and Statistics),
 
-$$
+```math
 \operatorname{AIC}=-2\log\hat L+2k,\qquad \operatorname{BIC}=-2\log\hat L+k\log n.
-$$
+```
 
 AIC estimates expected out-of-sample log loss, up to constants: its penalty $`2k`$ approximates the optimism of the training value $`-2\log\hat L`$, as $`2\operatorname{df}\hat\sigma^2`$ does for the residual sum of squares in $`C_p`$. It coincides with $`C_p`$ for Gaussian regression with known variance. BIC approximates $`-2`$ times the log marginal likelihood of a model by a Laplace approximation (Probability and Statistics), and it penalizes complexity more heavily once $`n\ge8`$, where $`\log n>2`$. The two criteria answer different questions. When the true model is among the candidates, BIC selects it with probability tending to one; AIC instead tends to choose the model with the best predictive accuracy, and it may overfit in the sense of including unnecessary terms. Both require a parameter count or degrees-of-freedom estimate, and both are derived under the assumption that the fitted model family is approximately correct.
 
@@ -182,9 +182,9 @@ The standard protocol splits the data three ways. The **training set** fits para
 
 Holding out data wastes it, and a single split gives a noisy estimate. **$`K`$-fold cross-validation** partitions the data into $`K`$ folds of nearly equal size. For each fold $`k`$, the procedure is fitted on the other $`K-1`$ folds, giving the model $`\hat f^{(-k)}`$, and evaluated on fold $`k`$; the $`K`$ error estimates are averaged:
 
-$$
+```math
 \operatorname{CV}_K=\frac1n\sum_{k=1}^K\sum_{i\in\text{fold }k}\ell\bigl(y_i,\hat f^{(-k)}(x_i)\bigr).
-$$
+```
 
 Every observation is used once for evaluation and $`K-1`$ times for fitting. Common choices are $`K=5`$ or $`10`$. With $`K=n`$, the procedure is **leave-one-out cross-validation** (LOOCV).
 
@@ -196,9 +196,9 @@ The choice of $`K`$ trades bias against variance and cost. Each fit uses a fract
 
 **A shortcut for linear smoothers.** Suppose the fitted values are $`\hat y=Sy`$ and deleting observation $`i`$ amounts to refitting the same smoother on the remaining data, as for least squares and ridge regression. The diagonal entry $`S_{ii}`$, the **leverage** of observation $`i`$, measures how strongly $`\hat y_i`$ depends on $`y_i`$. Then
 
-$$
+```math
 \operatorname{LOOCV}=\frac1n\sum_{i=1}^n\Bigl(\frac{y_i-\hat y_i}{1-S_{ii}}\Bigr)^2.
-$$
+```
 
 A single fit suffices. **Generalized cross-validation** replaces each $`S_{ii}`$ by its average $`\operatorname{tr}(S)/n=\operatorname{df}/n`$. The derivation, by the Sherman–Morrison formula, is in [Appendix A](#block-select-appendix-a); Probability and Statistics uses the same deletion formula for least-squares influence diagnostics.
 
@@ -284,11 +284,11 @@ The labels are random, so no classifier can exceed 50% accuracy on new data. The
 
 Iterative fitting introduces another hyperparameter: the number of iterations. Stopping gradient descent before convergence, at the point of lowest validation error, is **early stopping**. Consider least squares started from zero with step size $`\eta`$ (unrelated to the class probability $`\eta(x)`$ of the first section). Write the singular value decomposition of the design matrix as $`X=U\Sigma V^\top`$, with left singular vectors $`u_j`$ and singular values $`\sigma_j`$ (Linear Algebra). The fitted values after $`t`$ steps are then a spectral filter, like those of ridge regression:
 
-$$
+```math
 X\beta_t=\sum_ju_j\bigl[1-(1-\eta\sigma_j^2)^t\bigr]u_j^\top y
 \qquad\text{versus}\qquad
 X\hat\beta_\lambda=\sum_ju_j\frac{\sigma_j^2}{\sigma_j^2+\lambda}u_j^\top y.
-$$
+```
 
 For a step size $`\eta\le1/\sigma_1^2`$, where $`\sigma_1`$ is the largest singular value, both keep a fraction between zero and one of each component $`u_j^\top y`$ of the response. Directions with large singular values are fitted within a few steps; directions with small ones only after many. Stopping early leaves the small-variance directions shrunk, much as a penalty with $`\lambda\approx1/(\eta t)`$ would. The derivation is in [Appendix B](#block-select-appendix-b).
 
@@ -368,9 +368,9 @@ A scoring classifier defines a family of classifiers, one per threshold: it pred
 
 The area under the ROC curve, the **AUC**, has a direct interpretation:
 
-$$
+```math
 \operatorname{AUC}=P\bigl(S^+>S^-\bigr)+\tfrac12P\bigl(S^+=S^-\bigr),
-$$
+```
 
 where $`S^+`$ and $`S^-`$ are the scores of an independently drawn positive and negative example. It is the Mann–Whitney statistic (Probability and Statistics), computable from ranks, and it measures ranking quality independently of any threshold and of calibration ([Fawcett, 2006](https://www.sciencedirect.com/science/article/abs/pii/S016786550500303X)). For Gaussian scores with unit variances whose means differ by $`\Delta`$, the difference $`S^+-S^-`$ is $`\mathcal N(\Delta,2)`$, so $`\operatorname{AUC}=\Phi(\Delta/\sqrt2)`$, where $`\Phi`$ is the standard normal distribution function: $`0.760`$ for $`\Delta=1`$ and $`0.921`$ for $`\Delta=2`$. The **precision–recall curve** plots precision against recall. Its summary, **average precision**, weights the curve by the recall gained at each threshold: $`\sum_k(R_k-R_{k-1})P_k`$, where $`R_k`$ and $`P_k`$ are the recall and precision at the $`k`$th threshold.
 
@@ -429,13 +429,13 @@ A difference of 1.7 percentage points rests on 13 discordant examples and is wel
 
 Let $`y=\mu+\varepsilon`$ and $`y'=\mu+\varepsilon'`$ with $`\varepsilon,\varepsilon'`$ independent, mean zero, and covariance $`\sigma^2I`$. The fitted values $`\hat y`$ depend on $`y`$ but not on $`y'`$. For each $`i`$,
 
-$$
+```math
 \mathbb E(y'_i-\hat y_i)^2=\sigma^2+\mathbb E(\mu_i-\hat y_i)^2,
-$$
+```
 
-$$
+```math
 \mathbb E(y_i-\hat y_i)^2=\sigma^2+\mathbb E(\mu_i-\hat y_i)^2-2\operatorname{Cov}(y_i,\hat y_i),
-$$
+```
 
 where the first uses the independence of $`\varepsilon'_i`$ and $`\hat y`$, and the second uses $`\mathbb E[\varepsilon_i(\mu_i-\hat y_i)]=-\mathbb E[\varepsilon_i\hat y_i]=-\operatorname{Cov}(y_i,\hat y_i)`$. Subtracting and averaging over $`i`$ gives the optimism $`\frac2n\sum_i\operatorname{Cov}(\hat y_i,y_i)`$. For a linear smoother $`\hat y=Sy`$ with $`S`$ not depending on $`y`$, $`\operatorname{Cov}(\hat y_i,y_i)=\sigma^2S_{ii}`$, so $`\operatorname{df}=\operatorname{tr}S`$. For adaptive procedures such as best-subset selection, the covariance exceeds the number of selected parameters, because the choice of subset itself adapts to the noise.
 
@@ -443,22 +443,22 @@ where the first uses the independence of $`\varepsilon'_i`$ and $`\hat y`$, and 
 
 For ridge regression with $`A=X^\top X+\lambda I`$, deleting row $`i`$ gives $`A_{-i}=A-x_ix_i^\top`$ and $`X_{-i}^\top y_{-i}=X^\top y-x_iy_i`$. Write $`h_i=x_i^\top A^{-1}x_i=S_{ii}`$. Sherman–Morrison gives
 
-$$
+```math
 A_{-i}^{-1}x_i=\frac{A^{-1}x_i}{1-h_i}.
-$$
+```
 
 Then the leave-one-out prediction satisfies
 
-$$
+```math
 x_i^\top\hat\beta^{(-i)}=x_i^\top A_{-i}^{-1}(X^\top y-x_iy_i)
 =\frac{\hat y_i-h_iy_i}{1-h_i},
-$$
+```
 
 using $`x_i^\top A_{-i}^{-1}X^\top y=(x_i^\top A^{-1}X^\top y)/(1-h_i)`$ by symmetry of the same identity. Hence
 
-$$
+```math
 y_i-x_i^\top\hat\beta^{(-i)}=\frac{y_i-\hat y_i}{1-h_i}.
-$$
+```
 
 The same argument applies to least squares ($`\lambda=0`$) and to any smoother obtained by solving a penalized least-squares problem whose penalty is a fixed quadratic form in the coefficients, $`\beta^\top\Omega\beta`$, with $`\lambda I`$ replaced by $`\Omega`$.
 
@@ -471,17 +471,17 @@ The same argument applies to least squares ($`\lambda=0`$) and to any smoother o
 
 Minimize $`\frac12\|y-X\beta\|^2`$ by gradient descent from $`\beta_0=0`$ with step $`\eta<2/\sigma_1^2`$, where $`\sigma_1`$ is the largest singular value; the Hessian is $`X^\top X`$, whose largest eigenvalue is $`\sigma_1^2`$, and Calculus and Optimization shows that this is the stability condition on a quadratic. The update is
 
-$$
+```math
 \beta_{t+1}=\beta_t+\eta X^\top(y-X\beta_t)=(I-\eta X^\top X)\beta_t+\eta X^\top y.
-$$
+```
 
 In the SVD $`X=U\Sigma V^\top`$, the coordinates $`\theta_t=V^\top\beta_t`$ evolve independently:
 
-$$
+```math
 \theta_{t+1,j}=(1-\eta\sigma_j^2)\theta_{t,j}+\eta\sigma_j\,u_j^\top y
 \quad\Longrightarrow\quad
 \theta_{t,j}=\frac{1-(1-\eta\sigma_j^2)^t}{\sigma_j}\,u_j^\top y.
-$$
+```
 
 The solution follows by summing the geometric series $`\eta\sigma_ju_j^\top y\sum_{s=0}^{t-1}(1-\eta\sigma_j^2)^s`$. Multiplying by $`\sigma_j`$ gives the fitted-value filter $`1-(1-\eta\sigma_j^2)^t`$, compared with the ridge filter $`\sigma_j^2/(\sigma_j^2+\lambda)`$. Both are near one for large $`\sigma_j`$ and near zero for small $`\sigma_j`$. For small $`\eta\sigma_j^2`$, $`1-(1-\eta\sigma_j^2)^t\approx1-e^{-\eta t\sigma_j^2}`$, which crosses one half at $`\sigma_j^2=\log2/(\eta t)`$; the ridge filter crosses one half at $`\sigma_j^2=\lambda`$. The correspondence $`\lambda\approx1/(\eta t)`$ is therefore a statement about the order of magnitude, not an exact equivalence. As $`t\to\infty`$, directions with $`\sigma_j=0`$ are never updated, so gradient descent from zero converges to the minimum-norm least-squares solution, the estimator whose double descent appears in the main text.
 
@@ -494,9 +494,9 @@ The solution follows by summing the geometric series $`\eta\sigma_ju_j^\top y\su
 
 The model of the double-descent figure has inputs $`x\sim\mathcal N(0,I_d)`$ and targets $`y=x^\top\beta+\varepsilon`$ with $`\varepsilon\sim\mathcal N(0,\sigma^2)`$ independent of $`x`$. The fit uses only the first $`p`$ features: $`X_p`$ is the $`n\times p`$ matrix of their training values, $`X_{p+1:d}`$ holds the values of the others, and the fit has coefficients $`w\in\mathbb R^p`$ for the first $`p`$ features and zero for the rest. Its risk on a new observation is
 
-$$
+```math
 R(w)=\mathbb E\bigl(y-x_{1:p}^\top w\bigr)^2=\|\beta_{1:p}-w\|^2+\|\beta_{p+1:d}\|^2+\sigma^2,
-$$
+```
 
 because the coordinates of $`x`$ are independent with unit variance. This is the exact risk computed for each fitted model in the figure.
 

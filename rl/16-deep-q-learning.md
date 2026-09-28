@@ -32,9 +32,9 @@ Replay also makes the method off-policy by construction, since the stored transi
 
 The second ingredient is a separate **target network** $`\hat q(\cdot,\cdot;\mathbf w^-)`$, a copy of the online network whose weights are updated only every $`C`$ updates, 10,000 in the original. The targets are computed with it,
 
-$$
+```math
 y=r+\gamma\max_{a'}\hat q(s',a';\mathbf w^-),\qquad L(\mathbf w)=\mathbb E_{(s,a,r,s')\sim\mathcal D}\bigl[\ell\bigl(y-\hat q(s,a;\mathbf w)\bigr)\bigr],
-$$
+```
 
 so that between copies, the online network solves a fixed regression problem, as in fitted Q iteration. Without it, each update moves the targets in the direction of the update, and because the network generalizes, raising $`\hat q(s,a)`$ also raises $`\hat q(s',a')`$ for similar states, the bootstrapping loop that can spiral into divergence. An alternative to periodic copies is **Polyak averaging**, $`\mathbf w^-\leftarrow(1-\tau)\mathbf w^-+\tau\mathbf w`$ at every step with a small $`\tau`$ (0.001 in the original, 0.005 in later actor–critic methods), introduced for continuous control ([Lillicrap et al., 2016](https://arxiv.org/abs/1509.02971)) and standard in actor–critic methods (exercise 16.5).
 
@@ -204,9 +204,9 @@ In this experiment the regression targets are the exact true values, and there i
 
 **Double Q-learning** (chapter 7) removes the bias by using one estimate to choose the maximizing action and an independent one to evaluate it. **Double DQN** ([van Hasselt, Guez, and Silver, 2016](https://arxiv.org/abs/1509.06461)) obtains the second estimate for free, from the networks DQN already has: the online network chooses and the target network evaluates,
 
-$$
+```math
 y=r+\gamma\,\hat q\Bigl(s',\arg\max_{a'}\hat q(s',a';\mathbf w);\mathbf w^-\Bigr).
-$$
+```
 
 The two networks are not independent, so the bias is reduced rather than removed, but the change of one line reduced the overestimates substantially on Atari and improved the scores on many games. Other remedies average several target networks ([Anschel, Baram, and Shimkin, 2017](https://arxiv.org/abs/1611.01929)) or take the minimum of two independent critics, the clipped double Q-learning of TD3 (chapter 21), which trades overestimation for a controlled underestimation.
 
@@ -216,9 +216,9 @@ The two networks are not independent, so the bias is reduced rather than removed
 
 In many states the choice of action matters little: in a racing game, when no car is near, every action has nearly the same value. The **dueling architecture** ([Wang et al., 2016](https://arxiv.org/abs/1511.06581)) splits the network after the shared convolutional layers into two streams, one estimating the state value $`V(s)`$ and one the advantages $`A(s,a)`$, and combines them as
 
-$$
+```math
 \hat q(s,a)=V(s)+\Bigl(A(s,a)-\frac1{|\mathcal A|}\sum_{b}A(s,b)\Bigr).
-$$
+```
 
 The subtraction makes the decomposition identifiable: without it, adding a constant to $`V`$ and subtracting it from every $`A`$ gives the same $`\hat q`$ (exercise 16.4). Every update then improves $`V(s)`$, which is shared by all actions, even though only one action's value is observed per transition, and the network learns which states are valuable without having to learn the effect of each action in each of them. Dueling networks improved DQN and double DQN on most Atari games, and the architecture is a standard component of later agents.
 

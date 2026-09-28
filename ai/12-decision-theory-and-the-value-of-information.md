@@ -27,15 +27,15 @@ The axioms are constraints on consistency, not on tastes. An agent that violates
 
 **Theorem (von Neumann–Morgenstern).** If preferences satisfy the axioms, there is a real-valued function $`U`$ on outcomes such that
 
-$$
+```math
 A\succ B\iff U(A)>U(B),\qquad U\bigl([p_1,S_1;\dots;p_n,S_n]\bigr)=\sum_ip_i\,U(S_i).
-$$
+```
 
 The utility of a lottery is the expected utility of its outcomes, and $`U`$ is unique up to a **positive affine transformation** $`U'=aU+b`$ with $`a>0`$ ([Appendix A](#block-ai12-appendix-a)). The theorem justifies the **principle of maximum expected utility** (MEU): given evidence $`e`$, a rational agent chooses
 
-$$
+```math
 a^*=\arg\max_a\;\mathbb E[U\mid a,e]=\arg\max_a\sum_sP(\mathrm{Result}(a)=s\mid a,e)\,U(s).
-$$
+```
 
 The principle does not say that agents compute utilities or maximize them explicitly; it says that the behavior of any agent with consistent preferences can be described as if it did. It also fixes what utility numbers mean: only their ratios of differences are meaningful, which is why, unlike in deterministic games (chapter 4), a monotone but nonlinear rescaling of utilities can change decisions under uncertainty.
 
@@ -118,9 +118,9 @@ With several decisions made in sequence, each observing more, the network is eva
 
 Some actions only gather information: tests, measurements, surveys, questions. **Information value theory** ([Howard, 1966](https://doi.org/10.1109/TSSC.1966.300074)) says how much they are worth. Let $`\alpha`$ be the best action given the current evidence $`e`$, with expected utility $`\mathrm{EU}(\alpha\mid e)`$. If the agent could observe the value of a variable $`E_j`$ before deciding, it would choose the best action $`\alpha_{e_{jk}}`$ for each observed value $`e_{jk}`$. Since the value is not yet known, the expected utility of deciding after observing is averaged over the current beliefs about it, and the **value of perfect information** is
 
-$$
+```math
 \mathrm{VPI}_e(E_j)=\Bigl(\sum_kP(E_j=e_{jk}\mid e)\,\mathrm{EU}\bigl(\alpha_{e_{jk}}\mid e,E_j=e_{jk}\bigr)\Bigr)-\mathrm{EU}(\alpha\mid e).
-$$
+```
 
 It is the most the agent should pay for the observation. Information has value only because it can change a decision: if the best action is the same for every possible outcome, the VPI is zero, however much the information reduces uncertainty. The VPI has three properties ([Appendix B](#block-ai12-appendix-b)):
 
@@ -192,15 +192,15 @@ The same reasoning applies to computation itself: thinking is an action whose va
 
 Assume the axioms and, for simplicity, finitely many outcomes, with a best outcome $`S^\top`$ and a worst $`S^\bot`$, $`S^\top\succ S^\bot`$ (if all outcomes are equivalent, any constant utility works). For each outcome $`S`$, continuity gives a probability $`u_S`$ with
 
-$$
+```math
 S\sim[u_S,S^\top;\;1-u_S,S^\bot],
-$$
+```
 
 and monotonicity makes it unique. Define $`U(S)=u_S`$. For a lottery $`L=[p_1,S_1;\dots;p_n,S_n]`$, substitutability lets each $`S_i`$ be replaced by its equivalent lottery over $`S^\top`$ and $`S^\bot`$, and decomposability reduces the result to
 
-$$
+```math
 L\sim\Bigl[\textstyle\sum_ip_iu_{S_i},\;S^\top;\;1-\sum_ip_iu_{S_i},\;S^\bot\Bigr].
-$$
+```
 
 So every lottery is equivalent to a lottery over the best and worst outcomes with probability $`\sum_ip_iU(S_i)`$ of the best, and by monotonicity and transitivity, $`L\succ L'`$ exactly when this probability is larger for $`L`$. That is the expected-utility representation. If $`U'`$ is another representation, both are increasing affine functions of the probability in the equivalent best–worst lottery, hence of each other: $`U'=aU+b`$ with $`a>0`$.
 
@@ -214,9 +214,9 @@ So every lottery is equivalent to a lottery over the best and worst outcomes wit
 
 Let $`V(p)=\max_a\mathbb E_p[U\mid a]`$ be the value of acting optimally under beliefs $`p`$ about the state. Each $`\mathbb E_p[U\mid a]=\sum_sp(s)U(a,s)`$ is linear in $`p`$, and a maximum of linear functions is **convex**. Observing $`E_j`$ turns the current belief $`p`$ into a posterior $`p_k`$ with probability $`P(E_j=e_{jk})`$, and the posteriors average back to the prior, $`\sum_kP(e_{jk})\,p_k=p`$ (the law of total probability). By Jensen's inequality for the convex $`V`$,
 
-$$
+```math
 \sum_kP(e_{jk})\,V(p_k)\ge V\Bigl(\sum_kP(e_{jk})\,p_k\Bigr)=V(p),
-$$
+```
 
 which is $`\mathrm{VPI}\ge0`$. Equality holds when a single action is optimal for all the posteriors, since $`V`$ is then linear over their convex hull; this is the case where information cannot change the decision. The figure shows the convexity directly: the value of perfect information is the gap between the chord of $`V`$ over the extreme beliefs and $`V`$ itself, largest at the kink.
 
@@ -232,9 +232,9 @@ which is $`\mathrm{VPI}\ge0`$. Equality holds when a single action is optimal fo
 
 With $`U(x)=-e^{-x/R}`$ and $`X\sim\mathcal N(\mu,\sigma^2)`$, the moment generating function of the normal gives
 
-$$
+```math
 \mathbb E\bigl[e^{-X/R}\bigr]=\exp\Bigl(-\frac{\mu}{R}+\frac{\sigma^2}{2R^2}\Bigr),
-$$
+```
 
 so $`\mathbb E[U(X)]=U(\mathrm{CE})`$ with $`\mathrm{CE}=\mu-\sigma^2/(2R)`$. The risk premium $`\sigma^2/(2R)`$ is proportional to the variance and inversely to the risk tolerance, which is why mean–variance criteria appear in finance. More generally, for a small risk around wealth $`w`$ and any smooth utility, the risk premium is approximately $`\tfrac12\sigma^2\,r(w)`$ with the **Arrow–Pratt coefficient** $`r(w)=-U''(w)/U'(w)`$: $`1/R`$ for exponential utility, and $`1/w`$ for logarithmic utility, whose aversion to a fixed risk falls as wealth grows.
 

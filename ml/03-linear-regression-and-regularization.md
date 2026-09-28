@@ -10,15 +10,15 @@
 
 **Linear regression** predicts a numerical target by an affine function of the features,
 
-$$
+```math
 f_\beta(x)=\beta_0+\sum_{j=1}^d\beta_jx_j=\beta_0+x^\top\beta.
-$$
+```
 
 Here $`x\in\mathbb R^d`$ is the feature vector, $`\beta_0`$ is the **intercept**, and $`\beta=(\beta_1,\ldots,\beta_d)^\top`$ holds one slope per feature. Fitting by **least squares** minimizes the empirical squared-error risk
 
-$$
+```math
 \widehat R_n(\beta_0,\beta)=\frac1n\sum_{i=1}^n\bigl(y_i-\beta_0-x_i^\top\beta\bigr)^2.
-$$
+```
 
 This is the empirical risk $`\widehat R_n(f)`$ of chapter 1 for the squared loss, written as a function of the coefficients. Under that loss the best possible predictor is the regression function $`m(x)=\mathbb E[Y\mid X=x]`$, so a linear model approximates $`m`$ by an affine function.
 
@@ -26,15 +26,15 @@ Absorb a column of ones into the design matrix $`X\in\mathbb R^{n\times(d+1)}`$,
 
 Least squares is also maximum likelihood under a Gaussian noise model. If
 
-$$
+```math
 y_i=\beta_0+x_i^\top\beta+\varepsilon_i,\qquad \varepsilon_i\stackrel{\mathrm{iid}}{\sim}\mathcal N(0,\sigma^2),
-$$
+```
 
 the negative log-likelihood is
 
-$$
+```math
 -\log L(\beta_0,\beta,\sigma^2)=\frac n2\log(2\pi\sigma^2)+\frac1{2\sigma^2}\sum_{i=1}^n\bigl(y_i-\beta_0-x_i^\top\beta\bigr)^2.
-$$
+```
 
 For any fixed $`\sigma^2`$, maximizing over the coefficients is minimizing the residual sum of squares $`\mathrm{RSS}=\sum_i(y_i-\beta_0-x_i^\top\beta)^2`$, so the least-squares coefficients are the MLE in the sense of Probability and Statistics. Setting the derivative with respect to $`\sigma^2`$ to zero then gives the MLE of the noise variance, $`\hat\sigma^2=\mathrm{RSS}/n`$, which differs from the unbiased $`\mathrm{RSS}/(n-d-1)`$ of least-squares inference: the fit uses $`d+1`$ of the $`n`$ dimensions of the response, and the residuals live in the remaining $`n-d-1`$. The prediction rule does not depend on normality: whenever second moments exist, least squares estimates the best linear approximation to the regression function, the affine function closest to $`m`$ in mean square (best linear approximation). Normality matters for exact finite-sample inference and for interpreting the fit as a full conditional distribution $`p(y\mid x)`$.
 
@@ -60,15 +60,15 @@ A straight line underfits: its error, even on the training data, is dominated by
 
 The size of the gap can be computed exactly for least squares with a fixed design, that is, with the inputs treated as fixed and only the noise random. Let $`X`$ be a design with $`p`$ linearly independent columns and $`H=X(X^\top X)^{-1}X^\top`$ its **hat matrix**, which maps responses to fitted values, $`\hat y=Hy`$. Let $`y=\mu+\varepsilon`$, where $`\mu=(m(x_1),\ldots,m(x_n))^\top`$ collects the regression function at the inputs and $`\operatorname{Cov}(\varepsilon)=\sigma^2I`$. The hat matrix is the orthogonal projection onto the column space of $`X`$ (projection geometry). Since $`\operatorname{tr}H=p`$ and $`I-H`$ projects onto an $`(n-p)`$-dimensional space, writing $`y-Hy=(I-H)\mu+(I-H)\varepsilon`$ and using $`\mathbb E[\varepsilon^\top A\varepsilon]=\sigma^2\operatorname{tr}A`$ gives
 
-$$
+```math
 \mathbb E\Bigl[\tfrac1n\|y-Hy\|^2\Bigr]=\frac{\|(I-H)\mu\|^2}n+\sigma^2\Bigl(1-\frac pn\Bigr),
-$$
+```
 
 while a fresh response vector $`y'=\mu+\varepsilon'`$ at the **same inputs**, with noise $`\varepsilon'`$ independent of $`\varepsilon`$, satisfies $`y'-Hy=(I-H)\mu+\varepsilon'-H\varepsilon`$ and gives
 
-$$
+```math
 \mathbb E\Bigl[\tfrac1n\|y'-Hy\|^2\Bigr]=\frac{\|(I-H)\mu\|^2}n+\sigma^2\Bigl(1+\frac pn\Bigr).
-$$
+```
 
 The first term is squared bias, identical in both. The noise contributions differ by $`2\sigma^2p/n`$: the training error is optimistic by an amount proportional to the number of fitted coefficients. This is the quantity estimated by Mallows' $`C_p`$ and related criteria in chapter 6, which also extends the calculation to any fitting method.
 
@@ -102,9 +102,9 @@ Here the model is correctly specified, so the bias term is zero. With ten coeffi
 
 The normal equations are solved directly when $`d`$ is moderate. For large problems, or when the same machinery must handle non-quadratic losses, the objective
 
-$$
+```math
 J(\beta)=\frac1{2n}\|y-X\beta\|^2,\qquad \nabla J(\beta)=\frac1nX^\top(X\beta-y),\qquad \nabla^2J=\frac1nX^\top X,
-$$
+```
 
 is minimized by gradient descent or its stochastic variants. The Hessian is constant, so $`J`$ is a convex quadratic whose curvature in any direction lies between the smallest and largest eigenvalues, $`\lambda_{\min}`$ and $`\lambda_{\max}`$, of $`X^\top X/n`$; it is $`L`$-smooth in the sense of Calculus and Optimization with $`L=\lambda_{\max}`$. From Calculus and Optimization, gradient descent with step $`1/L`$ contracts the error in each eigendirection by $`1-\lambda_j/\lambda_{\max}`$, where $`\lambda_j`$ is the eigenvalue of that direction. When the condition number $`\kappa=\lambda_{\max}/\lambda_{\min}`$ is large, the small-curvature directions converge slowly. After $`t`$ steps the error along the flattest direction has shrunk by the factor $`(1-1/\kappa)^t\approx e^{-t/\kappa}`$, so each reduction by a factor $`e`$ costs about $`\kappa`$ iterations.
 
@@ -159,15 +159,15 @@ After centering and scaling, the curvature matrix is close to the identity and f
 
 When features are numerous or strongly correlated, least-squares coefficients have high variance. **Ridge regression** adds a squared-norm penalty:
 
-$$
+```math
 \hat\beta_\lambda=\operatorname*{arg\,min}_{\beta}\ \|y-X\beta\|_2^2+\lambda\|\beta\|_2^2,\qquad\lambda>0.
-$$
+```
 
 Throughout this section, the features are standardized and the target is centered using training-set statistics; the intercept is then the training mean of $`y`$ and is not penalized. Penalizing the intercept would make predictions depend on the arbitrary origin of the target. From here on, $`X\in\mathbb R^{n\times d}`$ therefore denotes the matrix of standardized features, without the column of ones, and $`\beta\in\mathbb R^d`$ the slopes. With this convention, setting the gradient $`2X^\top(X\beta-y)+2\lambda\beta`$ to zero gives
 
-$$
+```math
 \hat\beta_\lambda=(X^\top X+\lambda I)^{-1}X^\top y.
-$$
+```
 
 The matrix $`X^\top X+\lambda I`$ is positive definite for every $`\lambda>0`$, because $`v^\top(X^\top X+\lambda I)v=\|Xv\|^2+\lambda\|v\|^2>0`$ for every $`v\ne0`$. The solution therefore exists and is unique even when $`X`$ is rank deficient, including when $`d>n`$. The penalty is equivalent to a constraint $`\|\beta\|_2\le t`$ for a data-dependent $`t`$, by Lagrangian duality for this convex problem (Lagrange multipliers and KKT). The penalized solution $`\hat\beta_\lambda`$ solves the constrained problem with $`t=\|\hat\beta_\lambda\|_2`$, and every budget $`t`$ smaller than the norm of the minimum-norm least-squares solution arises in this way from some $`\lambda>0`$.
 
@@ -177,26 +177,26 @@ The value of $`\lambda`$ is meaningful only with its normalization. The objectiv
 
 **Shrinkage in singular directions.** Write the thin SVD as $`X=U\Sigma V^\top`$. The columns $`u_j`$ of $`U`$ and $`v_j`$ of $`V`$ are orthonormal, $`r`$ is the rank of $`X`$, and $`\Sigma=\operatorname{diag}(\sigma_1,\ldots,\sigma_r)`$ holds the singular values $`\sigma_1\ge\cdots\ge\sigma_r>0`$. (Subscripted, $`\sigma_j`$ is a singular value; the unsubscripted $`\sigma`$ below is the noise standard deviation.) Then
 
-$$
+```math
 X\hat\beta_\lambda=\sum_{j=1}^r u_j\,\frac{\sigma_j^2}{\sigma_j^2+\lambda}\,u_j^\top y.
-$$
+```
 
 Equivalently, $`\hat\beta_\lambda=\sum_{j=1}^rv_j\,\sigma_j(\sigma_j^2+\lambda)^{-1}\,u_j^\top y`$. Least squares keeps every component $`u_j^\top y`$ of the response along the column space. Ridge multiplies component $`j`$ by the **shrinkage factor** $`\sigma_j^2/(\sigma_j^2+\lambda)\in(0,1)`$. Because the features are centered, $`\sigma_j^2/n`$ is the sample variance of the inputs along the direction $`v_j`$, the $`j`$th principal direction of chapter 12. Directions of large variance in the inputs, with large $`\sigma_j`$, are barely changed; directions of small variance, where coefficient estimates are least stable, are shrunk heavily. The derivation is in Linear Algebra.
 
 **Maximum a posteriori estimation.** Under the Gaussian model $`y\mid\beta\sim\mathcal N(X\beta,\sigma^2I)`$ and the prior $`\beta\sim\mathcal N(0,\tau^2I)`$, the negative log posterior is, up to a constant,
 
-$$
+```math
 \frac1{2\sigma^2}\|y-X\beta\|^2+\frac1{2\tau^2}\|\beta\|^2.
-$$
+```
 
 Multiplying by $`2\sigma^2`$ shows that its minimizer is $`\hat\beta_\lambda`$ with $`\lambda=\sigma^2/\tau^2`$: the negative log prior has become the penalty, as in Posterior means and MAP estimates. Because the posterior is Gaussian, this MAP estimate is also the posterior mean. A small prior variance, meaning a strong belief that coefficients are small, corresponds to a large penalty. Bayesian linear regression, which also propagates posterior *uncertainty* into predictions, is developed in chapter 15.
 
 **A kernel form.** The identity $`(X^\top X+\lambda I_d)^{-1}X^\top=X^\top(XX^\top+\lambda I_n)^{-1}`$ gives
 
-$$
+```math
 \hat\beta_\lambda=X^\top(XX^\top+\lambda I_n)^{-1}y,\qquad
 \hat f(x)=x^\top\hat\beta_\lambda=\sum_{i=1}^n\alpha_i\,x^\top x_i,\quad \alpha=(XX^\top+\lambda I)^{-1}y.
-$$
+```
 
 The first form solves a $`d\times d`$ system; the second an $`n\times n`$ system involving only inner products between observations. The second is cheaper when $`d>n`$, and it is the starting point for **kernel ridge regression** in chapter 8. To verify the identity, multiply both sides on the left by $`X^\top X+\lambda I`$ and on the right by $`XX^\top+\lambda I`$: both sides become $`X^\top XX^\top+\lambda X^\top`$.
 
@@ -204,9 +204,9 @@ The first form solves a $`d\times d`$ system; the second an $`n\times n`$ system
 
 The fitted values are a linear function of the response, $`\hat y=H_\lambda y`$ with $`H_\lambda=X(X^\top X+\lambda I)^{-1}X^\top`$. By analogy with least squares, where $`\operatorname{tr}H`$ counts the coefficients, the **effective degrees of freedom** of ridge regression are
 
-$$
+```math
 \operatorname{df}(\lambda)=\operatorname{tr}H_\lambda=\sum_{j=1}^r\frac{\sigma_j^2}{\sigma_j^2+\lambda}.
-$$
+```
 
 The second expression follows from the singular-direction form above, since $`H_\lambda=\sum_ju_j\frac{\sigma_j^2}{\sigma_j^2+\lambda}u_j^\top`$ and each $`u_ju_j^\top`$ has trace one. The effective degrees of freedom decrease continuously from the rank $`r`$ at $`\lambda=0`$ to zero as $`\lambda\to\infty`$. It measures flexibility on the scale of a parameter count: $`\operatorname{df}(\lambda)=4.5`$ means that the ridge fit is about as flexible as least squares with four or five features. Probability and Statistics uses the same definition, the trace of the smoother matrix, for any linear smoother, and the general definition as a sum of covariances between fitted and observed responses appears in chapter 6.
 
@@ -247,16 +247,16 @@ The [diabetes data](https://scikit-learn.org/stable/datasets/toy_dataset.html#di
 
 For a fixed design with $`y=X\beta+\varepsilon`$, $`\mathbb E\varepsilon=0`$, and $`\operatorname{Cov}\varepsilon=\sigma^2I`$,
 
-$$
+```math
 \mathbb E\hat\beta_\lambda-\beta=-\lambda(X^\top X+\lambda I)^{-1}\beta,\qquad
 \operatorname{Cov}\hat\beta_\lambda=\sigma^2(X^\top X+\lambda I)^{-1}X^\top X(X^\top X+\lambda I)^{-1}.
-$$
+```
 
 [Appendix A](#block-linreg-appendix-a) derives both formulas. Ridge is biased toward zero for every $`\lambda>0`$, and when $`X`$ has full column rank its covariance is smaller than that of least squares, $`\sigma^2(X^\top X)^{-1}`$, in the positive semidefinite order. The mean squared error of an estimator is its squared bias plus its variance (Probability and Statistics), summed here over coordinates. In the rotated coordinates $`\theta=V^\top\beta`$ of the right singular vectors, where $`\theta_j=v_j^\top\beta`$ is the component of the true coefficient vector along $`v_j`$, and assuming full column rank, the mean squared estimation error separates into one term per direction:
 
-$$
+```math
 \mathbb E\|\hat\beta_\lambda-\beta\|^2=\sum_{j=1}^d\frac{\sigma^2\sigma_j^2+\lambda^2\theta_j^2}{(\sigma_j^2+\lambda)^2}.
-$$
+```
 
 At $`\lambda=0`$ this is the least-squares error $`\sigma^2\sum_j\sigma_j^{-2}`$, dominated by the smallest singular values. Differentiating a single term at $`\lambda=0`$ gives $`-2\sigma^2/\sigma_j^4<0`$. Hence **some positive $`\lambda`$ always has smaller estimation error than least squares**, whatever the true coefficients. This is the theorem of [Hoerl and Kennard (1970)](https://www.tandfonline.com/doi/abs/10.1080/00401706.1970.10488634). The best $`\lambda`$ depends on the unknown $`\beta`$ and $`\sigma^2`$, so the theorem does not say how to choose it; in practice, $`\lambda`$ is chosen by cross-validation.
 
@@ -274,10 +274,10 @@ The figure below evaluates this formula for the diabetes design. The data supply
 
 Ridge shrinks every coefficient but sets none exactly to zero. The **lasso** of [Tibshirani (1996)](https://doi.org/10.1111/j.2517-6161.1996.tb02080.x) replaces the squared norm by the $`\ell_1`$ norm:
 
-$$
+```math
 \hat\beta_\lambda=\operatorname*{arg\,min}_\beta\ \frac1{2n}\|y-X\beta\|_2^2+\lambda\|\beta\|_1,
 \qquad \|\beta\|_1=\sum_j\lvert\beta_j\rvert.
-$$
+```
 
 The normalization here matches scikit-learn's [`Lasso`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html); note the factor $`1/(2n)`$, which the ridge objective above does not have. For large enough $`\lambda`$ the solution is exactly zero; as $`\lambda`$ decreases, coefficients become nonzero one or a few at a time. The lasso therefore performs **estimation and variable selection** in one convex problem.
 
@@ -291,19 +291,19 @@ The constrained form, $`\min\|y-X\beta\|^2`$ subject to $`\|\beta\|_1\le t`$, ex
 
 The lasso objective is convex but not differentiable where a coefficient is zero. Its optimality conditions use subgradients. A convex function is minimized at a point exactly when zero belongs to its **subdifferential** there, the set of slopes of the affine functions that touch it from below at that point. For the absolute value, $`\partial\lvert b\rvert=\{\operatorname{sign}b\}`$ for $`b\ne0`$ and $`[-1,1]`$ for $`b=0`$; see Constraints and nonsmooth objectives. Both facts are stated in Appendix E of that chapter. The lasso objective is a differentiable term plus a sum of absolute values, one per coordinate, so its subdifferential is the gradient of the first term plus $`\lambda`$ times the coordinatewise subdifferentials of the second. A vector $`\hat\beta`$ is a solution exactly when, for every $`j`$,
 
-$$
+```math
 \frac1n\,x_j^\top\bigl(y-X\hat\beta\bigr)
 \begin{cases}
 =\lambda\operatorname{sign}(\hat\beta_j),&\hat\beta_j\ne0,\\
 \in[-\lambda,\lambda],&\hat\beta_j=0,
 \end{cases}
-$$
+```
 
 where $`x_j`$ is column $`j`$. For standardized features, $`x_j^\top r/n`$ is the covariance of feature $`j`$ with the residual $`r=y-X\hat\beta`$. Every active feature has the same absolute covariance $`\lambda`$ with the residual; every inactive feature has absolute covariance at most $`\lambda`$. At $`\beta=0`$ the residual is $`y`$, so the all-zero vector is optimal exactly when
 
-$$
+```math
 \lambda\ge\lambda_{\max}=\frac1n\|X^\top y\|_\infty.
-$$
+```
 
 This gives the natural starting point for computing a path of solutions from $`\lambda_{\max}`$ downward.
 
@@ -327,16 +327,16 @@ Soft thresholding both selects and shrinks: surviving coefficients are moved tow
 
 With all coordinates but $`\beta_j`$ held fixed, the lasso objective is a one-dimensional quadratic plus $`\lambda\lvert\beta_j\rvert`$, whose minimizer is a soft-thresholded least-squares update. Define the partial residual $`r^{(j)}=y-\sum_{k\ne j}x_k\beta_k`$, the residual without the contribution of feature $`j`$. As a function of $`\beta_j`$ alone, the objective is
 
-$$
+```math
 \frac{\|x_j\|^2}{2n}\beta_j^2-\frac{x_j^\top r^{(j)}}n\beta_j+\lambda\lvert\beta_j\rvert+\text{const},
-$$
+```
 
 a scalar problem of the orthonormal kind once divided by $`\|x_j\|^2/n`$. The update is
 
-$$
+```math
 \beta_j\leftarrow\frac{S_\lambda\bigl(x_j^\top r^{(j)}/n\bigr)}{\|x_j\|^2/n},
 \qquad S_\lambda(z)=\operatorname{sign}(z)(\lvert z\rvert-\lambda)_+.
-$$
+```
 
 Cycling through the coordinates converges to a solution because the nonsmooth part of the objective is separable across coordinates, a result of [Tseng (2001)](https://doi.org/10.1023/A:1017501703105); the simpler smooth, strongly convex case is in Calculus and Optimization, Appendix D. Maintaining the full residual $`r=y-X\beta`$ makes each update cost $`O(n)`$: the code below obtains $`x_j^\top r^{(j)}/n`$ as $`x_j^\top r/n+(\|x_j\|^2/n)\beta_j`$ and corrects $`r`$ after every change. Computing solutions for a decreasing sequence of $`\lambda`$ values, each started from the previous solution, is very efficient; this is the algorithm of [Friedman, Hastie, and Tibshirani (2010)](https://www.jstatsoft.org/v33/i01/) and of scikit-learn.
 
@@ -411,10 +411,10 @@ The paths show a typical pattern with correlated features. The least-squares est
 
 The **elastic net** of [Zou and Hastie (2005)](https://doi.org/10.1111/j.1467-9868.2005.00503.x) combines both penalties. In scikit-learn's [`ElasticNet`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html) parameterization,
 
-$$
+```math
 \hat\beta=\operatorname*{arg\,min}_\beta\ \frac1{2n}\|y-X\beta\|^2
 +\lambda\Bigl(\alpha\|\beta\|_1+\frac{1-\alpha}2\|\beta\|_2^2\Bigr),\qquad 0\le\alpha\le1.
-$$
+```
 
 The mixing weight $`\alpha`$ interpolates between ridge ($`\alpha=0`$) and the lasso ($`\alpha=1`$); scikit-learn calls it `l1_ratio` and calls $`\lambda`$ `alpha`. The $`\ell_1`$ part produces sparsity. For $`\alpha<1`$, the $`\ell_2`$ part makes the objective strongly convex, so the solution is unique and continuous in the data, and it produces a **grouping effect**: strongly correlated features receive similar coefficients rather than one being chosen arbitrarily. For two identical columns, the lasso solution set contains every split of the combined coefficient between them into two parts of the same sign, while the elastic net splits it equally. The elastic net can select more than $`n`$ features.
 
@@ -426,9 +426,9 @@ A numerical check in the chapter script shows the same behavior on data: with tw
 
 Coordinate descent handles the elastic net with the update
 
-$$
+```math
 \beta_j\leftarrow\frac{S_{\lambda\alpha}\bigl(x_j^\top r^{(j)}/n\bigr)}{\|x_j\|^2/n+\lambda(1-\alpha)}.
-$$
+```
 
 The $`\ell_1`$ part sets the threshold $`\lambda\alpha`$, and the $`\ell_2`$ part adds $`\lambda(1-\alpha)`$ to the curvature of each coordinate problem.
 
@@ -452,9 +452,9 @@ The $`\ell_1`$ part sets the threshold $`\lambda\alpha`$, and the $`\ell_2`$ par
 
 Write $`A_\lambda=(X^\top X+\lambda I)^{-1}`$. Since $`\hat\beta_\lambda=A_\lambda X^\top y`$ and $`y=X\beta+\varepsilon`$,
 
-$$
+```math
 \hat\beta_\lambda=A_\lambda X^\top X\beta+A_\lambda X^\top\varepsilon.
-$$
+```
 
 The first term is the mean. Using $`X^\top X=A_\lambda^{-1}-\lambda I`$ gives $`A_\lambda X^\top X\beta=\beta-\lambda A_\lambda\beta`$, so the bias is $`-\lambda A_\lambda\beta`$. The second term has covariance $`\sigma^2A_\lambda X^\top XA_\lambda`$.
 
@@ -462,18 +462,18 @@ The first term is the mean. Using $`X^\top X=A_\lambda^{-1}-\lambda I`$ gives $`
 
 Assume $`X`$ has full column rank with SVD $`X=U\Sigma V^\top`$, and put $`\theta=V^\top\beta`$. Then $`A_\lambda=V(\Sigma^2+\lambda I)^{-1}V^\top`$, and in rotated coordinates both the bias and the covariance are diagonal:
 
-$$
+```math
 \bigl(V^\top(\mathbb E\hat\beta_\lambda-\beta)\bigr)_j=-\frac{\lambda\theta_j}{\sigma_j^2+\lambda},
 \qquad
 \operatorname{Var}\bigl((V^\top\hat\beta_\lambda)_j\bigr)=\frac{\sigma^2\sigma_j^2}{(\sigma_j^2+\lambda)^2}.
-$$
+```
 
 The orthogonal rotation preserves squared error, so the mean squared error is the sum of squared biases and variances over $`j`$. The derivative of one term is
 
-$$
+```math
 \frac{d}{d\lambda}\,\frac{\sigma^2\sigma_j^2+\lambda^2\theta_j^2}{(\sigma_j^2+\lambda)^2}
 =\frac{2\sigma_j^2(\lambda\theta_j^2-\sigma^2)}{(\sigma_j^2+\lambda)^3},
-$$
+```
 
 negative for $`\lambda<\sigma^2/\theta_j^2`$ and positive afterward. Each term is therefore strictly decreasing near zero, and the whole sum has negative derivative at $`\lambda=0`$.
 
@@ -481,9 +481,9 @@ negative for $`\lambda<\sigma^2/\theta_j^2`$ and positive afterward. Each term i
 
 For in-sample prediction, the relevant loss is $`\|X(\hat\beta_\lambda-\beta)\|^2`$, which weights direction $`j`$ by $`\sigma_j^2`$. The same calculation gives
 
-$$
+```math
 \mathbb E\|X(\hat\beta_\lambda-\beta)\|^2=\sum_j\frac{\sigma^2\sigma_j^4+\lambda^2\sigma_j^2\theta_j^2}{(\sigma_j^2+\lambda)^2},
-$$
+```
 
 whose derivative at $`\lambda=0`$ is $`-2\sigma^2\sum_j\sigma_j^{-2}<0`$. A positive penalty improves prediction as well. Each term is $`\sigma_j^2`$ times the corresponding term of the estimation error, so it is also minimized at $`\lambda=\sigma^2/\theta_j^2`$; when all $`\theta_j^2`$ equal $`\tau^2`$, the same penalty $`\sigma^2/\tau^2`$ is best for both losses.
 
@@ -496,17 +496,17 @@ whose derivative at $`\lambda=0`$ is $`-2\sigma^2\sum_j\sigma_j^{-2}<0`$. A posi
 
 Splitting $`\beta=\beta^+-\beta^-`$ with $`\beta^\pm\ge0`$ turns the lasso into a quadratic program with $`2d`$ nonnegative variables:
 
-$$
+```math
 \min_{\beta^+,\beta^-\ge0}\ \frac1{2n}\|y-X\beta^++X\beta^-\|^2+\lambda\mathbf 1^\top(\beta^++\beta^-).
-$$
+```
 
 At an optimum, $`\beta_j^+\beta_j^-=0`$, since reducing both by their minimum lowers the penalty without changing the fit.
 
 On an interval of $`\lambda`$ over which the active set $`A`$ and the signs $`s_A`$ of the active coefficients do not change, the optimality conditions read $`X_A^\top(y-X_A\beta_A)=n\lambda s_A`$. When $`X_A`$ has full column rank,
 
-$$
+```math
 \beta_A(\lambda)=(X_A^\top X_A)^{-1}\bigl(X_A^\top y-n\lambda s_A\bigr),
-$$
+```
 
 which is affine in $`\lambda`$. The path changes direction only where a new feature's correlation with the residual reaches $`\lambda`$, or where an active coefficient crosses zero. This is the piecewise-linear structure exploited by LARS.
 

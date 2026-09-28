@@ -12,9 +12,9 @@ Logical agents, chapters 5 and 6, represent what is known as true or false. Real
 
 The probabilistic vocabulary is that of Foundations chapter 4: random variables, joint and conditional distributions, the product rule, marginalization, and Bayes' rule. A **possible world** assigns a value to every variable, and a **full joint distribution** gives the probability of every world; any query, $`P(X\mid e)`$ for a query variable $`X`$ and evidence $`e`$, follows by summing the joint over the worlds consistent with $`e`$ and normalizing:
 
-$$
+```math
 P(X\mid e)=\alpha\,P(X,e)=\alpha\sum_yP(X,e,y),
-$$
+```
 
 where $`y`$ ranges over the values of the remaining **hidden** variables and $`\alpha`$ is the normalizing constant. This **inference by enumeration** is correct and useless at scale: $`n`$ Boolean variables need a table of $`2^n-1`$ numbers, too large to store, to estimate, or to sum.
 
@@ -22,9 +22,9 @@ where $`y`$ ranges over the values of the remaining **hidden** variables and $`\
 
 Structure is what makes probabilistic reasoning possible. Two variables are **independent** if $`P(X,Y)=P(X)P(Y)`$, and independent subsets of variables factor the joint into smaller tables. Full independence is rare; **conditional independence** is common. $`X`$ and $`Y`$ are conditionally independent given $`Z`$, written $`X\perp Y\mid Z`$, if
 
-$$
+```math
 P(X,Y\mid Z)=P(X\mid Z)\,P(Y\mid Z),\qquad\text{equivalently}\qquad P(X\mid Y,Z)=P(X\mid Z).
-$$
+```
 
 A toothache and a probe catching in a tooth are dependent, since both indicate a cavity, but once the presence of a cavity is known, neither tells anything more about the other. When a single cause has many conditionally independent effects, the joint factors as $`P(\mathit{Cause})\prod_iP(\mathit{Effect}_i\mid\mathit{Cause})`$, which needs a number of parameters linear in the number of effects: the naive Bayes model of ML chapter 4. Graphical models generalize this to arbitrary patterns of conditional independence, and make the patterns visible in a graph.
 
@@ -34,9 +34,9 @@ A toothache and a probe catching in a tooth are dependent, since both indicate a
 
 A **Bayesian network** is a directed acyclic graph with one node per random variable and, for each node $`X_i`$, a **conditional probability distribution** $`P(X_i\mid\mathrm{Parents}(X_i))`$, a **conditional probability table** (CPT) for discrete variables. The network represents the joint distribution
 
-$$
+```math
 P(x_1,\dots,x_n)=\prod_{i=1}^nP\bigl(x_i\mid\mathrm{parents}(X_i)\bigr).
-$$
+```
 
 The product is a valid distribution for any choice of CPTs, and it agrees with the chain rule $`P(x_1,\dots,x_n)=\prod_iP(x_i\mid x_1,\dots,x_{i-1})`$ written in a topological order, exactly when each variable is conditionally independent of its other predecessors given its parents. That is the meaning of the missing arcs.
 
@@ -237,15 +237,15 @@ Different graphs can imply the same independences. $`A\to B\to C`$, $`A\leftarro
 
 Some dependencies have no natural direction: neighboring pixels of an image, adjacent spins in a magnet, friends in a social network who influence each other. A **Markov network**, or **Markov random field**, is an undirected graph together with nonnegative **potential functions** (factors) $`\psi_c`$ on its cliques, and it represents the **Gibbs distribution**
 
-$$
+```math
 P(x)=\frac1Z\prod_c\psi_c(x_c),\qquad Z=\sum_x\prod_c\psi_c(x_c).
-$$
+```
 
 The potentials are not probabilities; they express compatibilities, and the **partition function** $`Z`$ normalizes their product. Computing $`Z`$ is the central difficulty of undirected models: it sums over exponentially many configurations, and without it the probability of any single configuration is unknown. Writing $`\psi_c=\exp(-E_c)`$ gives the energy form $`P(x)\propto\exp\bigl(-\sum_cE_c(x_c)\bigr)`$ of statistical physics. The **Ising model** on a grid, with spins $`x_i\in\{-1,+1\}`$ and
 
-$$
+```math
 P(x)\propto\exp\Bigl(J\sum_{(i,j)\in\text{edges}}x_ix_j+\sum_ih_ix_i\Bigr),
-$$
+```
 
 is the prototype: with $`J>0`$ neighbors prefer to agree, which makes it a model of smooth images for denoising and segmentation. The Boltzmann machines of early neural-network research are Markov networks of this form.
 
@@ -265,9 +265,9 @@ A Bayesian network converts to a Markov network by **moralization**: connect the
 
 Writing each potential as the exponential of a weighted sum of features gives a **log-linear model**:
 
-$$
+```math
 P(x)=\frac1{Z(w)}\exp\Bigl(\sum_kw_kf_k(x_{c_k})\Bigr),
-$$
+```
 
 an exponential family whose sufficient statistics are the features. Features can be much sparser than full potential tables, such as an indicator that two neighboring words are both capitalized. Conditioning a log-linear model on observed inputs $`x`$ gives a **conditional random field** (CRF), $`P(y\mid x)\propto\exp\bigl(\sum_kw_kf_k(y,x)\bigr)`$, which models the dependencies among outputs, such as the tags of a sentence, without modeling the inputs, the discriminative counterpart of a hidden Markov model (chapter 11). Learning log-linear models and CRFs is the subject of chapter 14.
 
@@ -282,9 +282,9 @@ The full proof shows that d-separation in a DAG implies the conditional independ
 
 **Chain** $`A\to B\to C`$: $`P(a,b,c)=P(a)P(b\mid a)P(c\mid b)`$, so
 
-$$
+```math
 P(a,c\mid b)=\frac{P(a)P(b\mid a)}{P(b)}\,P(c\mid b)=P(a\mid b)\,P(c\mid b).
-$$
+```
 
 **Fork** $`A\leftarrow B\to C`$: $`P(a,b,c)=P(b)P(a\mid b)P(c\mid b)`$, and dividing by $`P(b)`$ gives $`P(a,c\mid b)=P(a\mid b)P(c\mid b)`$.
 
@@ -306,15 +306,15 @@ The ancestral-moral test of the code is equivalent to d-separation: the variable
 
 **Pairwise Markov implies factorization** (positivity needed). Fix a reference configuration $`x^*`$ and define, for every subset $`S`$ of variables, $`x^S`$ as the configuration equal to $`x`$ on $`S`$ and to $`x^*`$ elsewhere. By the Möbius inversion formula,
 
-$$
+```math
 \log P(x)=\sum_{S}\phi_S(x_S),\qquad \phi_S(x_S)=\sum_{T\subseteq S}(-1)^{|S\setminus T|}\log P(x^T),
-$$
+```
 
 and each $`\phi_S`$ depends only on $`x_S`$. It remains to show that $`\phi_S=0`$ whenever $`S`$ contains two non-adjacent nodes $`i,j`$. Group the terms of $`\phi_S`$ in fours, by $`T=W`$, $`W\cup\{i\}`$, $`W\cup\{j\}`$, $`W\cup\{i,j\}`$ with $`W\subseteq S\setminus\{i,j\}`$:
 
-$$
+```math
 \log\frac{P(x^{W\cup\{i,j\}})\,P(x^{W})}{P(x^{W\cup\{i\}})\,P(x^{W\cup\{j\}})}.
-$$
+```
 
 By the pairwise property, $`x_i`$ and $`x_j`$ are independent given all other variables, and the ratio compares the four combinations of $`x_i\in\{x_i,x_i^*\}`$ and $`x_j\in\{x_j,x_j^*\}`$ with everything else fixed; conditional independence makes it equal to 1, so each group contributes zero. Hence only subsets that are cliques have nonzero $`\phi_S`$, and $`P(x)=\prod_{\text{cliques }C}\exp\phi_C(x_C)`$. Positivity is used to take logarithms; the theorem fails without it.
 

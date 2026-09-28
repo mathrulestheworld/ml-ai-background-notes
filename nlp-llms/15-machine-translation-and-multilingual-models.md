@@ -16,9 +16,9 @@ The difficulty lies in how differently languages express the same meaning. Word 
 
 Statistical translation began with the noisy-channel model of chapter 2. To translate a foreign sentence $`f`$ into English, pretend that $`f`$ was produced by corrupting an English sentence $`e`$, and recover the most probable original:
 
-$$
+```math
 \hat e=\arg\max_eP(e\mid f)=\arg\max_eP(f\mid e)\,P(e).
-$$
+```
 
 The decomposition divides the work. The **translation model** $`P(f\mid e)`$ ensures that the words of $`e`$ account for those of $`f`$, and it can be learned from translated sentence pairs; it does not need to produce fluent English, because the **language model** $`P(e)`$, learned from much larger amounts of English alone, rewards fluent candidates. The idea of combining a model of adequacy with a model of fluency, trained on different data, survived into later systems in other forms.
 
@@ -32,9 +32,9 @@ A collection of sentences with their translations, a **parallel corpus**, does n
 
 The IBM models ([Brown et al., 1993](https://aclanthology.org/J93-2003/)) are a series of five translation models of increasing detail. The simplest, **Model 1**, generates a foreign sentence $`f_1,\dots,f_m`$ from an English sentence $`e_1,\dots,e_l`$ as follows: for each position $`j`$, choose an English position $`a_j\in\{0,1,\dots,l\}`$ uniformly, where position 0 is a special NULL word that accounts for foreign words with no counterpart, and generate $`f_j`$ with probability $`t(f_j\mid e_{a_j})`$. The only parameters are the word translation probabilities $`t(f\mid e)`$. Since each foreign word's alignment is chosen independently, the posterior over alignments factorizes over positions:
 
-$$
+```math
 P(a_j=i\mid e,f)=\frac{t(f_j\mid e_i)}{\sum_{i'=0}^{l}t(f_j\mid e_{i'})}.
-$$
+```
 
 EM alternates between computing these posteriors, adding them up as expected counts of how often each English word generated each foreign word, and renormalizing the counts into new translation probabilities ([Appendix A](#block-nlp15-appendix-a)). The code applies it to 300 sentence pairs generated from a toy grammar of English and Spanish, in which Spanish adjectives follow their nouns and articles and adjectives agree with the noun's gender.
 
@@ -222,9 +222,9 @@ Pretrained encoders turned out to be multilingual in the same way. **Multilingua
 
 Web text is dominated by a few languages, so sampling training data in proportion to its availability would leave most languages nearly unseen. Multilingual models sample language $`i`$ with probability
 
-$$
+```math
 q_i=\frac{p_i^\alpha}{\sum_jp_j^\alpha},
-$$
+```
 
 where $`p_i`$ is its share of the available data and $`\alpha\in[0,1]`$ interpolates between proportional sampling ($`\alpha=1`$) and uniform sampling ($`\alpha=0`$). XLM used $`\alpha=0.5`$ and XLM-R $`\alpha=0.3`$. Upsampling a small language means repeating its data, and repeated data is worth less than fresh data and eventually leads to memorization (chapter 6). The code computes the trade-off for eight languages whose data sizes span more than three orders of magnitude, with a training budget of about 1.8 passes over all the data.
 
@@ -267,16 +267,16 @@ Most of the world's roughly 7,000 languages have little digital text, and much o
 
 For an English sentence $`e=e_0e_1\dots e_l`$, with $`e_0`$ the NULL word, and a foreign sentence $`f=f_1\dots f_m`$ of given length, Model 1 defines
 
-$$
+```math
 P(f,a\mid e)=\prod_{j=1}^m\frac{t(f_j\mid e_{a_j})}{l+1},\qquad
 P(f\mid e)=\sum_a\prod_{j=1}^m\frac{t(f_j\mid e_{a_j})}{l+1}=\prod_{j=1}^m\frac1{l+1}\sum_{i=0}^lt(f_j\mid e_i).
-$$
+```
 
 The sum over the $`(l+1)^m`$ alignments collapses into a product of sums because each term factorizes over $`j`$ and each $`a_j`$ ranges independently over $`0,\dots,l`$. For the same reason the posterior factorizes, $`P(a\mid e,f)=\prod_jP(a_j\mid e,f)`$ with $`P(a_j=i\mid e,f)`$ as in the text. The **E-step** computes, for every sentence pair $`s`$, word $`f`$, and word $`e`$, the expected number of times $`e`$ generated $`f`$:
 
-$$
+```math
 c(f\mid e)=\sum_s\sum_{j:f_j^{(s)}=f}\ \sum_{i:e_i^{(s)}=e}\frac{t(f\mid e)}{\sum_{i'}t(f\mid e_{i'}^{(s)})},
-$$
+```
 
 in time proportional to $`l\cdot m`$ per pair. The **M-step** maximizes the expected complete-data log-likelihood $`\sum_{f,e}c(f\mid e)\log t(f\mid e)`$ subject to $`\sum_ft(f\mid e)=1`$ for each $`e`$, which by a Lagrange multiplier gives $`t(f\mid e)=c(f\mid e)/\sum_{f'}c(f'\mid e)`$, the normalized counts. As for any EM algorithm, the log-likelihood never decreases.
 
@@ -292,23 +292,23 @@ The log-likelihood $`\sum_s\sum_j\log\sum_it(f_j\mid e_i)`$ is a sum of logarith
 
 For a candidate $`c`$ and reference $`r`$, let $`\mathrm{count}_c(g)`$ and $`\mathrm{count}_r(g)`$ be the counts of n-gram $`g`$. The clipped precision of order $`n`$, pooled over the sentences of a test set, is
 
-$$
+```math
 p_n=\frac{\sum_{\text{sentences}}\sum_{g\in\text{n-grams}(c)}\min\bigl(\mathrm{count}_c(g),\max_r\mathrm{count}_r(g)\bigr)}{\sum_{\text{sentences}}\sum_{g\in\text{n-grams}(c)}\mathrm{count}_c(g)},
-$$
+```
 
 where the maximum is over the references when there are several. With $`C`$ the total length of the candidates and $`R`$ the total length of the references, choosing for each sentence the reference closest in length, BLEU is
 
-$$
+```math
 \mathrm{BLEU}=\mathrm{BP}\cdot\exp\Bigl(\frac14\sum_{n=1}^4\log p_n\Bigr),\qquad\mathrm{BP}=\begin{cases}1&C>R,\\e^{1-R/C}&C\le R.\end{cases}
-$$
+```
 
 The brevity penalty takes the place of recall, which is ill-defined with several references that differ in wording. Scores are usually reported multiplied by 100. Sentence-level BLEU adds smoothing, for example adding one to the numerator and denominator of $`p_n`$ for $`n\ge2`$, so that a missing 4-gram does not zero the score.
 
 chrF computes character n-gram precision $`\mathrm{chrP}`$ and recall $`\mathrm{chrR}`$, each averaged over $`n=1,\dots,6`$ with whitespace removed, and combines them as
 
-$$
+```math
 \mathrm{chrF}_\beta=(1+\beta^2)\frac{\mathrm{chrP}\cdot\mathrm{chrR}}{\beta^2\,\mathrm{chrP}+\mathrm{chrR}},
-$$
+```
 
 with $`\beta=2`$, which weights recall twice as much as precision. Unlike BLEU, it is defined and informative for single sentences.
 
@@ -322,9 +322,9 @@ with $`\beta=2`$, which weights recall twice as much as precision. Unlike BLEU, 
 
 With data shares $`p_i`$ and sampling probabilities $`q_i\propto p_i^\alpha`$, the ratio of the probabilities of two languages is $`q_i/q_j=(p_i/p_j)^\alpha`$: the exponent compresses the ratio of their data sizes, so a language with 1,000 times less data is sampled about 8 times less often at $`\alpha=0.3`$. Writing $`\alpha=1/T`$ shows the analogy with softmax temperature (chapter 8) applied to log data sizes. The number of passes over language $`i`$'s data in a run that sees $`B`$ units of text in total is
 
-$$
+```math
 \text{passes}_i=\frac{Bq_i}{n_i}\propto\frac{p_i^{\alpha}}{p_i}=p_i^{\alpha-1},
-$$
+```
 
 where $`n_i`$ is the size of language $`i`$'s data, so for $`\alpha<1`$ the smallest languages are repeated the most, by a factor $`(p_{\max}/p_{\min})^{1-\alpha}`$ relative to the largest. Since the value of repeated data decays with the number of repetitions (chapter 6, Appendix C), sampling beyond a few passes adds little for a small language while taking training away from the others, which bounds how far upsampling can help.
 

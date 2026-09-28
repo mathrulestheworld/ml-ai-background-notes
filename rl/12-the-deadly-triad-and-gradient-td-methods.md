@@ -101,9 +101,9 @@ The semi-gradient TD update, in expectation, moves $`\mathbf w`$ in the directio
 
 Since semi-gradient TD is not a gradient method, a natural idea is to replace it by true stochastic gradient descent on one of the objectives above, which would converge off-policy as any gradient method does. Descending the mean squared TD error gives the **naive residual-gradient algorithm**,
 
-$$
+```math
 \mathbf w\leftarrow\mathbf w+\alpha\rho_t\delta_t\bigl(\mathbf x_t-\gamma\mathbf x_{t+1}\bigr),
-$$
+```
 
 which differs from semi-gradient TD in the term $`-\gamma\mathbf x_{t+1}`$: it also moves the value of the next state toward the value of the current one. It converges robustly, but to the wrong answer. Sutton and Barto's **A-split** example shows why: from state A, an episode moves with equal probability to B, which then pays 1, or to C, which pays 0. The true values are A $`=1/2`$, B $`=1`$, and C $`=0`$, and TD finds them; but at those values the TD errors out of A are $`+1/2`$ and $`-1/2`$, and the squared TD error is smaller on average if B and C are pulled toward A.
 
@@ -158,30 +158,30 @@ The value error is not learnable in this sense either, but its minimizer is: the
 
 Writing out the projection, the projected Bellman error is a quadratic form in the expected TD update:
 
-$$
+```math
 \overline{\mathrm{PBE}}(\mathbf w)=\bigl(\mathbf X^\top\mathbf D\bar\delta_\mathbf w\bigr)^\top\bigl(\mathbf X^\top\mathbf D\mathbf X\bigr)^{-1}\bigl(\mathbf X^\top\mathbf D\bar\delta_\mathbf w\bigr)
 =\mathbb E[\rho_t\delta_t\mathbf x_t]^\top\,\mathbb E[\mathbf x_t\mathbf x_t^\top]^{-1}\,\mathbb E[\rho_t\delta_t\mathbf x_t],
-$$
+```
 
 with the expectations under the behavior's distribution. Its gradient is
 
-$$
+```math
 \nabla\overline{\mathrm{PBE}}(\mathbf w)=-2\,\mathbb E\bigl[\rho_t(\mathbf x_t-\gamma\mathbf x_{t+1})\mathbf x_t^\top\bigr]\,\mathbb E[\mathbf x_t\mathbf x_t^\top]^{-1}\,\mathbb E[\rho_t\delta_t\mathbf x_t],
-$$
+```
 
 a product of three expectations, which cannot be sampled from one transition. The **gradient-TD** methods of Sutton, Maei, and colleagues ([Sutton et al., 2009](https://doi.org/10.1145/1553374.1553501), following the first gradient-TD method, GTD, of [Sutton, Szepesvári, and Maei, 2008](https://papers.nips.cc/paper_files/paper/2008/hash/e0c641195b27425bb056ac56f8953d24-Abstract.html), which descended a related objective, the squared norm of the expected TD update) handle two of the three with a second, auxiliary weight vector $`\mathbf u`$ that estimates the last two factors, $`\mathbf u\approx\mathbb E[\mathbf x_t\mathbf x_t^\top]^{-1}\mathbb E[\rho_t\delta_t\mathbf x_t]`$, the solution of a least-squares problem that predicts the TD error from the features, and learns it by the LMS rule:
 
-$$
+```math
 \mathbf u\leftarrow\mathbf u+\beta\rho_t\bigl(\delta_t-\mathbf u^\top\mathbf x_t\bigr)\mathbf x_t.
-$$
+```
 
 With $`\mathbf u`$ in hand, the gradient can be sampled. Two ways of arranging the terms give the two standard algorithms:
 
-$$
+```math
 \textbf{GTD2:}\quad\mathbf w\leftarrow\mathbf w+\alpha\rho_t\bigl(\mathbf x_t-\gamma\mathbf x_{t+1}\bigr)\mathbf x_t^\top\mathbf u,
 \qquad
 \textbf{TDC:}\quad\mathbf w\leftarrow\mathbf w+\alpha\rho_t\bigl(\delta_t\mathbf x_t-\gamma\mathbf x_{t+1}\mathbf x_t^\top\mathbf u\bigr).
-$$
+```
 
 **TDC**, for TD with gradient correction, is the semi-gradient TD update plus a correction term that is zero in expectation at the TD fixed point, where the expected TD error is orthogonal to the features. Both methods cost $`O(d)`$ per step, like TD. They converge to the TD fixed point under general off-policy sampling when the step sizes satisfy the conditions of a **two-time-scale** stochastic approximation, in which $`\mathbf u`$ learns faster than $`\mathbf w`$, so that it tracks its target as $`\mathbf w`$ changes; GTD2 also converges with the two step sizes in a fixed ratio ([Maei, 2011](https://era.library.ualberta.ca/items/fd55edcb-ce47-4f84-84e2-be281d27b16a)).
 
@@ -236,15 +236,15 @@ Gradient-TD methods extend to eligibility traces, GTD(λ), to control, Greedy-GQ
 
 **Emphatic TD** ([Sutton, Mahmood, and White, 2016](https://jmlr.org/papers/v17/14-488.html)) keeps the semi-gradient update but changes the weighting of the states. Off-policy divergence arises because the behavior updates states in proportions that the target policy would not produce; emphatic TD reweights each update so that the effective distribution is one under which the key matrix is positive definite. It maintains a scalar **followon trace**, a discounted, importance-weighted count of how much the target policy would have visited the current state from the states the behavior visited,
 
-$$
+```math
 F_t=\gamma\rho_{t-1}F_{t-1}+i(S_t),\qquad M_t=\lambda i(S_t)+(1-\lambda)F_t,
-$$
+```
 
 where the **interest** $`i(s)\ge0`$ says how much the agent cares about accurate values at $`s`$, and updates with the **emphasis** $`M_t`$:
 
-$$
+```math
 \mathbf w\leftarrow\mathbf w+\alpha M_t\rho_t\delta_t\mathbf x_t\qquad(\text{for }\lambda=0).
-$$
+```
 
 In Baird's example, the target policy leads every state to the lower one, so the lower state's emphasis is about 700 times that of the others, and the reweighted matrix has no eigenvalue with a negative real part (exercise 12.2). Emphatic TD converges with probability one for linear function approximation under general conditions ([Yu, 2015](https://arxiv.org/abs/1506.02582)), and in the figure its expected version drives the value error on Baird's example to zero. Its weakness is variance: the followon trace is a discounted sum of products of importance ratios, which can grow large, and the sampled algorithm can be too noisy to be practical without additional variance reduction.
 
@@ -287,9 +287,9 @@ In this example, from [Tsitsiklis and Van Roy (1996)](https://doi.org/10.1007/BF
 
 When fitted value iteration is stable, how good is its answer? [Munos and Szepesvári (2008)](https://jmlr.org/papers/v9/munos08a.html) bound the loss of the greedy policy after $`K`$ iterations in terms of the regression errors made along the way,
 
-$$
+```math
 \|v_*-v_{\pi_K}\|_{p,\rho}\le\frac{2\gamma}{(1-\gamma)^2}\,C^{1/p}\max_k\|\varepsilon_k\|_{p,\mu}+O\bigl(\gamma^K\bigr),
-$$
+```
 
 where the loss is measured in a weighted $`L_p`$ norm under a distribution $`\rho`$ of states of interest, $`\varepsilon_k`$ is the error of the $`k`$th regression, measured in the same kind of norm under the data distribution $`\mu`$, and $`C`$ is a **concentrability coefficient** that measures how much the state distributions reachable from $`\rho`$ by any sequence of policies can exceed $`\mu`$. Two lessons carry over to all of batch and offline RL. The error is amplified by $`1/(1-\gamma)^2`$, so long horizons are unforgiving. And the data distribution matters through $`C`$: if some policy can reach states the data rarely cover, the bound is loose or infinite, because regression errors in those states are unconstrained and the maximization in the backup finds and exploits them. This is the central problem of offline reinforcement learning (chapter 26), and the theory of chapter 30 develops it.
 

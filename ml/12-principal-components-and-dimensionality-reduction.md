@@ -16,9 +16,9 @@ This chapter treats PCA as a learning method, the linear case of the learned rep
 
 PCA has parameters, and they are estimated from training data: the mean $`\hat\mu`$ and the directions $`V_k=[v_1,\ldots,v_k]`$. Once fitted, it is a fixed map from inputs to $`k`$ coordinates and back:
 
-$$
+```math
 z=V_k^\top(x-\hat\mu),\qquad \hat x=\hat\mu+V_kz .
-$$
+```
 
 The **transform** gives scores for any input, including one never seen in training: the $`j`$th score $`z_j=v_j^\top(x-\hat\mu)`$ is the coordinate of $`x`$ along $`v_j`$, measured from the training mean. The **reconstruction** $`\hat x`$ is the orthogonal projection of $`x`$ onto the fitted affine subspace $`\hat\mu+\operatorname{span}(v_1,\ldots,v_k)`$, and the squared length $`\|x-\hat x\|^2`$ of the residual $`x-\hat x`$ measures how poorly the subspace describes it. Because the directions are orthonormal, this squared length equals $`\|x-\hat\mu\|^2-\|z\|^2`$, the sum of the squared scores on the discarded directions $`v_{k+1},\ldots,v_d`$.
 
@@ -44,9 +44,9 @@ The wine data of the next figure show the effect. Among their 13 chemical measur
 
 Neither choice is always right. When features share a unit and their variances are meaningful, as with pixel intensities or gene-expression levels on a common scale, raw covariance PCA keeps information that standardization would discard. When features are measured in incommensurable units, standardization is usually necessary. Centering is essential either way: without it, the first "component" mostly points toward the mean. The uncentered SVD finds the direction that maximizes the average squared projection
 
-$$
+```math
 \frac1n\sum_{i=1}^n(v^\top x_i)^2=(v^\top\bar x)^2+\frac{n-1}n\,v^\top Sv ,
-$$
+```
 
 where $`\bar x`$ is the sample mean; the cross term vanishes because the centered data sum to zero. When the mean is far from the origin compared with the spread of the data, the first term dominates and the leading direction points toward $`\bar x`$. Foundations draws the same distinction between covariance PCA and an uncentered matrix approximation, and notes that standardizing is a modeling choice.
 
@@ -60,9 +60,9 @@ The fraction of variance explained by the first $`k`$ components, $`\sum_{j\le k
 
 Even data with no structure produce unequal sample eigenvalues. If $`n`$ observations of $`d`$ independent unit-variance features are drawn, the population covariance is the identity and every population eigenvalue equals one. Yet as $`n,d\to\infty`$ with $`d/n\to\gamma\le1`$, the sample eigenvalues spread over the interval $`\bigl[(1-\sqrt\gamma)^2,(1+\sqrt\gamma)^2\bigr]`$ according to the **Marchenko–Pastur law**: the fraction of them in any subinterval converges to the integral over it of the density
 
-$$
+```math
 p_\gamma(t)=\frac{\sqrt{(t_+-t)(t-t_-)}}{2\pi\gamma\,t},\qquad t_-\le t\le t_+,\qquad t_\pm=(1\pm\sqrt\gamma)^2 .
-$$
+```
 
 With $`d=100`$ and $`n=300`$, so $`\gamma=1/3`$, pure noise gives eigenvalues from about 0.18 to 2.49. A scree plot of such data shows a smooth decay that is easy to mistake for structure. The matrix concentration bounds of Probability and Statistics make the sample covariance close to the population covariance when $`n`$ is large compared with $`d`$; the Marchenko–Pastur law shows that the error does not vanish when $`d/n`$ stays fixed.
 
@@ -74,9 +74,9 @@ Two practical tests follow. The upper edge $`(1+\sqrt{d/n})^2`$, scaled by the n
 
 The theory of the **spiked covariance model** makes the threshold precise ([Johnstone, 2001](https://projecteuclid.org/journals/annals-of-statistics/volume-29/issue-2/On-the-distribution-of-the-largest-eigenvalue-in-principal-components/10.1214/aos/1009210544.full)). Suppose the population covariance is the identity plus $`\ell\,uu^\top`$ for a unit vector $`u`$ and a spike size $`\ell>0`$, so that the variance is $`1+\ell`$ along $`u`$ and one in every orthogonal direction. Let $`\hat v`$ be the top sample eigenvector; its agreement with $`u`$ is measured by $`\langle\hat v,u\rangle^2`$, the squared cosine of the angle between them, which does not depend on the arbitrary sign of $`\hat v`$. As $`n,d\to\infty`$ with $`d/n\to\gamma`$, if $`\ell>\sqrt\gamma`$, the top sample eigenvalue converges to $`(1+\ell)(1+\gamma/\ell)`$, above the bulk, and the sample eigenvector $`\hat v`$ satisfies
 
-$$
+```math
 \langle\hat v,u\rangle^2\to\frac{1-\gamma/\ell^2}{1+\gamma/\ell}.
-$$
+```
 
 If $`\ell\le\sqrt\gamma`$, the top eigenvalue sticks to the bulk edge and $`\langle\hat v,u\rangle^2\to0`$: the sample direction carries asymptotically no information about the true one. The behavior thus changes abruptly at $`\ell=\sqrt\gamma`$, a phase transition ([Baik, Ben Arous, and Péché, 2005](https://projecteuclid.org/journals/annals-of-probability/volume-33/issue-5/Phase-transition-of-the-largest-eigenvalue-for-nonnull-complex-sample/10.1214/009117905000000233.full); [Paul, 2007](https://www3.stat.sinica.edu.tw/statistica/j17n4/j17n418/j17n418.html)). In the figure's data, the three sample directions have $`|\cos|`$ of 0.97, 0.92, and 0.42 with their population counterparts, against limits, the square roots of the formula, of 0.98, 0.93, and 0.
 
@@ -90,21 +90,21 @@ Even detected components are estimated imperfectly when $`d`$ is comparable to $
 
 **Probabilistic PCA** ([Tipping and Bishop, 1999](https://academic.oup.com/jrsssb/article-abstract/61/3/611/7083217)) turns PCA into a density model, which gives a likelihood for choosing $`k`$. Each observation is generated from $`k`$ latent coordinates $`z`$, which a $`d\times k`$ loading matrix $`W`$ maps into the input space, with isotropic noise of variance $`\sigma^2`$ added:
 
-$$
+```math
 x=\mu+Wz+\varepsilon,\qquad z\sim\mathcal N(0,I_k),\qquad \varepsilon\sim\mathcal N(0,\sigma^2I_d),
-$$
+```
 
 with $`z`$ and $`\varepsilon`$ independent. Since $`x`$ is an affine function of the jointly Gaussian pair $`(z,\varepsilon)`$, it is Gaussian (Gaussian vectors), with covariance $`W\operatorname{Cov}(z)W^\top+\operatorname{Cov}(\varepsilon)`$, so that $`x\sim\mathcal N(\mu,WW^\top+\sigma^2I)`$: a Gaussian whose covariance has $`k`$ free directions plus isotropic noise. The maximum likelihood estimates are available in closed form ([Appendix A](#block-pca-appendix-a)). With $`\lambda_1\ge\cdots\ge\lambda_d`$ the eigenvalues of the sample covariance, here with divisor $`n`$ as maximum likelihood requires, $`V_k`$ its top $`k`$ eigenvectors, and $`\Lambda_k=\operatorname{diag}(\lambda_1,\ldots,\lambda_k)`$,
 
-$$
+```math
 \hat\sigma^2=\frac1{d-k}\sum_{j>k}\lambda_j,\qquad \widehat W=V_k\bigl(\Lambda_k-\hat\sigma^2I\bigr)^{1/2}R
-$$
+```
 
 for any rotation $`R`$, that is, any $`k\times k`$ orthogonal matrix. The fitted subspace is exactly the PCA subspace, and the discarded variance becomes the noise level. The posterior mean of the latent coordinates, $`\mathbb E[z\mid x]=(\widehat W^\top\widehat W+\hat\sigma^2I)^{-1}\widehat W^\top(x-\hat\mu)`$, follows from the Gaussian conditioning formula of the same Foundations section together with the identity $`W^\top(WW^\top+\sigma^2I)^{-1}=(W^\top W+\sigma^2I)^{-1}W^\top`$. It is a shrunken version of the PCA scores. With $`R=I`$, the matrix $`\widehat W^\top\widehat W+\hat\sigma^2I`$ equals $`\Lambda_k`$, so each posterior mean is the whitened PCA score multiplied by a factor below one:
 
-$$
+```math
 \mathbb E[z_j\mid x]=\sqrt{1-\hat\sigma^2/\lambda_j}\;\frac{v_j^\top(x-\hat\mu)}{\sqrt{\lambda_j}} .
-$$
+```
 
 The factor is smallest for components whose variance barely exceeds the noise level.
 
@@ -186,10 +186,10 @@ Dimensionality reduction buys speed, storage, or interpretability; it improves a
 
 **Principal components regression** (PCR) regresses the response on the first $`k`$ principal component scores. With the SVD $`X_c=U\Sigma V^\top`$ of the centered inputs and a centered response $`y`$, the score matrix $`Z_k=X_cV_k`$ has orthogonal columns $`\sigma_ju_j`$. Least squares on orthogonal columns separates into one simple regression per column, with coefficient $`\sigma_ju_j^\top y/\sigma_j^2=u_j^\top y/\sigma_j`$, and mapping these coefficients back to the inputs through $`V_k`$ gives
 
-$$
+```math
 \hat\beta_{\text{PCR}}=\sum_{j=1}^kv_j\,\frac{u_j^\top y}{\sigma_j},\qquad
 X_c\hat\beta_{\text{PCR}}=\sum_{j=1}^ku_j\,u_j^\top y .
-$$
+```
 
 Least squares, computed with the pseudoinverse, sums the same terms $`v_ju_j^\top y/\sigma_j`$ over every nonzero singular value. PCR is thus the pseudoinverse solution with the singular values after the $`k`$th treated as zero, a cutoff that declares the low-variance directions unresolved.
 
@@ -207,21 +207,21 @@ The right panel shows the fundamental limitation. PCA chooses directions by the 
 
 The kernel methods of chapter 8 extend PCA to nonlinear structure ([Schölkopf, Smola, and Müller, 1998](https://direct.mit.edu/neco/article/10/5/1299/6193/Nonlinear-Component-Analysis-as-a-Kernel)). Map the inputs to a feature space by $`\phi`$, with kernel $`k(x,z)=\langle\phi(x),\phi(z)\rangle`$ and Gram matrix $`K_{ij}=k(x_i,x_j)`$, as in chapter 8. Center the features as $`\tilde\phi(x_i)=\phi(x_i)-\frac1n\sum_j\phi(x_j)`$, and seek eigenvectors of the feature-space covariance $`C=\frac1n\sum_i\tilde\phi(x_i)\tilde\phi(x_i)^\top`$. Any eigenvector with a nonzero eigenvalue $`\lambda`$ lies in the span of the centered training features, $`v=\sum_ia_i\tilde\phi(x_i)`$, because $`Cv`$ does:
 
-$$
+```math
 v=\frac1\lambda Cv=\frac1{n\lambda}\sum_i\tilde\phi(x_i)\,\langle\tilde\phi(x_i),v\rangle .
-$$
+```
 
 Substituting this form into $`Cv=\lambda v`$ and taking inner products with each $`\tilde\phi(x_j)`$ gives $`\widetilde K^2a=n\lambda\widetilde Ka`$, where $`\widetilde K_{ij}=\langle\tilde\phi(x_i),\tilde\phi(x_j)\rangle`$ is the Gram matrix of the centered features. A component of $`a`$ in the null space of $`\widetilde K`$ does not change $`v`$, since $`\|\sum_ia_i\tilde\phi(x_i)\|^2=a^\top\widetilde Ka`$, so $`Cv=\lambda v`$ reduces to an eigenproblem for the centered Gram matrix:
 
-$$
+```math
 \widetilde Ka=\mu a,\qquad \widetilde K=HKH,\quad H=I-\tfrac1n\mathbf 1\mathbf 1^\top,\quad \mu=n\lambda .
-$$
+```
 
 Here $`\mathbf 1`$ is the vector of $`n`$ ones and $`H`$ is the centering matrix, which subtracts the mean of a vector's entries; [Appendix B](#block-pca-appendix-b) shows that $`\widetilde K=HKH`$. Requiring $`\|v\|=1`$ gives $`a^\top\widetilde Ka=\mu\|a\|^2=1`$, so $`a=u/\sqrt\mu`$ for a unit eigenvector $`u`$ of $`\widetilde K`$. The score of any input $`x`$ on the component is
 
-$$
+```math
 \langle v,\tilde\phi(x)\rangle=\sum_ia_i\,\tilde k(x_i,x),
-$$
+```
 
 where $`\tilde k`$ is the kernel between centered feature vectors, computed from kernel values alone ([Appendix B](#block-pca-appendix-b)). For training points the scores are $`\widetilde Ka=\sqrt\mu\,u`$. With the linear kernel, kernel PCA reproduces ordinary PCA: then $`\widetilde K=X_cX_c^\top=U\Sigma^2U^\top`$, so the eigenvalues are $`\mu_j=\sigma_j^2`$ and the training scores $`\sqrt{\mu_j}\,u_j=\sigma_ju_j`$ are the columns of $`Z_k`$.
 
@@ -283,9 +283,9 @@ Finally, a point in feature space generally has no exact **pre-image** in the in
 
 Sometimes only dissimilarities between objects are available: travel times between cities, disagreement between survey responses, or edit distances between strings. **Classical multidimensional scaling** (MDS) finds points whose Euclidean distances reproduce given distances $`D_{ij}`$ between $`n`$ objects. For points $`y_1,\ldots,y_n`$, stacked as the rows of a matrix $`Y`$, with centered Gram matrix $`B=HYY^\top H`$, the squared distances determine $`B`$ through **double centering**:
 
-$$
+```math
 B=-\tfrac12H\,D^{(2)}H,\qquad D^{(2)}_{ij}=D_{ij}^2 .
-$$
+```
 
 The matrix $`D^{(2)}`$ squares the distances entry by entry, and $`H`$ is the centering matrix of the previous section. [Appendix B](#block-pca-appendix-b) proves the identity. Classical MDS eigendecomposes $`B=Q\Lambda Q^\top`$, as the spectral theorem allows for a symmetric matrix, and returns the coordinates $`Q_k\Lambda_k^{1/2}`$, whose rows are the fitted points. When $`B`$ is positive semidefinite, this eigendecomposition is also its SVD, so by the Eckart–Young theorem the Gram matrix of the fitted points, $`Q_k\Lambda_kQ_k^\top`$, is the best rank-$`k`$ approximation of $`B`$.
 
@@ -344,9 +344,9 @@ At the other extreme, the random projections of Linear Algebra reduce dimension 
 
 Let $`S`$ be the sample covariance with divisor $`n`$, and $`\lambda_1\ge\cdots\ge\lambda_d`$ its eigenvalues. The marginal distribution $`x\sim\mathcal N(\mu,C)`$ with $`C=WW^\top+\sigma^2I`$ gives $`\hat\mu=\bar x`$ and, up to constants, the profile log-likelihood
 
-$$
+```math
 \ell(W,\sigma^2)=-\frac n2\bigl[\ln\det C+\operatorname{tr}(C^{-1}S)\bigr].
-$$
+```
 
 Using $`\partial\ln\det C=\operatorname{tr}(C^{-1}\partial C)`$ from the matrix gradient identities, $`\partial C^{-1}=-C^{-1}(\partial C)C^{-1}`$, which follows by differentiating $`CC^{-1}=I`$, and $`\partial C=(\partial W)W^\top+W(\partial W)^\top`$, the gradient in $`W`$ is $`n\bigl(C^{-1}SC^{-1}W-C^{-1}W\bigr)`$, so stationary points satisfy $`SC^{-1}W=W`$.
 
@@ -354,15 +354,15 @@ Write the thin SVD $`W=ULR^\top`$ with $`L`$ diagonal and positive. Then $`C^{-1
 
 Substituting back, $`C`$ has eigenvalues $`\lambda_j`$ on the retained eigenvectors and $`\sigma^2`$ on the other $`d-k`$ directions, and
 
-$$
+```math
 -\frac2n\ell=\sum_{j\in\mathcal K}(\ln\lambda_j+1)+(d-k)\ln\sigma^2+\frac1{\sigma^2}\sum_{j\notin\mathcal K}\lambda_j,
-$$
+```
 
 where $`\mathcal K`$ indexes the retained eigenvalues. Minimizing over $`\sigma^2`$ gives the average of the discarded eigenvalues. The remaining dependence on $`\mathcal K`$ is through $`\sum_{j\in\mathcal K}\ln\lambda_j+(d-k)\ln\bigl(\frac1{d-k}\sum_{j\notin\mathcal K}\lambda_j\bigr)`$. Writing $`\sum_{j\in\mathcal K}\ln\lambda_j=\sum_{j=1}^d\ln\lambda_j-\sum_{j\notin\mathcal K}\ln\lambda_j`$, where the first sum does not depend on $`\mathcal K`$, this is a constant plus
 
-$$
+```math
 (d-k)\Bigl[\ln\Bigl(\frac1{d-k}\sum_{j\notin\mathcal K}\lambda_j\Bigr)-\frac1{d-k}\sum_{j\notin\mathcal K}\ln\lambda_j\Bigr],
-$$
+```
 
 $`d-k`$ times the gap between the logarithm of the average discarded eigenvalue and the average of their logarithms. By concavity of the logarithm (Jensen's inequality) this gap is nonnegative, and it is smallest when the discarded eigenvalues are as nearly equal as possible. Together with the requirement $`\lambda_j>\sigma^2`$ for the retained eigenvalues, Tipping and Bishop show that it is minimized by retaining the $`k`$ largest; other choices are saddle points. The rotation $`R`$ is not identified, because $`WR`$ gives the same $`WW^\top`$.
 
@@ -376,17 +376,17 @@ $`d-k`$ times the gap between the logarithm of the average discarded eigenvalue 
 
 **Double centering.** Let $`y_1,\ldots,y_n`$ be points with squared distances $`D^{(2)}_{ij}=\|y_i-y_j\|^2=g_{ii}+g_{jj}-2g_{ij}`$, where $`G=YY^\top`$. In matrix form, $`D^{(2)}=g\mathbf 1^\top+\mathbf 1g^\top-2G`$ with $`g`$ the diagonal of $`G`$. The centering matrix satisfies $`H\mathbf 1=0`$, so the first two terms vanish on both sides:
 
-$$
+```math
 -\tfrac12HD^{(2)}H=HGH=(HY)(HY)^\top ,
-$$
+```
 
 the Gram matrix of the centered points. It is therefore positive semidefinite whenever the distances are Euclidean. The converse also holds. For any symmetric $`D^{(2)}`$ with zero diagonal, let $`c_i`$ be the mean of its $`i`$th row and $`m`$ the mean of all its entries; then $`B=-\tfrac12HD^{(2)}H`$ has entries $`b_{ij}=-\tfrac12\bigl(D^{(2)}_{ij}-c_i-c_j+m\bigr)`$, and the zero diagonal gives $`b_{ii}+b_{jj}-2b_{ij}=D^{(2)}_{ij}`$. If $`B=Q\Lambda Q^\top`$ is positive semidefinite, the rows of $`Q\Lambda^{1/2}`$ therefore have exactly the squared distances $`D^{(2)}`$, since their Gram matrix is $`B`$ (positive semidefinite matrices are Gram matrices). So $`B`$ is positive semidefinite exactly when the distances are Euclidean, and an eigendecomposition recovers the centered points up to an orthogonal transformation.
 
 **Centered kernels.** For the centered features $`\tilde\phi(x)=\phi(x)-\bar\phi`$ with $`\bar\phi=\frac1n\sum_j\phi(x_j)`$,
 
-$$
+```math
 \tilde k(x_i,x)=k(x_i,x)-\frac1n\sum_jk(x_j,x)-\frac1n\sum_jk(x_i,x_j)+\frac1{n^2}\sum_{j,l}k(x_j,x_l).
-$$
+```
 
 For training points this is the matrix $`HKH`$. For a new input, the second term averages its kernel values with the training points, and the last two terms use only training quantities, which must be stored with the fitted model, like the mean in ordinary PCA.
 

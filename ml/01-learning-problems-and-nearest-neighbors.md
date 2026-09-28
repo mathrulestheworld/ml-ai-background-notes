@@ -10,23 +10,23 @@
 
 Supervised learning begins with observations of input–target pairs. Throughout the ML module,
 
-$$
+```math
 D=\{(x_i,y_i)\}_{i=1}^n,\qquad (X_i,Y_i)\stackrel{\mathrm{iid}}{\sim}P,
-$$
+```
 
 where $`x_i\in\mathcal X`$ is an input, usually a feature vector in $`\mathbb R^d`$, and $`y_i\in\mathcal Y`$ is its target. In **regression** the target is numerical, $`\mathcal Y\subseteq\mathbb R`$. In **classification** it is one of $`K`$ labels. The design matrix $`X\in\mathbb R^{n\times d}`$ stores the inputs as rows $`x_i^\top`$, following the conventions in Foundations.
 
 A **prediction rule** is a function $`f:\mathcal X\to\widehat{\mathcal Y}`$. A **loss** $`\ell(y,\hat y)`$, with the target first, measures the cost of predicting $`\hat y`$ when the target is $`y`$. The quantity a learning method ultimately cares about is the **population risk**
 
-$$
+```math
 R(f)=\mathbb E_{(X,Y)\sim P}\,\ell\bigl(Y,f(X)\bigr),
-$$
+```
 
 the expected loss on a fresh observation from the same law. The data supply only the **empirical risk**
 
-$$
+```math
 \widehat R_n(f)=\frac1n\sum_{i=1}^n\ell\bigl(y_i,f(x_i)\bigr).
-$$
+```
 
 These are the objects written $`R_\ast`$ and $`\widehat R_n`$ in Information and Learning Theory; the subscript on the law is dropped in this module. A **learning algorithm** maps the sample to a rule, $`\hat f=\mathcal A(D)`$. The rule is then applied to new inputs, and its quality is judged by $`R(\hat f)`$, a random quantity because $`\hat f`$ depends on $`D`$. The terminology of tasks, models, algorithms, and data splits is developed in Terminology and Mathematical Language.
 
@@ -42,15 +42,15 @@ Each entry follows by minimizing the conditional expected loss $`\mathbb E[\ell(
 
 For binary classification with labels $`\{0,1\}`$, write
 
-$$
+```math
 \eta(x)=P(Y=1\mid X=x).
-$$
+```
 
 The **Bayes classifier** predicts $`1`$ exactly when $`\eta(x)\ge1/2`$, and its error is
 
-$$
+```math
 R^*=\mathbb E\bigl[\min\{\eta(X),1-\eta(X)\}\bigr].
-$$
+```
 
 Thus both regression and classification reduce, at the population level, to knowledge of a conditional distribution. For squared error one needs its mean; for zero–one loss one needs to know which side of $`1/2`$ the class probability lies on. The Bayes predictor is a benchmark, not an algorithm: it requires the unknown law $`P`$.
 
@@ -64,9 +64,9 @@ A **local nonparametric** method instead averages targets of observations whose 
 
 The contrast is visible on a simulated two-class problem whose Bayes classifier is known exactly. The two classes are equally likely and Gaussian, with different shapes: class 0 is $`\mathcal N\bigl((0,0)^\top,\operatorname{diag}(1,4)\bigr)`$, spread out vertically, and class 1 is $`\mathcal N\bigl((2,0)^\top,\operatorname{diag}(1,1/4)\bigr)`$, flattened. Writing $`p_0`$ and $`p_1`$ for the two class densities, the log ratio
 
-$$
+```math
 \ln\frac{p_1(x)}{p_0(x)}=2x_1-2+\ln4-\tfrac{15}{8}x_2^2
-$$
+```
 
 is positive exactly when $`\eta(x)>1/2`$. The Bayes boundary is therefore the parabola $`x_1=1-\ln2+\tfrac{15}{16}x_2^2`$, which curves around class 1. It is curved rather than straight because the two covariance matrices differ, as Generative Classifiers explains. The Bayes error is $`0.099`$. Fitting a least-squares linear function to the $`0/1`$ labels and thresholding it at $`1/2`$ gives a single straight boundary. Nearest-neighbor rules, defined in the next section, instead follow the data locally.
 
@@ -96,21 +96,21 @@ The word *bias* here refers to an assumption, not yet to the statistical bias of
 
 Fix a distance $`\rho`$ on $`\mathcal X`$, usually Euclidean distance on standardized features. Given a query input $`x`$, rank the training inputs by their distance to $`x`$. Write $`x_{(1)}(x)`$ for the closest training input, $`x_{(2)}(x)`$ for the second closest, and in general $`x_{(j)}(x)`$ for the one of rank $`j`$, so that
 
-$$
+```math
 \rho\bigl(x,x_{(1)}(x)\bigr)\le\rho\bigl(x,x_{(2)}(x)\bigr)\le\cdots\le\rho\bigl(x,x_{(n)}(x)\bigr).
-$$
+```
 
 The subscript in parentheses is a rank, as in the order statistics $`X_{(1)}\le\cdots\le X_{(n)}`$ of Probability and Statistics, and the argument $`x`$ records that the ranking depends on the query: a different query reorders the same sample. Thus $`\rho\bigl(x,x_{(j)}(x)\bigr)`$ is the $`j`$th smallest of the distances $`\rho(x,x_1),\ldots,\rho(x,x_n)`$. Let $`y_{(j)}(x)`$ be the target paired with $`x_{(j)}(x)`$, and let $`N_k(x)`$ be the set of indices of the $`k`$ inputs of rank $`1`$ to $`k`$, the **$`k`$ nearest neighbors** of $`x`$. The **$`k`$-nearest-neighbor ($`k`$-NN) regression estimate** is the local average
 
-$$
+```math
 \hat m_k(x)=\frac1k\sum_{j=1}^k y_{(j)}(x)=\frac1k\sum_{i\in N_k(x)}y_i.
-$$
+```
 
 For classification, the **$`k`$-NN classifier** predicts the most frequent label among the neighbors,
 
-$$
+```math
 \hat f_k(x)\in\operatorname*{arg\,max}_{c}\ \sum_{i\in N_k(x)}\mathbf 1\{y_i=c\}.
-$$
+```
 
 With binary labels in $`\{0,1\}`$, this is the plug-in rule that thresholds the local estimate $`\hat\eta_k(x)=\hat m_k(x)`$ at $`1/2`$. The classifier and the regression estimate therefore share one construction: estimate a conditional expectation by a local average, then apply the Bayes decision to that estimate.
 
@@ -124,9 +124,9 @@ The rule stores the training sample and does no fitting. It is sometimes called 
 
 **Weighted neighbors.** The average can weight neighbors unequally, for example by $`w_i\propto1/\rho(x,x_i)`$, or by a decreasing kernel of the distance:
 
-$$
+```math
 \hat m(x)=\frac{\sum_iK\bigl(\rho(x,x_i)/h\bigr)y_i}{\sum_iK\bigl(\rho(x,x_i)/h\bigr)}.
-$$
+```
 
 With a fixed bandwidth $`h`$ instead of a fixed number of neighbors, this is the **Nadaraya–Watson** kernel smoother. The $`k`$-NN rule is the special case with a uniform kernel whose bandwidth adapts to the local density of the data: in sparse regions the $`k`$th neighbor is farther away, so the neighborhood widens automatically. Kernel smoothing and local polynomial regression are developed in Smoothing, Density Estimation, and Basis Expansions.
 
@@ -188,25 +188,25 @@ The pattern is the prototypical tradeoff between fitting the observed sample and
 
 Regression makes the tradeoff exact. Treat the training inputs as fixed and suppose
 
-$$
+```math
 y_i=m(x_i)+\varepsilon_i,\qquad \mathbb E\varepsilon_i=0,\quad \operatorname{Var}(\varepsilon_i)=\sigma^2,
-$$
+```
 
 with independent noise. At a fixed query $`x_0`$, the neighbor set $`N_k(x_0)`$ depends only on the inputs, so the estimate is an average of $`k`$ independent noisy targets:
 
-$$
+```math
 \hat m_k(x_0)=\frac1k\sum_{i\in N_k(x_0)}m(x_i)+\frac1k\sum_{i\in N_k(x_0)}\varepsilon_i.
-$$
+```
 
 Its expectation is the average of $`m`$ over the neighbors, and its variance is $`\sigma^2/k`$. Expanding the square therefore gives
 
-$$
+```math
 \boxed{
 \mathbb E\bigl[(\hat m_k(x_0)-m(x_0))^2\bigr]
 =\underbrace{\Bigl(\frac1k\sum_{i\in N_k(x_0)}m(x_i)-m(x_0)\Bigr)^2}_{\text{squared bias}}
 +\underbrace{\frac{\sigma^2}{k}}_{\text{variance}}.
 }
-$$
+```
 
 This is the decomposition of mean squared error into squared bias and variance from Probability and Statistics, applied to the estimator $`\hat m_k(x_0)`$ of the number $`m(x_0)`$. Increasing $`k`$ reduces variance but averages over neighbors farther from $`x_0`$, whose conditional means may differ from $`m(x_0)`$. For a new observation $`Y_0=m(x_0)+\varepsilon_0`$, the expected squared prediction error adds the irreducible $`\sigma^2`$. The decomposition for a whole predictor, rather than one query, is studied in Losses, Model Selection, and Evaluation.
 
@@ -250,9 +250,9 @@ For small $`k`$ the error is almost entirely variance; for $`k=101`$, half the s
 
 A nearest-neighbor rule is only as good as its notion of similarity. Common choices for numerical features are the Minkowski distances $`\|x-z\|_p`$ built from the norms of Linear Algebra, with $`p=2`$ (Euclidean) and $`p=1`$ (Manhattan) most frequent. Their unit balls, drawn in the left panel of the figure in the next subsection, show which points each distance treats as equally near: the Euclidean ball is round, the $`\ell_1`$ ball is a diamond that favors changes along a single coordinate, and the $`\ell_\infty`$ ball is a square that looks only at the largest coordinate difference. The **Mahalanobis distance**
 
-$$
+```math
 \rho_\Sigma(x,z)=\sqrt{(x-z)^\top\Sigma^{-1}(x-z)}
-$$
+```
 
 is Euclidean distance after whitening by a covariance matrix $`\Sigma`$; see Whitening and Mahalanobis distance. With $`\Sigma`$ diagonal it reduces to standardization of each feature.
 
@@ -282,9 +282,9 @@ The empirical behavior of $`k`$-NN raises a theoretical question: with unlimited
 
 Let $`X`$ have law $`\mu`$ on $`\mathbb R^d`$ and let $`x`$ be in the **support** of $`\mu`$, meaning that every open ball around $`x`$ has positive probability. If $`X_1,\ldots,X_n`$ are iid from $`\mu`$, write $`X_{(j)}(x)`$ for the $`j`$th nearest of them to $`x`$. Then
 
-$$
+```math
 \rho\bigl(x,X_{(1)}(x)\bigr)\longrightarrow0\quad\text{almost surely as }n\to\infty.
-$$
+```
 
 Indeed, for any $`r>0`$ the ball $`B(x,r)`$ has probability $`p_r>0`$, so the chance that none of $`n`$ observations lands in it is $`(1-p_r)^n`$, which tends to zero. This is the formula $`P(X_{(1)}>t)=[1-F(t)]^n`$ for the smallest order statistic, applied to the distances $`\rho(x,X_i)`$. The nearest distance is nonincreasing in $`n`$, so convergence in probability upgrades to almost-sure convergence. The same holds for the $`k`$th nearest neighbor with $`k`$ fixed. Since $`X`$ itself lies in the support with probability one, the nearest neighbor of a random query converges to that query.
 
@@ -292,29 +292,29 @@ Indeed, for any $`r>0`$ the ball $`B(x,r)`$ has probability $`p_r>0`$, so the ch
 
 Assume binary labels and that $`\eta`$ is continuous; the conclusion holds more generally, but continuity keeps the argument short. Condition on the query $`X=x`$ and its nearest neighbor $`X_{(1)}(x)=x'`$. The test label $`Y`$ and the neighbor's label $`Y'`$ are then independent Bernoulli variables with parameters $`\eta(x)`$ and $`\eta(x')`$. The 1-NN rule errs when they differ:
 
-$$
+```math
 P(Y\ne Y'\mid x,x')=\eta(x)\bigl(1-\eta(x')\bigr)+\bigl(1-\eta(x)\bigr)\eta(x').
-$$
+```
 
 As $`n\to\infty`$, $`x'\to x`$ and continuity gives the limit $`2\eta(x)(1-\eta(x))`$. The conditional error is bounded by one, so dominated convergence yields the asymptotic 1-NN risk
 
-$$
+```math
 R_{\mathrm{1NN}}=\lim_{n\to\infty}\mathbb E\,R(\hat f_{1,n})=\mathbb E\bigl[2\eta(X)\bigl(1-\eta(X)\bigr)\bigr].
-$$
+```
 
 This is the probability that two independent labels drawn at the same input disagree. It lies between the Bayes risk and twice the Bayes risk.
 
 **Theorem (Cover and Hart, 1967).** Under the assumptions above,
 
-$$
+```math
 \boxed{R^*\le R_{\mathrm{1NN}}\le2R^*(1-R^*)\le2R^*.}
-$$
+```
 
 **Proof.** Let $`r(x)=\min\{\eta(x),1-\eta(x)\}`$, so $`R^\ast=\mathbb Er(X)`$ and $`2\eta(1-\eta)=2r(1-r)`$ pointwise. Since $`r\le1/2`$, $`2r(1-r)\ge r`$, giving the lower bound. For the upper bound,
 
-$$
+```math
 R_{\mathrm{1NN}}=2\mathbb E r(X)-2\mathbb E r(X)^2\le2R^*-2(R^*)^2,
-$$
+```
 
 because $`\mathbb E r^2\ge(\mathbb Er)^2`$. $`\square`$
 
@@ -328,9 +328,9 @@ The result has a striking interpretation: half of the classification information
 
 Averaging more neighbors removes the noise that 1-NN copies. Let $`k=k_n`$ grow with the sample size. **Stone's theorem** states that if
 
-$$
+```math
 k_n\to\infty\qquad\text{and}\qquad k_n/n\to0,
-$$
+```
 
 then $`\mathbb E R(\hat f_{k_n})\to R^\ast`$ for **every** distribution of $`(X,Y)`$ on $`\mathbb R^d\times\{0,1\}`$, with ties broken randomly. The rule is **universally consistent**. The first condition makes the average of the neighbors' labels concentrate around its mean; the second keeps the neighbors close to the query, so that their mean approaches $`\eta(x)`$. See [Stone, *Consistent Nonparametric Regression* (1977)](https://doi.org/10.1214/aos/1176343886) and [Devroye, Györfi, and Lugosi, *A Probabilistic Theory of Pattern Recognition*](https://doi.org/10.1007/978-1-4612-0711-5), which develops these results in detail.
 
@@ -340,16 +340,16 @@ Universal consistency is a limit statement. It says nothing about how large $`n`
 
 Suppose the inputs lie in a bounded set in $`\mathbb R^d`$, the regression function is $`L`$-Lipschitz, and the noise variance is at most $`\sigma^2`$. The $`k`$ nearest neighbors of a typical query lie within distance of order $`(k/n)^{1/d}`$, because a ball of that radius has probability of order $`k/n`$. Inserting this into the pointwise decomposition gives a bound of the form
 
-$$
+```math
 \mathbb E\bigl[(\hat m_k(X)-m(X))^2\bigr]
 \lesssim\frac{\sigma^2}{k}+L^2\Bigl(\frac kn\Bigr)^{2/d},
-$$
+```
 
 valid for $`d\ge3`$ with a constant depending on $`d`$ and the input distribution. Balancing the two terms gives $`k\asymp n^{2/(d+2)}`$ and
 
-$$
+```math
 \mathbb E\bigl[(\hat m_k(X)-m(X))^2\bigr]\lesssim n^{-2/(d+2)}.
-$$
+```
 
 A precise statement and proof are in [Györfi, Kohler, Krzyżak, and Walk, *A Distribution-Free Theory of Nonparametric Regression*](https://doi.org/10.1007/b97848), Chapter 6. The exponent cannot be improved by any method under a Lipschitz assumption alone: [Stone (1982)](https://doi.org/10.1214/aos/1176345969) showed that $`n^{-2/(d+2)}`$ is the minimax rate for this class. Analogous rates for classification depend on smoothness of $`\eta`$ and on how much probability lies near the boundary $`\eta=1/2`$; see [Chaudhuri and Dasgupta (2014)](https://arxiv.org/abs/1407.0067).
 
@@ -363,9 +363,9 @@ The exponent $`2/(d+2)`$ is one expression of the **curse of dimensionality**: l
 
 **The nearest point is far away.** For $`N`$ points uniform in the unit ball of $`\mathbb R^d`$, the median distance from the center to the nearest point is
 
-$$
+```math
 \operatorname{med}=\Bigl(1-2^{-1/N}\Bigr)^{1/d},
-$$
+```
 
 because $`P(\text{all }N\text{ points farther than }r)=(1-r^d)^N`$. With $`N=500`$:
 
@@ -410,9 +410,9 @@ Global assumptions are the other response. A linear model in $`d`$ dimensions ha
 
 A brute-force query computes all $`n`$ distances in $`O(nd)`$ time and selects the $`k`$ smallest in $`O(n)`$ expected time with a partial selection such as `np.argpartition`. For a batch of $`q`$ queries, the squared distances can be formed with one matrix product,
 
-$$
+```math
 \|x-z\|_2^2=\|x\|_2^2+\|z\|_2^2-2x^\top z,
-$$
+```
 
 which is how many libraries compute them. This expansion subtracts large, nearly equal quantities when the two points are close relative to their norms, so tiny distances can lose relative accuracy or even become slightly negative in floating point. The expansion needs only the $`q\times n`$ matrix of inner products instead of the $`q\times n\times d`$ array of differences; Numerical Computing with NumPy and PyTorch discusses this tradeoff between memory and accuracy. Centering the data first reduces the problem; exact ties may need a direct recomputation.
 
@@ -434,21 +434,21 @@ In high dimension these savings disappear. Because distances concentrate, the ba
 
 With $`K`$ classes and class probabilities $`\eta_c(x)=P(Y=c\mid X=x)`$, the same conditioning argument gives the asymptotic 1-NN risk
 
-$$
+```math
 R_{\mathrm{1NN}}=\mathbb E\Bigl[1-\sum_{c=1}^K\eta_c(X)^2\Bigr],
-$$
+```
 
 the probability that two independent labels at the same input differ. The Bayes risk is $`R^\ast=\mathbb E[1-\max_c\eta_c(X)]`$. At a fixed $`x`$, write $`r=1-\max_c\eta_c`$. The sum of squares $`\sum_c\eta_c^2`$ is smallest, subject to the largest probability being $`1-r`$, when the remaining mass $`r`$ is spread equally over the other $`K-1`$ classes. Hence
 
-$$
+```math
 1-\sum_c\eta_c^2\le1-(1-r)^2-\frac{r^2}{K-1}=2r-\frac K{K-1}r^2.
-$$
+```
 
 Taking expectations and using $`\mathbb Er^2\ge(\mathbb Er)^2`$,
 
-$$
+```math
 R^*\le R_{\mathrm{1NN}}\le R^*\Bigl(2-\frac K{K-1}R^*\Bigr).
-$$
+```
 
 For $`K=2`$ this is the binary bound.
 
@@ -456,9 +456,9 @@ For $`K=2`$ this is the binary bound.
 
 For fixed $`k`$ and binary labels, the $`k`$ nearest neighbors of $`x`$ converge to $`x`$, and their labels become independent $`\operatorname{Bernoulli}(\eta(x))`$ variables, independent of the test label. A majority vote of $`k`$ such labels disagrees with an independent test label with probability
 
-$$
+```math
 \alpha_k(p)=p\,P\Bigl(B\le\tfrac{k-1}2\Bigr)+(1-p)\,P\Bigl(B\ge\tfrac{k+1}2\Bigr),\qquad B\sim\operatorname{Binomial}(k,p),
-$$
+```
 
 at $`p=\eta(x)`$. Under the continuity assumption, the asymptotic $`k`$-NN risk is $`\mathbb E\,\alpha_k(\eta(X))`$. The law of large numbers gives $`\alpha_k(p)\to\min\{p,1-p\}`$ as $`k\to\infty`$, recovering the Bayes risk only in the limit. Numerical values show how slowly this happens when $`\eta(x)`$ is near $`1/2`$:
 

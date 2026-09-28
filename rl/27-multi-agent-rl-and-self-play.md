@@ -16,9 +16,9 @@ Several difficulties appear that single-agent RL never had to face. From the poi
 
 AI chapter 15 defines the solution concepts of game theory; here are the ones learning algorithms aim for. A **best response** of agent $`i`$ to the others' policies $`\boldsymbol\pi^{-i}`$ is a policy maximizing $`V^i(\pi^i,\boldsymbol\pi^{-i})`$, and a **Nash equilibrium** is a joint policy in which every agent's policy is a best response to the others'. How far a joint policy is from equilibrium is measured by what the agents could gain by deviating,
 
-$$
+```math
 \operatorname{NashConv}(\boldsymbol\pi)=\sum_{i=1}^n\Bigl(\max_{\pi'}V^i(\pi',\boldsymbol\pi^{-i})-V^i(\boldsymbol\pi)\Bigr)\ \ge0,
-$$
+```
 
 which is zero exactly at a Nash equilibrium; in two-player zero-sum games, the sum is also called the **exploitability**, or that name is given to half of it. Computing it requires a best response, which is easy in small games and is itself a hard RL problem in large ones.
 
@@ -105,15 +105,15 @@ The value of acting at an information set depends on the probabilities of the hi
 
 The regret-minimizing learners of the previous section solve a game by playing it repeatedly, but applied to the normal form of an extensive game they would need one "action" per complete strategy, exponentially many. **Counterfactual regret minimization** (CFR; [Zinkevich, Johanson, Bowling, and Piccione, 2007](https://proceedings.neurips.cc/paper/2007/hash/08d98638c6fcd194a4b1e6992063e944-Abstract.html)) instead runs a small regret minimizer at every information set. The **counterfactual value** of an information set $`I`$ of player $`i`$ is the expected payoff below it, weighted by the probability that *the others and chance* bring play to each of its histories, as if player $`i`$ had tried to reach it:
 
-$$
+```math
 v_i(\sigma,I)=\sum_{h\in I}\pi^\sigma_{-i}(h)\sum_{z}\pi^\sigma(h\to z)\,u_i(z),
-$$
+```
 
 where $`z`$ ranges over the terminal histories below $`h`$ and $`\pi^\sigma(h\to z)`$ is the probability of going from $`h`$ to $`z`$; $`v_i(\sigma,I,a)`$ is the same with action $`a`$ taken at $`I`$. The **counterfactual regret** of $`a`$ after $`T`$ iterations is $`R^T(I,a)=\sum_{t=1}^T\bigl(v_i(\sigma^t,I,a)-v_i(\sigma^t,I)\bigr)`$, and CFR plays **regret matching** at every information set, $`\sigma^{t+1}(I,a)\propto\max\bigl(R^t(I,a),0\bigr)`$, or uniformly if no regret is positive. Zinkevich et al. proved that a player's overall regret is at most the sum of its positive counterfactual regrets over its information sets ([appendix A](#block-rl27-appendix-a)), so the average regret falls as $`O\bigl(\Delta\,|\mathcal I_i|\sqrt{|A|}/\sqrt T\bigr)`$, with $`\Delta`$ the range of payoffs, $`|\mathcal I_i|`$ the number of information sets, and $`|A|`$ the largest number of actions. In a two-player zero-sum game, the **average strategy**, with each iteration weighted by the player's own probability of reaching the information set,
 
-$$
+```math
 \bar\sigma^T_i(I,a)=\frac{\sum_{t=1}^T\pi^{\sigma^t}_i(I)\,\sigma^t(I,a)}{\sum_{t=1}^T\pi^{\sigma^t}_i(I)},
-$$
+```
 
 therefore converges to a Nash equilibrium. Each iteration traverses the tree once, with work proportional to its size, instead of enumerating strategies. **CFR+** ([Tammelin, 2014](https://arxiv.org/abs/1407.5042)) floors the cumulative regrets at zero after every update, so an action that becomes good is not held back by old negative regret, updates the players alternately, and weights later iterations more in the average; it converges much faster in practice, and with it the Cepheus program **essentially solved** heads-up limit Texas hold'em, a game with $`3.19\times10^{14}`$ decision points: its strategy is exploitable by less than 1 milli-big-blind per hand, too little to be detected in a human lifetime of play ([Bowling, Burch, Johanson, and Tammelin, 2015](https://doi.org/10.1126/science.1259433)). The next code runs both on Kuhn poker, computing exploitability exactly by enumerating each player's 64 pure strategies.
 
@@ -270,9 +270,9 @@ The simplest approach to a cooperative task lets every agent run its own single-
 
 When training happens in a simulator, the learner can see everything, including every agent's observations and actions and the true state, even though at execution each agent must act on its own observations. **Centralized training with decentralized execution** (CTDE) exploits this. In **MADDPG** ([Lowe et al., 2017](https://arxiv.org/abs/1706.02275)) each agent's actor uses only its own observations, while its critic $`Q_i(s,a^1,\dots,a^n)`$ sees the state and all actions, so that, from the critic's point of view, the environment is stationary again. **COMA** ([Foerster et al., 2018](https://arxiv.org/abs/1705.08926)) addresses credit assignment with a centralized critic and a **counterfactual baseline** for each agent,
 
-$$
+```math
 A^i(s,\mathbf a)=Q(s,\mathbf a)-\sum_{a'}\pi^i(a'\mid o^i)\,Q\bigl(s,(\mathbf a^{-i},a')\bigr),
-$$
+```
 
 which compares the joint action's value with what agent $`i`$ would have obtained on average, drawing its action from its own policy, while the teammates' actions stay fixed, isolating its own contribution.
 
@@ -349,7 +349,9 @@ Consider the continuous-time version of Hedge, the **replicator dynamics** $`\do
 (b) The strategies stay on a level set of $`D`$ forever. Unless they start at the equilibrium, they never reach it: they orbit it, while their time averages converge. A discrete step moves along the tangent of the orbit, and since $`D`$ is convex, a step along the tangent of a level set leaves it outward: each step increases $`D`$, and the iterates spiral toward the boundary, as the mirror-descent row of the code shows.
 
 (c) Repeating the computation with the regularized payoffs, the bilinear terms give $`x^\top A\hat y-\hat x^\top Ay`$, and the regularized equilibrium conditions, $`A\hat y=\alpha(\ln\hat x-\ln\rho)+c_1\mathbf 1`$ and $`-A^\top\hat x=\alpha(\ln\hat y-\ln\varsigma)+c_2\mathbf 1`$, turn them into $`\alpha(x-\hat x)^\top(\ln\hat x-\ln\rho)+\alpha(y-\hat y)^\top(\ln\hat y-\ln\varsigma)`$. Adding the regularization terms $`\alpha(\hat x-x)^\top(\ln x-\ln\rho)+\alpha(\hat y-y)^\top(\ln y-\ln\varsigma)`$, the magnets cancel and
-$$\frac{d}{dt}\Bigl(D_{\mathrm{KL}}(\hat x\,\|\,x)+D_{\mathrm{KL}}(\hat y\,\|\,y)\Bigr)=-\alpha\Bigl((x-\hat x)^\top(\ln x-\ln\hat x)+(y-\hat y)^\top(\ln y-\ln\hat y)\Bigr)\le0,$$
+```math
+\frac{d}{dt}\Bigl(D_{\mathrm{KL}}(\hat x\,\|\,x)+D_{\mathrm{KL}}(\hat y\,\|\,y)\Bigr)=-\alpha\Bigl((x-\hat x)^\top(\ln x-\ln\hat x)+(y-\hat y)^\top(\ln y-\ln\hat y)\Bigr)\le0,
+```
 since $`(u-w)^\top(\ln u-\ln w)=D_{\mathrm{KL}}(u\,\|\,w)+D_{\mathrm{KL}}(w\,\|\,u)\ge0`$, with equality only at the regularized equilibrium. The regularization turns the orbit into a spiral inward, at a rate proportional to $`\alpha`$.
 
 </details>
@@ -389,9 +391,9 @@ CFR weights the regrets at an information set by the probability that the *other
 
 Two cooperating agents share the payoffs of the **climbing game** of Claus and Boutilier, in which the row agent chooses the row and the column agent the column:
 
-$$
+```math
 \begin{pmatrix}11&-30&0\\-30&7&6\\0&0&5\end{pmatrix}.
-$$
+```
 
 (a) Which joint actions are Nash equilibria? (b) Early in learning, each agent's partner acts nearly uniformly at random. Which action does each agent's value estimate favor? (c) Describe how independent learners then climb to a suboptimal equilibrium, and name the pathology.
 
@@ -450,13 +452,19 @@ Three responses $`A`$, $`B`$, and $`C`$ to a prompt are compared by people, with
 
 
 Fix player $`i`$ and a sequence of strategy profiles $`\sigma^1,\dots,\sigma^T`$, and assume perfect recall. For an information set $`I`$ of player $`i`$, write $`\sigma|_{I\to\sigma'}`$ for the profile that follows player $`i`$'s alternative strategy $`\sigma'`$ at $`I`$ and at all of its information sets below $`I`$, and $`\sigma`$ everywhere else. The **full counterfactual regret** of $`I`$ is
-$$R_{\text{full}}(I)=\max_{\sigma'}\sum_{t=1}^T\Bigl(v_i(\sigma^t|_{I\to\sigma'},I)-v_i(\sigma^t,I)\Bigr).$$
+```math
+R_{\text{full}}(I)=\max_{\sigma'}\sum_{t=1}^T\Bigl(v_i(\sigma^t|_{I\to\sigma'},I)-v_i(\sigma^t,I)\Bigr).
+```
 At player $`i`$'s topmost information sets, those not preceded by another of its own, the player's own reach probability is 1, so counterfactual values are ordinary expected payoffs weighted by the probability that chance and the opponents lead there; since the subtrees below different topmost information sets are disjoint, player $`i`$'s overall regret is at most the sum of their full counterfactual regrets.
 
 Now let $`\sigma'`$ play action $`a`$ at $`I`$; since the counterfactual value is linear in the strategy at $`I`$, a pure action suffices. Let $`\operatorname{Succ}(I,a)`$ be the information sets of player $`i`$ that can be reached next after $`a`$, without another decision of player $`i`$ in between. By perfect recall, the histories below $`(I,a)`$ split into those ending without another decision of player $`i`$, whose payoffs do not depend on $`\sigma'`$, and those passing through exactly one $`I'\in\operatorname{Succ}(I,a)`$, where the opponents' and chance's reach probabilities carry over. Therefore
-$$v_i(\sigma|_{I\to\sigma'},I)=v_i(\sigma,I,a)+\sum_{I'\in\operatorname{Succ}(I,a)}\Bigl(v_i(\sigma|_{I'\to\sigma'},I')-v_i(\sigma,I')\Bigr).$$
+```math
+v_i(\sigma|_{I\to\sigma'},I)=v_i(\sigma,I,a)+\sum_{I'\in\operatorname{Succ}(I,a)}\Bigl(v_i(\sigma|_{I'\to\sigma'},I')-v_i(\sigma,I')\Bigr).
+```
 Subtracting $`v_i(\sigma^t,I)`$, summing over $`t`$, and maximizing separately over the disjoint subtrees,
-$$R_{\text{full}}(I)\le\max_a\Bigl(R^T(I,a)+\sum_{I'\in\operatorname{Succ}(I,a)}R_{\text{full}}(I')\Bigr)\le R^{T,+}(I)+\sum_{I'\in\operatorname{Succ}(I)}R^+_{\text{full}}(I'),$$
+```math
+R_{\text{full}}(I)\le\max_a\Bigl(R^T(I,a)+\sum_{I'\in\operatorname{Succ}(I,a)}R_{\text{full}}(I')\Bigr)\le R^{T,+}(I)+\sum_{I'\in\operatorname{Succ}(I)}R^+_{\text{full}}(I'),
+```
 where $`R^{T,+}(I)=\max\bigl(\max_aR^T(I,a),0\bigr)`$ is the positive counterfactual regret and $`\operatorname{Succ}(I)`$ collects the successors of all actions. Unrolling the recursion, each information set of player $`i`$ contributes its positive counterfactual regret at most once, so the overall regret is at most $`\sum_{I\in\mathcal I_i}R^{T,+}(I)`$ ([Zinkevich et al., 2007](https://proceedings.neurips.cc/paper/2007/hash/08d98638c6fcd194a4b1e6992063e944-Abstract.html), theorem 3). Regret matching keeps each $`R^{T,+}(I)`$ below $`\Delta\sqrt{|A|T}`$, where $`\Delta`$ bounds the range of the counterfactual values, and summing over the information sets gives the bound in the text. With exercise 27.1, the average strategies of two CFR players are an $`\epsilon`$-equilibrium with $`\epsilon=O(1/\sqrt T)`$.
 
 </details>
@@ -468,13 +476,19 @@ where $`R^{T,+}(I)=\max\bigl(\max_aR^T(I,a),0\bigr)`$ is the positive counterfac
 
 
 Consider a two-player zero-sum stochastic game with finite states and actions, discount factor $`\gamma<1`$, and payoff $`r(s,a,b)`$ to player 1. For a value function $`V`$, define at each state the matrix game
-$$M_s(V)_{ab}=r(s,a,b)+\gamma\sum_{s'}P(s'\mid s,a,b)\,V(s'),$$
+```math
+M_s(V)_{ab}=r(s,a,b)+\gamma\sum_{s'}P(s'\mid s,a,b)\,V(s'),
+```
 and the **Shapley operator** $`(\mathcal TV)(s)=\operatorname{val}M_s(V)=\max_x\min_yx^\top M_s(V)\,y`$, where $`x`$ and $`y`$ range over the players' mixed strategies. The value of a matrix game is monotone in its entries and shifts with constants: if $`M\le M'+c`$ entrywise, then $`\operatorname{val}M\le\operatorname{val}M'+c`$. Hence $`|\operatorname{val}M-\operatorname{val}M'|\le\max_{a,b}|M_{ab}-M'_{ab}|`$, and since the entries of $`M_s(V)`$ and $`M_s(V')`$ differ by at most $`\gamma\|V-V'\|_\infty`$,
-$$\|\mathcal TV-\mathcal TV'\|_\infty\le\gamma\|V-V'\|_\infty.$$
+```math
+\|\mathcal TV-\mathcal TV'\|_\infty\le\gamma\|V-V'\|_\infty.
+```
 The operator is a contraction, as the Bellman operator of chapter 2 is, so value iteration converges to its unique fixed point $`V^*`$. [Shapley (1953)](https://doi.org/10.1073/pnas.39.10.1095) showed that $`V^*(s)`$ is the value of the game started in $`s`$, and that the stationary strategies that play, at every state, equilibrium strategies of the matrix game $`M_s(V^*)`$ form an equilibrium of the stochastic game: in the zero-sum case, stationary Markov strategies suffice, as they do for MDPs.
 
 **Minimax-Q** replaces the model by samples. After observing $`(s,a,b,r,s')`$, it updates
-$$Q(s,a,b)\leftarrow Q(s,a,b)+\alpha\Bigl(r+\gamma\operatorname{val}Q(s',\cdot,\cdot)-Q(s,a,b)\Bigr),$$
+```math
+Q(s,a,b)\leftarrow Q(s,a,b)+\alpha\Bigl(r+\gamma\operatorname{val}Q(s',\cdot,\cdot)-Q(s,a,b)\Bigr),
+```
 where the value of the matrix game $`Q(s',\cdot,\cdot)`$ is computed by the linear program that maximizes $`v`$ over mixed strategies $`x`$ subject to $`\sum_ax_aQ(s',a,b)\ge v`$ for every $`b`$. Its convergence follows from the contraction as Q-learning's does, and it learns a safe, equilibrium policy, but not one that exploits a weak opponent: against an opponent who always plays rock, it keeps playing the equilibrium mixture.
 
 </details>

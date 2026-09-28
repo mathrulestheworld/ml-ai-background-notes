@@ -26,9 +26,9 @@ Which figure should guide the choice of treatment? The data alone cannot say. If
 
 The **potential outcomes** framework ([Rubin, 1974](https://doi.org/10.1037/h0037350)), going back to Neyman, defines causal effects by comparing, for each unit $`i`$, the outcome $`Y_i(1)`$ it would have under treatment and the outcome $`Y_i(0)`$ it would have without. The **individual effect** $`Y_i(1)-Y_i(0)`$ is never observed, since each unit receives one treatment, which is the **fundamental problem of causal inference**. Population quantities can still be estimable, notably the **average treatment effect** $`\mathrm{ATE}=\mathbb E[Y(1)-Y(0)]`$. With the observed treatment $`X`$, the observed outcome is $`Y=Y(X)`$ (**consistency**, which presupposes no interference between units), and the naive comparison is
 
-$$
+```math
 \mathbb E[Y\mid X=1]-\mathbb E[Y\mid X=0]=\mathbb E[Y(1)\mid X=1]-\mathbb E[Y(0)\mid X=0],
-$$
+```
 
 which equals the ATE when the potential outcomes are independent of the treatment received. **Randomization** guarantees this: a coin flip cannot depend on how a unit would respond. That is why randomized controlled trials are the standard of evidence. In observational data, the substitute is **conditional ignorability**: $`\bigl(Y(1),Y(0)\bigr)\perp X\mid Z`$ for measured covariates $`Z`$, together with **positivity**, $`0<P(X=1\mid z)<1`$ for all $`z`$. Then the ATE is identified by comparing treated and untreated units with the same $`Z`$ and averaging, and the question becomes which covariates make ignorability hold. Graphs answer it.
 
@@ -38,15 +38,15 @@ which equals the ATE when the potential outcomes are independent of the treatmen
 
 A **structural causal model** (SCM) ([Pearl, 2009](https://doi.org/10.1017/CBO9780511803161)) describes each variable as determined by its direct causes and an independent noise term,
 
-$$
+```math
 V_i:=f_i\bigl(\mathrm{PA}_i,U_i\bigr),\qquad U_1,\dots,U_n\text{ independent},
-$$
+```
 
 with the direct causes drawn as arrows in a **causal graph**. The assignments are mechanisms, not equations: each can be changed without changing the others. With acyclic graphs and independent noises, an SCM induces a joint distribution that factorizes over the graph as a Bayesian network does (chapter 8); what the SCM adds is a meaning for interventions. The **intervention** $`\mathrm{do}(X=x)`$ replaces the mechanism of $`X`$ by the constant $`x`$, cutting all arrows into $`X`$ and leaving the other mechanisms intact. The resulting interventional distribution follows from the **truncated factorization**:
 
-$$
+```math
 P\bigl(v\mid\mathrm{do}(x)\bigr)=\prod_{i:\,V_i\notin X}P\bigl(v_i\mid\mathrm{pa}_i\bigr)\Big|_{X=x},
-$$
+```
 
 the factorization of the observational distribution with the factors of the intervened variables removed. This is the formal difference between $`P(y\mid x)`$, which filters the population to those units with $`X=x`$, and $`P(y\mid\mathrm{do}(x))`$, which changes the population so that every unit has $`X=x`$. Potential outcomes are defined within an SCM as $`Y_x(u)`$, the value of $`Y`$ in unit $`u`$ in the model modified by $`\mathrm{do}(X=x)`$, so the two frameworks describe the same objects in different notation.
 
@@ -66,9 +66,9 @@ An interventional quantity is **identifiable** if it can be computed from the ob
 
 A set of variables $`Z`$ satisfies the **backdoor criterion** relative to $`(X,Y)`$ if no variable in $`Z`$ is a descendant of $`X`$, and $`Z`$ blocks, in the sense of d-separation (chapter 8), every path between $`X`$ and $`Y`$ that starts with an arrow into $`X`$, the **backdoor paths**. Then
 
-$$
+```math
 P\bigl(y\mid\mathrm{do}(x)\bigr)=\sum_zP(y\mid x,z)\,P(z),
-$$
+```
 
 the **adjustment formula** ([Appendix A](#block-ai13-appendix-a)). Backdoor paths carry the association that is due to common causes, and blocking them leaves only the causal paths from $`X`$ to $`Y`$. The criterion formalizes the rules of thumb about what to control for, and corrects some of them:
 
@@ -123,9 +123,9 @@ In this model the treatment raises the recovery probability by 0.10 in every str
 
 Adjustment is not the only route. When the confounder $`U`$ of $`X`$ and $`Y`$ is unobserved but the effect of $`X`$ on $`Y`$ passes entirely through a mediator $`M`$ that $`U`$ does not affect directly ($`X\to M\to Y`$, $`X\leftarrow U\to Y`$), the **frontdoor formula** identifies the effect:
 
-$$
+```math
 P\bigl(y\mid\mathrm{do}(x)\bigr)=\sum_mP(m\mid x)\sum_{x'}P(y\mid m,x')\,P(x'),
-$$
+```
 
 by chaining two identifiable effects, of $`X`$ on $`M`$ (unconfounded) and of $`M`$ on $`Y`$ (confounded only through $`X`$, which can be adjusted for). The general tool is the **do-calculus** ([Pearl, 1995](https://doi.org/10.1093/biomet/82.4.669)), three rules for inserting and deleting observations and interventions, justified by d-separation in modified graphs:
 
@@ -147,9 +147,9 @@ Identification yields a formula; estimating it from finite data is a statistical
 
 When confounders are unmeasured, adjustment is impossible, but an **instrumental variable** can still identify an effect. $`Z`$ is an instrument for the effect of $`X`$ on $`Y`$ if it affects $`X`$ (**relevance**), is independent of the unobserved confounders (**independence**), and affects $`Y`$ only through $`X`$ (**exclusion**). Classic instruments are a randomized encouragement to take a treatment, the draft lottery for military service, and genetic variants in **Mendelian randomization**. In a linear model $`Y=\beta X+\gamma U+\varepsilon`$, the **Wald estimator**
 
-$$
+```math
 \hat\beta_{\mathrm{IV}}=\frac{\widehat{\mathrm{Cov}}(Z,Y)}{\widehat{\mathrm{Cov}}(Z,X)}
-$$
+```
 
 is consistent, because $`\mathrm{Cov}(Z,Y)=\beta\,\mathrm{Cov}(Z,X)`$ when $`Z`$ is independent of $`U`$ and $`\varepsilon`$. Without linearity, an instrument identifies only the **local average treatment effect** among the units whose treatment the instrument changes ([Angrist, Imbens, and Rubin, 1996](https://doi.org/10.1080/01621459.1996.10476902)), under a monotonicity assumption. Instruments that barely affect the treatment, **weak instruments**, make the denominator small and the estimate unstable and biased toward the confounded regression.
 
@@ -269,9 +269,9 @@ Causal reasoning connects to the rest of AI in several ways, developed in later 
 
 Let $`Z`$ satisfy the backdoor criterion for $`(X,Y)`$. In the graph $`G_{\overline X}`$ with the arrows into $`X`$ removed, which describes the intervened model, $`Z`$ is not affected by the intervention, since it contains no descendants of $`X`$; hence $`P(z\mid\mathrm{do}(x))=P(z)`$. Conditioning on $`Z`$,
 
-$$
+```math
 P\bigl(y\mid\mathrm{do}(x)\bigr)=\sum_zP\bigl(y\mid\mathrm{do}(x),z\bigr)\,P(z).
-$$
+```
 
 It remains to show $`P(y\mid\mathrm{do}(x),z)=P(y\mid x,z)`$, which is rule 2 of the do-calculus: exchanging the action $`\mathrm{do}(x)`$ for the observation $`x`$ is allowed when $`Y\perp X\mid Z`$ in the graph $`G_{\underline X}`$ with the arrows *out of* $`X`$ removed. In $`G_{\underline X}`$, the only paths between $`X`$ and $`Y`$ are the backdoor paths, which $`Z`$ blocks by assumption. Combining the two steps gives the adjustment formula.
 
@@ -287,9 +287,9 @@ A direct derivation for the case where $`Z`$ is the set of parents of $`X`$: by 
 
 With ignorability given $`Z`$ and positivity, and the true propensity $`e(z)=P(X=1\mid z)`$,
 
-$$
+```math
 \mathbb E\left[\frac{XY}{e(Z)}\right]=\mathbb E\left[\frac{\mathbb E[X\,Y(1)\mid Z]}{e(Z)}\right]=\mathbb E\left[\frac{\mathbb E[X\mid Z]\;\mathbb E[Y(1)\mid Z]}{e(Z)}\right]=\mathbb E\bigl[Y(1)\bigr],
-$$
+```
 
 using consistency ($`XY=XY(1)`$), then ignorability to factor the conditional expectation, then $`\mathbb E[X\mid Z]=e(Z)`$. Symmetrically, $`\mathbb E[(1-X)Y/(1-e(Z))]=\mathbb E[Y(0)]`$, so the difference estimates the ATE without bias. Each unit's weight is the inverse of the probability that it would have received its treatment, so units of a kind that is rarely treated count more when treated, standing in for the many similar units that were not.
 

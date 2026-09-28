@@ -386,9 +386,13 @@ In the maze of the code, the robot starts at $`(0,0)`$, 0.8 from the goal at $`(
 
 
 Let tasks $`\mathcal M`$ be drawn from a prior $`p(\mathcal M)`$, all sharing state and action spaces, and let the agent interact with one sampled task for $`H`$ steps. Its history $`h_t=(s_0,a_0,r_0,\dots,s_t)`$ determines a posterior $`b_t(\mathcal M)=p(\mathcal M\mid h_t)`$, updated by Bayes' rule after each transition,
-$$b_{t+1}(\mathcal M)\propto b_t(\mathcal M)\,P_{\mathcal M}(s_{t+1}\mid s_t,a_t)\,p_{\mathcal M}(r_t\mid s_t,a_t).$$
+```math
+b_{t+1}(\mathcal M)\propto b_t(\mathcal M)\,P_{\mathcal M}(s_{t+1}\mid s_t,a_t)\,p_{\mathcal M}(r_t\mid s_t,a_t).
+```
 The pair $`(s_t,b_t)`$ is a Markov state for the problem of maximizing $`\mathbb E\bigl[\sum_{t<H}r_t\bigr]`$ with $`\mathcal M`$ unknown: the **Bayes-adaptive MDP**. Its Bellman equation is
-$$V_t(s,b)=\max_a\Bigl(\mathbb E_{\mathcal M\sim b}\bigl[r_{\mathcal M}(s,a)\bigr]+\mathbb E\bigl[V_{t+1}(s',b')\bigr]\Bigr),$$
+```math
+V_t(s,b)=\max_a\Bigl(\mathbb E_{\mathcal M\sim b}\bigl[r_{\mathcal M}(s,a)\bigr]+\mathbb E\bigl[V_{t+1}(s',b')\bigr]\Bigr),
+```
 where the expectation is over $`\mathcal M\sim b`$, then $`(r,s')`$ from $`\mathcal M`$, and $`b'`$ is the updated belief. The optimal policy's value of an action includes the value of what the action reveals, through $`b'`$, which is why the Bayes-optimal agent explores exactly as much as it pays.
 
 The meta-RL objective, the expected return over tasks drawn from $`p(\mathcal M)`$ within the budget, is the value of the BAMDP at the prior. A recurrent policy $`\pi(a_t\mid\text{GRU}(h_t))`$ can represent the Bayes-optimal policy if its hidden state can represent a sufficient statistic of the belief, the successes and failures of each arm in the code, and RL on tasks sampled from the prior optimizes exactly the BAMDP's objective; what is learned is limited by the network, the optimization, and the tasks seen. This is the sense in which a memory-based meta-learner, trained on a task distribution, implements an approximately Bayes-optimal learning algorithm for it ([Ortega et al., 2019](https://arxiv.org/abs/1905.03030)), and why it can beat algorithms designed for worst-case guarantees, as in the code, but only on tasks resembling its prior.
@@ -402,9 +406,13 @@ The meta-RL objective, the expected return over tasks drawn from $`p(\mathcal M)
 
 
 For a task, let $`J(\theta)=\mathbb E_{\tau\sim\pi_\theta}[R(\tau)]`$. MAML adapts with a policy-gradient step estimated from $`N`$ trajectories $`\tau_{1:N}`$ sampled with $`\pi_\theta`$, $`\theta'(\theta,\tau_{1:N})=\theta+\alpha\hat g(\theta,\tau_{1:N})`$ with $`\hat g=\frac1N\sum_iR(\tau_i)\nabla_\theta\ln\pi_\theta(\tau_i)`$, and maximizes the expected post-adaptation return
-$$\mathcal J(\theta)=\mathbb E_{\tau_{1:N}\sim\pi_\theta}\bigl[J(\theta'(\theta,\tau_{1:N}))\bigr].$$
+```math
+\mathcal J(\theta)=\mathbb E_{\tau_{1:N}\sim\pi_\theta}\bigl[J(\theta'(\theta,\tau_{1:N}))\bigr].
+```
 Both the adapted parameters and the distribution of the pre-adaptation trajectories depend on $`\theta`$, so
-$$\nabla_\theta\mathcal J=\mathbb E_{\tau_{1:N}}\Bigl[\Bigl(\frac{\partial\theta'}{\partial\theta}\Bigr)^{\!\top}\nabla_{\theta'}J(\theta')+J(\theta')\sum_{i=1}^N\nabla_\theta\ln\pi_\theta(\tau_i)\Bigr].$$
+```math
+\nabla_\theta\mathcal J=\mathbb E_{\tau_{1:N}}\Bigl[\Bigl(\frac{\partial\theta'}{\partial\theta}\Bigr)^{\!\top}\nabla_{\theta'}J(\theta')+J(\theta')\sum_{i=1}^N\nabla_\theta\ln\pi_\theta(\tau_i)\Bigr].
+```
 The first term, with $`\partial\theta'/\partial\theta=I+\alpha\,\partial\hat g/\partial\theta`$, is what automatic differentiation computes through the inner update, and it contains the second derivatives of exercise 29.2. The second term is a score-function term that credits the pre-adaptation policy for collecting data that made the adaptation successful. Implementations that differentiate only through the update omit it, and the meta-learned initialization then has no incentive to explore for the sake of adapting well; later MAML variants for RL added it, with variance-reduction techniques, because it is noisy. The contrast with memory-based methods is instructive: RL² optimizes the whole interaction, exploration included, with one ordinary policy gradient, and its "inner loop" is free of these complications, but it cannot keep improving when a task needs more adaptation than its memory can hold.
 
 </details>

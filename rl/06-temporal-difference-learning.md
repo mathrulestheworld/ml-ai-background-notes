@@ -12,15 +12,15 @@ Sutton and Barto write that "if one had to identify one idea as central and nove
 
 The simplest TD method, **TD(0)**, updates the value of the state it has just left as soon as it observes the reward and the next state:
 
-$$
+```math
 V(S_t)\leftarrow V(S_t)+\alpha\bigl[R_{t+1}+\gamma V(S_{t+1})-V(S_t)\bigr].
-$$
+```
 
 The quantity in brackets is the **TD error**,
 
-$$
+```math
 \delta_t=R_{t+1}+\gamma V(S_{t+1})-V(S_t),
-$$
+```
 
 the difference between the **TD target** $`R_{t+1}+\gamma V(S_{t+1})`$ and the current estimate. Compare the three targets for $`v_\pi(S_t)`$:
 
@@ -30,9 +30,9 @@ the difference between the **TD target** $`R_{t+1}+\gamma V(S_{t+1})`$ and the c
 
 The TD error is the error of an estimate made at time $`t`$, revealed at time $`t+1`$. If the estimates did not change during an episode, the Monte Carlo error would be exactly the discounted sum of the TD errors along the way,
 
-$$
+```math
 G_t-V(S_t)=\sum_{k=0}^{T-t-1}\gamma^k\delta_{t+k}
-$$
+```
 
 (exercise 6.1): Monte Carlo waits and applies all of them at once, while TD applies each one as it arrives.
 
@@ -190,9 +190,9 @@ TD exploits the Markov property: it propagates information between states along 
 
 TD(0) is a **stochastic approximation** algorithm: each update moves the estimate a step toward a noisy sample of $`(\mathcal T^\pi V)(S_t)`$, where the Bellman operator $`\mathcal T^\pi`$ is a contraction. For a fixed policy, the expected TD update at a state $`s`$ is
 
-$$
+```math
 \mathbb E[\delta_t\mid S_t=s]=r^\pi(s)+\gamma\sum_{s'}P^\pi_{ss'}V(s')-V(s)=(\mathcal T^\pi V)(s)-V(s),
-$$
+```
 
 so on average TD moves $`V`$ toward $`\mathcal T^\pi V`$, like iterative policy evaluation, but one sampled state at a time. Under the Robbins–Monro conditions on the step sizes of chapter 3, applied to each state's own sequence of updates, and if every state is visited infinitely often, tabular TD(0) converges to $`v_\pi`$ with probability one ([Dayan and Sejnowski, 1994](https://doi.org/10.1007/BF00993978); [Jaakkola, Jordan, and Singh, 1994](https://doi.org/10.1162/neco.1994.6.6.1185); [Tsitsiklis, 1994](https://doi.org/10.1007/BF00993306)). With a constant step size that is small enough, it converges in mean to $`v_\pi`$ and fluctuates around it with a variance of order $`\alpha`$. [Appendix A](#block-rl06-appendix-a) sketches the argument. Finite-time bounds on the error, including the linear function approximation of chapter 11, are more recent ([Bhandari, Russo, and Singal, 2018](https://arxiv.org/abs/1806.02450)).
 

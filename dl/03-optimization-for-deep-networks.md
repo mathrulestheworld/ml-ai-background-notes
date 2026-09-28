@@ -82,15 +82,15 @@ This picture explains the **linear scaling rule** of [Goyal et al. (2017)](https
 
 [McCandlish, Kaplan, and Amodei (2018)](https://arxiv.org/abs/1812.06162) turned this into a quantitative model. Consider one step with the best learning rate for a given batch size on a locally quadratic loss with Hessian $`H`$. Averaging the gradient over $`B`$ examples removes noise, and the achievable decrease per step is a fraction $`1/(1+B_{\text{noise}}/B)`$ of the decrease with the exact gradient, where
 
-$$
+```math
 B_{\text{noise}}=\frac{\operatorname{tr}(H\Sigma)}{G^\top HG}\approx B_{\text{simple}}=\frac{\operatorname{tr}\Sigma}{\|G\|^2}
-$$
+```
 
 is the **gradient noise scale**, the batch size at which the noise and the signal in the gradient have comparable size. Consequently the number of steps $`S`$ and the number of examples $`E=SB`$ needed to reach a given loss trade off as
 
-$$
+```math
 S=S_{\min}\Bigl(1+\frac{B_{\text{noise}}}{B}\Bigr),\qquad E=E_{\min}\Bigl(1+\frac{B}{B_{\text{noise}}}\Bigr).
-$$
+```
 
 [Appendix A](#block-dl3-appendix-a) derives both relations from a quadratic model of the loss. Batches much smaller than $`B_{\text{noise}}`$ use data efficiently but need many sequential steps; batches much larger reduce the steps only to $`S_{\min}`$ while wasting examples. The **critical batch size** $`B_{\text{noise}}`$ is the natural compromise, and it grows during training as the gradient signal weakens relative to the noise.
 
@@ -248,17 +248,17 @@ UDL chapter 6, DLB chapter 8, UMich lectures 4 and 11, and UNIGE sections 5.2 an
 
 Let the loss near the current point be approximated by $`\widehat R(\theta-\eta g)\approx\widehat R(\theta)-\eta G^\top g+\frac{\eta^2}2g^\top Hg`$ for a step along a stochastic gradient $`g`$ with mean $`G`$ and covariance $`\Sigma/B`$. Taking the expectation,
 
-$$
+```math
 \mathbb E\bigl[\Delta\widehat R\bigr]=-\eta\|G\|^2+\frac{\eta^2}2\Bigl(G^\top HG+\frac{\operatorname{tr}(H\Sigma)}B\Bigr).
-$$
+```
 
 The best step size minimizes this quadratic in $`\eta`$:
 
-$$
+```math
 \eta^*(B)=\frac{\|G\|^2}{G^\top HG+\operatorname{tr}(H\Sigma)/B}=\frac{\eta_{\max}}{1+B_{\text{noise}}/B},
 \qquad
 \mathbb E\bigl[\Delta\widehat R\bigr]_{\min}=-\frac{\Delta_{\max}}{1+B_{\text{noise}}/B},
-$$
+```
 
 where $`\eta_{\max}=\|G\|^2/(G^\top HG)`$ and $`\Delta_{\max}=\|G\|^4/(2G^\top HG)`$ are the optimal step size and decrease with the exact gradient, and $`B_{\text{noise}}=\operatorname{tr}(H\Sigma)/(G^\top HG)`$.
 

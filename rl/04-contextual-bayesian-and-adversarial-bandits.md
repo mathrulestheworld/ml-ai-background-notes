@@ -78,9 +78,9 @@ For discounted rewards over an infinite horizon, with arms whose states change o
 
 The **Gittins index** of an arm in posterior state $`x`$ is the constant reward per step that makes a player indifferent between retiring with that reward forever and continuing to pull the arm, with the option to retire at any later time:
 
-$$
+```math
 G(x)=\sup_{\tau\ge1}\frac{\mathbb E\bigl[\sum_{t=0}^{\tau-1}\gamma^tR_t\mid x_0=x\bigr]}{\mathbb E\bigl[\sum_{t=0}^{\tau-1}\gamma^t\mid x_0=x\bigr]},
-$$
+```
 
 the best achievable discounted reward per unit of discounted time, over all stopping times $`\tau`$. The **calibration** form gives a way to compute it: for a candidate $`\lambda`$, solve the optimal-stopping problem of pulling the arm or retiring with $`\lambda/(1-\gamma)`$, and search for the $`\lambda`$ at which continuing and retiring tie.
 
@@ -145,9 +145,9 @@ The index theorem ([Appendix A](#block-rl04-appendix-a)) is one of the most eleg
 
 The stochastic model assumes each arm's rewards are independent draws from a fixed distribution. In many applications, from routing packets to playing games against other learners, that assumption is doubtful. The **adversarial bandit** drops it: an adversary fixes a table of rewards $`x_t(a)\in[0,1]`$ for every step and arm before play begins, possibly with full knowledge of the learner's algorithm but not of its random choices (an **oblivious** adversary), and the learner sees only the reward of the arm it pulls. Since no arm need be good throughout, regret is measured against the **best fixed arm in hindsight**,
 
-$$
+```math
 \mathcal R_T=\max_a\sum_{t=1}^Tx_t(a)-\mathbb E\Bigl[\sum_{t=1}^Tx_t(A_t)\Bigr],
-$$
+```
 
 with the expectation over the learner's own randomization. This is the external regret of AI chapter 15, where the multiplicative-weights (Hedge) algorithm achieved $`O(\sqrt{T\ln k})`$ with **full information**, observing the payoffs of all actions after every round. With **bandit feedback**, only the chosen arm's payoff is seen.
 
@@ -220,15 +220,15 @@ UCB1 collects nothing, while the best fixed arm collects half the rewards: regre
 
 **Exp3**, for exponential weights for exploration and exploitation ([Auer et al., 2002](https://doi.org/10.1137/S0097539701398375)), runs Hedge on *estimated* reward vectors. At each step it samples $`A_t`$ from
 
-$$
+```math
 p_t(a)=\frac{\exp\bigl(\eta\hat S_{t-1}(a)\bigr)}{\sum_b\exp\bigl(\eta\hat S_{t-1}(b)\bigr)},\qquad\hat S_t(a)=\sum_{s\le t}\hat x_s(a),
-$$
+```
 
 and builds the estimates by **importance weighting** the observed reward: $`\hat x_t(a)=x_t(a)\mathbb 1[A_t=a]/p_t(a)`$, or, in the variant analyzed in the code and in [Appendix B](#block-rl04-appendix-b), the same estimate applied to the loss $`1-x_t(a)`$. The estimate is unbiased for every arm, observed or not: $`\mathbb E[\hat x_t(a)]=p_t(a)\cdot x_t(a)/p_t(a)=x_t(a)`$. Its variance is large for arms with small probability, and the analysis balances this variance against the learning rate. For the loss-based variant, with $`\eta=\sqrt{2\ln k/(Tk)}`$, the regret satisfies
 
-$$
+```math
 \mathcal R_T\le\sqrt{2Tk\ln k}
-$$
+```
 
 against any oblivious adversary, which is within a factor $`\sqrt{\ln k}`$ of the $`\Omega(\sqrt{kT})`$ lower bound that holds even for stochastic problems. Importance weighting, dividing by the probability with which an action was chosen to make an estimate from one action's feedback unbiased for all, is the idea behind off-policy evaluation later in this chapter and throughout chapter 9.
 
@@ -242,9 +242,9 @@ The expected regret of Exp3 is small, but its importance weights make the regret
 
 In most applications, each decision comes with side information: the user who will see the recommendation, the patient who will receive the treatment, the query whose results will be ranked. In a **contextual bandit**, at each step the environment reveals a **context** $`x_t`$, the learner chooses an action $`A_t`$, and it observes the reward $`R_t`$ of that action only. The contexts are drawn independently from a fixed distribution and do not depend on the learner's actions, which distinguishes the problem from a full MDP; it is an MDP with horizon one, or equivalently a supervised learning problem in which only the label of the chosen action is revealed. The learner competes with the best **policy** $`\pi:x\mapsto a`$ in some class $`\Pi`$,
 
-$$
+```math
 \mathcal R_T=\max_{\pi\in\Pi}\mathbb E\Bigl[\sum_tr(x_t,\pi(x_t))\Bigr]-\mathbb E\Bigl[\sum_tR_t\Bigr].
-$$
+```
 
 Treating each policy as an arm is hopeless when $`\Pi`$ is large, but **Exp4** runs exponential weights over the policies while sharing each observation among all of them through importance weighting, and achieves regret $`O(\sqrt{kT\ln|\Pi|})`$, depending on the number of policies only through $`\ln|\Pi|`$. Exp4 is not computationally feasible for rich classes, and the modern algorithms instead reduce the contextual bandit to a sequence of supervised learning problems, solved by an **oracle** for the class: first cost-sensitive classification (for example, [Agarwal et al., 2014](https://arxiv.org/abs/1402.0555)), and then plain regression, as in SquareCB ([Foster and Rakhlin, 2020](https://arxiv.org/abs/2002.04926)), which fits a regression model of the rewards and chooses each non-greedy action with probability $`1/(k+\gamma(\hat y_{\text{best}}-\hat y_a))`$, decreasing in its predicted gap to the best, and the greedy action with the remaining probability.
 
@@ -252,15 +252,15 @@ Treating each policy as an arm is hopeless when $`\Pi`$ is large, but **Exp4** r
 
 When the expected reward is linear in known features, $`r(x,a)=\theta^\top\phi(x,a)`$, or, in the **disjoint** model, $`r(x,a)=\theta_a^\top x`$ with a separate parameter per action, optimism can be applied to the parameters. After $`t`$ rounds, the **ridge regression** estimate $`\hat\theta=V^{-1}\sum_s\phi_sR_s`$ with $`V=\lambda I+\sum_s\phi_s\phi_s^\top`$ satisfies, with probability at least $`1-\delta`$ and for all $`t`$ at once,
 
-$$
+```math
 \|\hat\theta-\theta\|_V\le\beta_t(\delta),\qquad\beta_t=\sigma\sqrt{2\ln(1/\delta)+d\ln\bigl(1+t/(\lambda d)\bigr)}+\sqrt\lambda\,\|\theta\|,
-$$
+```
 
 a **confidence ellipsoid** whose axes are short in directions the data have explored ([Abbasi-Yadkori, Pál, and Szepesvári, 2011](https://papers.nips.cc/paper_files/paper/2011/hash/e1d5be1c7f2f456670de3d53c7b54f4a-Abstract.html); [Appendix C](#block-rl04-appendix-c)). The optimistic value of an action is the largest reward any parameter in the ellipsoid allows,
 
-$$
+```math
 \mathrm{UCB}(x,a)=\hat\theta^\top\phi(x,a)+\beta_t\sqrt{\phi(x,a)^\top V^{-1}\phi(x,a)},
-$$
+```
 
 the estimate plus a bonus that is large for feature directions rarely seen. This is **LinUCB** ([Li et al., 2010](https://arxiv.org/abs/1003.0146)), usually run with the theoretical $`\beta_t`$ replaced by a tuned constant $`\alpha`$. With the theoretical radius (the OFUL algorithm of Abbasi-Yadkori et al.), the regret is $`\tilde O(d\sqrt T)`$, independent of the number of actions when all actions share one parameter vector; in the disjoint model the dimension is effectively $`kd`$. Li et al. evaluated it on logged traffic from the Yahoo! front page, choosing articles for its Today module, and found a click lift of 12.5% over a context-free bandit.
 
@@ -676,15 +676,15 @@ Now for many arms: any policy's expected reward is at most the expected discount
 
 Work with losses $`y_t(a)=1-x_t(a)\in[0,1]`$, estimates $`\hat y_t(a)=\mathbb 1[A_t=a]y_t(a)/p_t(a)\ge0`$, cumulative estimates $`\hat L_t(a)`$, and $`p_t(a)\propto e^{-\eta\hat L_{t-1}(a)}`$. Let $`W_t=\sum_ae^{-\eta\hat L_t(a)}`$, with $`W_0=k`$. On one hand, for any arm $`a^*`$, $`\ln(W_T/W_0)\ge-\eta\hat L_T(a^*)-\ln k`$. On the other hand,
 
-$$
+```math
 \ln\frac{W_t}{W_{t-1}}=\ln\sum_ap_t(a)e^{-\eta\hat y_t(a)}\le\ln\sum_ap_t(a)\Bigl(1-\eta\hat y_t(a)+\tfrac{\eta^2}2\hat y_t(a)^2\Bigr)\le-\eta\sum_ap_t(a)\hat y_t(a)+\frac{\eta^2}2\sum_ap_t(a)\hat y_t(a)^2,
-$$
+```
 
 using $`e^{-z}\le1-z+z^2/2`$ for $`z\ge0`$ and $`\ln(1+u)\le u`$. Summing over $`t`$ and combining,
 
-$$
+```math
 \sum_t\sum_ap_t(a)\hat y_t(a)-\hat L_T(a^*)\le\frac{\ln k}\eta+\frac\eta2\sum_t\sum_ap_t(a)\hat y_t(a)^2.
-$$
+```
 
 Take expectations. The estimates are unbiased, so the left side becomes $`\mathbb E[\sum_ty_t(A_t)]-\sum_ty_t(a^*)`$, the regret against $`a^*`$; by exercise 4.3 the last sum has expectation at most $`Tk`$. Hence $`\mathcal R_T\le\ln k/\eta+\eta Tk/2`$, minimized at $`\eta=\sqrt{2\ln k/(Tk)}`$, giving $`\sqrt{2Tk\ln k}`$ ([Lattimore and Szepesvári](https://tor-lattimore.com/downloads/book/book.pdf), chapter 11). Using losses rather than rewards matters: it makes the estimates nonnegative, which is what the inequality $`e^{-z}\le1-z+z^2/2`$ requires.
 
@@ -698,15 +698,15 @@ Take expectations. The estimates are unbiased, so the left side becomes $`\mathb
 
 Let $`R_s=\theta^\top\phi_s+\eta_s`$ with $`\sigma`$-sub-Gaussian noise, $`V_t=\lambda I+\sum_{s\le t}\phi_s\phi_s^\top`$, and $`\hat\theta_t=V_t^{-1}\sum_s\phi_sR_s`$. Then
 
-$$
+```math
 \hat\theta_t-\theta=V_t^{-1}\Bigl(\sum_s\phi_s\eta_s-\lambda\theta\Bigr),\qquad\|\hat\theta_t-\theta\|_{V_t}\le\Bigl\|\sum_s\phi_s\eta_s\Bigr\|_{V_t^{-1}}+\sqrt\lambda\|\theta\|.
-$$
+```
 
 The first term is a **self-normalized** martingale. Its norm cannot be bounded by a fixed-design argument, because the features were chosen adaptively using the past noise; Abbasi-Yadkori, Pál, and Szepesvári proved, by a mixture-of-martingales argument, that with probability at least $`1-\delta`$, simultaneously for all $`t`$,
 
-$$
+```math
 \Bigl\|\sum_{s\le t}\phi_s\eta_s\Bigr\|_{V_t^{-1}}^2\le2\sigma^2\ln\Bigl(\frac{\det(V_t)^{1/2}\det(\lambda I)^{-1/2}}\delta\Bigr),
-$$
+```
 
 which with $`\|\phi\|\le1`$ gives the radius $`\beta_t`$ of the text. **Regret.** On the event that $`\theta`$ lies in every ellipsoid, the optimistic choice satisfies $`r(x_t,a^*)\le\mathrm{UCB}(x_t,A_t)`$, so the instantaneous regret is at most $`2\beta_t\|\phi_t\|_{V_{t-1}^{-1}}`$, twice the bonus of the chosen action. The **elliptical potential lemma** bounds the sum of squared bonuses: $`\sum_t\min(1,\|\phi_t\|^2_{V_{t-1}^{-1}})\le2d\ln(1+T/(\lambda d))`$, because each new feature vector increases $`\ln\det V`$ by $`\ln(1+\|\phi_t\|^2_{V_{t-1}^{-1}})`$ and $`\ln\det V_T`$ can grow only logarithmically in $`T`$. By Cauchy–Schwarz (taking $`\lambda\ge1`$, so that $`\|\phi_t\|^2_{V_{t-1}^{-1}}\le1`$ and the minimum in the lemma is inactive), the regret is at most $`2\beta_T\sqrt{T\cdot2d\ln(1+T/(\lambda d))}=\tilde O(d\sqrt T)`$. The same potential argument reappears in the theory of exploration with linear function approximation (chapter 30).
 

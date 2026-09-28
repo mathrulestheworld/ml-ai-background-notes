@@ -10,9 +10,9 @@
 
 The most flexible way to define a distribution with a network is to let the network assign a number to every input and make low numbers likely. An **energy-based model** (EBM) sets
 
-$$
+```math
 p_\theta(x)=\frac{e^{-E_\theta(x)}}{Z_\theta},\qquad Z_\theta=\int e^{-E_\theta(x)}\,dx,
-$$
+```
 
 where the **energy** $`E_\theta`$ can be any network with a scalar output ([LeCun et al., 2006](http://yann.lecun.com/exdb/publis/pdf/lecun-06.pdf)). There is no constraint of invertibility, no ordering of dimensions, and no latent variable to infer. Markov networks are energy-based models whose energy is a sum of potentials (AI chapter 8), and the Boltzmann machine of 1985 was one over binary units with pairwise interactions. The price of this flexibility is the **partition function** $`Z_\theta`$, an integral over the whole space that cannot be computed for any interesting energy. Without it, the density cannot be evaluated, samples cannot be drawn directly, and even comparing $`p_\theta(x)`$ with $`p_\theta(x')`$ requires only the energy difference, which is all one can get.
 
@@ -20,9 +20,9 @@ where the **energy** $`E_\theta`$ can be any network with a scalar output ([LeCu
 
 The log-likelihood is $`-E_\theta(x)-\log Z_\theta`$, and its gradient, although $`Z_\theta`$ is unknown, has a simple form:
 
-$$
+```math
 \nabla_\theta\log p_\theta(x)=-\nabla_\theta E_\theta(x)+\mathbb E_{x'\sim p_\theta}\bigl[\nabla_\theta E_\theta(x')\bigr]
-$$
+```
 
 ([Appendix A](#block-gen06-appendix-a)). The first term, the **positive phase**, lowers the energy of the data; the second, the **negative phase**, raises the energy of the model's own samples. At the optimum, the two balance: the model's samples and the data have the same expected energy gradient, the moment matching of log-linear models (AI chapter 14). The difficulty has moved from the partition function to the negative phase, which needs samples from the model at every training step, and the model can only be sampled by Markov chain Monte Carlo.
 
@@ -30,9 +30,9 @@ $$
 
 For continuous data, the natural sampler follows the gradient of the log-density with added noise. The **Langevin** update
 
-$$
+```math
 x_{k+1}=x_k+\frac\epsilon2\nabla_x\log p_\theta(x_k)+\sqrt\epsilon\,\xi_k,\qquad\xi_k\sim\mathcal N(0,I),
-$$
+```
 
 is a discretized diffusion whose stationary distribution is $`p_\theta`$ as $`\epsilon\to0`$, and it needs only $`\nabla_x\log p_\theta=-\nabla_xE_\theta`$, in which the partition function has disappeared. With a finite step size it is slightly biased, which a Metropolis–Hastings correction removes (AI chapter 10; [Roberts and Tweedie, 1996](https://doi.org/10.2307/3318418)). The same update with stochastic gradients of a posterior is a method for Bayesian learning ([Welling and Teh, 2011](https://icml.cc/2011/papers/398_icmlpaper.pdf)).
 
@@ -91,9 +91,9 @@ A different way around the partition function is to avoid sampling from the mode
 
 The **score** of a distribution is the gradient of its log-density with respect to the data, $`s(x)=\nabla_x\log p(x)`$, a vector field that points toward higher density. For an energy-based model it is $`-\nabla_xE_\theta(x)`$, independent of the partition function. The score determines the distribution on a connected domain, since integrating it recovers $`\log p`$ up to the constant fixed by normalization, and it is all that Langevin dynamics needs. So instead of modeling the density, one can model the score directly with a network $`s_\theta:\mathbb R^D\to\mathbb R^D`$, and fit it by minimizing the **Fisher divergence**,
 
-$$
+```math
 \frac12\,\mathbb E_{p_{\mathrm{data}}}\bigl\|s_\theta(x)-\nabla_x\log p_{\mathrm{data}}(x)\bigr\|^2 .
-$$
+```
 
 The target score is unknown, since estimating it is the whole problem, but the objective can be rewritten without it.
 
@@ -101,9 +101,9 @@ The target score is unknown, since estimating it is the whole problem, but the o
 
 Integrating by parts, and assuming the density vanishes at infinity, the Fisher divergence equals, up to a constant,
 
-$$
+```math
 \mathbb E_{p_{\mathrm{data}}}\Bigl[\operatorname{tr}\bigl(\nabla_xs_\theta(x)\bigr)+\frac12\|s_\theta(x)\|^2\Bigr],
-$$
+```
 
 which involves only the model and the data ([Hyvärinen, 2005](https://jmlr.org/papers/v6/hyvarinen05a.html); [Appendix B](#block-gen06-appendix-b)). The estimator is consistent, but the trace of the Jacobian costs $`D`$ backward passes, as in continuous flows (chapter 4). **Sliced score matching** replaces the trace with $`v^\top\nabla_xs_\theta\,v`$ for random directions $`v`$, the same random-projection trick as Hutchinson's estimator ([Song et al., 2019](https://arxiv.org/abs/1905.07088)).
 
@@ -111,15 +111,15 @@ which involves only the model and the data ([Hyvärinen, 2005](https://jmlr.org/
 
 A cheaper route comes from denoising. Perturb each data point with Gaussian noise, $`\tilde x=x+\sigma\epsilon`$ with $`\epsilon\sim\mathcal N(0,I)`$. The score of the conditional distribution of $`\tilde x`$ given $`x`$ is known exactly, $`\nabla_{\tilde x}\log q_\sigma(\tilde x\mid x)=-(\tilde x-x)/\sigma^2=-\epsilon/\sigma`$, and [Vincent (2011)](https://doi.org/10.1162/NECO_a_00142) showed that regressing a network onto it,
 
-$$
+```math
 \mathbb E_{x,\epsilon}\Bigl\|s_\theta(x+\sigma\epsilon)+\frac\epsilon\sigma\Bigr\|^2,
-$$
+```
 
 has the same minimizer as matching the score of the noisy data distribution $`p_\sigma=p_{\mathrm{data}}*\mathcal N(0,\sigma^2I)`$ ([Appendix B](#block-gen06-appendix-b)). **Denoising score matching** needs one forward pass per example and no Jacobian. Its target is the noise itself, scaled: the network learns to predict which way the added noise pushed each point, which is the denoising autoencoder's task (DL chapter 10). The connection is exact in the other direction as well: **Tweedie's formula** gives the best denoiser in terms of the noisy score,
 
-$$
+```math
 \mathbb E[x\mid\tilde x]=\tilde x+\sigma^2\nabla_{\tilde x}\log p_\sigma(\tilde x)
-$$
+```
 
 ([Efron, 2011](https://doi.org/10.1198/jasa.2011.tm11181)), so learning to denoise and learning the score of noisy data are the same problem. The code learns the score of eight Gaussians on a circle, blurred with noise of standard deviation 0.3, compares it with the exact score, and uses it to denoise.
 
@@ -202,9 +202,9 @@ A noise-conditional score network is a diffusion model in all but name. Chapter 
 
 **Gradient.** Differentiating $`\log Z_\theta=\log\int e^{-E_\theta(x)}dx`$ under the integral sign,
 
-$$
+```math
 \nabla_\theta\log Z_\theta=\frac{\int-\nabla_\theta E_\theta(x)\,e^{-E_\theta(x)}\,dx}{Z_\theta}=-\mathbb E_{p_\theta}\bigl[\nabla_\theta E_\theta(x)\bigr],
-$$
+```
 
 so $`\nabla_\theta\log p_\theta(x)=-\nabla_\theta E_\theta(x)+\mathbb E_{p_\theta}[\nabla_\theta E_\theta]`$. Averaged over the data, the gradient vanishes when the expected energy gradient under the data equals that under the model. A Monte Carlo estimate of the second term with samples from a chain that has not converged gives a biased gradient, which is what contrastive divergence accepts in exchange for speed.
 
@@ -234,9 +234,9 @@ so $`\nabla_\theta\log p_\theta(x)=-\nabla_\theta E_\theta(x)+\mathbb E_{p_\thet
 
 Let $`p(x)=w\,p_1(x)+(1-w)\,p_2(x)`$. Its score is
 
-$$
+```math
 \nabla\log p(x)=r_1(x)\nabla\log p_1(x)+r_2(x)\nabla\log p_2(x),\qquad r_1(x)=\frac{w\,p_1(x)}{p(x)},
-$$
+```
 
 a weighted average of the components' scores with the posterior responsibilities as weights. If $`p_1`$ and $`p_2`$ have nearly disjoint supports, then $`r_1(x)\approx1`$ wherever $`p_1`$ dominates and $`\approx0`$ wherever $`p_2`$ does, whatever $`w`$ is, so the score in each region equals that region's component score and $`w`$ affects it only in the thin region between the modes, where the density is too low for chains to visit. Langevin dynamics started in each region therefore samples that component, and the fraction of chains in each mode stays close to the fraction that started there. Adding Gaussian noise of variance $`\sigma^2`$ widens both components until they overlap; then $`r_1`$ varies smoothly with $`x`$, the score depends on $`w`$ across the space, and chains distribute themselves according to the weights before the noise is reduced.
 

@@ -16,9 +16,9 @@ A conditional model trained this way samples $`p(x\mid c)`$ with its full divers
 
 Steering rests on one identity. Differentiating Bayes' rule, $`\log p_t(x\mid c)=\log p_t(x)+\log p_t(c\mid x)-\log p(c)`$, with respect to $`x`$ removes the normalizing constant:
 
-$$
+```math
 \nabla_x\log p_t(x\mid c)=\nabla_x\log p_t(x)+\nabla_x\log p_t(c\mid x).
-$$
+```
 
 The conditional score at each noise level is the unconditional score plus the gradient of the log-probability that a noisy sample $`x_t`$ has the attribute $`c`$. An unconditional model can therefore sample conditionally if the second term can be computed or approximated, and scaling that term controls how strongly the condition is imposed.
 
@@ -32,9 +32,9 @@ The conditional score at each noise level is the unconditional score plus the gr
 
 [Ho and Salimans (2022)](https://arxiv.org/abs/2207.12598) removed the classifier. Train a single network both conditionally and unconditionally, by replacing the condition with a null token for a random 10% or 20% of training examples; then the difference between its two predictions is the gradient of an implicit classifier, $`\nabla\log p_t(c\mid x)=\nabla\log p_t(x\mid c)-\nabla\log p_t(x)`$, and amplifying it gives **classifier-free guidance** (CFG):
 
-$$
+```math
 \tilde\epsilon_\theta(x_t,t,c)=(1+w)\,\epsilon_\theta(x_t,t,c)-w\,\epsilon_\theta(x_t,t,\varnothing),
-$$
+```
 
 with $`w=0`$ the plain conditional model. Guidance costs two network evaluations per step, usually batched together. On ImageNet $`64\times64`$, a little guidance improved the FID from 1.80 to 1.55 at $`w=0.1`$, and strong guidance maximized the Inception score, 260.2 at $`w=4`$, at the cost of an FID of 26.22. The text-to-image model GLIDE ([Nichol et al., 2022](https://arxiv.org/abs/2112.10741)) found that human raters preferred classifier-free guidance to guidance by the gradient of CLIP, and since then nearly every text-to-image model uses it, typically with a scale $`\gamma=1+w`$ between about 5 and 10. The figure trains a class-conditional DDPM on the digits with the label dropped 10% of the time and samples it at three guidance weights.
 
@@ -136,9 +136,9 @@ Because guidance extrapolates away from the second prediction, the second predic
 
 Many problems in imaging observe a degraded version of an unknown image, $`y=\mathcal A(x)+\text{noise}`$: a blurred or low-resolution image, an image with missing pixels, a set of measurements in a scanner. A trained unconditional model is a prior $`p(x)`$, and solving the problem means sampling the posterior $`p(x\mid y)`$, whose score at noise level $`t`$ is $`\nabla\log p_t(x)+\nabla\log p_t(y\mid x_t)`$. The first term is the model; the second is the problem. It is intractable, because the measurement depends on the clean image, and the clean image given $`x_t`$ is uncertain:
 
-$$
+```math
 p_t(y\mid x_t)=\int p(y\mid x_0)\,p(x_0\mid x_t)\,dx_0 .
-$$
+```
 
 Training a conditional model on pairs of degraded and clean images, as SR3 and Palette do, avoids the problem but needs a model for every task. Methods that approximate the likelihood term instead use one unconditional model for many tasks without retraining, an idea that goes back to [Kadkhodaie and Simoncelli (2021)](https://proceedings.neurips.cc/paper/2021/hash/6e28943943dbed3c7f82fc05f269947a-Abstract.html), who solved linear inverse problems with the prior implicit in a denoiser.
 

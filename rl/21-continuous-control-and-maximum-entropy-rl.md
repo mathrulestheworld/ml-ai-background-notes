@@ -12,9 +12,9 @@ Robots, vehicles, and simulated bodies act with torques, forces, and velocities,
 
 The standard stochastic policy is a Gaussian, $`a\sim\mathcal N\bigl(\boldsymbol\mu_{\boldsymbol\theta}(s),\operatorname{diag}\boldsymbol\sigma^2\bigr)`$, with the mean computed by a network and the standard deviations either computed by the network as well, as SAC does, or kept as free parameters independent of the state, as PPO usually does. Real actuators are bounded, and a Gaussian is not. Clipping the sampled action to the bounds, as the PPO code of Lab 10 does, leaves the policy's log-probabilities those of the unclipped sample, so the gradient treats actions beyond the bounds as different even though the environment cannot distinguish them. The cleaner solution is a **squashed Gaussian**: sample $`u\sim\mathcal N(\boldsymbol\mu,\operatorname{diag}\boldsymbol\sigma^2)`$, act with $`a=\tanh(u)`$, rescaled to the bounds, and account for the change of variables in the log-density,
 
-$$
+```math
 \ln\pi(a\mid s)=\ln\mathcal N(u;\boldsymbol\mu,\operatorname{diag}\boldsymbol\sigma^2)-\sum_i\ln\bigl(1-\tanh^2(u_i)\bigr)
-$$
+```
 
 (exercise 21.1). Beta distributions, which live on an interval, are another option ([Chou, Maturana, and Scherer, 2017](https://proceedings.mlr.press/v70/chou17a.html)).
 
@@ -22,9 +22,9 @@ $$
 
 A deterministic policy $`a=\mu_{\boldsymbol\theta}(s)`$ has its own policy gradient theorem ([Silver et al., 2014](https://proceedings.mlr.press/v32/silver14.html)):
 
-$$
+```math
 \nabla_{\boldsymbol\theta}J=\mathbb E_{s\sim\rho}\Bigl[\nabla_{\boldsymbol\theta}\mu_{\boldsymbol\theta}(s)\,\nabla_aQ(s,a)\big|_{a=\mu_{\boldsymbol\theta}(s)}\Bigr].
-$$
+```
 
 The actor follows the critic's slope in action space: it moves each state's action in the direction that increases the critic's estimate, as fast as the critic's gradient says. The theorem is the limit of the stochastic policy gradient as the policy's variance goes to zero (exercise 21.2), but it has a practical advantage over it: the expectation is over states only, so the gradient needs no importance weights on the actions. With a critic of the target policy learned from any data, the states can come from any behavior, and learning is off-policy. Chapter 13 introduced the theorem; here it becomes the basis of a family of deep agents.
 
@@ -94,21 +94,21 @@ The first two fixes addressed failures the authors measured, overestimation and 
 
 The **maximum-entropy** objective adds the policy's entropy to the reward at every step:
 
-$$
+```math
 J(\pi)=\mathbb E_\pi\Bigl[\sum_t\gamma^t\bigl(R_{t+1}+\alpha\,\mathcal H(\pi(\cdot\mid S_t))\bigr)\Bigr],
-$$
+```
 
 with a **temperature** $`\alpha>0`$ that sets the price of randomness. Unlike the entropy bonus of A2C and PPO, which regularizes each update, this changes the problem: the optimal policy is the one that collects the most reward *and entropy* over the whole future, so it prefers states from which many actions are good. Its value functions satisfy the **soft Bellman equations**
 
-$$
+```math
 Q(s,a)=r(s,a)+\gamma\,\mathbb E\bigl[V(S')\bigr],\qquad V(s)=\mathbb E_{a\sim\pi}\bigl[Q(s,a)-\alpha\ln\pi(a\mid s)\bigr],
-$$
+```
 
 and the optimal policy is a Boltzmann distribution over the optimal soft action values, with the soft maximum as its value (exercise 21.3):
 
-$$
+```math
 \pi^*(a\mid s)=\exp\Bigl(\frac{Q^*(s,a)-V^*(s)}{\alpha}\Bigr),\qquad V^*(s)=\alpha\ln\sum_a\exp\bigl(Q^*(s,a)/\alpha\bigr),
-$$
+```
 
 with an integral for continuous actions. As $`\alpha\to0`$ the soft maximum becomes a maximum, and the standard objective returns. The framework goes back to work on control with KL costs and to maximum-entropy inverse RL (chapter 25), and **soft Q-learning** ([Haarnoja, Tang, Abbeel, and Levine, 2017](https://arxiv.org/abs/1702.08165)) brought it to deep RL, sampling from the energy-based policy $`\pi\propto e^{Q/\alpha}`$ with a learned sampler. Its attractions: the policy keeps exploring where rewards do not distinguish actions; it represents several good behaviors instead of committing to one, which later fine-tuning can use; its objective is smoother; and it is robust, in a precise sense, to some perturbations of the dynamics and rewards ([Eysenbach and Levine, 2022](https://arxiv.org/abs/2103.06257)). Entropy-regularized policy gradients and soft Q-learning are, moreover, the same algorithm in different parameterizations ([Schulman, Chen, and Abbeel, 2017](https://arxiv.org/abs/1704.06440)).
 
@@ -186,9 +186,9 @@ At low temperature the soft-optimal policy is the optimal one, 13 steps along th
 
 **Soft actor–critic** ([Haarnoja, Zhou, Abbeel, and Levine, 2018](https://arxiv.org/abs/1801.01290); [Haarnoja et al., 2018](https://arxiv.org/abs/1812.05905)) is an off-policy actor–critic for the maximum-entropy objective. Its theory is **soft policy iteration**: evaluate the current policy's soft action values, then improve the policy by projecting the Boltzmann distribution of those values onto the policy class,
 
-$$
+```math
 \pi_{\text{new}}=\arg\min_{\pi'}D_{\mathrm{KL}}\Bigl(\pi'(\cdot\mid s)\,\Big\|\,\frac{\exp(Q^{\pi_{\text{old}}}(s,\cdot)/\alpha)}{Z(s)}\Bigr),
-$$
+```
 
 which improves the soft values monotonically and, in the tabular case, converges to the optimal maximum-entropy policy. The practical algorithm alternates single gradient steps on the two parts, with the second version of the algorithm as the standard:
 
@@ -208,9 +208,9 @@ The maximum-entropy objective is not an ad hoc bonus; it arises from casting con
 
 One class of problems becomes linear under this view. In a **linearly solvable MDP** ([Todorov, 2006](https://papers.nips.cc/paper_files/paper/2006/hash/d806ca13ca3449af72a1ea5aedbed26a-Abstract.html); [Todorov, 2009](https://doi.org/10.1073/pnas.0710743106)), the controller chooses the next-state distribution $`u(\cdot\mid x)`$ directly and pays a state cost $`q(x)`$ plus the KL divergence from the uncontrolled, **passive** dynamics $`p(\cdot\mid x)`$. The minimization over $`u`$ has a closed form, and the Bellman equation for the cost-to-go $`v`$ becomes linear in the **desirability** $`z=e^{-v}`$:
 
-$$
+```math
 v(x)=q(x)-\ln\sum_{x'}p(x'\mid x)e^{-v(x')}\qquad\Longleftrightarrow\qquad z=e^{-q}\odot Pz,
-$$
+```
 
 with the optimal controlled dynamics $`u^*(x'\mid x)\propto p(x'\mid x)z(x')`$. A first-exit problem is then one linear system and an infinite-horizon average-cost problem a principal eigenvector (exercise 21.6). The continuous-time counterpart is **path integral control** ([Kappen, 2005](https://arxiv.org/abs/physics/0505066)), in which the desirability is an expectation over trajectories of the passive dynamics, estimated by sampling; it is the basis of the MPPI controller of chapter 15.
 

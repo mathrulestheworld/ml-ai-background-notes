@@ -10,11 +10,11 @@
 
 Most of the progress in language models since 2018 came from training larger models on more data with more computation, and the gains followed a regular pattern. [Hestness et al. (2017)](https://arxiv.org/abs/1712.00409) observed across translation, language modeling, image classification, and speech recognition that test loss falls as a power law in the amount of training data. [Kaplan et al. (2020)](https://arxiv.org/abs/2001.08361) measured the pattern for transformer language models over more than seven orders of magnitude: when neither of the other two limits binds, the test loss in nats per token behaves as
 
-$$
+```math
 L(N)\approx\Bigl(\frac{N_c}N\Bigr)^{\alpha_N},\qquad
 L(D)\approx\Bigl(\frac{D_c}D\Bigr)^{\alpha_D},\qquad
 L(C)\approx\Bigl(\frac{C_c}C\Bigr)^{\alpha_C},
-$$
+```
 
 with $`N`$ the number of non-embedding parameters, $`D`$ the number of training tokens, $`C`$ the training compute, and exponents of about 0.076, 0.095, and 0.050. On log–log axes each is a straight line. The exponents are small, so a tenfold increase in compute lowers the loss by only about 11%, but the lines are straight enough to extrapolate: loss can be predicted for a model a thousand times larger than any that has been trained. Other architectural details, such as the ratio of depth to width or the number of heads, move the loss much less than $`N`$, $`D`$, and $`C`$ (chapter 4).
 
@@ -32,9 +32,9 @@ Power laws in loss arise when the task consists of many components of decreasing
 
 A model is limited by both its size and its data. [Hoffmann et al. (2022)](https://arxiv.org/abs/2203.15556) fitted the additive form
 
-$$
+```math
 L(N,D)=E+\frac A{N^\alpha}+\frac B{D^\beta},
-$$
+```
 
 where $`E`$ is the loss of an ideal model, the entropy of the text under the tokenizer (chapter 2), and the other two terms are the excess loss due to finite size and finite data. The left panel of the figure shows the same structure in the toy model: each curve follows the data term until it meets the floor $`E+AN^{-\alpha}`$ of its model size, so a small model stops benefiting from data early and a large model benefits for longer.
 
@@ -44,11 +44,11 @@ where $`E`$ is the loss of an ideal model, the entropy of the text under the tok
 
 Training a transformer costs about $`C\approx6ND`$ floating-point operations (DL chapter 9). With a fixed budget, a larger model must be trained on fewer tokens, and the question is how to divide the budget. Minimizing $`L(N,D)`$ subject to $`6ND=C`$ ([Appendix A](#block-nlp07-appendix-a)) gives
 
-$$
+```math
 N^*(C)=G\Bigl(\frac C6\Bigr)^{\frac\beta{\alpha+\beta}},\qquad
 D^*(C)=G^{-1}\Bigl(\frac C6\Bigr)^{\frac\alpha{\alpha+\beta}},\qquad
 G=\Bigl(\frac{\alpha A}{\beta B}\Bigr)^{\frac1{\alpha+\beta}},
-$$
+```
 
 so both grow as powers of the budget, with exponents that sum to one. When $`\alpha\approx\beta`$, as fits to language data find, model size and data should grow at the same rate, and the ratio of tokens to parameters stays roughly constant.
 
@@ -214,23 +214,23 @@ Scaling laws describe averages and hold over the ranges where they were measured
 
 Minimize $`L(N,D)=E+AN^{-\alpha}+BD^{-\beta}`$ subject to $`6ND=C`$. Substituting $`D=C/(6N)`$ gives a function of $`N`$ alone,
 
-$$
+```math
 \ell(N)=E+AN^{-\alpha}+B\Bigl(\frac C6\Bigr)^{-\beta}N^{\beta}.
-$$
+```
 
 Its derivative, $`-\alpha AN^{-\alpha-1}+\beta B(C/6)^{-\beta}N^{\beta-1}`$, vanishes where
 
-$$
+```math
 N^{\alpha+\beta}=\frac{\alpha A}{\beta B}\Bigl(\frac C6\Bigr)^{\beta},
 \qquad\text{so}\qquad
 N^*=\Bigl(\frac{\alpha A}{\beta B}\Bigr)^{\frac1{\alpha+\beta}}\Bigl(\frac C6\Bigr)^{\frac\beta{\alpha+\beta}},
-$$
+```
 
 and $`\ell`$ is convex in $`\log N`$, so this is the minimum. Then $`D^*=C/(6N^*)=G^{-1}(C/6)^{\alpha/(\alpha+\beta)}`$. At the optimum the two excess terms are in a fixed ratio: from the stationarity condition, $`\alpha AN^{*-\alpha}=\beta BD^{*-\beta}`$, so the finite-size term is $`\beta/(\alpha+\beta)`$ and the finite-data term $`\alpha/(\alpha+\beta)`$ of the total excess loss. Substituting shows that the excess loss itself falls as a power of compute,
 
-$$
+```math
 L^*(C)-E\propto C^{-\frac{\alpha\beta}{\alpha+\beta}},
-$$
+```
 
 which is why loss against compute on the efficient frontier is a straight line on log–log axes, with an exponent smaller than either $`\alpha`$ or $`\beta`$. With $`\alpha\approx\beta\approx0.35`$ the compute exponent is about 0.18 for the excess loss; Kaplan's exponent of 0.050 refers to the total loss without an irreducible term, which falls more slowly.
 
@@ -244,9 +244,9 @@ which is why loss against compute on the efficient frontier is a straight line o
 
 Hoffmann et al. write the law in log-space as
 
-$$
+```math
 \log\hat L(N,D)=\operatorname{LSE}\bigl(a-\alpha\log N,\ b-\beta\log D,\ e\bigr),
-$$
+```
 
 where $`\operatorname{LSE}`$ is the log of the sum of exponentials and $`A=e^a`$, $`B=e^b`$, $`E=e^e`$, which keeps the three terms positive without constraints. They minimize $`\sum_i\operatorname{Huber}_\delta\bigl(\log\hat L(N_i,D_i)-\log L_i\bigr)`$ with $`\delta=10^{-3}`$ using L-BFGS from a grid of starting points, since the objective has many local minima. Fitting the logarithm weights runs by their relative error, which matches multiplicative noise across a wide range of losses; the Huber loss, quadratic for residuals below $`\delta`$ and linear beyond, limits the influence of runs that diverged or were mistuned. With $`\delta=10^{-3}`$, most residuals exceed $`\delta`$, so the fit behaves nearly like least absolute deviations.
 
@@ -262,9 +262,9 @@ Uncertainty should be estimated by refitting on bootstrap resamples of the runs,
 
 Suppose the answer to a task has $`k`$ tokens and the model predicts each correctly with probability $`p(C)`$, independently, and that the per-token error falls as a power of compute, $`1-p(C)=cC^{-\gamma}`$. Exact-match accuracy is
 
-$$
+```math
 \operatorname{acc}(C)=p(C)^k=\bigl(1-cC^{-\gamma}\bigr)^k\approx\exp\bigl(-kcC^{-\gamma}\bigr)
-$$
+```
 
 for small errors. As a function of $`\log C`$ this is a Gumbel-shaped curve, near 0 while $`kcC^{-\gamma}\gg1`$ and near 1 once it is $`\ll1`$. The accuracy crosses one half at $`C_{1/2}=(kc/\ln2)^{1/\gamma}`$, and the transition from 10% to 90% accuracy spans a factor of $`(\ln10/\ln(10/9))^{1/\gamma}\approx21.9^{1/\gamma}`$ in compute, independent of $`k`$. Larger $`k`$ moves the transition to larger scale, where it is typically observed only at the last few model sizes of a family. With $`\gamma=0.5`$ and a family spaced by factors of ten in compute, the rise from 10% to 90% spans a factor of about 480, less than three model sizes, and looks abrupt, though the per-token error falls smoothly all along. The per-token log-likelihood, $`\log p(C)\approx-cC^{-\gamma}`$, is a straight line in log–log coordinates and predicts the transition before it happens.
 

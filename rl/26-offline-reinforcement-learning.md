@@ -138,9 +138,9 @@ From the noisy expert's data, naive Q-learning, the off-policy algorithm used as
 
 The most direct remedy is to keep the learned policy close to the behavior policy, so that the Q-function is only queried where the data support it. **BCQ** ([Fujimoto, Meger, and Precup, 2019](https://arxiv.org/abs/1812.02900)) learns a generative model of the behavior's actions, a variational autoencoder (GenAI chapter 3), and chooses, among a few actions sampled from it and slightly perturbed by a learned network, the one with the highest Q-value; both the policy and the Bellman targets use only such actions. **BEAR** ([Kumar, Fu, Tucker, and Levine, 2019](https://arxiv.org/abs/1906.00949)) argued that the constraint should be on the *support* of the behavior distribution rather than on its density, allowing any action the behavior takes with non-negligible probability, and enforced it with a kernel divergence (MMD). The simplest method of this kind is also one of the strongest: **TD3+BC** ([Fujimoto and Gu, 2021](https://arxiv.org/abs/2106.06860)) adds a behavior cloning term to the actor of TD3 (chapter 21),
 
-$$
+```math
 \max_{\pi}\ \mathbb E_{(s,a)\sim\mathcal D}\bigl[\lambda\,Q(s,\pi(s))-(\pi(s)-a)^2\bigr],\qquad\lambda=\frac{\alpha}{\frac1N\sum_{(s,a)}|Q(s,a)|},
-$$
+```
 
 with $`\alpha=2.5`$ and the normalization making the balance between the two terms independent of the scale of the rewards (exercise 26.5). With normalized states and no other change, it matched the far more complex methods of its time on the standard benchmark.
 
@@ -148,9 +148,9 @@ with $`\alpha=2.5`$ and the normalization making the balance between the two ter
 
 Instead of constraining the policy, **conservative Q-learning** (CQL) ([Kumar, Zhou, Tucker, and Levine, 2020](https://arxiv.org/abs/2006.04779)) makes the Q-function itself pessimistic where the data are silent. It adds to the Bellman error a penalty that pushes down the values of the actions the policy might choose and pushes up those of the actions in the data,
 
-$$
+```math
 \min_Q\ \alpha\,\mathbb E_{s\sim\mathcal D}\Bigl[\ln\sum_a\exp Q(s,a)-\mathbb E_{a\sim\pi_\beta(\cdot\mid s)}Q(s,a)\Bigr]+\tfrac12\,\mathbb E_{(s,a,s')\sim\mathcal D}\Bigl[\bigl(Q(s,a)-\hat{\mathcal B}^\pi\hat Q(s,a)\bigr)^2\Bigr],
-$$
+```
 
 where the log-sum-exp is a soft maximum over all actions. Kumar et al. proved that, with a large enough $`\alpha`$, the resulting values lower-bound the true values of the policy in expectation, so that a policy improved against them cannot exploit overestimated actions (exercise 26.2). CQL was the first offline method to perform well on the hardest data sets of its time, often two to five times better than earlier ones. The next code shows its effect on a neural Q-function fitted to data from a narrow behavior, in a one-step problem where actions far from the behavior's are dangerous.
 
@@ -224,9 +224,9 @@ The fitted network extrapolates smoothly beyond the data, and here that extrapol
 
 Both families still evaluate the Q-function at actions the data may not contain, one to maximize it and the other to penalize it. **Implicit Q-learning** (IQL) ([Kostrikov, Nair, and Levine, 2022](https://arxiv.org/abs/2110.06169)) never does. It learns a state-value function $`V`$ by **expectile regression** on the Q-values of the data's own actions,
 
-$$
+```math
 \min_V\ \mathbb E_{(s,a)\sim\mathcal D}\Bigl[L^\tau_2\bigl(Q(s,a)-V(s)\bigr)\Bigr],\qquad L^\tau_2(u)=|\tau-\mathbb 1(u<0)|\,u^2,
-$$
+```
 
 which for $`\tau`$ close to 1 approximates the maximum of $`Q(s,a)`$ over the actions the data contain in $`s`$ (exercise 26.3), and trains $`Q`$ on the targets $`r+\gamma V(s')`$, which involve only data. Its values thus approximate those of the best policy *supported by the data*, without ever querying an unseen action. The policy is extracted at the end by **advantage-weighted regression**, a behavior cloning that weights each data action by $`\exp\bigl(\beta(Q(s,a)-V(s))\bigr)`$: the solution of a KL-constrained policy improvement projected onto the policy class (exercise 26.4), as in AWR ([Peng, Kumar, Zhang, and Levine, 2019](https://arxiv.org/abs/1910.00177)) and AWAC ([Nair, Gupta, Dalal, and Levine, 2020](https://arxiv.org/abs/2006.09359)). IQL is simple, stable, and fast, and it became a standard baseline, especially on tasks that require stitching together parts of suboptimal trajectories, such as the navigation mazes of the D4RL benchmark.
 
@@ -425,9 +425,9 @@ The steps alternate on minibatches from the data set for a million gradient step
 
 Start from SAC (chapter 21, appendix A) and add to each critic's loss
 
-$$
+```math
 \alpha\Bigl(\ln\sum_{j}\exp Q(s,a_j)-Q(s,a_{\mathcal D})\Bigr),
-$$
+```
 
 where the log-sum-exp over continuous actions is estimated by importance sampling with about 10 actions each from a uniform distribution and from the current policy at $`s`$ and at $`s'`$, each term corrected by its sampling density. Typical settings: $`\alpha`$ from 1 to 10, or tuned automatically by a Lagrangian to keep the gap $`\ln\sum\exp Q-Q(s,a_{\mathcal D})`$ near a threshold; a critic learning rate of $`3\times10^{-4}`$ and a smaller one for the actor; and a period of pure behavior cloning at the start. For discrete actions the log-sum-exp is computed exactly, and CQL is a one-line addition to DQN.
 

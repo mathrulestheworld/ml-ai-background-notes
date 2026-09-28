@@ -16,9 +16,9 @@ Uniform replay treats every stored transition as equally informative, but most a
 
 Replaying only the transition with the largest error would be too greedy: errors are updated only for replayed transitions, so a transition with a small error when first seen might never be replayed again, and a few noisy transitions could monopolize the replays. PER samples stochastically instead. Each transition $`i`$ has a priority $`p_i=|\delta_i|+\epsilon`$, with a small $`\epsilon`$ that keeps every probability positive (or $`p_i=1/\mathrm{rank}(i)`$ in the rank-based variant), and is sampled with probability
 
-$$
+```math
 P(i)=\frac{p_i^\alpha}{\sum_kp_k^\alpha},
-$$
+```
 
 where $`\alpha`$ interpolates between uniform sampling ($`\alpha=0`$) and full prioritization ($`\alpha=1`$); new transitions receive the largest current priority, so that each is replayed at least once. Sampling from this distribution changes the distribution of the data, which biases the updates toward the prioritized transitions. PER corrects the bias with **importance weights**, $`w_i=\bigl(1/(N\,P(i))\bigr)^\beta`$, normalized by their maximum for stability, which multiply each transition's loss; $`\beta`$ is annealed from about 0.4 to 1 over training, since unbiasedness matters most at the end, when the values converge (exercise 18.1). Sampling in proportion to priorities among millions of transitions is done with a **sum tree**, a binary tree whose leaves hold the priorities and whose internal nodes hold the sums of their children, so that updating a priority and sampling both take $`O(\log N)`$ time.
 
@@ -124,9 +124,9 @@ With uniform replay, the number of replays needed grows much faster than the mem
 
 The one-step target propagates a reward back by one step per update. The **$`n`$-step target** of chapter 8,
 
-$$
+```math
 y_t=\sum_{k=0}^{n-1}\gamma^kR_{t+k+1}+\gamma^n\max_{a'}\hat q(S_{t+n},a';\mathbf w^-),
-$$
+```
 
 propagates it $`n`$ steps at once and depends less on the current estimates, at the price of more variance. With replay it is also off-policy in an uncorrected way: the intermediate actions were chosen by an older, exploratory policy, not by the greedy policy whose value the target should estimate, and deep agents usually ignore this rather than correct it with the importance weights or traces of chapter 9. The bias is often harmless and sometimes useful, as the next code shows.
 
@@ -195,9 +195,9 @@ The one-step learner finds the optimal path along the cliff edge. The multi-step
 
 ε-greedy exploration is undirected and state-independent: it randomizes a fixed fraction of actions everywhere, whether or not the agent is uncertain. **Noisy networks** ([Fortunato et al., 2018](https://arxiv.org/abs/1706.10295)) replace it by learned noise in the weights. A noisy linear layer computes
 
-$$
+```math
 \mathbf y=(\boldsymbol\mu^w+\boldsymbol\sigma^w\odot\boldsymbol\varepsilon^w)\mathbf x+\boldsymbol\mu^b+\boldsymbol\sigma^b\odot\boldsymbol\varepsilon^b,
-$$
+```
 
 where the means $`\boldsymbol\mu`$ and the noise scales $`\boldsymbol\sigma`$ are learned by gradient descent along with the rest of the network, and the noise $`\boldsymbol\varepsilon`$ is resampled, usually once per step or per update. To save random numbers, the noise of a $`p\times q`$ weight matrix is **factorized**, $`\varepsilon^w_{ij}=f(\varepsilon_i)f(\varepsilon_j)`$ with $`f(x)=\mathrm{sign}(x)\sqrt{|x|}`$, using $`p+q`$ independent Gaussians instead of $`pq+q`$. The greedy action of a noisy network varies from step to step in a way that depends on the state and that the agent can reduce where it has learned to, by shrinking $`\boldsymbol\sigma`$: a crude but automatic form of the directed exploration of chapter 22. Noisy nets raised the median human-normalized score on Atari by 48% for DQN and 30% for dueling DQN (and 18% for A3C), though the gains varied widely from game to game.
 

@@ -10,9 +10,9 @@
 
 This chapter uses labels $`y\in\{-1,+1\}`$ and affine scores $`f(x)=w^\top x+b`$, predicting $`\operatorname{sign}f(x)`$. Unlike the homogeneous form of chapter 2, which absorbs the intercept into $`w`$ through a constant feature, the intercept $`b`$ is kept separate here because it will not be penalized. For a training example $`(x_i,y_i)`$, the **functional margin** is $`y_if(x_i)`$, which is positive exactly when the example is classified correctly. The **geometric margin** is
 
-$$
+```math
 \frac{y_i(w^\top x_i+b)}{\|w\|_2},
-$$
+```
 
 the signed Euclidean distance from $`x_i`$ to the hyperplane $`\{x:w^\top x+b=0\}`$, positive when $`x_i`$ is on the correct side. The distance formula holds because $`w`$ is normal to the hyperplane: every point $`x_0`$ of the hyperplane has $`w^\top x_0=-b`$, so the component of $`x_i-x_0`$ along the unit normal $`w/\|w\|_2`$ is $`(w^\top x_i+b)/\|w\|_2`$. Rescaling $`(w,b)`$ by a positive constant leaves the classifier and the geometric margin unchanged but rescales the functional margin. The margin of the whole sample is the smallest geometric margin over its examples.
 
@@ -26,11 +26,11 @@ A separable sample has infinitely many separating hyperplanes, and the perceptro
 
 Because of the scale freedom, one may require the smallest functional margin to equal one. The geometric margin is then $`1/\|w\|_2`$, and maximizing it is equivalent to minimizing $`\frac12\|w\|_2^2`$ subject to every functional margin being at least one:
 
-$$
+```math
 \min_{w,b}\ \frac12\|w\|_2^2
 \quad\text{subject to}\quad
 y_i(w^\top x_i+b)\ge1,\qquad i=1,\ldots,n.
-$$
+```
 
 Replacing "the smallest margin equals one" by "every margin is at least one" changes nothing, because at the optimum some constraint is active: otherwise $`w`$ and $`b`$ could be scaled down together and $`\|w\|_2`$ reduced. This is a convex quadratic program, the minimization of a convex quadratic objective under affine constraints. The objective is strictly convex in $`w`$, so the optimal $`w`$ is unique (Calculus and Optimization). The objective does not involve $`b`$, but once $`w`$ is fixed the active constraints determine $`b`$. The formulation was used by [Boser, Guyon, and Vapnik (1992)](https://dl.acm.org/doi/10.1145/130385.130401), who combined it with kernels to produce the first support vector machine (SVM).
 
@@ -40,11 +40,11 @@ Replacing "the smallest margin equals one" by "every margin is at least one" cha
 
 The hard-margin problem is infeasible for nonseparable data, and even for separable data a single outlier can force a tiny margin. [Cortes and Vapnik (1995)](https://link.springer.com/article/10.1007/BF00994018) allowed each constraint to be violated by a **slack** $`\xi_i\ge0`$ at a cost:
 
-$$
+```math
 \min_{w,b,\xi}\ \frac12\|w\|_2^2+C\sum_{i=1}^n\xi_i
 \quad\text{subject to}\quad
 y_i(w^\top x_i+b)\ge1-\xi_i,\quad \xi_i\ge0.
-$$
+```
 
 The slack $`\xi_i`$ measures, on the scale of the functional margin, how far example $`i`$ falls short of margin one. An example with $`0<\xi_i\le1`$ lies inside the margin but not on the wrong side of the boundary; one with $`\xi_i>1`$ is misclassified. Every misclassified example has $`\xi_i\ge1`$, so the sum $`\sum_i\xi_i`$ upper-bounds the number of training mistakes. The constant $`C>0`$ sets the exchange rate between a wide margin and small violations.
 
@@ -54,10 +54,10 @@ If the data are separable and $`C`$ is at least the largest dual variable $`\alp
 
 For fixed $`(w,b)`$, the objective increases with each $`\xi_i`$, and the constraints require $`\xi_i\ge1-y_if(x_i)`$ and $`\xi_i\ge0`$. The best slack is therefore $`\xi_i=\max\{0,1-y_if(x_i)\}`$. Substituting it and dividing by $`Cn`$ gives an unconstrained problem:
 
-$$
+```math
 \min_{w,b}\ \frac1n\sum_{i=1}^n\max\{0,\,1-y_i(w^\top x_i+b)\}+\frac\lambda2\|w\|_2^2,
 \qquad \lambda=\frac1{nC}.
-$$
+```
 
 The soft-margin SVM is therefore regularized empirical risk minimization with the **hinge loss** $`\max\{0,1-s\}`$ of the margin $`s=y_if(x_i)`$. Three consequences follow from earlier chapters. First, the hinge loss is convex and classification-calibrated, and its population minimizer is $`\operatorname{sign}(2\eta(x)-1)`$, where $`\eta(x)=P(Y=1\mid X=x)`$; the SVM thus targets the Bayes classifier but does not estimate probabilities (chapter 6). Second, the hinge loss and its derivative are zero for margins above one, so well-classified points exert no pull on the solution.
 
@@ -75,25 +75,25 @@ Since $`C`$ multiplies a sum of $`n`$ terms, the same value of $`C`$ means stron
 
 The Lagrangian duality of Calculus and Optimization, Appendix E turns the soft-margin problem into one that depends on the data only through inner products. With multipliers $`\alpha_i\ge0`$ for the margin constraints and $`\mu_i\ge0`$ for $`\xi_i\ge0`$,
 
-$$
+```math
 \mathcal L=\frac12\|w\|_2^2+C\sum_i\xi_i-\sum_i\alpha_i\bigl[y_i(w^\top x_i+b)-1+\xi_i\bigr]-\sum_i\mu_i\xi_i.
-$$
+```
 
 The dual function is the infimum of $`\mathcal L`$ over the primal variables $`(w,b,\xi)`$. The Lagrangian is a convex quadratic function of $`w`$ and a linear function of $`b`$ and of each $`\xi_i`$. A linear function is bounded below only when its coefficient vanishes, so the infimum is $`-\infty`$ unless the coefficients of $`b`$ and of every $`\xi_i`$ are zero. These two requirements, together with the minimization over $`w`$, amount to setting the derivatives with respect to the primal variables to zero:
 
-$$
+```math
 w=\sum_{i=1}^n\alpha_iy_ix_i,\qquad
 \sum_{i=1}^n\alpha_iy_i=0,\qquad
 \alpha_i+\mu_i=C.
-$$
+```
 
 The last condition with $`\mu_i\ge0`$ confines $`\alpha_i`$ to $`[0,C]`$. Substituting back eliminates $`w`$, $`b`$, $`\xi`$, and $`\mu`$: the terms in $`b`$ and $`\xi`$ vanish, and $`\sum_i\alpha_iy_iw^\top x_i=\|w\|_2^2`$, so $`\mathcal L`$ reduces to $`\sum_i\alpha_i-\frac12\|w\|_2^2`$. In terms of $`\alpha`$ alone, the dual problem is
 
-$$
+```math
 \max_{\alpha}\ \sum_{i=1}^n\alpha_i-\frac12\sum_{i,j}\alpha_i\alpha_jy_iy_j\,x_i^\top x_j
 \quad\text{subject to}\quad
 0\le\alpha_i\le C,\quad \sum_i\alpha_iy_i=0.
-$$
+```
 
 Its quadratic part is $`-\frac12\alpha^\top Q\alpha`$ with $`Q_{ij}=y_iy_jx_i^\top x_j`$. The matrix $`Q`$ is the Gram matrix of the vectors $`y_ix_i`$, hence positive semidefinite (Linear Algebra), and the dual objective is concave.
 
@@ -103,9 +103,9 @@ The primal problem is convex, and the point $`w=0`$, $`b=0`$, $`\xi_i=2`$ satisf
 
 Besides the stationarity equations above, the KKT conditions consist of primal feasibility, dual feasibility ($`\alpha_i\ge0`$ and $`\mu_i=C-\alpha_i\ge0`$), and complementary slackness: a multiplier can be positive only if its constraint is active,
 
-$$
+```math
 \alpha_i\bigl[y_if(x_i)-1+\xi_i\bigr]=0,\qquad (C-\alpha_i)\xi_i=0.
-$$
+```
 
 These two conditions sort the training points into three groups:
 
@@ -174,9 +174,9 @@ The three points with $`0<\alpha_i<C`$ have margin exactly one, the sixteen with
 
 The last line of the output illustrates a classical bound. If $`\alpha_i=0`$, the solution fitted without example $`i`$ is the same as the full solution, since the remaining KKT conditions still hold with the same multipliers, and that solution classifies $`x_i`$ correctly with $`y_if(x_i)\ge1`$. Leave-one-out mistakes can therefore occur only at support vectors:
 
-$$
+```math
 \widehat R_{\mathrm{LOO}}\le\frac{\#\{i:\alpha_i>0\}}{n}.
-$$
+```
 
 Each term of the leave-one-out estimate evaluates a rule on an example that was not used to fit it, so the estimate is unbiased for the risk of the rule trained on $`n-1`$ examples (chapter 6). Taking expectations, the expected risk of that rule is at most the expected fraction of support vectors, so sparse solutions generalize. The bound is loose for noisy problems, because every misclassified training point is a support vector and the fraction of support vectors then stays bounded away from zero as $`n`$ grows.
 
@@ -186,9 +186,9 @@ A general-purpose quadratic-programming solver needs the $`n\times n`$ matrix $`
 
 For a linear SVM with many examples, the primal is often solved directly. **Pegasos** ([Shalev-Shwartz, Singer, Srebro, and Cotter, 2011](https://link.springer.com/article/10.1007/s10107-010-0420-4)) runs stochastic subgradient descent on the regularized hinge objective of the homogeneous problem, without an intercept. At step $`t`$ it draws one example $`i`$ at random; the vector $`\lambda w-y_ix_i\mathbf 1\{y_iw^\top x_i<1\}`$ is a subgradient of $`\frac\lambda2\|w\|_2^2+\max\{0,1-y_iw^\top x_i\}`$ at $`w`$, and a step against it with step size $`1/(\lambda t)`$ gives
 
-$$
+```math
 w\leftarrow\Bigl(1-\frac1t\Bigr)w+\frac{1}{\lambda t}\,y_ix_i\,\mathbf 1\{y_iw^\top x_i<1\}.
-$$
+```
 
 The objective is $`\lambda`$-strongly convex, and steps of order $`1/(\lambda t)`$ are the standard choice for strongly convex objectives with bounded subgradients (Calculus and Optimization, which defines subgradients in Appendix E). The update resembles the perceptron's, except that it also fires on correct predictions with margin below one, and it shrinks $`w`$ at every step. Dual coordinate descent, used by scikit-learn's [`LinearSVC`](https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html), is another fast option.
 
@@ -198,23 +198,23 @@ The objective is $`\lambda`$-strongly convex, and steps of order $`1/(\lambda t)
 
 A linear method becomes nonlinear when applied to transformed inputs $`\phi(x)`$. The exclusive-or pattern of chapter 2 and the concentric rings below both become linearly separable after adding quadratic features. The dual SVM on the features $`\phi(x_i)`$ needs only the inner products $`\langle\phi(x_i),\phi(x_j)\rangle`$, and the classifier needs only
 
-$$
+```math
 f(x)=\sum_i\alpha_iy_i\langle\phi(x_i),\phi(x)\rangle+b.
-$$
+```
 
 A **kernel** $`k(x,z)=\langle\phi(x),\phi(z)\rangle`$ that can be evaluated without forming $`\phi`$ therefore gives the nonlinear method at the cost of the linear one. This substitution is the **kernel trick**.
 
 For $`x,z\in\mathbb R^d`$, the polynomial kernel $`k(x,z)=(x^\top z+1)^2`$ expands as
 
-$$
+```math
 (x^\top z+1)^2=1+\sum_j2x_jz_j+\sum_jx_j^2z_j^2+\sum_{j<l}2x_jx_lz_jz_l,
-$$
+```
 
 so $`k(x,z)=\phi(x)^\top\phi(z)`$ with
 
-$$
+```math
 \phi(x)=\bigl(1,\ \sqrt2x_1,\ldots,\sqrt2x_d,\ x_1^2,\ldots,x_d^2,\ \sqrt2x_1x_2,\ldots,\sqrt2x_{d-1}x_d\bigr).
-$$
+```
 
 The feature space has dimension $`(d+1)(d+2)/2`$ and contains every monomial of degree at most two. More generally $`(x^\top z+1)^p`$ corresponds to all $`\binom{d+p}{p}`$ monomials of degree at most $`p`$, suitably weighted. For $`d=100`$ and $`p=5`$ that is about $`9.7\times10^7`$ features, while the kernel costs one inner product of length 100.
 
@@ -226,29 +226,28 @@ The feature space has dimension $`(d+1)(d+2)/2`$ and contains every monomial of 
 
 Which functions $`k`$ are inner products in some feature space? A symmetric function $`k:\mathcal X\times\mathcal X\to\mathbb R`$ is a **positive semidefinite kernel** if, for every $`m`$ and every choice of points $`x_1,\ldots,x_m\in\mathcal X`$, the Gram matrix $`K_{ij}=k(x_i,x_j)`$ is positive semidefinite:
 
-$$
+```math
 \sum_{i,j}c_ic_j\,k(x_i,x_j)\ge0\quad\text{for all }c\in\mathbb R^m.
-$$
+```
 
 For a single matrix the question has a familiar answer: a symmetric matrix is positive semidefinite exactly when it is the Gram matrix of some vectors (Linear Algebra). A kernel asks for one feature map that produces all of its Gram matrices at once. The condition is necessary: if $`k(x,z)=\langle\phi(x),\phi(z)\rangle`$, the double sum equals $`\|\sum_ic_i\phi(x_i)\|^2\ge0`$. It is also sufficient, and the construction is canonical. Take the functions $`k(\cdot,x)`$ as feature vectors, form their finite linear combinations, and define
 
-$$
+```math
 \Bigl\langle\sum_ia_ik(\cdot,x_i),\ \sum_jb_jk(\cdot,z_j)\Bigr\rangle=\sum_{i,j}a_ib_j\,k(x_i,z_j).
-$$
+```
 
 Positive semidefiniteness makes this an inner product, and completing the space gives the **reproducing kernel Hilbert space** (RKHS) $`\mathcal H_k`$ ([Aronszajn, 1950](https://www.ams.org/journals/tran/1950-068-03/S0002-9947-1950-0051437-7/); details in [Appendix B](#block-svm-appendix-b)). The feature map is $`\phi(x)=k(\cdot,x)`$, and every $`f\in\mathcal H_k`$ satisfies the **reproducing property**
 
-$$
+```math
 f(x)=\langle f,k(\cdot,x)\rangle_{\mathcal H}.
-$$
+```
 
 Evaluating a function is taking an inner product with a feature vector. The Cauchy–Schwarz inequality, which holds in every inner-product space as in the Euclidean case of Linear Algebra, then shows that the RKHS norm controls how much a function can vary:
 
-$$
-
+```math
 |f(x)-f(z)|\le\|f\|_{\mathcal H}\,\|\phi(x)-\phi(z)\|_{\mathcal H}
 =\|f\|_{\mathcal H}\sqrt{k(x,x)-2k(x,z)+k(z,z)}.
-$$
+```
 
 A small norm forces $`f`$ to be smooth with respect to the geometry the kernel defines. Penalizing $`\|f\|_{\mathcal H}^2`$, as the SVM does, is a smoothness penalty.
 
@@ -333,9 +332,9 @@ The SVM's weight vector is a combination of training features, $`w=\sum_i\alpha_
 
 **Theorem** ([Schölkopf, Herbrich, and Smola, 2001](https://link.springer.com/chapter/10.1007/3-540-44581-1_27), generalizing Kimeldorf and Wahba). Let $`\mathcal H`$ be an RKHS with kernel $`k`$, let $`L:\mathbb R^n\to\mathbb R`$ be any function, and let $`\Omega`$ be strictly increasing on $`[0,\infty)`$. Every minimizer of
 
-$$
+```math
 L\bigl(f(x_1),\ldots,f(x_n)\bigr)+\Omega\bigl(\|f\|_{\mathcal H}\bigr)
-$$
+```
 
 over $`f\in\mathcal H`$ has the form $`f=\sum_{i=1}^n\alpha_ik(\cdot,x_i)`$.
 
@@ -349,9 +348,9 @@ The component $`f_\perp`$ in the proof is a function that vanishes at every trai
 
 The theorem converts an optimization over a possibly infinite-dimensional space into one over $`\alpha\in\mathbb R^n`$. With $`f=\sum_j\alpha_jk(\cdot,x_j)`$,
 
-$$
+```math
 \bigl(f(x_1),\ldots,f(x_n)\bigr)^\top=K\alpha,\qquad \|f\|_{\mathcal H}^2=\alpha^\top K\alpha.
-$$
+```
 
 Any loss can be kernelized this way: hinge loss gives the kernel SVM, squared loss gives kernel ridge regression, and log loss gives kernel logistic regression. An unpenalized intercept or other finite-dimensional unpenalized component can be added, and the same argument applies to the penalized part. The theorem says nothing about sparsity: kernel ridge and kernel logistic regression generally have every $`\alpha_i\ne0`$, whereas the flat part of the hinge loss makes most SVM coefficients zero, so prediction requires kernel evaluations only at the support vectors.
 
@@ -400,11 +399,11 @@ On the two rings, which no line separates, the linear perceptron cycles indefini
 
 Replacing $`x_i^\top x_j`$ by $`k(x_i,x_j)`$ in the dual gives the kernel SVM:
 
-$$
+```math
 \max_{\alpha}\ \sum_i\alpha_i-\frac12\sum_{i,j}\alpha_i\alpha_jy_iy_j\,k(x_i,x_j)
 \quad\text{subject to}\quad
 0\le\alpha_i\le C,\quad \sum_i\alpha_iy_i=0,
-$$
+```
 
 with decision function $`f(x)=\sum_{i:\alpha_i>0}\alpha_iy_ik(x_i,x)+b`$ and $`b=y_j-\sum_i\alpha_iy_ik(x_i,x_j)`$ for any $`j`$ with $`0<\alpha_j<C`$. In primal form, the kernel SVM minimizes $`\sum_i\max\{0,1-y_i(g(x_i)+b)\}+\frac1{2C}\|g\|_{\mathcal H}^2`$ over $`g\in\mathcal H`$ and $`b\in\mathbb R`$. Everything in the preceding sections, including the three kinds of points, the leave-one-out bound, and SMO, carries over unchanged with $`K`$ in place of $`XX^\top`$.
 
@@ -412,16 +411,16 @@ with decision function $`f(x)=\sum_{i:\alpha_i>0}\alpha_iy_ik(x_i,x)+b`$ and $`b
 
 With squared loss, the representer theorem reduces
 
-$$
+```math
 \min_{f\in\mathcal H}\ \sum_{i=1}^n\bigl(y_i-f(x_i)\bigr)^2+\lambda\|f\|_{\mathcal H}^2
-$$
+```
 
 to minimizing $`\|y-K\alpha\|_2^2+\lambda\,\alpha^\top K\alpha`$. Here $`\lambda`$ weighs the penalty against a sum rather than an average of squared errors, as in chapter 3; it is not the $`\lambda=1/(nC)`$ of the averaged hinge objective. The gradient is $`2K\bigl[(K+\lambda I)\alpha-y\bigr]`$, which vanishes at
 
-$$
+```math
 \hat\alpha=(K+\lambda I)^{-1}y,\qquad
 \hat f(x)=k(x)^\top(K+\lambda I)^{-1}y,\quad k(x)_i=k(x_i,x).
-$$
+```
 
 With the linear kernel $`K=XX^\top`$ this is the dual form of ridge regression from chapter 3. The fitted values $`\hat y=K(K+\lambda I)^{-1}y`$ are a linear smoother. With the spectral decomposition $`K=\sum_j\mu_ju_ju_j^\top`$ (Linear Algebra), the smoother matrix has eigenvalues $`\mu_j/(\mu_j+\lambda)`$, so the effective degrees of freedom, the trace of the smoother, are $`\sum_j\mu_j/(\mu_j+\lambda)`$, and the leave-one-out shortcut of chapter 6 applies exactly. The same predictor is the posterior mean of Gaussian-process regression with noise variance $`\lambda`$, which adds predictive uncertainty (chapter 15). [Welling's note on kernel ridge regression](https://web2.qatar.cmu.edu/~gdicaro/10315-Fall19/additional/welling-notes-on-kernel-ridge.pdf) gives the derivation from the primal.
 
@@ -439,9 +438,9 @@ The **Nyström method** ([Williams and Seeger, 2000](https://proceedings.neurips
 
 **Random Fourier features** ([Rahimi and Recht, 2007](https://proceedings.neurips.cc/paper/2007/hash/013a006f03dbc5392effeb8f18fda755-Abstract.html)) use Bochner's theorem: a continuous shift-invariant kernel $`k(x-z)`$ is positive semidefinite exactly when it is the Fourier transform of a nonnegative measure. After normalizing $`k(0)=1`$, that measure is a probability distribution $`p(\omega)`$, and $`k(x-z)=\mathbb E_\omega\bigl[\cos\bigl(\omega^\top(x-z)\bigr)\bigr]`$; in other words, $`k`$, as a function of the difference $`x-z`$, is the characteristic function of $`p`$. With $`\omega_j\sim p`$ and $`b_j\sim\operatorname{Uniform}[0,2\pi]`$, the features
 
-$$
+```math
 \hat\phi(x)=\sqrt{\frac2D}\bigl(\cos(\omega_1^\top x+b_1),\ldots,\cos(\omega_D^\top x+b_D)\bigr)
-$$
+```
 
 satisfy $`\mathbb E\bigl[\hat\phi(x)^\top\hat\phi(z)\bigr]=k(x-z)`$, because $`2\cos(a+b)\cos(c+b)=\cos(a-c)+\cos(a+c+2b)`$ and the second term averages to zero over $`b`$. The inner product $`\hat\phi(x)^\top\hat\phi(z)`$ is thus a Monte Carlo average of $`D`$ independent terms, and its error shrinks like $`D^{-1/2}`$, as the right panel of the previous figure shows. For the Gaussian kernel $`\exp(-\gamma\|x-z\|^2)`$, $`p`$ is $`\mathcal N(0,2\gamma I)`$. scikit-learn provides both approximations as [kernel approximation transformers](https://scikit-learn.org/stable/modules/kernel_approximation.html).
 
@@ -477,9 +476,9 @@ A linear kernel is usually adequate when $`d`$ is large relative to $`n`$, as wi
 
 Two reductions to binary problems are common. **One-versus-rest** trains $`K`$ classifiers, each separating one class from all others, and predicts the class with the largest score. The scores come from separately trained problems, so their scales need not be comparable. **One-versus-one** trains $`K(K-1)/2`$ classifiers on pairs of classes and predicts by voting; each subproblem is small, which suits the superlinear cost of kernel SVM training, and LIBSVM uses it. [Crammer and Singer (2001)](https://www.jmlr.org/papers/v2/crammer01a.html) instead train all $`K`$ score functions jointly with the multiclass hinge loss
 
-$$
+```math
 \max\Bigl\{0,\ 1+\max_{k\ne y}f_k(x)-f_y(x)\Bigr\},
-$$
+```
 
 which requires the correct class to beat every other by a margin of one, the analogue of the multiclass perceptron of chapter 2.
 
@@ -491,15 +490,15 @@ The hinge loss targets only the sign of $`2\eta(x)-1`$, so SVM scores are not pr
 
 The Rademacher bound for norm-bounded linear scores in Information and Learning Theory uses only inner products, so it holds verbatim in an RKHS. For $`\mathcal F_B=\{x\mapsto\langle g,\phi(x)\rangle_{\mathcal H}:\|g\|_{\mathcal H}\le B\}`$, the supremum of $`\frac1n\sum_i\sigma_i\langle g,\phi(x_i)\rangle`$ over the ball is $`\frac Bn\|\sum_i\sigma_i\phi(x_i)\|_{\mathcal H}`$, and the expected squared norm of $`\sum_i\sigma_i\phi(x_i)`$ is $`\sum_ik(x_i,x_i)`$ because the cross terms have mean zero. Jensen's inequality then gives
 
-$$
+```math
 \widehat{\mathfrak R}_{x_{1:n}}(\mathcal F_B)\le\frac Bn\sqrt{\sum_{i=1}^nk(x_i,x_i)}=\frac Bn\sqrt{\operatorname{tr}K}.
-$$
+```
 
 If $`k(x,x)\le r^2`$ for all $`x`$, this is at most $`Br/\sqrt n`$; for the Gaussian kernel $`r=1`$. The ramp loss $`\min\{1,\max\{0,1-s\}\}`$ of Information and Learning Theory, the case $`\rho=1`$ of its margin level, is bounded by the hinge loss $`\max\{0,1-s\}`$ of the margin $`s=yg(x)`$, so the margin bound of Foundations gives, with probability at least $`1-\delta`$, simultaneously for all $`g`$ with $`\|g\|_{\mathcal H}\le B`$,
 
-$$
+```math
 P\bigl(Yg(X)\le0\bigr)\le\frac1n\sum_{i=1}^n\max\{0,1-y_ig(x_i)\}+\frac{2Br}{\sqrt n}+\sqrt{\frac{\ln(1/\delta)}{2n}}.
-$$
+```
 
 The probability on the left is the error of the classifier $`\operatorname{sign}g`$ on a new observation, counting a zero score as an error. The two data-dependent terms are the two terms of the SVM objective: average slack and the norm of the function. The SVM minimizes a weighted sum of them, and $`C`$ sets the weight. An unpenalized intercept is not covered directly, but appending a constant feature, which replaces $`k`$ by $`k+1`$, covers the classifier $`\operatorname{sign}(g+b)`$ at the price of $`r^2+1`$ in place of $`r^2`$ and $`\|g\|_{\mathcal H}^2+b^2`$ in place of $`B^2`$.
 
@@ -520,33 +519,33 @@ The kernel also changes which functions have small norm. A narrow Gaussian kerne
 
 Write the dual objective as $`D(\alpha)=\sum_k\alpha_k-\frac12\alpha^\top Q\alpha`$ with $`Q_{kl}=y_ky_lK_{kl}`$, and let $`E_k=f(x_k)-y_k`$ be the current prediction error, where $`f(x)=\sum_l\alpha_ly_lk(x_l,x)+b`$. To keep $`\sum_k\alpha_ky_k`$ fixed while changing $`\alpha_i`$ and $`\alpha_j`$, move along
 
-$$
+```math
 \alpha_j\leftarrow\alpha_j+y_jt,\qquad \alpha_i\leftarrow\alpha_i-y_it.
-$$
+```
 
 The sum changes by $`y_j^2t-y_i^2t=0`$. Since $`\partial D/\partial\alpha_k=1-y_k\bigl(f(x_k)-b\bigr)`$ and $`y_k^2=1`$, the derivative along this direction at $`t=0`$ is
 
-$$
+```math
 y_j\bigl(1-y_jf(x_j)+y_jb\bigr)-y_i\bigl(1-y_if(x_i)+y_ib\bigr)=E_i-E_j.
-$$
+```
 
 The intercept cancels. The second derivative is $`-(K_{ii}+K_{jj}-2K_{ij})=-\kappa`$, where $`\kappa=\|\phi(x_i)-\phi(x_j)\|^2\ge0`$ (Platt writes $`\eta`$; the chapter reserves $`\eta`$ for the conditional class probability). The objective along the line is therefore
 
-$$
+```math
 D(t)=D(0)+t\,(E_i-E_j)-\frac\kappa2t^2,
-$$
+```
 
 maximized at $`t^\star=(E_i-E_j)/\kappa`$ when $`\kappa>0`$. In terms of $`\alpha_j`$:
 
-$$
+```math
 \alpha_j^{\text{new}}=\alpha_j+\frac{y_j(E_i-E_j)}{\kappa}.
-$$
+```
 
 Both variables must stay in $`[0,C]`$, so $`\alpha_j^{\text{new}}`$ is clipped to $`[L,H]`$. If $`y_i\ne y_j`$, then $`\alpha_j-\alpha_i`$ is conserved and $`L=\max\{0,\alpha_j-\alpha_i\}`$, $`H=\min\{C,C+\alpha_j-\alpha_i\}`$. If $`y_i=y_j`$, then $`\alpha_i+\alpha_j`$ is conserved and $`L=\max\{0,\alpha_i+\alpha_j-C\}`$, $`H=\min\{C,\alpha_i+\alpha_j\}`$. Finally,
 
-$$
+```math
 \alpha_i^{\text{new}}=\alpha_i+y_iy_j\bigl(\alpha_j-\alpha_j^{\text{clipped}}\bigr),
-$$
+```
 
 and $`b`$ is recomputed so that a variable strictly inside $`(0,C)`$ satisfies $`y_kf(x_k)=1`$. When $`\kappa=0`$, $`D`$ is linear along the line and the maximum is at an endpoint. Each step increases $`D`$ unless the pair already satisfies its KKT conditions. The algorithm stops when no pair violates them by more than a tolerance. Platt's selection heuristics and LIBSVM's second-order working-set selection choose pairs that make large progress.
 

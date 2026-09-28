@@ -68,17 +68,17 @@ Exact duplicates of whole documents, paragraphs, or lines are found by hashing e
 
 Most duplicates are not exact: the same article with a different header, a page with a changed date, a lightly edited copy. Near-duplicate detection represents each document by its set of **shingles**, the n-grams of words it contains, and measures the similarity of two documents $`A`$ and $`B`$ by the **Jaccard similarity** of their shingle sets,
 
-$$
+```math
 J(A,B)=\frac{|A\cap B|}{|A\cup B|}.
-$$
+```
 
 Comparing every pair of documents is impossible at the scale of billions, and **MinHash** ([Broder, 1997](https://doi.org/10.1109/SEQUEN.1997.666900)) makes the comparison cheap. Apply a random hash function $`h`$ to every shingle of a document and keep the minimum value. For two documents, the minima agree exactly when the shingle with the smallest hash among $`A\cup B`$ lies in $`A\cap B`$, which happens with probability $`J(A,B)`$ ([Appendix A](#block-nlp06-appendix-a)). With $`k`$ independent hash functions, each document gets a **signature** of $`k`$ minima, and the fraction of positions where two signatures agree is an unbiased estimate of their Jaccard similarity with standard deviation $`\sqrt{J(1-J)/k}`$.
 
 Signatures shrink documents to a few hundred numbers, but comparing all pairs of signatures is still quadratic. **Locality-sensitive hashing** avoids it by splitting each signature into $`b`$ bands of $`r`$ rows and hashing each band: two documents become a **candidate pair** if they agree on all $`r`$ rows of at least one band. A pair with similarity $`s`$ agrees on a given band with probability $`s^r`$, so it becomes a candidate with probability
 
-$$
+```math
 P(\text{candidate})=1-(1-s^r)^b,
-$$
+```
 
 an S-shaped curve that rises steeply near the threshold $`s^*\approx(1/b)^{1/r}`$ ([Appendix B](#block-nlp06-appendix-b)). Only candidate pairs are compared, and duplicates among them are removed, typically keeping one document from each connected cluster. FineWeb uses word 5-grams and 112 hash functions split into 14 bands of 8 rows. The code builds a small synthetic crawl of 2,000 disjoint 80-word passages of Shakespeare and 300 copies in which between 0 and 50% of the words have been replaced, and runs the same procedure.
 
@@ -248,9 +248,9 @@ Because data choices matter so much, documenting them is part of doing science w
 
 Let $`A`$ and $`B`$ be finite sets of shingles and $`h`$ a random hash function that, restricted to $`A\cup B`$, induces a uniformly random ordering of its elements (a random permutation; practical hash families approximate this). Let $`x^*`$ be the element of $`A\cup B`$ with the smallest hash value. Each element of $`A\cup B`$ is equally likely to be $`x^*`$. Now $`\min_{x\in A}h(x)=\min_{x\in B}h(x)`$ if and only if $`x^*\in A\cap B`$: if $`x^*`$ lies in both sets, it is the minimum of each; if it lies in only one, say $`A`$, then $`\min_Ah=h(x^*)`$, which is smaller than every hash value in $`B`$. Therefore
 
-$$
+```math
 P\bigl(\min_Ah=\min_Bh\bigr)=\frac{|A\cap B|}{|A\cup B|}=J(A,B).
-$$
+```
 
 With $`k`$ independent hash functions the indicators of agreement are independent Bernoulli($`J`$) variables, so their mean $`\hat J`$ is unbiased with variance $`J(1-J)/k`$, and by Hoeffding's inequality $`P(|\hat J-J|\ge\epsilon)\le2e^{-2k\epsilon^2}`$. The accuracy depends on $`k`$ only, not on the size of the documents.
 
@@ -264,9 +264,9 @@ With $`k`$ independent hash functions the indicators of agreement are independen
 
 Split a signature of $`br`$ minhashes into $`b`$ bands of $`r`$ rows. For a pair with Jaccard similarity $`s`$, the $`r`$ rows of one band all agree with probability $`s^r`$, independently across bands, so the pair shares at least one band with probability
 
-$$
+```math
 f(s)=1-(1-s^r)^b.
-$$
+```
 
 $`f`$ increases from $`f(0)=0`$ to $`f(1)=1`$. Its derivative $`f'(s)=br\,s^{r-1}(1-s^r)^{b-1}`$ is maximized where the second derivative vanishes; solving gives $`s^r=\frac{r-1}{br-1}`$, so for large $`b`$ and $`r`$ the steepest point is at $`s^*\approx(1/b)^{1/r}`$, where $`f(s^*)=1-(1-1/b)^b\approx1-e^{-1}\approx0.63`$. Increasing $`r`$ with $`b`$ fixed moves the threshold up; increasing both, with more hash functions in total, makes the curve steeper, so fewer pairs fall in the uncertain region around the threshold. For $`b=14`$ and $`r=8`$, $`s^*\approx14^{-1/8}\approx0.72`$, and a pair with $`s=0.9`$ is missed with probability $`(1-0.9^8)^{14}\approx4\times10^{-4}`$ while a pair with $`s=0.5`$ becomes a candidate with probability $`1-(1-2^{-8})^{14}\approx0.05`$.
 
@@ -280,15 +280,15 @@ $`f`$ increases from $`f(0)=0`$ to $`f(1)=1`$. Its derivative $`f'(s)=br\,s^{r-1
 
 Suppose a dataset of $`U`$ unique tokens is seen for $`1+R`$ epochs, $`R`$ of them repetitions. If each additional epoch is worth a constant fraction $`\rho<1`$ of the one before, measured in equivalent fresh tokens, the effective amount of data is
 
-$$
+```math
 D'=U\bigl(1+\rho+\rho^2+\dots+\rho^{R}\bigr)=U\,\frac{1-\rho^{R+1}}{1-\rho}.
-$$
+```
 
 Writing $`\rho=e^{-1/R^*}`$ and approximating the geometric sum by an integral gives the form fitted by [Muennighoff et al. (2023)](https://arxiv.org/abs/2305.16264),
 
-$$
+```math
 D'\approx U+U R^*\bigl(1-e^{-R/R^*}\bigr).
-$$
+```
 
 For $`R\ll R^*`$ this is $`U(1+R)`$, so repetitions count almost like new data; for $`R\gg R^*`$ it saturates at $`U(1+R^*)`$, so the dataset can never be worth more than $`1+R^*`$ epochs of fresh text. Their fit gave $`R^*\approx15`$: four epochs ($`R=3`$) are worth $`1+15(1-e^{-0.2})\approx3.7`$ epochs of new data, while forty are worth about fifteen. Substituting $`D'`$ for the number of tokens in a scaling law predicts the loss of data-constrained training runs.
 

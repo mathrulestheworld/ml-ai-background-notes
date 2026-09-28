@@ -60,9 +60,9 @@ If a model sometimes solves problems, its successful solutions are training data
 
 Reinforcement learning uses failures as well as successes. In **reinforcement learning with verifiable rewards** (RLVR), the reward is computed by a program rather than a learned model: 1 if the final answer matches the reference or the code passes its tests, 0 otherwise, sometimes with a small reward for the required format. Because the reward cannot be flattered by style or length, it is much harder to exploit than a learned reward model. The most widely used algorithm, **group relative policy optimization** (GRPO; [Shao et al., 2024](https://arxiv.org/abs/2402.03300)), is a simplification of PPO for this setting. For each prompt it samples a group of $`G`$ responses, normalizes their rewards within the group,
 
-$$
+```math
 A_i=\frac{r_i-\operatorname{mean}(r_1,\dots,r_G)}{\operatorname{std}(r_1,\dots,r_G)},
-$$
+```
 
 and uses $`A_i`$ as the advantage of every token of response $`i`$ in a clipped policy-gradient objective with a KL penalty toward a reference model ([Appendix B](#block-nlp12-appendix-b)). The group mean replaces PPO's learned value function as the baseline. The code applies GRPO to a toy task, answering the sum of two digits with a reward of 1 for the right answer. The policy is a small network that starts either from random weights or from a stand-in for a pretrained model, which puts 30% of its probability on the right sum and 35% on each of its two neighbors, so that it can sample the answer but rarely prefers it.
 
@@ -172,10 +172,10 @@ Fix a problem, and let the model's samples be independent with answer probabilit
 
 For a prompt $`x`$, sample responses $`y_1,\dots,y_G`$ from the current policy $`\pi_{\mathrm{old}}`$ and compute rewards $`r_i`$ and normalized advantages $`A_i`$. GRPO maximizes
 
-$$
+```math
 \frac1G\sum_{i=1}^G\frac1{|y_i|}\sum_{t=1}^{|y_i|}\Bigl[\min\bigl(\rho_{i,t}A_i,\ \operatorname{clip}(\rho_{i,t},1-\epsilon,1+\epsilon)A_i\bigr)-\beta\,\hat D_{i,t}\Bigr],
 \qquad\rho_{i,t}=\frac{\pi_\theta(y_{i,t}\mid x,y_{i,<t})}{\pi_{\mathrm{old}}(y_{i,t}\mid x,y_{i,<t})},
-$$
+```
 
 with the per-token divergence estimate $`\hat D=\frac{\pi_{\mathrm{ref}}}{\pi_\theta}-\log\frac{\pi_{\mathrm{ref}}}{\pi_\theta}-1`$, which is nonnegative and has expectation $`D_{\mathrm{KL}}(\pi_\theta\Vert\pi_{\mathrm{ref}})`$ under samples from $`\pi_\theta`$. At $`\theta=\theta_{\mathrm{old}}`$, where $`\rho=1`$ and clipping is inactive, the gradient of the first term is $`\frac1G\sum_iA_i\nabla\log\pi_\theta(y_i\mid x)`$ up to the length normalization: the REINFORCE estimator with the group mean as a baseline, divided by the group's standard deviation. Subtracting a baseline that does not depend on the sampled response leaves the policy gradient unbiased (exactly so for a leave-one-out mean; the group mean including the sample itself introduces a bias of order $`1/G`$). Dividing by the standard deviation rescales the gradient per prompt, giving problems where the group's rewards barely vary the same weight as others, and when all $`G`$ rewards are equal, all advantages are zero and the prompt contributes no learning signal. Very easy and very hard prompts are therefore wasted, which is why training sets for RLVR are filtered to problems of intermediate difficulty for the current model. The per-response normalization by $`|y_i|`$ weights tokens of short responses more; variants remove it to avoid a bias toward long wrong answers.
 

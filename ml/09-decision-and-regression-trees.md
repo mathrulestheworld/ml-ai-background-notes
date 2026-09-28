@@ -10,9 +10,9 @@
 
 A **decision tree** predicts by asking a sequence of questions about the input. Each internal node tests a single feature against a threshold, $`x_j\le t`$, and sends the input to its left child when the answer is yes and to its right child otherwise. Each leaf holds a constant prediction. Following the tests from the root to a leaf takes an input to one cell $`R_m`$ of a partition of the input space into $`M`$ axis-aligned boxes, one per leaf, and the tree computes
 
-$$
+```math
 f(x)=\sum_{m=1}^Mc_m\,\mathbf 1\{x\in R_m\},
-$$
+```
 
 where $`c_m`$ is the prediction stored in leaf $`m`$. For regression, $`c_m`$ is a number; for classification, it is a class label or a vector of class probabilities. Each leaf is described by the conjunction of the tests along its path, so a tree is a compact set of disjoint rules of the kind studied in chapter 7. Terminology and Mathematical Language introduces the idea with a four-leaf tree fitted to the petal measurements of iris flowers.
 
@@ -36,15 +36,15 @@ Every standard algorithm therefore grows the tree **greedily**, from the root do
 
 Let a node contain the examples with indices in $`N`$. A split on feature $`j`$ at threshold $`t`$ creates $`N_L=\{i\in N:x_{ij}\le t\}`$ and $`N_R=N\setminus N_L`$, where $`x_{ij}`$ is feature $`j`$ of example $`i`$. With squared error and leaf means $`\bar y_L,\bar y_R`$, the split is chosen to minimize
 
-$$
+```math
 \sum_{i\in N_L}(y_i-\bar y_L)^2+\sum_{i\in N_R}(y_i-\bar y_R)^2 .
-$$
+```
 
 Only thresholds between consecutive distinct values of $`x_j`$ in the node matter, so there are at most $`|N|-1`$ candidates per feature. They can all be evaluated in one pass after sorting. Within this subsection write $`n=|N|`$ and $`S=\sum_{i\in N}y_i`$ for the size and response total of the node, and $`n_L=|N_L|`$ and $`S_L=\sum_{i\in N_L}y_i`$ for those of its left child. The squared error of the node's responses about their mean is $`\sum_{i\in N}y_i^2-S^2/n`$, and the same identity applied to each child gives the children's error as $`\sum_{i\in N}y_i^2-S_L^2/n_L-(S-S_L)^2/(n-n_L)`$. The sum of $`y_i^2`$ over the node is the same for every split, so minimizing the children's error is equivalent to maximizing
 
-$$
+```math
 \frac{S_L^2}{n_L}+\frac{(S-S_L)^2}{n-n_L},
-$$
+```
 
 which cumulative sums of the sorted responses give for every threshold at once.
 
@@ -120,9 +120,9 @@ A tree grown until every leaf is pure, or holds a single example, interpolates t
 
 The doubling at full depth is no accident. Suppose each leaf holds one training point, so that a test input $`x`$ whose leaf holds $`(x_i,y_i)`$ receives the prediction $`y_i=m(x_i)+\varepsilon_i`$, where $`m`$ is the regression function and $`\varepsilon_i`$ the noise. The test response is $`Y=m(x)+\varepsilon`$ with independent noise of the same variance $`\sigma^2`$, so the prediction error is the difference of two independent noise draws plus approximation error:
 
-$$
+```math
 \mathbb E\bigl[(Y-y_i)^2\bigr]=2\sigma^2+\bigl(m(x)-m(x_i)\bigr)^2,
-$$
+```
 
 as for 1-NN regression. In the figure the second term is small, and the fully grown tree's population error is 2.07 times $`\sigma^2=0.1225`$.
 
@@ -134,21 +134,21 @@ The consistency theory of chapter 1 extends to trees. A partitioning estimate wh
 
 For classification with $`K`$ classes, let $`\hat p_{mk}`$ be the proportion of class $`k`$ among the $`n_m`$ training examples in node $`m`$, and let $`\hat p_m=(\hat p_{m1},\ldots,\hat p_{mK})`$. Splits are chosen to reduce an **impurity** $`Q(\hat p_m)`$, a measure of how mixed the node is. The three standard choices are
 
-$$
+```math
 \begin{aligned}
 \text{misclassification error:}&\quad 1-\max_k\hat p_{mk},\\
 \text{Gini index:}&\quad \sum_{k}\hat p_{mk}(1-\hat p_{mk})=1-\sum_k\hat p_{mk}^2,\\
 \text{entropy:}&\quad -\sum_k\hat p_{mk}\log\hat p_{mk}.
 \end{aligned}
-$$
+```
 
 In this chapter $`\log`$ is the natural logarithm, so entropy is measured in nats. Information and Learning Theory measures entropy in bits, with $`\log_2`$, and so does scikit-learn's `criterion="entropy"`. Changing the base multiplies every entropy, and every decrease of entropy, by the same constant, so it never changes which split is chosen.
 
 A split of node $`m`$ into children $`L`$ and $`R`$ reduces impurity by
 
-$$
+```math
 \Delta=Q(\hat p_m)-\frac{n_L}{n_m}Q(\hat p_L)-\frac{n_R}{n_m}Q(\hat p_R),
-$$
+```
 
 and the greedy rule chooses the split with the largest decrease. With entropy, $`\Delta`$ is the **information gain**: the empirical mutual information, within the node, between the class label and the side of the split. Indeed, if $`Y`$ is the label and $`Z\in\{L,R\}`$ the side of the split of a training example drawn at random from the node, the entropy of $`Y`$ is $`Q(\hat p_m)`$, the conditional entropy of $`Y`$ given $`Z`$ is the weighted sum of the children's entropies, and $`\Delta=H(Y)-H(Y\mid Z)=I(Y;Z)`$ (Information and Learning Theory).
 
@@ -162,9 +162,9 @@ Each impurity is the smallest training loss that a single constant prediction ca
 
 Here $`e_y`$ is the one-hot vector of the label $`y`$, with a one in position $`y`$ and zeros elsewhere. For the first row, predicting label $`k`$ errs on the fraction $`1-\hat p_{mk}`$ of the node, which is smallest for the majority class. For the Gini row, the average of $`\lVert e_{y_i}-q\rVert^2`$ over the node is
 
-$$
+```math
 \sum_k\bigl[\hat p_{mk}-2\hat p_{mk}q_k+q_k^2\bigr]=\sum_k(q_k-\hat p_{mk})^2+\sum_k\hat p_{mk}(1-\hat p_{mk}),
-$$
+```
 
 which is minimized at $`q=\hat p_m`$ with value $`\sum_k\hat p_{mk}(1-\hat p_{mk})`$. For two classes this loss is twice the Brier score $`(\hat p-y)^2`$ of chapter 5. For the entropy row, the average log loss of $`q`$ over the node is the cross-entropy $`H(\hat p_m,q)=-\sum_k\hat p_{mk}\log q_k`$, which exceeds the entropy of $`\hat p_m`$ by the divergence $`D_{\mathrm{KL}}(\hat p_m\Vert q)\ge0`$, with equality exactly at $`q=\hat p_m`$ (Information and Learning Theory). The Gini index is also the error rate of a rule that predicts a random label drawn from the node's class proportions.
 
@@ -246,17 +246,17 @@ The first split is chosen by sampling noise: its location near zero is luck, and
 
 Let $`T`$ be a subtree of the fully grown tree $`T_0`$ obtained by collapsing some internal nodes into leaves, and let $`|T|`$ be its number of leaves. Let $`\widehat R(T)`$ be its training loss, the sum over leaves of the node losses, where, as in scikit-learn, a leaf's loss is its share of the training examples times its impurity. By [Impurity measures](#impurity-measures), this is the tree's empirical risk $`\widehat R_n`$, in the sense of chapter 1, under the loss that corresponds to the impurity; CART writes it without the hat. CART's **cost-complexity criterion** is
 
-$$
+```math
 \widehat R_\alpha(T)=\widehat R(T)+\alpha|T|,\qquad \alpha\ge0.
-$$
+```
 
 For each $`\alpha`$ there is a unique smallest subtree $`T(\alpha)`$ minimizing $`\widehat R_\alpha`$, and the optimal subtrees are **nested**: as $`\alpha`$ increases, $`T(\alpha)`$ only loses branches. Only finitely many distinct subtrees arise, $`T_0\supset T_1\supset\cdots\supset\{\text{root}\}`$, at breakpoints $`0=\alpha_0<\alpha_1<\alpha_2<\cdots`$. ($`T(0)`$ is $`T_0`$ itself unless collapsing some branch of $`T_0`$ leaves the training loss unchanged, in which case $`T(0)`$ already omits that branch.) [Appendix B](#block-tree-appendix-b) proves both facts.
 
 The sequence is computed by **weakest-link pruning**. For an internal node $`t`$, let $`T_t`$ be the branch of the current tree rooted at $`t`$, let $`\widehat R(T_t)`$ be the training loss of its leaves, and let $`\widehat R(t)`$ be the training loss of $`t`$ alone if it were made a leaf. Collapsing the branch into a leaf changes $`\widehat R_\alpha`$ by $`\bigl[\widehat R(t)-\widehat R(T_t)\bigr]-\alpha\bigl(|T_t|-1\bigr)`$. The collapse pays off once $`\alpha`$ exceeds
 
-$$
+```math
 g(t)=\frac{\widehat R(t)-\widehat R(T_t)}{|T_t|-1},
-$$
+```
 
 the reduction in training loss per additional leaf that the branch provides. The weakest link is the node with the smallest $`g(t)`$. It is pruned, the values of $`g`$ are updated for its ancestors, whose branches have just lost leaves, and the process repeats until only the root remains; nodes that tie for the smallest $`g`$ are pruned together. The successive minima of $`g`$ are the breakpoints $`\alpha_k`$.
 
@@ -325,9 +325,9 @@ Several variants relax the axis-aligned, piecewise-constant form. **Oblique tree
 
 Consider regression with squared error and a categorical feature whose levels $`c=1,\ldots,K`$ have $`n_c`$ examples with mean response $`\bar y_c`$. For a binary split that sends the levels in $`A`$ left, the total squared error of the children is
 
-$$
+```math
 \sum_c\sum_{i\in c}(y_i-\bar y_c)^2+\sum_cn_c\bigl(\bar y_c-\mu_{g(c)}\bigr)^2,
-$$
+```
 
 where $`g(c)\in\{L,R\}`$ is the side of level $`c`$ and $`\mu_L,\mu_R`$ are the children's means. The first term does not depend on the split. The second is the objective of two-means clustering (chapter 13) of the points $`\bar y_c`$ on the line with weights $`n_c`$, with each center equal to the weighted mean of its group.
 
@@ -345,23 +345,23 @@ For two classes coded $`y\in\{0,1\}`$, the squared error of a node with proporti
 
 **Existence and uniqueness by dynamic programming.** For a node $`t`$ of $`T_0`$, let $`C_\alpha(t)`$ be the smallest value of $`\widehat R(S)+\alpha|S|`$ over pruned subtrees $`S`$ of the branch rooted at $`t`$. A subtree either collapses $`t`$ into a leaf or keeps its split and prunes each child's branch optimally and independently:
 
-$$
+```math
 C_\alpha(t)=\min\bigl\{\widehat R(t)+\alpha,\ C_\alpha(t_L)+C_\alpha(t_R)\bigr\},
-$$
+```
 
 with $`C_\alpha(t)=\widehat R(t)+\alpha`$ at the leaves of $`T_0`$. Computing this bottom-up, and collapsing whenever the first option is at most the second, yields a minimizer of $`\widehat R_\alpha`$. It is the smallest one: it is contained in every other minimizer. Indeed, the cost is a sum over branches, so any minimizer, restricted to the branch of a node that it contains, must minimize that branch's cost; it must therefore keep a node wherever keeping is strictly better, and those are the only nodes the dynamic program keeps, since ties are resolved toward collapsing.
 
 **Nesting.** Fix a node $`t`$ and let $`K_\alpha(t)=C_\alpha(t_L)+C_\alpha(t_R)`$ be the best value when $`t`$ is kept. Any subtree that keeps $`t`$ has at least two leaves, so for $`\alpha'>\alpha`$,
 
-$$
+```math
 K_{\alpha'}(t)\ge K_\alpha(t)+2(\alpha'-\alpha),
-$$
+```
 
 since the minimizing subtree at $`\alpha'`$ costs at least $`K_\alpha(t)`$ at $`\alpha`$ and gains at least $`2(\alpha'-\alpha)`$ in penalty. Collapsing costs $`\widehat R(t)+\alpha`$, which grows at rate exactly one. If collapsing is chosen at $`\alpha`$, meaning $`\widehat R(t)+\alpha\le K_\alpha(t)`$, then
 
-$$
+```math
 \widehat R(t)+\alpha'=\widehat R(t)+\alpha+(\alpha'-\alpha)\le K_\alpha(t)+2(\alpha'-\alpha)\le K_{\alpha'}(t),
-$$
+```
 
 so it is also chosen at $`\alpha'`$. Every node collapsed at $`\alpha`$ stays collapsed at larger values, hence $`T(\alpha')\subseteq T(\alpha)`$.
 

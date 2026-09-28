@@ -86,9 +86,9 @@ Diffusion and flow-matching models, the most successful family today, belong to 
 
 When the model's density can be evaluated, the natural objective is the **log-likelihood** of the training data, $`\frac1n\sum_i\log p_\theta(x_i)`$, an unbiased estimate of $`\mathbb E_{p_{\mathrm{data}}}[\log p_\theta(x)]`$. Since
 
-$$
+```math
 \mathrm{KL}(p_{\mathrm{data}}\,\|\,p_\theta)=\mathbb E_{p_{\mathrm{data}}}[\log p_{\mathrm{data}}(x)]-\mathbb E_{p_{\mathrm{data}}}[\log p_\theta(x)],
-$$
+```
 
 and the first term does not depend on $`\theta`$, maximizing the expected log-likelihood is the same as minimizing the **forward** Kullback–Leibler divergence from the data to the model, the cross-entropy of Foundations chapter 5. Maximum likelihood is consistent, statistically efficient for well-specified models, and gives a single number, the held-out log-likelihood, with which to compare models ([Appendix A](#block-gen01-appendix-a)).
 
@@ -146,15 +146,15 @@ The forward fit matches the mixture's mean and standard deviation exactly, which
 
 Both KL divergences belong to the family of **f-divergences**,
 
-$$
+```math
 D_f(p\,\|\,q)=\mathbb E_{q}\Bigl[f\Bigl(\frac{p(x)}{q(x)}\Bigr)\Bigr],\qquad f\text{ convex},\ f(1)=0,
-$$
+```
 
 which compare the densities pointwise through their ratio. Choosing $`f(t)=t\log t`$ gives the forward KL divergence $`\mathrm{KL}(p\,\|\,q)`$, $`f(t)=-\log t`$ the reverse, $`f(t)=\frac12|t-1|`$ the total variation distance, and a symmetric combination the **Jensen–Shannon divergence**,
 
-$$
+```math
 \mathrm{JS}(p,q)=\tfrac12\mathrm{KL}\bigl(p\,\big\|\,m\bigr)+\tfrac12\mathrm{KL}\bigl(q\,\big\|\,m\bigr),\qquad m=\tfrac12(p+q),
-$$
+```
 
 which is bounded by $`\log2`$ and which the original adversarial network minimizes (chapter 5). Every f-divergence has a variational form as a maximum over functions of the difference between expectations under $`p`$ and under $`q`$ ([Appendix B](#block-gen01-appendix-b)), and this form lets a divergence be estimated, and minimized, from samples alone, with a neural network in the role of the function; this is the principle behind adversarial training in general ([Nowozin, Cseke, and Tomioka, 2016](https://arxiv.org/abs/1606.00709)).
 
@@ -164,9 +164,9 @@ Divergences built on density ratios behave badly when the two distributions bare
 
 An **integral probability metric** compares distributions through the expectations of test functions instead of density ratios:
 
-$$
+```math
 d_{\mathcal F}(p,q)=\sup_{f\in\mathcal F}\Bigl|\mathbb E_p[f(x)]-\mathbb E_q[f(x)]\Bigr|.
-$$
+```
 
 With $`\mathcal F`$ the functions with Lipschitz constant at most 1, it is the **Wasserstein-1 distance**, the minimum average distance that mass must travel to transform $`q`$ into $`p`$, which grows with how far apart the distributions are even when they do not overlap ([Arjovsky, Chintala, and Bottou, 2017](https://arxiv.org/abs/1701.07875)). With $`\mathcal F`$ the unit ball of a reproducing-kernel Hilbert space, it is the **maximum mean discrepancy** (MMD), which has a closed-form estimate from samples in terms of kernel evaluations ([Gretton et al., 2012](https://jmlr.org/papers/v13/gretton12a.html); [Appendix C](#block-gen01-appendix-c)). The figure compares the behaviors.
 
@@ -259,9 +259,9 @@ Chapters 2–5 develop the families that model the data in one pass through a ne
 
 **Dequantization.** Let $`y=x+u`$ with $`u`$ uniform on $`[0,1)^D`$, and let $`p`$ be a density on $`\mathbb R^D`$. Define the discrete model $`P(x)=\int_{[0,1)^D}p(x+u)\,du`$. By Jensen's inequality,
 
-$$
+```math
 \mathbb E_u[\log p(x+u)]\le\log\mathbb E_u[p(x+u)]=\log P(x),
-$$
+```
 
 so the average continuous log-likelihood of dequantized data is a lower bound on the discrete log-likelihood of the implied model, and maximizing it cannot exploit the discreteness of the data. Learned dequantization noise, fitted by a variational bound, tightens the gap.
 
@@ -275,17 +275,17 @@ so the average continuous log-likelihood of dequantized data is a lower bound on
 
 The convex conjugate of $`f`$ is $`f^*(u)=\sup_t\bigl(ut-f(t)\bigr)`$, and because $`f`$ is convex and lower semicontinuous, $`f(t)=\sup_u\bigl(ut-f^*(u)\bigr)`$. Substituting into the definition,
 
-$$
+```math
 D_f(p\,\|\,q)=\mathbb E_q\Bigl[\sup_u\Bigl(u\,\tfrac{p(x)}{q(x)}-f^*(u)\Bigr)\Bigr]\ge\sup_{T}\Bigl(\mathbb E_p[T(x)]-\mathbb E_q[f^*(T(x))]\Bigr),
-$$
+```
 
 where the supremum is over functions $`T`$, with equality when $`T(x)=f'\bigl(p(x)/q(x)\bigr)`$. The right side involves only expectations, so it can be estimated from samples of $`p`$ and $`q`$, and maximizing it over a network $`T`$ gives an estimate of the divergence and, at the optimum, of the density ratio. For the KL divergence, $`f(t)=t\log t`$, $`f^*(u)=e^{u-1}`$, and the bound is $`\mathbb E_p[T]-\mathbb E_q[e^{T-1}]`$.
 
 For the Jensen–Shannon divergence, write $`T`$ in terms of a classifier $`D(x)\in(0,1)`$. The quantity
 
-$$
+```math
 V(D)=\mathbb E_p[\log D(x)]+\mathbb E_q[\log(1-D(x))]
-$$
+```
 
 is maximized pointwise by $`D^*(x)=p(x)/(p(x)+q(x))`$, and substituting gives $`V(D^*)=2\,\mathrm{JS}(p,q)-\log4`$. This is the value of the discriminator in the original adversarial network, which chapter 5 develops.
 
@@ -299,23 +299,23 @@ is maximized pointwise by $`D^*(x)=p(x)/(p(x)+q(x))`$, and substituting gives $`
 
 **MMD.** Let $`k`$ be a positive-definite kernel with feature map $`\phi`$ into a Hilbert space $`\mathcal H`$, so that $`k(x,y)=\langle\phi(x),\phi(y)\rangle`$. Over the unit ball of $`\mathcal H`$, the supremum of $`\mathbb E_p[f]-\mathbb E_q[f]`$ is attained by $`f`$ proportional to $`\mu_p-\mu_q`$, where $`\mu_p=\mathbb E_p[\phi(x)]`$ is the **mean embedding**, so
 
-$$
+```math
 \mathrm{MMD}^2(p,q)=\|\mu_p-\mu_q\|^2=\mathbb E[k(x,x')]+\mathbb E[k(y,y')]-2\,\mathbb E[k(x,y)],
-$$
+```
 
 with $`x,x'\sim p`$ and $`y,y'\sim q`$ independent. Averaging the kernel over pairs of distinct samples gives an unbiased estimate. For characteristic kernels such as the Gaussian, $`\mathrm{MMD}=0`$ only when $`p=q`$. For the two Gaussians of the figure, $`\mathcal N(0,s^2)`$ and $`\mathcal N(\theta,s^2)`$, with $`k(x,y)=e^{-(x-y)^2/2h^2}`$, each expectation is a Gaussian integral and
 
-$$
+```math
 \mathrm{MMD}^2=\frac{2h}{\sqrt{h^2+2s^2}}\Bigl(1-e^{-\theta^2/2(h^2+2s^2)}\Bigr),
-$$
+```
 
 which grows quadratically for small shifts and saturates once $`\theta`$ exceeds the kernel width.
 
 **Wasserstein distances.** The Wasserstein-$`p`$ distance is $`W_p(p,q)=\bigl(\inf_\gamma\mathbb E_{(x,y)\sim\gamma}\|x-y\|^p\bigr)^{1/p}`$, the infimum over couplings $`\gamma`$ with marginals $`p`$ and $`q`$. The Kantorovich–Rubinstein duality gives $`W_1(p,q)=\sup_{\|f\|_{\mathrm{Lip}}\le1}\mathbb E_p[f]-\mathbb E_q[f]`$, an integral probability metric. For a shift of a distribution by $`\theta`$, $`W_1=|\theta|`$, because transporting every point by $`\theta`$ is optimal. Between Gaussians the squared $`W_2`$ distance has a closed form,
 
-$$
+```math
 W_2^2\bigl(\mathcal N(\mu_1,\Sigma_1),\mathcal N(\mu_2,\Sigma_2)\bigr)=\|\mu_1-\mu_2\|^2+\operatorname{tr}\Bigl(\Sigma_1+\Sigma_2-2\bigl(\Sigma_1^{1/2}\Sigma_2\Sigma_1^{1/2}\bigr)^{1/2}\Bigr),
-$$
+```
 
 which chapter 13 applies to features of images as the Fréchet inception distance.
 

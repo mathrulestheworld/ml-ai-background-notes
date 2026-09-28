@@ -12,15 +12,15 @@ The notation follows Foundations: a class $`\mathcal H`$ of binary classifiers $
 
 Two finite-class results from Foundations recur throughout. For a class of $`M`$ classifiers in the realizable case, every consistent learner that returns a member of the class has error at most $`\varepsilon`$ with probability at least $`1-\delta`$ once
 
-$$
+```math
 n\ge\frac{\ln M+\ln(1/\delta)}{\varepsilon},
-$$
+```
 
 because a fixed classifier with error above $`\varepsilon`$ survives $`n`$ examples with probability at most $`(1-\varepsilon)^n\le e^{-n\varepsilon}`$, and a union bound covers the whole class (PAC learning and its limits). Without realizability, Hoeffding's inequality and a union bound show that with probability at least $`1-\delta`$ every classifier in the class satisfies
 
-$$
+```math
 \bigl\lvert R(h)-\widehat R_n(h)\bigr\rvert\le\varepsilon_n(M,\delta):=\sqrt{\frac{\ln(2M/\delta)}{2n}},
-$$
+```
 
 so an empirical risk minimizer has risk at most $`\inf_{h\in\mathcal H}R(h)+2\varepsilon_n(M,\delta)`$ (From concentration to generalization).
 
@@ -34,9 +34,9 @@ The **tightest-fit learner** returns the smallest rectangle $`\widehat B`$ conta
 
 **Theorem.** For every distribution on $`\mathbb R^2`$ and every target rectangle, if
 
-$$
+```math
 n\ge\frac4\varepsilon\ln\frac4\delta,
-$$
+```
 
 then with probability at least $`1-\delta`$ the tightest-fit rectangle has error at most $`\varepsilon`$.
 
@@ -60,9 +60,9 @@ Let $`\mathcal X=\{0,1\}^d`$ and let $`\mathcal H`$ be the **conjunctions** of l
 
 Every literal of the target conjunction is satisfied by every positive example, so it is never removed. The output therefore contains all of the target's literals and is at least as restrictive: whenever the output predicts $`1`$, so does the target. It thus predicts $`0`$ on every negative example, and it predicts $`1`$ on every positive example seen, because each literal it keeps survived all of them. The output is consistent with all training examples. Since $`\lvert\mathcal H\rvert\le3^d+1\le2\cdot3^d`$, the realizable finite-class bound of Foundations shows that
 
-$$
+```math
 n\ge\frac1\varepsilon\Bigl(d\ln3+\ln\frac2\delta\Bigr)
-$$
+```
 
 examples suffice, and the algorithm runs in $`O(nd)`$ time. Conjunctions are therefore **efficiently PAC learnable**: both the number of examples and the running time are polynomial in $`d`$, $`1/\varepsilon`$, and $`\ln(1/\delta)`$.
 
@@ -72,9 +72,9 @@ Statistical and computational learnability can separate. A **3-term DNF** formul
 
 The obstacle disappears if the learner may output a different representation. Distributing the disjunction gives
 
-$$
+```math
 T_1\vee T_2\vee T_3=\bigwedge_{u\in T_1,\,v\in T_2,\,w\in T_3}(u\vee v\vee w),
-$$
+```
 
 where $`u`$, $`v`$, and $`w`$ range over the literals of $`T_1`$, $`T_2`$, and $`T_3`$. The result is a **3-CNF** (conjunctive normal form): a conjunction of clauses with three literals each. Treating each of the $`O(d^3)`$ possible clauses as a new Boolean variable turns learning 3-CNF into learning a conjunction, which the elimination algorithm does with running time and a number of examples polynomial in $`d`$, $`1/\varepsilon`$, and $`\ln(1/\delta)`$. Every 3-term DNF is a 3-CNF, so the target stays realizable in the larger class, and the class of 3-term DNF formulas is therefore efficiently learnable **improperly**, by outputting a 3-CNF. The choice of hypothesis representation can decide whether a learning problem is tractable. Stronger, cryptographic hardness results show that some classes, such as small Boolean circuits, cannot be learned efficiently in any representation under standard assumptions.
 
@@ -84,17 +84,17 @@ where $`u`$, $`v`$, and $`w`$ range over the literals of $`T_1`$, $`T_2`$, and $
 
 For a class of binary classifiers, the **growth function** $`\Pi_{\mathcal H}(m)`$ is the largest number of distinct labelings the class produces on $`m`$ points, and the **VC dimension** $`v`$ is the largest $`m`$ with $`\Pi_{\mathcal H}(m)=2^m`$; both are defined in Infinite classes and VC dimension. The uniform deviation bounds in Foundations depend on $`\ln\Pi_{\mathcal H}(n)`$, which takes the place of $`\ln M`$ in the finite-class bound; the proof in Foundations, Appendix B gives, with probability at least $`1-\delta`$ and simultaneously for all $`h\in\mathcal H`$,
 
-$$
+```math
 \bigl\lvert R(h)-\widehat R_n(h)\bigr\rvert\le2\sqrt{\frac{2\ln\Pi_{\mathcal H}(n)}{n}}+\sqrt{\frac{\ln(2/\delta)}{2n}}.
-$$
+```
 
 If $`\ln\Pi_{\mathcal H}(n)`$ grew linearly in $`n`$, as it does when every labeling is possible, the bounds would be vacuous: they would not tend to zero. Sauer's lemma shows that finite VC dimension forces polynomial growth, so that $`\ln\Pi_{\mathcal H}(n)`$ grows only like $`v\ln n`$.
 
 **Lemma (Sauer–Shelah).** If $`\operatorname{VCdim}(\mathcal H)=v<\infty`$, then for every $`m`$,
 
-$$
+```math
 \Pi_{\mathcal H}(m)\le\Phi_v(m):=\sum_{j=0}^v\binom mj.
-$$
+```
 
 **Proof.** Induct on $`m+v`$. If $`v=0`$, no point can be labeled both ways, so every set of points has at most one labeling, and $`\Phi_0(m)=1`$. If $`m\le v`$, then $`\Phi_v(m)=2^m`$ and the bound is trivial. Otherwise fix points $`C=\{x_1,\ldots,x_m\}`$, write $`C'=C\setminus\{x_m\}`$, and let $`\mathcal H_C`$ be the set of labelings of $`C`$ produced by $`\mathcal H`$. Define two classes of labelings of $`C'`$:
 
@@ -103,9 +103,9 @@ $$
 
 Each labeling of $`C'`$ in $`\mathcal H'`$ extends to one or two labelings of $`C`$, and it extends to two exactly when it lies in $`\mathcal H''`$. Hence $`\lvert\mathcal H_C\rvert=\lvert\mathcal H'\rvert+\lvert\mathcal H''\rvert`$. The class $`\mathcal H'`$ has VC dimension at most $`v`$. The class $`\mathcal H''`$ has VC dimension at most $`v-1`$: if it shattered a set $`S\subseteq C'`$, then $`\mathcal H`$ would shatter $`S\cup\{x_m\}`$, because every labeling of $`S`$ occurs with both labels of $`x_m`$. By induction,
 
-$$
+```math
 \lvert\mathcal H_C\rvert\le\Phi_v(m-1)+\Phi_{v-1}(m-1)=\Phi_v(m),
-$$
+```
 
 by Pascal's rule $`\binom{m-1}j+\binom{m-1}{j-1}=\binom mj`$. $`\square`$
 
@@ -190,9 +190,9 @@ For homogeneous halfspaces, the standard basis vectors $`e_1,\ldots,e_d`$ are sh
 
 VC dimension often resembles a parameter count, but the two are different. The one-parameter class $`h_\omega(x)=\mathbf 1\{\sin(\omega x)>0\}`$ on $`\mathbb R`$ has **infinite** VC dimension. The points $`x_i=2^{-i}`$, $`i=1,\ldots,m`$, are shattered: for labels $`y_1,\ldots,y_m`$, take
 
-$$
+```math
 \omega=\pi\Bigl(1+\sum_{i:\,y_i=0}2^i\Bigr).
-$$
+```
 
 For the point $`x_j`$, the product $`\omega x_j=\pi2^{-j}+\pi\sum_{i:\,y_i=0}2^{i-j}`$ splits into three parts. Terms with $`i>j`$ contribute even multiples of $`\pi`$, which do not change the sign of the sine. The term $`i=j`$, present when $`y_j=0`$, contributes exactly $`\pi`$. The remaining terms contribute $`\pi\,2^{-j}\bigl(1+\sum_{i<j,\,y_i=0}2^i\bigr)`$, which lies in $`(0,\pi)`$ because $`1+\sum_{i<j}2^i=2^j-1`$. So $`\omega x_j`$ lies in $`(0,\pi)`$ modulo $`2\pi`$ when $`y_j=1`$ and in $`(\pi,2\pi)`$ when $`y_j=0`$. Capacity is a property of the function class's geometry, which a single real parameter can encode with unbounded precision.
 
@@ -208,9 +208,9 @@ Conversely, a class with many parameters can have small effective capacity when 
 
 **Proof.** For each labeling $`y`$, summing the margin conditions and applying the Cauchy–Schwarz inequality with $`\|w\|_2\le1`$ gives $`m\gamma\le w^\top\sum_iy_ix_i\le\|\sum_iy_ix_i\|_2`$. Since this holds for every labeling, it holds on average over independent uniform random signs $`y_i`$. By Jensen's inequality, and because the cross terms vanish ($`\mathbb E\,y_iy_j=0`$ for $`i\ne j`$),
 
-$$
+```math
 m\gamma\le\mathbb E\Bigl\|\sum_iy_ix_i\Bigr\|_2\le\Bigl(\mathbb E\Bigl\|\sum_iy_ix_i\Bigr\|_2^2\Bigr)^{1/2}=\Bigl(\sum_i\|x_i\|_2^2\Bigr)^{1/2}\le R\sqrt m.
-$$
+```
 
 Hence $`\sqrt m\le R/\gamma`$. $`\square`$
 
@@ -259,21 +259,21 @@ The theorem is specific to binary classification with the zero–one loss and to
 
 A single class of finite VC dimension forces a fixed tradeoff between approximation and estimation error. A nested sequence $`\mathcal H_1\subseteq\mathcal H_2\subseteq\cdots`$ of increasing capacity, such as polynomials of increasing degree or trees of increasing depth, lets the data choose. **Structural risk minimization** (SRM) assigns class $`k`$ a failure probability $`\delta_k`$ with $`\sum_k\delta_k\le\delta`$, for example $`\delta_k=\delta/(k(k+1))`$, and a corresponding uniform deviation bound $`\epsilon_k(n,\delta_k)`$ from the VC theory of that class: with probability at least $`1-\delta_k`$, every $`h\in\mathcal H_k`$ has $`\lvert R(h)-\widehat R_n(h)\rvert\le\epsilon_k(n,\delta_k)`$. The bound grows with $`k`$, because the capacity grows and $`\delta_k`$ shrinks. SRM then minimizes
 
-$$
+```math
 \widehat R_n(h)+\epsilon_{k(h)}(n,\delta_{k(h)}),
-$$
+```
 
 where $`k(h)`$ is the first class containing $`h`$. Because the bounds increase with $`k`$, this amounts to fitting an empirical risk minimizer in each class and choosing the class whose training error plus bound is smallest. By the union bound over classes, all the per-class bounds hold simultaneously with probability at least $`1-\delta`$, and on that event the SRM choice satisfies
 
-$$
+```math
 R(\hat h)\le\min_k\Bigl[\inf_{h\in\mathcal H_k}R(h)+2\epsilon_k(n,\delta_k)\Bigr].
-$$
+```
 
 Indeed, abbreviate $`\epsilon_k(n,\delta_k)`$ as $`\epsilon_k`$. For any $`k`$ and any $`h\in\mathcal H_k`$, the bound for the class of $`\hat h`$, the minimizing property of $`\hat h`$, and the bound for the class of $`h`$ give
 
-$$
+```math
 R(\hat h)\le\widehat R_n(\hat h)+\epsilon_{k(\hat h)}\le\widehat R_n(h)+\epsilon_{k(h)}\le R(h)+2\epsilon_{k(h)}\le R(h)+2\epsilon_k,
-$$
+```
 
 where the last step uses $`k(h)\le k`$ and the growth of the bounds with $`k`$. The learner competes with every class at once, paying only for the class that the comparison actually uses, plus the logarithmic cost of the weights. Classes that are countable unions of finite-VC classes are **nonuniformly learnable** in this way: the required sample size may depend on the target, but no fixed class needs to be chosen in advance. The finite-class version with description-length weights appears in Foundations.
 
@@ -281,9 +281,9 @@ where the last step uses $`k(h)\le k`$ and the growth of the bounds with $`k`$. 
 
 The penalties in SRM are worst-case bounds and are usually far too large to guide practice. Validation replaces them by data. Fit one candidate $`\hat h_k`$ in each of $`K`$ classes on the training data; then evaluate all $`K`$ on an independent validation set of size $`m`$. Conditional on the training data, the candidates are $`K`$ fixed classifiers, and the finite-class bound gives, with probability at least $`1-\delta`$,
 
-$$
+```math
 R(\hat h_{\hat k})\le\min_kR(\hat h_k)+2\sqrt{\frac{\ln(2K/\delta)}{2m}},
-$$
+```
 
 where $`\hat k`$ minimizes validation error. Choosing among $`K`$ candidates costs only a factor $`\ln K`$. This is the theoretical reason that hold-out selection works well even among many models, and also a reminder that the cost is not zero: selecting among thousands of configurations with a small validation set can overfit it, as chapter 6 demonstrates. Foundations discusses the same distinction between evaluating a fixed classifier and selecting among many.
 
@@ -301,9 +301,9 @@ In the **mistake-bound model**, examples arrive one at a time in an arbitrary or
 
 For a finite class, the **halving algorithm** maintains the **version space**, the set of classifiers consistent with all labels seen so far, and predicts by majority vote over it. Every mistake means that at least half of the version space voted wrongly and is eliminated. The target is never eliminated, so after $`M`$ mistakes $`1\le\lvert\mathcal H\rvert2^{-M}`$, and
 
-$$
+```math
 M\le\log_2\lvert\mathcal H\rvert.
-$$
+```
 
 ```python
 import numpy as np
@@ -339,9 +339,9 @@ The optimal mistake bound of a class is characterized by its **Littlestone dimen
 
 When no classifier in the class is perfect, the goal becomes competing with the best one. Suppose $`N`$ experts predict each binary label. The **weighted majority algorithm** of [Littlestone and Warmuth (1994)](https://www.sciencedirect.com/science/article/pii/S0890540184710091) gives every expert weight one, predicts by weighted majority vote, and multiplies the weight of every expert that errs by $`\beta\in(0,1)`$. If the best expert makes $`m^\ast`$ mistakes, the algorithm makes at most
 
-$$
+```math
 M\le\frac{m^\ast\log_2(1/\beta)+\log_2N}{\log_2\bigl(2/(1+\beta)\bigr)},
-$$
+```
 
 which is $`M\le2.41(m^\ast+\log_2N)`$ for $`\beta=1/2`$. The proof, in [Appendix B](#block-theory-appendix-b), tracks the total weight: each algorithm mistake removes at least a quarter of it when $`\beta=1/2`$, while the best expert's weight alone is at least $`\beta^{m^\ast}`$. The figure runs the algorithm with $`\beta=1/2`$ against 64 simulated experts, one of which is much better than the others.
 
@@ -359,11 +359,11 @@ The deterministic bound has a factor above one in front of $`m^\ast`$, and no de
 
 For $`m\ge v\ge1`$, since $`v/m\le1`$,
 
-$$
+```math
 \sum_{j=0}^v\binom mj\le\sum_{j=0}^v\binom mj\Bigl(\frac mv\Bigr)^{v-j}
 =\Bigl(\frac mv\Bigr)^v\sum_{j=0}^v\binom mj\Bigl(\frac vm\Bigr)^j
 \le\Bigl(\frac mv\Bigr)^v\Bigl(1+\frac vm\Bigr)^m\le\Bigl(\frac{em}v\Bigr)^v.
-$$
+```
 
 The first inequality multiplies each term by $`(m/v)^{v-j}\ge1`$. The second extends the sum to $`j=m`$ and applies the binomial theorem; the last uses $`1+u\le e^u`$. Thus $`\ln\Pi_{\mathcal H}(m)\le v\ln(em/v)`$, which is what enters the VC generalization bound in Foundations.
 
@@ -376,15 +376,15 @@ The first inequality multiplies each term by $`(m/v)^{v-j}\ge1`$. The second ext
 
 Let $`W_t`$ be the total weight before round $`t`$, with $`W_1=N`$. On a round where the algorithm errs, the experts that voted wrongly held at least half of the weight, and their weights are multiplied by $`\beta`$. Hence
 
-$$
+```math
 W_{t+1}\le\frac{W_t}2+\beta\frac{W_t}2=\frac{1+\beta}2W_t.
-$$
+```
 
 On other rounds the weight does not increase. After $`M`$ algorithm mistakes, $`W_{T+1}\le N\bigl((1+\beta)/2\bigr)^M`$. The best expert, with $`m^\ast`$ mistakes, keeps weight $`\beta^{m^\ast}`$, so $`W_{T+1}\ge\beta^{m^\ast}`$. Combining and taking base-two logarithms,
 
-$$
+```math
 m^\ast\log_2\beta\le\log_2N+M\log_2\frac{1+\beta}2,
-$$
+```
 
 which rearranges to the stated bound. For $`\beta=1/2`$, $`\log_2(4/3)\approx0.415`$ gives the constant $`1/0.415\approx2.41`$.
 

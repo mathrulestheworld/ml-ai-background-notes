@@ -10,9 +10,9 @@
 
 A **finite mixture model** explains each observation as coming from one of $`K`$ unobserved groups. Its generative story has two steps: draw a latent label $`z\in\{1,\ldots,K\}`$ with probabilities $`\pi_1,\ldots,\pi_K`$, then draw $`x`$ from the component distribution of that group. The **mixing weights** $`\pi_k`$ are nonnegative and sum to one. In a **Gaussian mixture**, the components are multivariate normal, and $`\mathcal N(x\mid\mu_k,\Sigma_k)`$ denotes the density of $`\mathcal N(\mu_k,\Sigma_k)`$ at $`x\in\mathbb R^d`$, given in Probability and Statistics. Summing the joint density of $`z=k`$ and $`x`$ over the unobserved label gives the density of an observation,
 
-$$
+```math
 p(x\mid\theta)=\sum_{k=1}^K\pi_k\,\mathcal N(x\mid\mu_k,\Sigma_k),\qquad \theta=\{\pi_k,\mu_k,\Sigma_k\}_{k=1}^K ,
-$$
+```
 
 where $`\theta`$ collects all the parameters. Conditioning on $`z`$ also gives the mixture's moments. By the tower property and the law of total covariance of Probability and Statistics, whose worked example is a two-component mixture, the mean is $`\bar\mu=\sum_k\pi_k\mu_k`$ and the covariance is $`\sum_k\pi_k\Sigma_k+\sum_k\pi_k(\mu_k-\bar\mu)(\mu_k-\bar\mu)^\top`$, the average spread within components plus the spread of the component means. The mixture itself is not Gaussian: its density can have several modes, be skewed, or have heavier tails than a Gaussian.
 
@@ -24,9 +24,9 @@ Mixtures serve two purposes. As a **clustering** method, they generalize k-means
 
 Given the parameters, Bayes' rule gives the posterior probability that observation $`x_i`$ came from component $`k`$, its **responsibility**:
 
-$$
+```math
 r_{ik}=P(z_i=k\mid x_i,\theta)=\frac{\pi_k\,\mathcal N(x_i\mid\mu_k,\Sigma_k)}{\sum_{j=1}^K\pi_j\,\mathcal N(x_i\mid\mu_j,\Sigma_j)} .
-$$
+```
 
 The numerator is the joint density of the label $`z_i=k`$ and the observation $`x_i`$, and the denominator is $`p(x_i\mid\theta)`$. The responsibilities of each observation sum to one. They are a soft clustering: points deep inside a component have one responsibility near one, and points between components share their membership. The same ratio can be evaluated at any point $`x`$. Written $`r_k(x)`$, so that $`r_{ik}=r_k(x_i)`$, it is the share of the mixture density at $`x`$ that component $`k`$ contributes.
 
@@ -44,17 +44,17 @@ In two dimensions the same soft assignment can be shown by color.
 
 For iid observations the log-likelihood, in the sense of Probability and Statistics, is
 
-$$
+```math
 \ell(\theta)=\sum_{i=1}^n\log\sum_{k=1}^K\pi_k\,\mathcal N(x_i\mid\mu_k,\Sigma_k).
-$$
+```
 
 Throughout the chapter, $`\log`$ is the natural logarithm. The logarithm of a sum does not separate into terms for each component, and setting derivatives to zero gives coupled equations without a closed-form solution. The gradient of $`\mathcal N(x\mid\mu,\Sigma)`$ in $`\mu`$ is $`\mathcal N(x\mid\mu,\Sigma)\,\Sigma^{-1}(x-\mu)`$, so differentiating the logarithm of the mixture density produces the responsibilities, and the stationarity condition for a mean is
 
-$$
+```math
 \nabla_{\mu_k}\ell(\theta)=\sum_{i=1}^nr_{ik}\,\Sigma_k^{-1}(x_i-\mu_k)=0,
 \qquad\text{that is,}\qquad
 \mu_k=\frac{\sum_ir_{ik}\,x_i}{\sum_ir_{ik}} .
-$$
+```
 
 A stationary mean is a responsibility-weighted average of the data, but the weights $`r_{ik}`$ themselves depend on $`\mu_k`$ and on every other parameter, so the right side is not an explicit formula. The conditions for the weights and covariances have the same structure. Beyond the lack of a closed form, the log-likelihood has three awkward properties.
 
@@ -72,11 +72,11 @@ The **expectation–maximization** (EM) algorithm ([Dempster, Laird, and Rubin, 
 
 **M-step.** With $`N_k=\sum_ir_{ik}`$, the effective number of observations in component $`k`$, update
 
-$$
+```math
 \pi_k=\frac{N_k}n,\qquad
 \mu_k=\frac1{N_k}\sum_ir_{ik}\,x_i,\qquad
 \Sigma_k=\frac1{N_k}\sum_ir_{ik}\,(x_i-\mu_k)(x_i-\mu_k)^\top .
-$$
+```
 
 The updated values form $`\theta^{(t+1)}`$, and the covariance update uses the updated mean. The M-step is the QDA estimate of chapter 4 with each observation assigned fractionally to every class, in proportion to its responsibilities ([Appendix A](#block-gmm-appendix-a) derives it). It is also the stationarity condition derived above with the responsibilities frozen at their current values, which is what makes it solvable. Each iteration costs $`O(nKd^2)`$ operations for the densities, plus $`O(Kd^3)`$ for factorizing the covariance matrices.
 
@@ -84,16 +84,16 @@ The updated values form $`\theta^{(t+1)}`$, and the covariance update uses the u
 
 EM applies far beyond mixtures, and its logic is clearest in general terms. Call $`(x,z)`$ the **complete data** and $`x`$ alone the **observed data**, where $`x=(x_1,\ldots,x_n)`$ and $`z=(z_1,\ldots,z_n)`$ collect all observations and labels. If the labels were observed, the **complete-data log-likelihood**
 
-$$
+```math
 \ell_c(\theta)=\sum_i\sum_k\mathbf 1\{z_i=k\}\bigl[\log\pi_k+\log\mathcal N(x_i\mid\mu_k,\Sigma_k)\bigr]
-$$
+```
 
 would be easy to maximize, since it separates by component. The labels are unknown, but $`\ell_c`$ is linear in the indicators $`\mathbf 1\{z_i=k\}`$. Its conditional expectation given the data and the current parameters therefore replaces each indicator by $`\mathbb E\bigl[\mathbf 1\{z_i=k\}\mid x_i,\theta^{(t)}\bigr]=P(z_i=k\mid x_i,\theta^{(t)})`$, which is the responsibility $`r_{ik}`$ computed at $`\theta^{(t)}`$. EM maximizes the resulting **expected complete-data log-likelihood**
 
-$$
+```math
 Q(\theta\mid\theta^{(t)})=\mathbb E_{z\sim p(z\mid x,\theta^{(t)})}\bigl[\log p(x,z\mid\theta)\bigr]
 =\sum_i\sum_kr_{ik}\bigl[\log\pi_k+\log\mathcal N(x_i\mid\mu_k,\Sigma_k)\bigr].
-$$
+```
 
 The E-step computes the expectation, which amounts to computing the responsibilities; the M-step maximizes it over $`\theta`$, which gives the weighted estimates above.
 
@@ -161,15 +161,15 @@ The data were generated with weights $`0.5,0.3,0.2`$ and means $`(0,0)`$, $`(4,3
 
 Let $`q`$ be any distribution over the latent labels of one observation, positive wherever the posterior $`p(z\mid x,\theta)`$ is. Because $`\log`$ is concave, Jensen's inequality (Probability and Statistics), $`\log\mathbb E\,Y\ge\mathbb E\log Y`$, applied to the random variable $`Y=p(x,z\mid\theta)/q(z)`$ with $`z`$ drawn from $`q`$, gives
 
-$$
+```math
 \log p(x\mid\theta)=\log\sum_zq(z)\frac{p(x,z\mid\theta)}{q(z)}\ \ge\ \sum_zq(z)\log\frac{p(x,z\mid\theta)}{q(z)}\ =:\ F(q,\theta).
-$$
+```
 
 The sums run over the $`K`$ values of $`z`$. The gap is exactly a Kullback–Leibler divergence (Information and Learning Theory):
 
-$$
+```math
 \log p(x\mid\theta)=F(q,\theta)+D_{\mathrm{KL}}\bigl(q\,\big\|\,p(z\mid x,\theta)\bigr).
-$$
+```
 
 Because the logarithms here are natural, the divergence is measured in nats. Information and Learning Theory measures it in bits, which divides every term of the identity by $`\log2`$ and changes nothing below. To verify the identity, write $`p(x,z\mid\theta)=p(z\mid x,\theta)\,p(x\mid\theta)`$ inside $`F`$; [Appendix B](#block-gmm-appendix-b) gives the details. The quantity $`\log p(x\mid\theta)`$ is called the **evidence**, and $`F`$ the **evidence lower bound** (ELBO) in the variational-inference literature. Summed over observations, with a separate $`q_i`$ for each, it bounds $`\ell(\theta)`$.
 
@@ -184,9 +184,9 @@ The two EM steps maximize $`F`$ over its two arguments in turn ([Neal and Hinton
 
 **Proof.**
 
-$$
+```math
 \ell(\theta^{(t+1)})\ \ge\ F(q^{(t)},\theta^{(t+1)})\ \ge\ F(q^{(t)},\theta^{(t)})\ =\ \ell(\theta^{(t)}).
-$$
+```
 
 The first inequality holds because $`F`$ is a lower bound for every $`q`$; the second because the M-step maximizes $`F(q^{(t)},\cdot)`$; the equality because the E-step made the bound tight. $`\square`$
 
@@ -202,9 +202,9 @@ Monotonicity is a guarantee about the sequence of likelihood values, not about w
 
 EM's convergence is also slow when components overlap. Near a local maximum $`\hat\theta`$, the error shrinks by a roughly constant factor per iteration, and that factor is the fraction of information about $`\theta`$ that is missing because the labels are unobserved. Dempster, Laird, and Rubin make this precise. Let $`J_n(\hat\theta)=-\nabla^2\ell(\hat\theta)`$ be the observed information of Probability and Statistics, and let $`I_c(\hat\theta)=-\nabla_\theta^2Q(\theta\mid\hat\theta)`$ at $`\theta=\hat\theta`$ be the information the complete data would carry, averaged over the posterior of the labels. Their difference $`I_m=I_c-J_n`$ is the **missing information**; it equals the posterior covariance of the complete-data score $`\nabla_\theta\log p(x,z\mid\theta)`$ at $`\hat\theta`$, so it is positive semidefinite. Near $`\hat\theta`$ the EM update is approximately linear:
 
-$$
+```math
 \theta^{(t+1)}-\hat\theta\ \approx\ I_c(\hat\theta)^{-1}I_m(\hat\theta)\,\bigl(\theta^{(t)}-\hat\theta\bigr).
-$$
+```
 
 At a local maximum where $`J_n`$ is positive definite, the eigenvalues of the **fraction of missing information** $`I_c^{-1}I_m`$ lie in $`[0,1)`$, and the largest, $`\lambda`$, is the rate: the error falls roughly like $`\lambda^t`$, so each tenfold reduction takes about $`\log10/\log(1/\lambda)`$ iterations. Well-separated components have nearly certain labels, little missing information, and fast convergence; heavily overlapping ones have $`\lambda`$ close to one and can take thousands of iterations.
 
@@ -290,9 +290,9 @@ The scikit-learn example [Gaussian Mixture Model Selection](https://scikit-learn
 
 k-means is a limiting case of EM. Fix all covariances at $`\sigma^2I`$ and all weights at $`1/K`$. The responsibilities become
 
-$$
+```math
 r_{ik}=\frac{\exp\bigl(-\|x_i-\mu_k\|^2/2\sigma^2\bigr)}{\sum_j\exp\bigl(-\|x_i-\mu_j\|^2/2\sigma^2\bigr)},
-$$
+```
 
 a softmax of negative squared distances with temperature $`2\sigma^2`$. The boundary where two responsibilities are equal is the perpendicular bisector of the two means for every $`\sigma`$, because the normalizing constants cancel; shrinking $`\sigma`$ only sharpens the transition across it. As $`\sigma^2\to0`$, each responsibility tends to one for the nearest mean and zero otherwise, provided there are no ties. The E-step becomes the k-means assignment step, and the M-step for the means becomes the update step.
 
@@ -302,9 +302,9 @@ a softmax of negative squared distances with temperature $`2\sigma^2`$. The boun
 
 The objectives match as well. With $`d`$ the dimension, the expected complete-data log-likelihood of this restricted mixture is
 
-$$
+```math
 Q(\theta\mid\theta^{(t)})=\sum_i\sum_kr_{ik}\Bigl[-\log K-\frac d2\log(2\pi\sigma^2)-\frac{\|x_i-\mu_k\|^2}{2\sigma^2}\Bigr].
-$$
+```
 
 Multiply by $`\sigma^2`$ and let $`\sigma^2\to0`$. The first two terms vanish, the second because $`\sigma^2\log\sigma^2\to0`$, and each $`r_{ik}`$ becomes the indicator that $`\mu_k^{(t)}`$ is the current mean nearest to $`x_i`$, so $`\sigma^2Q`$ tends to $`-\frac12`$ times the within-cluster sum of squares $`W`$ of chapter 13, evaluated at that nearest-mean partition. Lloyd's algorithm is therefore **hard EM** for this restricted mixture, an EM whose E-step assigns each point entirely to its most responsible component.
 
@@ -338,9 +338,9 @@ General inference in graphical models with many interacting latent variables bel
 
 With responsibilities $`r_{ik}`$ fixed, the expected complete-data log-likelihood is
 
-$$
+```math
 Q=\sum_i\sum_kr_{ik}\Bigl[\log\pi_k-\frac12\log\det\Sigma_k-\frac12(x_i-\mu_k)^\top\Sigma_k^{-1}(x_i-\mu_k)\Bigr]+\text{const}.
-$$
+```
 
 **Weights.** Maximize $`\sum_kN_k\log\pi_k`$ subject to $`\sum_k\pi_k=1`$. The Lagrangian $`\sum_kN_k\log\pi_k+\lambda(1-\sum_k\pi_k)`$ has stationarity condition $`N_k/\pi_k=\lambda`$; summing $`\pi_k=N_k/\lambda`$ over $`k`$ gives $`\lambda=\sum_kN_k=n`$.
 
@@ -360,22 +360,22 @@ Each update is the corresponding observed-label estimate of chapter 4, with the 
 
 For one observation and any distribution $`q`$ over $`z`$ with $`q(z)>0`$ wherever $`p(z\mid x,\theta)>0`$,
 
-$$
+```math
 \begin{aligned}
 F(q,\theta)&=\sum_zq(z)\log\frac{p(x,z\mid\theta)}{q(z)}
 =\sum_zq(z)\log\frac{p(z\mid x,\theta)\,p(x\mid\theta)}{q(z)}\\
 &=\log p(x\mid\theta)-\sum_zq(z)\log\frac{q(z)}{p(z\mid x,\theta)}
 =\log p(x\mid\theta)-D_{\mathrm{KL}}\bigl(q\,\|\,p(z\mid x,\theta)\bigr).
 \end{aligned}
-$$
+```
 
 The second line uses $`\sum_zq(z)=1`$. Since the divergence is nonnegative and zero only when $`q`$ equals the posterior, this identity contains both Jensen's inequality and the exact form of the E-step. Summing over independent observations, each with its own $`q_i`$, gives $`\ell(\theta)=\sum_iF(q_i,\theta)+\sum_iD_{\mathrm{KL}}\bigl(q_i\,\|\,p(z_i\mid x_i,\theta)\bigr)`$.
 
 Splitting $`F`$ differently shows what the M-step maximizes:
 
-$$
+```math
 F(q,\theta)=\underbrace{\sum_zq(z)\log p(x,z\mid\theta)}_{Q\text{ when }q=p(z\mid x,\theta^{(t)})}+\underbrace{\Bigl(-\sum_zq(z)\log q(z)\Bigr)}_{\text{entropy of }q} .
-$$
+```
 
 The entropy term does not depend on $`\theta`$, so for fixed $`q`$ the M-step maximizes the expected complete-data log-likelihood alone.
 

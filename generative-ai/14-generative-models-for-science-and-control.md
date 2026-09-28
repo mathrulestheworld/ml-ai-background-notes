@@ -172,9 +172,9 @@ The atmosphere is chaotic: small errors in the initial state grow until, after a
 
 A forecast that is a distribution must be judged by a **proper scoring rule**, one whose expected value is best when the forecast distribution equals the true one (ML chapter 5 covers proper scoring for classifiers). For real-valued quantities, the standard is the **continuous ranked probability score** ([Gneiting and Raftery, 2007](https://doi.org/10.1198/016214506000001437)),
 
-$$
+```math
 \operatorname{CRPS}(F,y)=\mathbb E\,|X-y|-\tfrac12\,\mathbb E\,|X-X'|,\qquad X,X'\sim F\text{ independent},
-$$
+```
 
 in the orientation where lower is better, which reduces to the absolute error for a point forecast and rewards an ensemble for being close to the outcome but penalizes spread only as much as it is needed ([Appendix B](#block-gen14-appendix-b)). A calibrated ensemble also has a **spread–skill ratio** near one: the typical spread of its members matches the typical error of its mean. The code forecasts the chaotic system of [Lorenz (1963)](https://doi.org/10.1175/1520-0469%281963%29020%3C0130%3ADNF%3E2.0.CO%3B2) from noisy observations of its state, with a single run from the observation, with a 50-member ensemble whose perturbations match the observation error, and with an ensemble whose perturbations are ten times too small.
 

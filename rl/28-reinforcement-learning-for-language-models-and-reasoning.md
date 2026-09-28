@@ -16,23 +16,23 @@ Supervised fine-tuning on demonstrations is behavioral cloning (chapter 25) and 
 
 Optimizing a reward without restraint finds responses it scores highly for the wrong reasons, and destroys the fluency and diversity inherited from pretraining. Almost all methods therefore maximize the reward minus a penalty for moving away from a **reference policy** $`\pi_{\text{ref}}`$, usually the model before RL:
 
-$$
+```math
 J(\pi)=\mathbb E_{x}\Bigl[\mathbb E_{y\sim\pi(\cdot\mid x)}\bigl[r(x,y)\bigr]-\beta\,D_{\mathrm{KL}}\bigl(\pi(\cdot\mid x)\,\big\|\,\pi_{\text{ref}}(\cdot\mid x)\bigr)\Bigr].
-$$
+```
 
 Its maximizer is the reference policy reweighted by the exponentiated reward (exercise 28.1),
 
-$$
+```math
 \pi^*(y\mid x)=\frac1{Z(x)}\,\pi_{\text{ref}}(y\mid x)\exp\bigl(r(x,y)/\beta\bigr),\qquad Z(x)=\sum_y\pi_{\text{ref}}(y\mid x)\exp\bigl(r(x,y)/\beta\bigr),
-$$
+```
 
 and the optimal value is $`\beta\ln Z(x)`$. This is a Boltzmann policy, as in the maximum-entropy RL of chapter 21 with the reference in place of the uniform distribution, and it can be read as a Bayesian posterior with the reference as prior and $`\exp(r/\beta)`$ as likelihood ([Korbak, Perez, and Buckley, 2022](https://arxiv.org/abs/2205.11275)). The penalty keeps the policy where the reward model was trained and can be trusted, the concern of the offline RL of chapter 26.
 
 The sequence-level objective has a token-level form. Since the KL divergence between sequence distributions is the expected sum of per-token log-ratios, the penalty can be paid token by token, as a reward $`-\beta\ln\bigl(\pi(y_t\mid s_t)/\pi_{\text{ref}}(y_t\mid s_t)\bigr)`$ at every step $`s_t=(x,y_{<t})`$ with $`r(x,y)`$ added at the end. The result is entropy-regularized RL in a deterministic MDP, whose **soft** Bellman equations ([appendix A](#block-rl28-appendix-a)) give
 
-$$
+```math
 \beta\ln\frac{\pi^*(y_t\mid s_t)}{\pi_{\text{ref}}(y_t\mid s_t)}=Q^*(s_t,y_t)-V^*(s_t),\qquad V^*(s_t)=\beta\ln\sum_{a}\pi_{\text{ref}}(a\mid s_t)\,e^{Q^*(s_t,a)/\beta},
-$$
+```
 
 where $`Q^*(s_t,y_t)=V^*(s_{t+1})`$ for all but the last token. The optimal policy's log-ratio to the reference is a soft advantage, and summed over a response it telescopes to $`\bigl(r(x,y)-V^*(x)\bigr)/\beta`$. Direct preference optimization, which fits these log-ratios to preference data (NLP chapter 11), is therefore also learning a soft Q-function at the token level: every token receives credit according to how much it changed the soft value ([Rafailov, Hejna, Park, and Finn, 2024](https://arxiv.org/abs/2404.12358); exercise 28.2).
 
@@ -118,9 +118,9 @@ The first RLHF systems ([Ziegler et al., 2019](https://arxiv.org/abs/1909.08593)
 
 The alternatives treat a whole response as one action and use several responses per prompt to build a baseline. **REINFORCE** ([Williams, 1992](https://doi.org/10.1007/BF00992696)) with a baseline $`b(x)`$ estimates the gradient of the expected reward as $`(r(x,y)-b(x))\nabla\ln\pi_\theta(y\mid x)`$, where $`\nabla\ln\pi_\theta(y\mid x)=\sum_t\nabla\ln\pi_\theta(y_t\mid s_t)`$. With $`G`$ samples per prompt, the **leave-one-out** baseline, the mean reward of the other $`G-1`$ samples, is independent of the sample it is subtracted from and keeps the estimate unbiased ([Kool, van Hoof, and Welling, 2019](https://openreview.net/forum?id=r1lgTGL5DE)). **RLOO** ([Ahmadian et al., 2024](https://arxiv.org/abs/2402.14740)) showed that this simple estimator matches or beats PPO for RLHF, and that many of PPO's components are unnecessary when the reward is given per response; **ReMax** ([Li et al., 2024](https://arxiv.org/abs/2310.10505)) uses the reward of the greedy response as the baseline instead, and saved about half the memory of PPO. **Group relative policy optimization** (GRPO; [Shao et al., 2024](https://arxiv.org/abs/2402.03300)), introduced with the DeepSeekMath models and made famous by DeepSeek-R1, keeps PPO's clipped surrogate but replaces the critic with a group statistic: for $`G`$ responses to the same prompt, every token of response $`i`$ gets the advantage
 
-$$
+```math
 \hat A_i=\frac{r_i-\operatorname{mean}(r_1,\dots,r_G)}{\operatorname{std}(r_1,\dots,r_G)},
-$$
+```
 
 the loss of each response is averaged over its tokens, and the $`k_3`$ penalty of the previous section is added to the loss ([appendix B](#block-rl28-appendix-b) writes out GRPO and its successors in one notation). Subtracting the group mean, which includes the sample itself, gives the leave-one-out estimate scaled by $`(G-1)/G`$ (exercise 28.4), so the mean is harmless. The other two normalizations are not.
 
@@ -386,9 +386,13 @@ To label step $`t`$ of a solution, Math-Shepherd completes the partial solution 
 
 
 Treat generation as a deterministic MDP whose state $`s_t=(x,y_{<t})`$ is the prompt and the tokens so far, with the reward $`r(x,y)`$ given after the last token, and maximize $`\mathbb E_\pi[r(x,y)]-\beta D_{\mathrm{KL}}(\pi\,\|\,\pi_{\text{ref}})`$. Because $`\ln\frac{\pi(y\mid x)}{\pi_{\text{ref}}(y\mid x)}=\sum_t\ln\frac{\pi(y_t\mid s_t)}{\pi_{\text{ref}}(y_t\mid s_t)}`$, the objective is the expected return with a per-token reward $`-\beta\ln\frac{\pi(y_t\mid s_t)}{\pi_{\text{ref}}(y_t\mid s_t)}`$ and the final reward $`r`$. Define the optimal soft values backward from the end. At a state after the last token, the value is the reward. At any other state,
-$$Q^*(s_t,a)=V^*(s_t\oplus a),\qquad V^*(s_t)=\max_{p}\sum_ap(a)\Bigl(Q^*(s_t,a)-\beta\ln\frac{p(a)}{\pi_{\text{ref}}(a\mid s_t)}\Bigr),$$
+```math
+Q^*(s_t,a)=V^*(s_t\oplus a),\qquad V^*(s_t)=\max_{p}\sum_ap(a)\Bigl(Q^*(s_t,a)-\beta\ln\frac{p(a)}{\pi_{\text{ref}}(a\mid s_t)}\Bigr),
+```
 where $`s_t\oplus a`$ appends $`a`$ and the value of an end-of-sequence action is $`r`$. Each maximization is exercise 28.1 with one step, so
-$$\pi^*(a\mid s_t)=\pi_{\text{ref}}(a\mid s_t)\exp\Bigl(\frac{Q^*(s_t,a)-V^*(s_t)}\beta\Bigr),\qquad V^*(s_t)=\beta\ln\sum_a\pi_{\text{ref}}(a\mid s_t)e^{Q^*(s_t,a)/\beta}.$$
+```math
+\pi^*(a\mid s_t)=\pi_{\text{ref}}(a\mid s_t)\exp\Bigl(\frac{Q^*(s_t,a)-V^*(s_t)}\beta\Bigr),\qquad V^*(s_t)=\beta\ln\sum_a\pi_{\text{ref}}(a\mid s_t)e^{Q^*(s_t,a)/\beta}.
+```
 Multiplying the token probabilities along a response, the soft advantages telescope (exercise 28.2), and $`\pi^*(y\mid x)=\pi_{\text{ref}}(y\mid x)\exp\bigl((r(x,y)-V^*(x))/\beta\bigr)`$, the sequence-level optimum of exercise 28.1 with $`V^*(x)=\beta\ln Z(x)`$. The token-level and sequence-level views therefore agree, and the optimal policy's per-token log-ratios to the reference are soft advantages. Since the transitions are deterministic, the soft Bellman equation involves no expectation over next states, which is why a learned policy's log-ratios can be read as a Q-function, the observation behind [Rafailov, Hejna, Park, and Finn (2024)](https://arxiv.org/abs/2404.12358).
 
 </details>
@@ -402,13 +406,17 @@ Multiplying the token probabilities along a response, the soft advantages telesc
 For a prompt $`x`$, sample $`G`$ responses $`y_i`$ from the policy $`\pi_{\text{old}}`$ that generated the batch, with rewards $`r_i`$. Let $`w_{i,t}(\theta)=\pi_\theta(y_{i,t}\mid s_{i,t})/\pi_{\text{old}}(y_{i,t}\mid s_{i,t})`$ be the token-level importance ratio, $`\hat A_i`$ the advantage of response $`i`$, and $`\operatorname{clip}_\epsilon(w)=\min(\max(w,1-\epsilon),1+\epsilon)`$. All objectives are maximized.
 
 **GRPO** ([Shao et al., 2024](https://arxiv.org/abs/2402.03300)): $`\hat A_i=(r_i-\operatorname{mean}_jr_j)/\operatorname{std}_jr_j`$ and
-$$J=\frac1G\sum_{i=1}^G\frac1{|y_i|}\sum_{t=1}^{|y_i|}\Bigl(\min\bigl(w_{i,t}\hat A_i,\ \operatorname{clip}_\epsilon(w_{i,t})\hat A_i\bigr)-\beta\,k_{3,i,t}\Bigr),$$
+```math
+J=\frac1G\sum_{i=1}^G\frac1{|y_i|}\sum_{t=1}^{|y_i|}\Bigl(\min\bigl(w_{i,t}\hat A_i,\ \operatorname{clip}_\epsilon(w_{i,t})\hat A_i\bigr)-\beta\,k_{3,i,t}\Bigr),
+```
 with $`k_{3,i,t}=\rho_{i,t}-1-\ln\rho_{i,t}`$ and $`\rho_{i,t}=\pi_{\text{ref}}(y_{i,t}\mid s_{i,t})/\pi_\theta(y_{i,t}\mid s_{i,t})`$.
 
 **Dr. GRPO** ([Liu et al., 2025](https://arxiv.org/abs/2503.20783)): $`\hat A_i=r_i-\operatorname{mean}_jr_j`$, and the factor $`\frac1{|y_i|}`$ is replaced by a constant, such as one over the maximum length.
 
 **DAPO** ([Yu et al., 2025](https://arxiv.org/abs/2503.14476)): GRPO's advantages, no KL term, asymmetric clipping, and a token-level average,
-$$J=\frac1{\sum_i|y_i|}\sum_{i=1}^G\sum_{t=1}^{|y_i|}\min\bigl(w_{i,t}\hat A_i,\ \operatorname{clip}(w_{i,t},1-\epsilon_{\text{low}},1+\epsilon_{\text{high}})\hat A_i\bigr),$$
+```math
+J=\frac1{\sum_i|y_i|}\sum_{i=1}^G\sum_{t=1}^{|y_i|}\min\bigl(w_{i,t}\hat A_i,\ \operatorname{clip}(w_{i,t},1-\epsilon_{\text{low}},1+\epsilon_{\text{high}})\hat A_i\bigr),
+```
 with $`\epsilon_{\text{low}}=0.2`$ and $`\epsilon_{\text{high}}=0.28`$, prompts whose responses are all correct or all wrong dropped and replaced by new ones until the batch is full, and a length penalty near the maximum length.
 
 **GSPO** ([Zheng et al., 2025](https://arxiv.org/abs/2507.18071)): one ratio per response, $`s_i(\theta)=\bigl(\pi_\theta(y_i\mid x)/\pi_{\text{old}}(y_i\mid x)\bigr)^{1/|y_i|}`$, the geometric mean of the token ratios, and $`J=\frac1G\sum_i\min\bigl(s_i\hat A_i,\ \operatorname{clip}_\epsilon(s_i)\hat A_i\bigr)`$.

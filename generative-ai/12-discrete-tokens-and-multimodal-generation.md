@@ -71,9 +71,9 @@ The score-function estimators are unbiased. With a single choice, their standard
 
 The **vector-quantized VAE** ([van den Oord, Vinyals, and Kavukcuoglu, 2017](https://arxiv.org/abs/1711.00937)) makes the bottleneck a lookup. The encoder outputs a grid of vectors $`z_e`$; each is replaced by the nearest of $`K`$ learned **codebook** vectors $`e_k`$; and the decoder reconstructs the image from the quantized grid $`z_q`$. The index of the nearest vector at each position is the token. Nearest-neighbor lookup has no useful gradient, so the gradient of the reconstruction loss with respect to $`z_q`$ is copied to $`z_e`$ unchanged, a straight-through estimator, and two extra terms train the codebook and keep the encoder close to it:
 
-$$
+```math
 \mathcal L=-\log p(x\mid z_q)+\bigl\|\operatorname{sg}[z_e]-e\bigr\|^2+\beta\,\bigl\|z_e-\operatorname{sg}[e]\bigr\|^2,
-$$
+```
 
 where $`\operatorname{sg}`$ stops gradients and the **commitment** weight is $`\beta=0.25`$ ([Appendix B](#block-gen12-appendix-b)). In practice the codebook term is often replaced by an exponential moving average of the encoder outputs assigned to each code, an online k-means. The prior over tokens was fitted afterward, a PixelCNN over the latent grid. A VQ-VAE compressed $`128\times128\times3`$ ImageNet images to a $`32\times32`$ grid of tokens from a codebook of 512, and on speech it learned tokens close to phonemes, so that decoding them with another speaker's embedding converted the voice. **VQ-VAE-2** ([Razavi, van den Oord, and Vinyals, 2019](https://arxiv.org/abs/1906.00446)) used a hierarchy, a $`32\times32`$ top grid for global structure and a $`64\times64`$ bottom grid for detail, and generated $`256\times256`$ images of a quality then close to that of adversarial networks.
 
@@ -159,9 +159,9 @@ Diffusion does not need Gaussian noise. **D3PM** ([Austin et al., 2021](https://
 
 The absorbing process turned out to be all that is needed, and its analysis is simple. In **masked diffusion** ([Sahoo et al., 2024](https://arxiv.org/abs/2406.07524); [Shi et al., 2024](https://arxiv.org/abs/2406.04329)), each token of $`x_0`$ is independently replaced by [MASK] with probability $`t`$ at time $`t\in[0,1]`$, and the network predicts the original value of each masked token from the partly masked sequence. The negative log-likelihood is bounded by
 
-$$
+```math
 -\log p_\theta(x_0)\le\int_0^1\frac1t\,\mathbb E_{x_t}\Bigl[\sum_{i\,:\,x_t^i=\text{[MASK]}}-\log p_\theta\bigl(x_0^i\mid x_t\bigr)\Bigr]dt,
-$$
+```
 
 a weighted average of masked-language-modeling losses over masking rates ([Appendix C](#block-gen12-appendix-c)). The network needs no input for the time, since the fraction of masked tokens reveals it, and the bound turns out to equal the average log-loss of an autoregressive model over all orderings of the tokens, the order-agnostic training of NADE (chapter 2). Sampling runs the process backward: at each step, every masked token is revealed with a probability set by the schedule, with a value drawn from the network's prediction. The code trains a masked diffusion model on the binarized digits of chapter 2, compares its bound with the autoregressive MADE, and samples it with different numbers of steps.
 
@@ -279,9 +279,9 @@ Tokens let one sequence model handle every modality with the loss, infrastructur
 
 Let $`g_1,\dots,g_K`$ be independent standard Gumbel variables, with distribution function $`F(g)=\exp(-e^{-g})`$ and density $`f(g)=e^{-g}\exp(-e^{-g})`$. The probability that $`\theta_k+g_k`$ is the largest is
 
-$$
+```math
 \int f(g)\prod_{j\ne k}F(g+\theta_k-\theta_j)\,dg=\int e^{-g}\exp\Bigl(-e^{-g}\sum_je^{\theta_j-\theta_k}\Bigr)dg=\frac{1}{\sum_je^{\theta_j-\theta_k}}=\frac{e^{\theta_k}}{\sum_je^{\theta_j}},
-$$
+```
 
 substituting $`u=e^{-g}`$ in the last integral, $`\int_0^\infty\exp(-uS)\,du=1/S`$. So $`\arg\max_k(\theta_k+g_k)`$ is distributed as $`\operatorname{softmax}(\theta)`$. A Gumbel variable is obtained from a uniform $`u`$ as $`-\log(-\log u)`$. The relaxation replaces the argmax by $`\operatorname{softmax}((\theta+g)/\tau)`$, which converges to the one-hot argmax as $`\tau\to0`$ for every realization of $`g`$, but whose gradient then vanishes almost everywhere and explodes near ties, which is the rising variance of the code.
 
@@ -307,9 +307,9 @@ With $`z_q=e_{k^*}`$ for $`k^*=\arg\min_k\|z_e-e_k\|`$, the forward pass compute
 
 **Order-agnostic autoregression.** Condition on the number $`k`$ of masked tokens. Given $`t`$, $`k`$ is binomial, and
 
-$$
+```math
 \int_0^1\frac1t\binom Lk t^k(1-t)^{L-k}\,dt=\binom Lk\frac{(k-1)!\,(L-k)!}{L!}=\frac1k .
-$$
+```
 
 So the bound is $`\sum_{k=1}^L\frac1k\,\mathbb E\bigl[\sum_{i\text{ masked}}-\log p_\theta(x_0^i\mid x_{\text{visible}})\bigr]`$ over uniformly random sets of $`k`$ masked tokens, which is $`\sum_{k=1}^L`$ of the expected log-loss of predicting one random masked token from $`L-k`$ random visible ones. Reading $`k=L,L-1,\dots,1`$ as the steps of a random ordering, this is the expected negative log-likelihood of an autoregressive model that generates the tokens in a uniformly random order, averaged over orders. The masked diffusion model is an order-agnostic autoregressive model, and its bound is the average over orders of their exact log-likelihoods.
 

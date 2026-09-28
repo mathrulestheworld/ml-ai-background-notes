@@ -266,9 +266,9 @@ Let $`M`$ and $`\hat M`$ be two MDPs with the same states and actions, rewards i
 
 Write $`V=V^\pi_M`$ and $`\hat V=V^\pi_{\hat M}`$. From the Bellman equations,
 
-$$
+```math
 V(s)-\hat V(s)=\mathbb E_{a\sim\pi}\Bigl[r-\hat r+\gamma\sum_{s'}\bigl(P-\hat P\bigr)(s'\mid s,a)V(s')+\gamma\sum_{s'}\hat P(s'\mid s,a)\bigl(V-\hat V\bigr)(s')\Bigr].
-$$
+```
 
 The first term is at most $`\epsilon_R`$. For the second, $`\sum_{s'}(P-\hat P)(s')V(s')=\sum_{s'}(P-\hat P)(s')\bigl(V(s')-c\bigr)`$ for any constant $`c`$, since both distributions sum to 1; with $`c=R_{\max}/(2(1-\gamma))`$ and $`0\le V\le R_{\max}/(1-\gamma)`$ it is at most $`\frac{\epsilon_P}2\cdot\frac{R_{\max}}{1-\gamma}`$, and at most $`\epsilon_PR_{\max}/(1-\gamma)`$ without this refinement. The last term is at most $`\gamma\|V-\hat V\|_\infty`$. Taking the maximum over $`s`$ and solving, $`\|V-\hat V\|_\infty\le\bigl(\epsilon_R+\gamma\epsilon_PR_{\max}/(1-\gamma)\bigr)/(1-\gamma)`$ (with the refinement, half the second term). The factor $`(1-\gamma)^{-2}`$ on the dynamics error is the compounding of errors over an effective horizon of $`1/(1-\gamma)`$ steps, in the form of a guarantee; this lemma underlies the analyses of R-max (chapter 22) and of MBPO.
 

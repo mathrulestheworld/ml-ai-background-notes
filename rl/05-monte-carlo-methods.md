@@ -16,9 +16,9 @@ Monte Carlo methods are defined here for **episodic** tasks, where every episode
 
 The value of a state is an expected return, $`v_\pi(s)=\mathbb E_\pi[G_t\mid S_t=s]`$, and the obvious estimate is an average of observed returns. Each occurrence of $`s`$ in an episode is a **visit**. **First-visit Monte Carlo** averages the returns following the first visit to $`s`$ in each episode; **every-visit Monte Carlo** averages the returns following all visits:
 
-$$
+```math
 V(s)=\frac1{N(s)}\sum_{i=1}^{N(s)}G^{(i)}(s)\;\longrightarrow\;v_\pi(s).
-$$
+```
 
 In first-visit MC, each episode contributes one return per state, the returns from different episodes are independent and identically distributed with mean $`v_\pi(s)`$, and the estimate is unbiased, with standard error $`\sigma/\sqrt{N(s)}`$ that falls as the inverse square root of the number of visits. Every-visit MC uses several correlated returns from the same episode; it is biased whenever $`s`$ can recur within an episode, but also converges to $`v_\pi(s)`$, and it is the version that extends naturally to function approximation ([Appendix B](#block-rl05-appendix-b)). Neither method needs the returns of other states, so each state's estimate is built independently of the others' estimates (though estimates computed from the same episodes are correlated): to estimate the value of one state, one can generate episodes starting there and ignore every other state.
 
@@ -185,15 +185,15 @@ The dilemma of the previous section is sharp: an agent wants to learn about the 
 
 The probability of a trajectory $`A_t,S_{t+1},A_{t+1},\dots,S_T`$ from $`S_t`$ is a product of policy and transition probabilities. The transition probabilities are the same under both policies and cancel in the ratio, leaving the **importance sampling ratio**
 
-$$
+```math
 \rho_{t:T-1}=\prod_{k=t}^{T-1}\frac{\pi(A_k\mid S_k)}{b(A_k\mid S_k)},
-$$
+```
 
 which depends only on the two policies and the actions taken, not on the unknown dynamics. Reweighting returns by it corrects their expectation: $`\mathbb E_b[\rho_{t:T-1}G_t\mid S_t=s]=v_\pi(s)`$ ([Appendix A](#block-rl05-appendix-a)). With $`\mathcal T(s)`$ the set of visits to $`s`$ and $`T(t)`$ the end of the episode containing visit $`t`$, the two standard estimators are
 
-$$
+```math
 V_{\text{ordinary}}(s)=\frac{\sum_{t\in\mathcal T(s)}\rho_{t:T(t)-1}\,G_t}{|\mathcal T(s)|},\qquad V_{\text{weighted}}(s)=\frac{\sum_{t\in\mathcal T(s)}\rho_{t:T(t)-1}\,G_t}{\sum_{t\in\mathcal T(s)}\rho_{t:T(t)-1}}.
-$$
+```
 
 **Ordinary importance sampling** is unbiased, in the first-visit case, but its variance can be enormous, even infinite, because the ratios multiply along the episode and can be exponentially large. **Weighted importance sampling** normalizes by the sum of the weights: after a single episode its estimate is just the observed return, a biased estimate of $`v_\pi`$, but it is consistent, its bias falls to zero, and its variance stays bounded when returns are bounded. These are the IPS and self-normalized IPS estimators of chapter 4, applied to whole trajectories instead of single actions.
 
@@ -269,9 +269,9 @@ Only 14% of the random episodes are consistent with the target policy, which mus
 
 Weighted importance sampling can be computed incrementally without storing returns. For a sequence of returns $`G_1,G_2,\dots`$ from one state with weights $`W_k`$,
 
-$$
+```math
 C_n=C_{n-1}+W_n,\qquad V_{n+1}=V_n+\frac{W_n}{C_n}\bigl(G_n-V_n\bigr),
-$$
+```
 
 with $`C_0=0`$ (exercise 5.2). Processing each episode backward from its end, the return and the weight can both be accumulated step by step: $`G\leftarrow\gamma G+R_{t+1}`$ and $`W\leftarrow W\,\pi(A_t\mid S_t)/b(A_t\mid S_t)`$.
 
@@ -370,13 +370,13 @@ For Sutton and Barto's one-state example in the right panel of the importance-sa
 
 An episode that the target policy could produce consists of $`m\ge0`$ steps of "left" that return to the state, followed by one "left" that ends with reward 1. Under the behavior policy, each step chooses left with probability 1/2 and then returns with probability 0.9, so this episode has probability $`(0.5\cdot0.9)^m\cdot0.5\cdot0.1`$. Its ratio is $`2^{m+1}`$ and its return is 1; every other episode has ratio 0. Hence
 
-$$
+```math
 \mathbb E[X]=\sum_{m\ge0}0.45^m\cdot0.05\cdot2^{m+1}=0.1\sum_m0.9^m=1,
-$$
+```
 
-$$
+```math
 \mathbb E[X^2]=\sum_{m\ge0}0.45^m\cdot0.05\cdot4^{m+1}=0.2\sum_m1.8^m=\infty .
-$$
+```
 
 The average of $`n`$ such estimates still converges to 1 by the law of large numbers, which needs only a finite mean, but with no finite variance there is no $`1/\sqrt n`$ rate, and the running average makes the rare, huge jumps seen in the figure. The weighted estimator, whose value is the average of returns that are all equal to 1, is exact after the first consistent episode.
 
@@ -394,9 +394,9 @@ Let $`\pi`$ be ε-soft and $`\pi'`$ the ε-greedy policy with respect to $`q_\pi
 
 Let $`m=|\mathcal A(s)|`$. Since $`\pi`$ is ε-soft, the weights $`w_a=\bigl(\pi(a\mid s)-\varepsilon/m\bigr)/(1-\varepsilon)`$ are nonnegative and sum to one, so $`\max_aq_\pi(s,a)\ge\sum_aw_aq_\pi(s,a)`$. Then
 
-$$
+```math
 \sum_a\pi'(a\mid s)q_\pi(s,a)=\frac\varepsilon m\sum_aq_\pi(s,a)+(1-\varepsilon)\max_aq_\pi(s,a)\ge\frac\varepsilon m\sum_aq_\pi(s,a)+\sum_a\bigl(\pi(a\mid s)-\tfrac\varepsilon m\bigr)q_\pi(s,a)=v_\pi(s).
-$$
+```
 
 By the policy improvement theorem of chapter 2, $`v_{\pi'}\ge v_\pi`$. Equality everywhere means that $`\pi`$ is already ε-greedy with respect to its own values; Sutton and Barto show that this characterizes the best ε-soft policy, by moving the ε-randomness into a modified environment where it becomes part of the dynamics.
 
@@ -414,9 +414,9 @@ Show that $`\mathbb E_b[\rho_{t:T-1}R_{t+k+1}\mid S_t]=\mathbb E_b[\rho_{t:t+k}R
 
 Write $`\rho_{t:T-1}=\rho_{t:t+k}\,\rho_{t+k+1:T-1}`$. The first factor and $`R_{t+k+1}`$ are determined by the trajectory up to $`S_{t+k+1}`$. Conditional on that history, the remaining factor has expectation
 
-$$
+```math
 \mathbb E_b\Bigl[\prod_{j=t+k+1}^{T-1}\frac{\pi(A_j\mid S_j)}{b(A_j\mid S_j)}\Bigm|S_{t+k+1}\Bigr]=1,
-$$
+```
 
 by peeling off one factor at a time from the end: $`\mathbb E_b[\pi(A_j\mid S_j)/b(A_j\mid S_j)\mid S_j]=\sum_a\pi(a\mid S_j)=1`$. By the tower property, the later factors can be removed from each term. Summing over $`k`$ with discounts gives the claim. The later factors add variance and no information about the earlier rewards; dropping them is the idea behind the per-decision methods of chapter 9.
 
@@ -512,15 +512,15 @@ The value of the importance-sampling example's state is $`-0.27720`$, and the op
 
 Fix a state $`s`$ and consider the trajectory $`\tau=(A_t,S_{t+1},\dots,S_T)`$ that follows it. Its probability under a policy $`\pi`$ is
 
-$$
+```math
 \Pr_\pi(\tau\mid S_t=s)=\prod_{k=t}^{T-1}\pi(A_k\mid S_k)\,p(S_{k+1}\mid S_k,A_k).
-$$
+```
 
 The ratio of this probability under $`\pi`$ and $`b`$ is $`\rho_{t:T-1}`$, since the transition terms cancel. For any function $`f`$ of the trajectory, and in particular the return,
 
-$$
+```math
 \mathbb E_b[\rho_{t:T-1}f(\tau)\mid S_t=s]=\sum_\tau\Pr_b(\tau\mid s)\frac{\Pr_\pi(\tau\mid s)}{\Pr_b(\tau\mid s)}f(\tau)=\mathbb E_\pi[f(\tau)\mid S_t=s],
-$$
+```
 
 where the sum runs over trajectories with $`\Pr_b(\tau\mid s)>0`$, and the coverage assumption ensures that no trajectory with $`\Pr_\pi>0`$ is missed. The weights have expectation one, $`\mathbb E_b[\rho]=1`$, but their second moment is $`\mathbb E_b[\rho^2]=\mathbb E_\pi[\rho]`$, which grows exponentially with the length of the trajectory when the policies differ at every step: for $`T-t`$ steps at which a deterministic $`\pi`$ is compared with a uniform $`b`$ over $`m`$ actions, $`\mathbb E_b[\rho^2]=m^{T-t}`$. This is the **curse of horizon** of importance sampling.
 

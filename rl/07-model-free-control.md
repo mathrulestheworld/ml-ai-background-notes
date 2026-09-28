@@ -29,9 +29,9 @@ This chapter develops three one-step TD control methods: **SARSA**, which is on-
 
 Replace the state values in TD(0) with action values, and the update becomes
 
-$$
+```math
 Q(S_t,A_t)\leftarrow Q(S_t,A_t)+\alpha\bigl[R_{t+1}+\gamma Q(S_{t+1},A_{t+1})-Q(S_t,A_t)\bigr].
-$$
+```
 
 The update uses the quintuple of events $`(S_t,A_t,R_{t+1},S_{t+1},A_{t+1})`$ that makes up a transition from one state–action pair to the next, which gives the algorithm its name. The target $`R_{t+1}+\gamma Q(S_{t+1},A_{t+1})`$ is a sample of the Bellman expectation equation for $`q_\pi`$ from chapter 1, with the next action drawn from the policy being followed; if $`S_{t+1}`$ is terminal, $`Q(S_{t+1},A_{t+1})`$ is defined as zero. The algorithm was introduced by [Rummery and Niranjan (1994)](https://www.researchgate.net/publication/2500611_On-Line_Q-Learning_Using_Connectionist_Systems) as "modified connectionist Q-learning"; the name "Sarsa" comes from [Sutton (1996)](https://proceedings.neurips.cc/paper/1995/hash/8f1d43620bc6bb580df6e80b0dc05c48-Abstract.html).
 
@@ -110,15 +110,15 @@ SARSA's evaluation target is the value of a policy that keeps changing, so its c
 
 **Q-learning** ([Watkins, 1989](https://www.cs.rhul.ac.uk/~chrisw/new_thesis.pdf)) replaces the next action's value in the SARSA target with the maximum over actions:
 
-$$
+```math
 Q(S_t,A_t)\leftarrow Q(S_t,A_t)+\alpha\Bigl[R_{t+1}+\gamma\max_aQ(S_{t+1},a)-Q(S_t,A_t)\Bigr].
-$$
+```
 
 The target is now a sample of the Bellman optimality equation for $`q_*`$ from chapter 1, and the learned $`Q`$ approximates $`q_*`$ directly, whatever policy generates the data. The behavior policy still matters, since it determines which pairs are visited and updated, but only through which pairs it visits: any behavior that keeps trying every action in every state will do. Q-learning is the sampled, asynchronous form of value iteration on action values, just as SARSA is the sampled form of policy evaluation interleaved with improvement. Define the Bellman optimality operator on action values,
 
-$$
+```math
 (\mathcal T Q)(s,a)=r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\max_{a'}Q(s',a'),
-$$
+```
 
 whose unique fixed point is $`q_*`$. The Q-learning target is an unbiased sample of $`(\mathcal TQ)(S_t,A_t)`$, and each update moves one entry of $`Q`$ a step toward it.
 
@@ -225,9 +225,9 @@ Which answer is right depends on what the learned policy is for. If exploration 
 
 SARSA's target depends on the random next action $`A_{t+1}`$, which adds variance. **Expected SARSA** replaces the sampled next action with an expectation under the policy:
 
-$$
+```math
 Q(S_t,A_t)\leftarrow Q(S_t,A_t)+\alpha\Bigl[R_{t+1}+\gamma\sum_a\pi(a\mid S_{t+1})Q(S_{t+1},a)-Q(S_t,A_t)\Bigr].
-$$
+```
 
 Given the next state, the target is deterministic: it moves in the same direction as SARSA does in expectation, but without the noise of sampling $`A_{t+1}`$. By the law of total variance, the conditional variance of SARSA's target exceeds Expected SARSA's by exactly $`\gamma^2\,\mathbb E\bigl[\operatorname{Var}_{A'\sim\pi(\cdot\mid S_{t+1})}Q(S_{t+1},A')\bigr]`$ (exercise 7.3). [van Seijen, van Hasselt, Whiteson, and Wiering (2009)](https://doi.org/10.1109/ADPRL.2009.4927542) analyzed the method and showed empirically that it outperforms SARSA, most clearly when the environment is close to deterministic and the step size is large. On cliff walking, where the dynamics are deterministic, Expected SARSA's target for a given state–action pair has no randomness at all, since exploration only decides which pair is updated, and the step size can be raised to $`\alpha=1`$ with no loss: the top-right panel of the figure shows Expected SARSA improving all the way to $`\alpha=1`$. Sutton and Barto report the same pattern over 100,000 episodes: SARSA's asymptotic performance degrades with large step sizes, and Expected SARSA's does not.
 
@@ -251,9 +251,9 @@ All three share the same structure: a sampled reward and next state, followed by
 
 Q-learning's target takes a maximum over estimated values, and SARSA and Expected SARSA with ε-greedy policies are also built around the greedy action. Maximizing over noisy estimates introduces a positive bias. If $`\hat\mu_1,\dots,\hat\mu_K`$ are unbiased estimates of $`\mu_1,\dots,\mu_K`$, then
 
-$$
+```math
 \mathbb E\Bigl[\max_a\hat\mu_a\Bigr]\ge\max_a\mathbb E[\hat\mu_a]=\max_a\mu_a,
-$$
+```
 
 since the maximum of the estimates is at least the estimate of the truly best action. The inequality is usually strict, and the gap grows with the noise and the number of actions: if all $`K`$ estimates are independent and normally distributed with standard deviation $`\sigma`$ and equal means, the bias is $`\sigma`$ times the expected maximum of $`K`$ standard normal variables, about $`1.54\sigma`$ for $`K=10`$. This is the **optimizer's curse** of decision theory (AI chapter 12): the option that looks best is likely to be one whose value was overestimated. [Thrun and Schwartz (1993)](https://www.ri.cmu.edu/pub_files/pub1/thrun_sebastian_1993_1/thrun_sebastian_1993_1.pdf) identified it as a source of systematic overestimation in Q-learning with function approximation, where the errors of the approximator play the role of the noise.
 
@@ -317,9 +317,9 @@ Early in learning, Q-learning goes left from A in more than nine episodes out of
 
 The bias arises because the same estimates are used both to choose the maximizing action and to evaluate it: the action chosen is likely to be one whose estimate is too high, and its value is then read from that same inflated estimate. The remedy of [van Hasselt (2010)](https://papers.nips.cc/paper/2010/hash/091d584fced301b442654dd8c23b3fc9-Abstract.html) is to decouple the two by learning two independent estimates, $`Q_1`$ and $`Q_2`$, each from half of the experience. One estimate chooses the action, and the other evaluates it:
 
-$$
+```math
 Q_1(S_t,A_t)\leftarrow Q_1(S_t,A_t)+\alpha\Bigl[R_{t+1}+\gamma\,Q_2\bigl(S_{t+1},\arg\max_aQ_1(S_{t+1},a)\bigr)-Q_1(S_t,A_t)\Bigr].
-$$
+```
 
 At each step, a coin flip decides which estimate is updated, with the roles swapped when $`Q_2`$ is updated. The behavior policy can use both, for example ε-greedy with respect to $`Q_1+Q_2`$. When $`Q_2`$'s errors are independent of the choice made with $`Q_1`$, as they approximately are, the evaluation is unbiased given the choice, and the expected value of the **double estimator** is at most the true maximum ([Appendix B](#block-rl07-appendix-b)). It can underestimate: when a suboptimal action has a chance of being chosen, its lower value is sometimes returned. In the example above, all of B's actions have the same mean, so the double estimator is unbiased, and double Q-learning's left moves decline from the start, to 9% of episodes by episode 100 and 7% by episode 300. The memory doubles, but the computation per step does not, since each step updates one estimate.
 
@@ -457,9 +457,9 @@ Almost, but not exactly. With greedy action selection, SARSA's next action is $`
 
 (a) Let $`Y=R_{t+1}+\gamma Q(S_{t+1},A_{t+1})`$ be the SARSA target with $`A_{t+1}\sim\pi(\cdot\mid S_{t+1})`$, and $`X=R_{t+1}+\gamma\sum_a\pi(a\mid S_{t+1})Q(S_{t+1},a)`$ the Expected SARSA target. Then $`X=\mathbb E[Y\mid R_{t+1},S_{t+1}]`$, so $`\mathbb E[Y\mid S_t,A_t]=\mathbb E[X\mid S_t,A_t]`$ by the tower property. By the law of total variance, conditional on $`S_t,A_t`$,
 
-$$
+```math
 \operatorname{Var}(Y)=\operatorname{Var}\bigl(\mathbb E[Y\mid R_{t+1},S_{t+1}]\bigr)+\mathbb E\bigl[\operatorname{Var}(Y\mid R_{t+1},S_{t+1})\bigr]=\operatorname{Var}(X)+\gamma^2\,\mathbb E\bigl[\operatorname{Var}_{A'\sim\pi(\cdot\mid S_{t+1})}Q(S_{t+1},A')\bigr].
-$$
+```
 
 The extra term is zero only when all actions with positive probability have the same estimated value, for example when $`\pi`$ is deterministic.
 
@@ -705,9 +705,9 @@ Write the update of double Expected SARSA with an ε-greedy target policy. Which
 
 Keep two estimates, and at each step update one of them, chosen by a coin flip. To update $`Q_1`$, let $`\pi_1`$ be the ε-greedy policy with respect to $`Q_1`$ at $`S_{t+1}`$, and evaluate its actions with $`Q_2`$:
 
-$$
+```math
 Q_1(S_t,A_t)\leftarrow Q_1(S_t,A_t)+\alpha\Bigl[R_{t+1}+\gamma\sum_a\pi_1(a\mid S_{t+1})\,Q_2(S_{t+1},a)-Q_1(S_t,A_t)\Bigr],
-$$
+```
 
 and symmetrically for $`Q_2`$. The estimate being updated defines the policy, so it chooses which action gets most of the weight, and the other estimate evaluates it, so the chosen action's value is not inflated by the errors that made it look best. The behavior policy can be ε-greedy with respect to $`Q_1+Q_2`$. With $`\varepsilon=0`$, this is double Q-learning.
 
@@ -723,17 +723,17 @@ and symmetrically for $`Q_2`$. The estimate being updated defines the policy, so
 
 **Q-learning.** Write the update of the pair $`(s,a)=(S_t,A_t)`$ as
 
-$$
+```math
 Q_{t+1}(s,a)=\bigl(1-\alpha_t(s,a)\bigr)Q_t(s,a)+\alpha_t(s,a)\bigl[(\mathcal TQ_t)(s,a)+w_t\bigr],
-$$
+```
 
 with the noise $`w_t=R_{t+1}+\gamma\max_{a'}Q_t(S_{t+1},a')-(\mathcal TQ_t)(s,a)`$, and $`\alpha_t(s',a')=0`$ for every pair not updated at time $`t`$. Three facts give convergence through the asynchronous stochastic approximation theorem of chapter 6 ([Tsitsiklis, 1994](https://doi.org/10.1007/BF00993306); [Jaakkola, Jordan, and Singh, 1994](https://doi.org/10.1162/neco.1994.6.6.1185)). First, $`\mathcal T`$ is a $`\gamma`$-contraction in the maximum norm, since $`|\max_{a'}Q(s',a')-\max_{a'}Q'(s',a')|\le\max_{a'}|Q(s',a')-Q'(s',a')|`$, so $`\|\mathcal TQ-\mathcal TQ'\|_\infty\le\gamma\|Q-Q'\|_\infty`$, with fixed point $`q_*`$. Second, $`\mathbb E[w_t\mid\mathcal F_t]=0`$, where $`\mathcal F_t`$ is the history up to the choice of $`A_t`$, and with bounded rewards $`\mathbb E[w_t^2\mid\mathcal F_t]\le C(1+\|Q_t\|_\infty^2)`$. Third, the step sizes of each pair satisfy $`\sum_t\alpha_t(s,a)=\infty`$ and $`\sum_t\alpha_t(s,a)^2<\infty`$ with probability one, which requires each pair to be updated infinitely often. Then $`Q_t\to q_*`$ with probability one. The behavior policy enters only through the third condition.
 
 **SARSA.** The SARSA target has conditional expectation
 
-$$
+```math
 \mathbb E\bigl[R_{t+1}+\gamma Q_t(S_{t+1},A_{t+1})\mid\mathcal F_t\bigr]=(\mathcal TQ_t)(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\Bigl[\sum_{a'}\pi_t(a'\mid s')Q_t(s',a')-\max_{a'}Q_t(s',a')\Bigr],
-$$
+```
 
 where $`\pi_t`$ is the current policy. The second term is a perturbation $`c_t`$ of the Q-learning iteration. For ε-greedy policies that explore uniformly over all actions, the bracket equals $`\varepsilon_t\bigl(\tfrac1{|\mathcal A|}\sum_{a'}Q_t(s',a')-\max_{a'}Q_t(s',a')\bigr)`$, so $`|c_t|\le\gamma\varepsilon_t\max_{s'}\bigl(\max_{a'}Q_t(s',a')-\min_{a'}Q_t(s',a')\bigr)`$, which tends to zero if $`\varepsilon_t\to0`$ and the estimates stay bounded. [Singh, Jaakkola, Littman, and Szepesvári (2000)](https://doi.org/10.1023/A:1007678930559) extended the stochastic approximation theorem to iterations with such vanishing perturbations, which gives the convergence of SARSA to $`q_*`$ under GLIE, with each pair visited infinitely often and Robbins–Monro step sizes. With a fixed $`\varepsilon`$, the perturbation does not vanish, and SARSA tracks the action values of ε-greedy policies instead.
 
@@ -751,9 +751,9 @@ Let $`\hat\mu_1,\dots,\hat\mu_K`$ be unbiased estimates of $`\mu_1,\dots,\mu_K`$
 
 The **double estimator** uses two independent sets of unbiased estimates $`\hat\mu^A`$ and $`\hat\mu^B`$, chooses $`\hat a=\arg\max_a\hat\mu^A_a`$, and returns $`\hat\mu^B_{\hat a}`$. Since $`\hat a`$ depends only on $`\hat\mu^A`$, which is independent of $`\hat\mu^B`$,
 
-$$
+```math
 \mathbb E\bigl[\hat\mu^B_{\hat a}\bigr]=\sum_a\Pr(\hat a=a)\,\mathbb E\bigl[\hat\mu^B_a\bigr]=\sum_a\Pr(\hat a=a)\,\mu_a\le\max_a\mu_a,
-$$
+```
 
 with equality if and only if $`\hat a`$ is an optimal action with probability one. So the double estimator never overestimates in expectation, and it underestimates exactly when there is a chance of choosing a suboptimal action ([van Hasselt, 2010](https://papers.nips.cc/paper/2010/hash/091d584fced301b442654dd8c23b3fc9-Abstract.html)). In double Q-learning, $`\hat\mu^A`$ and $`\hat\mu^B`$ play the roles of $`Q_1(S_{t+1},\cdot)`$ and $`Q_2(S_{t+1},\cdot)`$, which are learned from disjoint sets of updates and so have approximately independent errors, though not exactly, since both bootstrap from the same trajectories.
 

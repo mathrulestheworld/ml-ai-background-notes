@@ -14,9 +14,9 @@ The graphical models of chapters 8–11 were specified by hand: an expert drew t
 
 For a Bayesian network and $`n`$ complete examples, the log-likelihood is a sum over examples of the log of a product of CPT entries, which regroups as a sum over the network's families:
 
-$$
+```math
 \log P(\mathcal D\mid\theta)=\sum_{i}\sum_{m=1}^n\log P\bigl(x_i^{(m)}\mid\mathrm{pa}_i^{(m)};\theta_i\bigr)=\sum_i\;\sum_{\mathrm{pa}}\;\sum_xN_i(x,\mathrm{pa})\log\theta_{i,x\mid\mathrm{pa}},
-$$
+```
 
 where $`N_i(x,\mathrm{pa})`$ counts the examples in which variable $`i`$ takes value $`x`$ and its parents take values $`\mathrm{pa}`$. Each CPT row is a separate multinomial, and its maximum-likelihood estimate is the normalized count, $`\hat\theta_{i,x\mid\mathrm{pa}}=N_i(x,\mathrm{pa})/N_i(\mathrm{pa})`$ ([Appendix A](#block-ai14-appendix-a)). Learning a Bayesian network from complete data is counting. The same decomposition holds for linear-Gaussian networks, where each family is a linear regression of a child on its parents.
 
@@ -24,9 +24,9 @@ where $`N_i(x,\mathrm{pa})`$ counts the examples in which variable $`i`$ takes v
 
 A CPT with $`k`$ parents of $`d`$ values each has $`d^k`$ rows, and with modest data many rows are estimated from few examples or none. Maximum likelihood then assigns probability zero to combinations never seen in training, and a model that gives probability zero to a test case has log-likelihood $`-\infty`$. **Bayesian parameter estimation** places a **Dirichlet prior** on each row, $`\theta_{i,\cdot\mid\mathrm{pa}}\sim\mathrm{Dirichlet}(\alpha,\dots,\alpha)`$, conjugate to the multinomial; the posterior is again Dirichlet, with the counts added to the **pseudocounts**, and the posterior predictive probability is
 
-$$
+```math
 P\bigl(X_i=x\mid\mathrm{pa},\mathcal D\bigr)=\frac{N_i(x,\mathrm{pa})+\alpha}{N_i(\mathrm{pa})+d\,\alpha},
-$$
+```
 
 the Laplace smoothing of naive Bayes (ML chapter 4) for every family. The pseudocounts express prior belief, a weak one when $`\alpha`$ is small, and they matter exactly where data are scarce.
 
@@ -40,9 +40,9 @@ the Laplace smoothing of naive Bayes (ML chapter 4) for every family. The pseudo
 
 Undirected models do not decompose so easily, because the partition function couples all parameters. For a log-linear model, $`P(x)=\exp\bigl(w^\top f(x)\bigr)/Z(w)`$ with feature vector $`f`$ (chapter 8), the average log-likelihood of the data is
 
-$$
+```math
 \ell(w)=w^\top\hat{\mathbb E}[f]-\log Z(w),\qquad\nabla\ell(w)=\hat{\mathbb E}[f]-\mathbb E_{w}[f],
-$$
+```
 
 because the gradient of $`\log Z`$ is the expected feature vector under the model ([Appendix B](#block-ai14-appendix-b)). The log-likelihood is concave, and at the maximum the model's expected features equal their empirical averages: **maximum likelihood is moment matching**. It is also, by convex duality, the **maximum-entropy** distribution among those that match the empirical moments. Each gradient step needs the model's expectations, an inference problem (chapters 9–10), so learning is at least as hard as inference and usually runs it in an inner loop, exactly where exact inference is infeasible.
 
@@ -186,9 +186,9 @@ The likelihood of the complete graph, $`-1811.90`$, is higher than that of the t
 
 When the graph is restricted to a tree, the best structure can be found exactly and quickly. The log-likelihood of a tree-structured model with maximum-likelihood parameters is, up to terms that do not depend on the tree,
 
-$$
+```math
 \log P(\mathcal D\mid\hat\theta_T,T)=n\sum_{(i,j)\in T}\hat I(X_i;X_j)-n\sum_i\hat H(X_i),
-$$
+```
 
 where $`\hat I`$ is the empirical mutual information (Foundations chapter 5) and $`\hat H`$ the empirical entropy. The best tree is therefore the **maximum-weight spanning tree** of the complete graph with mutual information as edge weights ([Chow and Liu, 1968](https://doi.org/10.1109/TIT.1968.1054142); [Appendix C](#block-ai14-appendix-c)), computable in $`O(k^2n)`$ time for $`k`$ variables. The figure above shows it recovering almost every edge of a 20-variable tree from a hundred samples. Chow–Liu trees are useful in their own right, as tractable density models and as the starting point for richer structures, such as mixtures of trees.
 
@@ -217,9 +217,9 @@ With a $`\mathrm{Dirichlet}(\alpha_1,\dots,\alpha_d)`$ prior, the posterior dens
 
 For $`Z(w)=\sum_x\exp\bigl(w^\top f(x)\bigr)`$,
 
-$$
+```math
 \nabla_w\log Z(w)=\frac{1}{Z(w)}\sum_xf(x)\exp\bigl(w^\top f(x)\bigr)=\mathbb E_w[f],\qquad\nabla^2_w\log Z(w)=\mathrm{Cov}_w[f].
-$$
+```
 
 The Hessian is a covariance matrix, positive semidefinite, so $`\log Z`$ is convex and the average log-likelihood $`\ell(w)=w^\top\hat{\mathbb E}[f]-\log Z(w)`$ is concave; it is strictly concave when no nonzero combination of features is constant under the model. Setting $`\nabla\ell=0`$ gives $`\mathbb E_w[f]=\hat{\mathbb E}[f]`$. The Hessian also sets the step size of gradient ascent: with step $`\eta`$, the iteration is stable when $`\eta`$ is below $`2/\lambda_{\max}(\mathrm{Cov}_w[f])`$, which is why the code uses a step of 0.1 for 21 correlated $`\pm1`$ features.
 
@@ -235,9 +235,9 @@ The Hessian is a covariance matrix, positive semidefinite, so $`\log Z`$ is conv
 
 For a tree $`T`$ rooted anywhere, with maximum-likelihood CPTs estimated from empirical frequencies $`\hat p`$, the average log-likelihood is
 
-$$
+```math
 \frac1n\log P(\mathcal D\mid\hat\theta_T,T)=\sum_i\sum_{x_i,x_{\mathrm{pa}(i)}}\hat p(x_i,x_{\mathrm{pa}(i)})\log\hat p(x_i\mid x_{\mathrm{pa}(i)}).
-$$
+```
 
 Writing $`\log\hat p(x_i\mid x_{\mathrm{pa}})=\log\frac{\hat p(x_i,x_{\mathrm{pa}})}{\hat p(x_i)\hat p(x_{\mathrm{pa}})}+\log\hat p(x_i)`$ splits each term into the empirical mutual information $`\hat I(X_i;X_{\mathrm{pa}(i)})`$ and $`-\hat H(X_i)`$. The entropies are the same for every tree, and each edge contributes its mutual information once, whichever endpoint is the parent. The best tree maximizes $`\sum_{(i,j)\in T}\hat I(X_i;X_j)`$, a maximum spanning tree problem solved exactly by Kruskal's or Prim's algorithm. Chow and Liu also showed that the resulting model minimizes the KL divergence from the empirical distribution among all tree-structured distributions.
 

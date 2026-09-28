@@ -10,10 +10,10 @@
 
 A **normalizing flow** generates data by pushing a simple random variable through an invertible function: draw $`z`$ from a base distribution $`p_Z`$, usually a standard Gaussian, and output $`x=f(z)`$. Because $`f`$ is invertible, every $`x`$ comes from exactly one $`z=f^{-1}(x)`$, and the density of $`x`$ follows from the **change-of-variables formula**:
 
-$$
+```math
 p_X(x)=p_Z\bigl(f^{-1}(x)\bigr)\,\Bigl|\det\frac{\partial f^{-1}(x)}{\partial x}\Bigr|,\qquad
 \log p_X(x)=\log p_Z(z)-\log\Bigl|\det\frac{\partial f(z)}{\partial z}\Bigr|.
-$$
+```
 
 The determinant measures how much $`f`$ expands volume near $`z`$ (Foundations chapter 2): where $`f`$ stretches a region, the same probability is spread over more volume and the density falls. A flow therefore has everything the other families lack in some combination. Its log-likelihood is exact and can be maximized directly, as for autoregressive models; sampling takes one pass through $`f`$, as for a VAE's decoder; and the latent code of any data point is computed exactly by $`f^{-1}`$, with no approximate posterior. The price is in the architecture: $`f`$ must be invertible, its Jacobian determinant must be cheap to compute, and $`z`$ must have the same dimension as $`x`$.
 
@@ -21,9 +21,9 @@ The determinant measures how much $`f`$ expands volume near $`z`$ (Foundations c
 
 A composition of invertible maps is invertible, and the log-determinants of the pieces add:
 
-$$
+```math
 x=f_K\circ\dots\circ f_1(z)\quad\Longrightarrow\quad\log p_X(x)=\log p_Z(z)-\sum_{k=1}^K\log\Bigl|\det\frac{\partial f_k}{\partial z_{k-1}}\Bigr|,
-$$
+```
 
 where $`z_0=z`$ and $`z_k=f_k(z_{k-1})`$. Deep flows are built from many simple layers, each of which is easy to invert and whose determinant is easy to compute. In one dimension, any continuous distribution is a flow: the inverse of its cumulative distribution function maps a uniform variable to it, and composing with the Gaussian CDF maps a Gaussian to it. In many dimensions, a flow must be both expressive enough to warp a Gaussian into, for example, the distribution of faces, and structured enough that an exact determinant of a $`D\times D`$ Jacobian costs far less than the $`O(D^3)`$ of a general matrix. The name comes from the reverse direction: $`f^{-1}`$ transforms the data step by step until its distribution is a standard normal ([Tabak and Vanden-Eijnden, 2010](https://doi.org/10.4310/CMS.2010.v8.n1.a11); [Rezende and Mohamed, 2015](https://arxiv.org/abs/1505.05770)).
 
@@ -33,9 +33,9 @@ where $`z_0=z`$ and $`z_k=f_k(z_{k-1})`$. Deep flows are built from many simple 
 
 The most widely used construction makes the Jacobian triangular, so that its determinant is the product of its diagonal. A **coupling layer** splits the input into two parts, leaves the first unchanged, and transforms the second with parameters computed from the first:
 
-$$
+```math
 x_A=z_A,\qquad x_B=z_B\odot\exp\bigl(s(z_A)\bigr)+t(z_A).
-$$
+```
 
 The functions $`s`$ and $`t`$ can be arbitrary networks, because they never need to be inverted: given $`x`$, the first part is $`z_A=x_A`$, and then $`z_B=\bigl(x_B-t(x_A)\bigr)\odot\exp\bigl(-s(x_A)\bigr)`$. The Jacobian is triangular with ones for the unchanged part and $`\exp(s)`$ for the transformed part, so $`\log|\det|=\sum_js_j(z_A)`$, one sum, however complicated the networks. **NICE** ([Dinh, Krueger, and Bengio, 2015](https://arxiv.org/abs/1410.8516)) used additive coupling, $`s=0`$, which preserves volume, followed by a final diagonal scaling; **RealNVP** ([Dinh, Sohl-Dickstein, and Bengio, 2017](https://arxiv.org/abs/1605.08803)) added the scale $`s`$, split images by checkerboard and channel masks, and alternated which part is transformed so that every dimension is changed in some layer. **Glow** ([Kingma and Dhariwal, 2018](https://arxiv.org/abs/1807.03039)) replaced the fixed permutations between couplings with learned invertible $`1\times1`$ convolutions, which mix channels with a matrix whose determinant is cheap in an LU parameterization, and generated $`256\times256`$ faces whose attributes could be changed by moving along directions in the latent space.
 
@@ -147,9 +147,9 @@ Affine transformations of each dimension are simple, and many layers are needed 
 
 Taking many small residual steps to the limit gives a flow defined by an ordinary differential equation, $`dz/dt=v_\theta(z,t)`$, run from $`t=0`$ to $`t=1`$ ([Chen et al., 2018](https://arxiv.org/abs/1806.07366)). Any sufficiently smooth velocity field defines an invertible map, since the ODE can be integrated backward, so there is no architectural constraint on $`v_\theta`$. The log-density changes along a trajectory according to the **instantaneous change of variables**,
 
-$$
+```math
 \frac{d\log p\bigl(z(t)\bigr)}{dt}=-\operatorname{tr}\Bigl(\frac{\partial v_\theta}{\partial z}\bigl(z(t),t\bigr)\Bigr),
-$$
+```
 
 a trace instead of a determinant ([Appendix B](#block-gen04-appendix-b)). A trace of a $`D\times D`$ Jacobian still costs $`D`$ backward passes to compute exactly, and **FFJORD** ([Grathwohl et al., 2019](https://arxiv.org/abs/1810.01367)) replaced it with **Hutchinson's estimator**, $`\operatorname{tr}(J)=\mathbb E[v^\top Jv]`$ for random vectors $`v`$ with identity covariance, which needs one vector–Jacobian product per sample ([Hutchinson, 1989](https://doi.org/10.1080/03610918908812806)). The code compares the estimator with the exact trace for the Jacobian of a small network in 100 dimensions.
 
@@ -209,9 +209,9 @@ For most of their history, flows trailed autoregressive models in likelihood and
 
 **Coupling.** Order the coordinates so that $`z=(z_A,z_B)`$. The coupling map $`x_A=z_A`$, $`x_B=z_B\odot e^{s(z_A)}+t(z_A)`$ has Jacobian
 
-$$
+```math
 \frac{\partial x}{\partial z}=\begin{pmatrix}I&0\\ \partial x_B/\partial z_A&\operatorname{diag}\bigl(e^{s(z_A)}\bigr)\end{pmatrix},
-$$
+```
 
 which is block lower triangular, so its determinant is the product of the diagonal blocks' determinants, $`\prod_je^{s_j(z_A)}`$, regardless of the block $`\partial x_B/\partial z_A`$, which contains the derivatives of the networks $`s`$ and $`t`$ and never needs to be computed. Bounding $`s`$, for example with $`\tanh`$ as in the code, keeps the scales from exploding early in training.
 
@@ -229,15 +229,15 @@ which is block lower triangular, so its determinant is the product of the diagon
 
 Let $`z(t)`$ solve $`\dot z=v(z,t)`$, and let $`p_t`$ be the density of $`z(t)`$ when $`z(0)\sim p_0`$. Mass is conserved as it moves with the flow, which is the **continuity equation**
 
-$$
+```math
 \frac{\partial p_t}{\partial t}+\nabla\cdot\bigl(p_t\,v\bigr)=0.
-$$
+```
 
 Along a trajectory, the total derivative of the log-density is
 
-$$
+```math
 \frac{d}{dt}\log p_t\bigl(z(t)\bigr)=\frac{\partial_tp_t+\nabla p_t\cdot v}{p_t}=\frac{-\nabla\cdot(p_tv)+\nabla p_t\cdot v}{p_t}=-\nabla\cdot v=-\operatorname{tr}\frac{\partial v}{\partial z},
-$$
+```
 
 so $`\log p_1(z(1))=\log p_0(z(0))-\int_0^1\operatorname{tr}\bigl(\partial v/\partial z\bigr)\,dt`$, the continuous analogue of summing log-determinants over layers. For a small step $`z\mapsto z+\epsilon v(z)`$, $`\log\det(I+\epsilon J)=\epsilon\operatorname{tr}J+O(\epsilon^2)`$, which gives the same result. The continuity equation reappears in chapter 9 as the condition that a velocity field generates a given path of distributions.
 

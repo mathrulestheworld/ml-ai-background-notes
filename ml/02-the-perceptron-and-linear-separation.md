@@ -10,25 +10,25 @@
 
 A **linear classifier** predicts a label from the sign of an affine score. For binary classification it is convenient to encode labels as $`y\in\{-1,+1\}`$ rather than $`\{0,1\}`$; the map $`y\mapsto2y-1`$ converts the second coding into the first. With weight vector $`w\in\mathbb R^d`$ and intercept $`b\in\mathbb R`$, the classifier computes the **score** $`f(x)`$ and predicts its sign:
 
-$$
+```math
 f(x)=w^\top x+b,\qquad \hat y(x)=\operatorname{sign}\bigl(f(x)\bigr).
-$$
+```
 
 A score of exactly zero puts $`x`$ on the boundary between the two predictions. Which label such a point receives is a convention; the perceptron below treats it as a mistake.
 
 The set $`\{x:w^\top x+b=0\}`$ is a **hyperplane**, the classifier's decision boundary. The weight vector is normal to it: if $`x`$ and $`x'`$ both lie on the hyperplane, then $`w^\top(x-x')=0`$, so $`w`$ is orthogonal to every direction within the hyperplane, and moving from a point on the boundary in the direction of $`w`$ increases the score. For $`w\ne0`$, the signed Euclidean distance from $`x`$ to the hyperplane is
 
-$$
+```math
 \frac{w^\top x+b}{\|w\|_2},
-$$
+```
 
 which follows by projecting onto the direction $`w/\|w\|_2`$; see orthogonal projections. Pick any point $`x_0`$ on the hyperplane, so that $`w^\top x_0=-b`$. The component of $`x-x_0`$ along the unit normal is $`w^\top(x-x_0)/\|w\|_2=(w^\top x+b)/\|w\|_2`$; it is positive on the side to which $`w`$ points and negative on the other. In particular, the origin is at distance $`\lvert b\rvert/\|w\|_2`$ from the boundary. The score $`f(x)`$ is therefore a distance measured in units of $`1/\|w\|_2`$. Multiplying $`(w,b)`$ by a positive constant rescales every score without changing any prediction.
 
 With signed labels, a prediction is correct exactly when the label and the score agree in sign:
 
-$$
+```math
 y\,f(x)>0.
-$$
+```
 
 The product $`y f(x)`$ is the **functional margin** of the example. Dividing by $`\|w\|_2`$ gives the **geometric margin**, the signed distance of the example from the boundary, positive on the correct side. Unlike the functional margin, the geometric margin does not change when $`(w,b)`$ is multiplied by a positive constant. Margins recur throughout the module: they define the perceptron's update rule, the support vector machine's objective (chapter 8), and the margin theory of boosting (chapter 11).
 
@@ -42,9 +42,9 @@ The product $`y f(x)`$ is the **functional margin** of the example. Dividing by 
 
 A labeled sample $`\{(x_i,y_i)\}_{i=1}^n`$ is **linearly separable** if some $`w`$ satisfies $`y_iw^\top x_i>0`$ for every $`i`$ (in homogeneous form). For a unit vector $`u`$, the smallest of the geometric margins $`y_i\,u^\top x_i`$ is the margin of the worst-placed example: when every example is on the correct side of the hyperplane $`u^\top x=0`$, it is the distance from the hyperplane to the nearest example, and otherwise it is zero or negative. The **margin** of the sample $`D`$ is the best achievable worst case,
 
-$$
+```math
 \gamma(D)=\max_{\|u\|_2=1}\ \min_{1\le i\le n}\ y_i\,u^\top x_i.
-$$
+```
 
 The maximum exists because the worst-case margin is a continuous function of $`u`$ on the compact unit sphere. The data are separable exactly when $`\gamma(D)>0`$: a separating $`w`$, divided by its norm, has a positive margin on each of the finitely many examples. The maximizing direction, written $`u^\ast`$, is unique for separable data. Indeed, writing $`v=u/\gamma`$ for a unit vector $`u`$ with worst-case margin $`\gamma>0`$ turns the problem into minimizing $`\|v\|_2^2`$ subject to $`y_iv^\top x_i\ge1`$ for every $`i`$, a strictly convex objective over a convex set, and the solution gives $`\gamma(D)=1/\|v\|_2`$; the implementation below computes the margin this way.
 
@@ -74,21 +74,21 @@ Practical linear classifiers therefore either exploit separability or replace th
 
 The **perceptron** processes examples one at a time and changes its weights only when it makes a mistake. Write $`(x_t,y_t)`$ for the example presented at step $`t`$ and $`w_t`$ for the weight vector held before that step. Starting from $`w_1=0`$, at step $`t`$ it receives $`(x_t,y_t)`$ and applies
 
-$$
+```math
 w_{t+1}=
 \begin{cases}
 w_t+y_tx_t,& y_t\,w_t^\top x_t\le0,\\
 w_t,&\text{otherwise.}
 \end{cases}
-$$
+```
 
 A score of exactly zero counts as a mistake, so the first example always triggers an update. On a finite training set, the algorithm cycles through the data, typically in a fresh random order in each pass, until a full pass produces no mistakes. The rule was introduced by [Rosenblatt (1958)](https://doi.org/10.1037/h0042519) for a physical learning machine.
 
 The update moves the score of the offending example in the correct direction. Because $`y_t^2=1`$,
 
-$$
+```math
 y_t\,w_{t+1}^\top x_t=y_t\,w_t^\top x_t+\|x_t\|_2^2.
-$$
+```
 
 Geometrically, adding $`y_tx_t`$ rotates the normal vector toward a misclassified positive example or away from a misclassified negative one. A single update need not fix the current example, because the gain $`\|x_t\|_2^2`$ can be smaller than the shortfall $`-y_t\,w_t^\top x_t`$, and it can break examples that were previously correct. The convergence proof shows that these setbacks cannot continue indefinitely when the data are separable.
 
@@ -100,9 +100,9 @@ Geometrically, adding $`y_tx_t`$ rotates the normal vector toward a misclassifie
 
 The perceptron is stochastic subgradient descent, with step size one, on the **perceptron loss**
 
-$$
+```math
 \phi_{\mathrm P}(w;x,y)=\max\{0,\,-y\,w^\top x\}.
-$$
+```
 
 This loss is zero on correctly classified examples and grows linearly with the violation otherwise. Where $`y\,w^\top x<0`$ its gradient is $`-y\,x`$, and the step $`w\leftarrow w-(-yx)`$ is the perceptron update. At the kink $`y\,w^\top x=0`$ the loss has no gradient, and its subgradients are the vectors $`-\lambda\,y\,x`$ with $`0\le\lambda\le1`$; the update uses the subgradient $`-yx`$. The method is stochastic in the sense of stochastic gradient descent: each step uses the loss of a single example, although here the examples arrive in cycling order rather than as independent draws. Unlike the zero–one loss, the perceptron loss is convex and provides a direction to move.
 
@@ -162,35 +162,35 @@ The perceptron's central guarantee concerns a sequence of examples, with no prob
 
 **Theorem (perceptron convergence).** Let $`(x_1,y_1),(x_2,y_2),\ldots`$ be any sequence with $`\|x_t\|_2\le R`$ and $`y_t\in\{-1,+1\}`$. Suppose some unit vector $`u`$ satisfies
 
-$$
+```math
 y_t\,u^\top x_t\ge\gamma>0\qquad\text{for every }t.
-$$
+```
 
 Then the perceptron, started from $`w_1=0`$, makes at most
 
-$$
+```math
 \boxed{M\le\Bigl(\frac R\gamma\Bigr)^2}
-$$
+```
 
 mistakes on the entire sequence.
 
 **Proof.** Track two quantities at each mistake. First, the alignment with $`u`$ grows by at least $`\gamma`$:
 
-$$
+```math
 u^\top w_{t+1}=u^\top w_t+y_t\,u^\top x_t\ge u^\top w_t+\gamma.
-$$
+```
 
 After $`M`$ mistakes, $`u^\top w\ge M\gamma`$. Second, the squared norm grows by at most $`R^2`$:
 
-$$
+```math
 \|w_{t+1}\|_2^2=\|w_t\|_2^2+2y_t\,w_t^\top x_t+\|x_t\|_2^2\le\|w_t\|_2^2+R^2,
-$$
+```
 
 because a mistake means $`y_t\,w_t^\top x_t\le0`$. After $`M`$ mistakes, $`\|w\|_2^2\le MR^2`$. Rounds without mistakes change neither quantity. The Cauchy–Schwarz inequality $`u^\top w\le\|u\|_2\|w\|_2`$ and $`\|u\|_2=1`$ give
 
-$$
+```math
 M\gamma\le u^\top w\le\|w\|_2\le\sqrt M\,R,
-$$
+```
 
 so $`\sqrt M\le R/\gamma`$. $`\square`$
 
@@ -221,9 +221,9 @@ Let $`e_1,\ldots,e_m`$ be orthonormal vectors in $`\mathbb R^d`$ with $`d\ge m`$
 
 The theorem was stated for homogeneous separators. Suppose instead that $`\|x_t\|_2\le R`$ and some unit $`u`$ and intercept $`b`$ satisfy $`y_t(u^\top x_t+b)\ge\gamma`$. Append the constant $`c`$ to each input. The augmented inputs have norm at most $`\sqrt{R^2+c^2}`$, and the augmented separator $`(u,b/c)`$ has norm $`\sqrt{1+b^2/c^2}`$, so after normalization its margin is $`\gamma/\sqrt{1+b^2/c^2}`$. The theorem gives
 
-$$
+```math
 M\le\frac{(R^2+c^2)(1+b^2/c^2)}{\gamma^2}.
-$$
+```
 
 The numerator equals $`R^2+b^2+c^2+R^2b^2/c^2`$, which is minimized at $`c^2=R\lvert b\rvert`$ with value $`(R+\lvert b\rvert)^2`$. With a well-chosen constant, an intercept therefore costs no more than replacing $`R`$ by $`R+\lvert b\rvert`$. The intercept cannot be large when both labels occur: a positive example $`x_+`$ gives $`b\ge\gamma-u^\top x_+\ge\gamma-R`$, and a negative example $`x_-`$ gives $`b\le-\gamma-u^\top x_-\le R-\gamma`$. Hence $`\lvert b\rvert\le R-\gamma<R`$, so the separating hyperplane passes through the ball containing the data, and the bound is at most $`4(R/\gamma)^2`$. In practice one can also center the inputs before training, which usually makes the intercept small.
 
@@ -237,15 +237,15 @@ Novikoff's theorem counts mistakes on a sequence. It does not mention a probabil
 
 Let $`(x_1,y_1),\ldots,(x_{n+1},y_{n+1})`$ be iid from $`P`$, and run the perceptron once through them in order. Let $`w_t`$ be the weight vector *before* example $`t`$, so $`w_t`$ depends only on the first $`t-1`$ examples. Then example $`t`$ is a fresh draw for $`w_t`$: conditionally on the first $`t-1`$ examples, $`w_t`$ is fixed and $`(x_t,y_t)`$ still has law $`P`$, so the conditional probability of a mistake at step $`t`$ is the population error of $`w_t`$. Taking expectations,
 
-$$
+```math
 \mathbb E\bigl[\operatorname{err}_P(w_t)\bigr]=P\bigl(y_t\,w_t^\top x_t\le0\bigr),
-$$
+```
 
 where $`\operatorname{err}_P(w)=P(Y\,w^\top X\le0)`$ is the zero–one population risk of chapter 1, written $`R(f)`$ there, for the classifier $`\operatorname{sign}(w^\top x)`$, again counting a zero score as an error; in this chapter the letter $`R`$ is reserved for the radius of the data. Choose $`T`$ uniformly from $`\{1,\ldots,n+1\}`$, independently of the data, and output $`w_T`$. Averaging over $`T`$,
 
-$$
+```math
 \mathbb E\bigl[\operatorname{err}_P(w_T)\bigr]=\frac{\mathbb E[M_{n+1}]}{n+1},
-$$
+```
 
 where $`M_{n+1}`$ is the number of mistakes in the single pass. If $`P`$ is supported on a ball of radius $`R`$ and is separable with margin $`\gamma`$, then $`M_{n+1}\le(R/\gamma)^2`$ always, and the randomly selected hypothesis has expected error at most $`(R/\gamma)^2/(n+1)`$. This is the online-to-batch conversion of Foundations, specialized to the zero–one loss. Foundations averages the iterates, which requires a loss that is convex in $`w`$; the zero–one loss is not convex, so the conversion here returns a randomly selected iterate instead, the alternative that the Foundations passage names for nonconvex problems.
 
@@ -273,17 +273,17 @@ If no separating hyperplane exists, the perceptron makes mistakes in every pass 
 
 Mistakes can still be bounded relative to any comparison vector, with a penalty for its margin violations. For a unit vector $`u`$ and a target margin $`\gamma>0`$, define the **hinge deviations**
 
-$$
+```math
 d_t=\max\{0,\ \gamma-y_t\,u^\top x_t\},\qquad D=\Bigl(\sum_td_t^2\Bigr)^{1/2}.
-$$
+```
 
 The deviation $`d_t`$ is zero for examples classified with margin at least $`\gamma`$, and it measures the shortfall otherwise; $`D`$ is the Euclidean norm of the vector of deviations. The letter follows Freund and Schapire; this $`D`$ has nothing to do with the sample $`D`$ in $`\gamma(D)`$.
 
 **Theorem (Freund and Schapire, 1999).** In a single pass through a sequence with $`\|x_t\|_2\le R`$, the perceptron makes at most
 
-$$
+```math
 M\le\Bigl(\frac{R+D}\gamma\Bigr)^2
-$$
+```
 
 mistakes, for every unit $`u`$ and every $`\gamma>0`$.
 
@@ -303,15 +303,15 @@ A related idea, the **pocket algorithm**, keeps the weight vector with the longe
 
 With $`K`$ classes, keep one weight vector per class and predict the class with the largest score,
 
-$$
+```math
 \hat y(x)=\operatorname*{arg\,max}_{c\in\{1,\ldots,K\}}\ w_c^\top x.
-$$
+```
 
 On a mistake, with true class $`y`$ and predicted class $`\hat y\ne y`$, the multiclass perceptron updates
 
-$$
+```math
 w_y\leftarrow w_y+x,\qquad w_{\hat y}\leftarrow w_{\hat y}-x.
-$$
+```
 
 The update raises the correct class's score on $`x`$ by $`\|x\|_2^2`$ and lowers the offending class's score on $`x`$ by the same amount, leaving the other scores unchanged. Like a binary update, it can move other examples to the wrong side.
 
@@ -361,9 +361,9 @@ Versicolor and virginica are not linearly separable in these four features, so t
 
 The perceptron stores its weight vector as a sum of training inputs:
 
-$$
+```math
 w=\sum_{i=1}^n\alpha_i\,y_i\,x_i,
-$$
+```
 
 where $`\alpha_i`$ counts the mistakes made on example $`i`$. Scores are therefore inner products with training examples, $`w^\top x=\sum_i\alpha_iy_i\,x_i^\top x`$. Replacing each inner product by a kernel evaluation gives the **kernel perceptron**, a nonlinear classifier trained by the same mistake-driven rule; this **dual representation** is developed in chapter 8.
 
@@ -389,21 +389,21 @@ Fix a unit vector $`u\in\mathbb R^d`$, a margin $`\gamma>0`$, and a sequence $`(
 
 **Augment the sequence.** For $`\Delta>0`$, embed each input into $`\mathbb R^{d+T}`$ by giving position $`t`$ its own coordinate:
 
-$$
+```math
 \tilde x_t=(x_t,\ \Delta e_t),\qquad \|\tilde x_t\|_2^2\le R^2+\Delta^2,
-$$
+```
 
 where $`e_t`$ is the $`t`$th standard basis vector of $`\mathbb R^T`$. Define the comparison vector
 
-$$
+```math
 \tilde u=\frac1Z\Bigl(u,\ \frac1\Delta\sum_{t=1}^Ty_td_t\,e_t\Bigr),\qquad Z=\sqrt{1+D^2/\Delta^2},
-$$
+```
 
 so that $`\|\tilde u\|_2=1`$. For every $`t`$,
 
-$$
+```math
 y_t\,\tilde u^\top\tilde x_t=\frac1Z\bigl(y_tu^\top x_t+d_t\bigr)\ge\frac\gamma Z,
-$$
+```
 
 because $`y_t^2=1`$ and $`d_t\ge\gamma-y_tu^\top x_t`$. The augmented sequence is separable with margin $`\gamma/Z`$.
 
@@ -411,10 +411,10 @@ because $`y_t^2=1`$ and $`d_t\ge\gamma-y_tu^\top x_t`$. The augmented sequence i
 
 **Apply the separable bound and optimize.** Novikoff's theorem, with radius $`\sqrt{R^2+\Delta^2}`$ and margin $`\gamma/Z`$, gives
 
-$$
+```math
 M\le\frac{(R^2+\Delta^2)(1+D^2/\Delta^2)}{\gamma^2}
 =\frac{R^2+D^2+\Delta^2+R^2D^2/\Delta^2}{\gamma^2}.
-$$
+```
 
 Choosing $`\Delta^2=RD`$ minimizes the right side and yields $`M\le(R+D)^2/\gamma^2`$. $`\square`$
 

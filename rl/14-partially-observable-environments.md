@@ -24,9 +24,9 @@ A policy can depend on anything the agent knows at time $`t`$, which is the **hi
 - **The observation** alone, $`X_t=O_t`$: a **memoryless** or **reactive** agent. It is optimal only if the observation is Markov.
 - **A window** of the last $`k`$ observations and actions. This is the frame stacking of the Atari agents, which makes velocities visible (chapter 16). It captures dependencies up to $`k`$ steps back and no further, and the number of distinct windows grows exponentially with $`k`$.
 - **The belief state** $`b_t(s)=\Pr(S_t=s\mid H_t)`$, the posterior over hidden states, updated by Bayes' rule:
-  $$
+  ```math
   b_{t+1}(s')=\frac{Z(o\mid s',a)\sum_sp(s'\mid s,a)\,b_t(s)}{\Pr(o\mid b_t,a)}.
-  $$
+  ```
   It is a **sufficient statistic** for the history: the optimal action depends on the history only through the belief ([Åström, 1965](https://doi.org/10.1016/0022-247X%2865%2990154-X)). It requires the model.
 - **A learned state**, such as the hidden state of a recurrent network or a set of predictions about future observations. It is what agents without a model use.
 
@@ -47,9 +47,9 @@ The best memoryless policy is also hard to find: for deterministic memoryless po
 
 For a finite horizon, the optimal value of the belief MDP is **piecewise linear and convex** in the belief ([Smallwood and Sondik, 1973](https://doi.org/10.1287/opre.21.5.1071)): there is a finite set $`\Gamma_t`$ of vectors in $`\mathbb R^{|\mathcal S|}`$, the **alpha-vectors**, with
 
-$$
+```math
 V_t(b)=\max_{\boldsymbol\alpha\in\Gamma_t}\;\sum_sb(s)\,\alpha(s).
-$$
+```
 
 Each alpha-vector is the value, state by state, of one conditional plan: a first action followed by a plan for each observation that may follow, and so on to the horizon. The value of following a fixed plan is linear in the belief, and the optimal value picks the best plan for each belief ([Appendix A](#block-rl14-appendix-a)). For an infinite horizon with discounting, $`V^*`$ is the limit of the $`V_t`$; it is convex but need not be piecewise linear, although it can be approximated arbitrarily well by finitely many vectors ([Sondik, 1978](https://doi.org/10.1287/opre.26.2.282)). The convexity is the value of information: the value of a mixture of beliefs is at most the average of their values, so learning which of them holds can only help on average.
 
@@ -57,9 +57,9 @@ Each alpha-vector is the value, state by state, of one conditional plan: a first
 
 The Bellman backup maps $`\Gamma_{t-1}`$ to $`\Gamma_t`$. For each action $`a`$ and observation $`o`$, each vector $`\boldsymbol\alpha\in\Gamma_{t-1}`$ is projected back one step,
 
-$$
+```math
 g_{a,o}^{\boldsymbol\alpha}(s)=\gamma\sum_{s'}p(s'\mid s,a)\,Z(o\mid s',a)\,\alpha(s'),
-$$
+```
 
 and a new vector is formed by choosing one projection for each observation: $`\boldsymbol\alpha_{\text{new}}=r(\cdot,a)+\sum_o g_{a,o}^{\boldsymbol\alpha_o}`$. All the choices give $`|\mathcal A|\,|\Gamma_{t-1}|^{|\mathcal O|}`$ vectors, most of which are **dominated**: they are the best at no belief, and can be removed. Deciding whether a vector is best somewhere is a linear program, one per vector. The classic algorithms differ in how they avoid generating dominated vectors in the first place: the enumeration of [Monahan (1982)](https://doi.org/10.1287/mnsc.28.1.1), Sondik's one-pass algorithm, the witness algorithm of [Kaelbling, Littman, and Cassandra (1998)](https://doi.org/10.1016/S0004-3702%2898%2900023-X), and incremental pruning, which prunes the cross-sum one observation at a time ([Cassandra, Littman, and Zhang, 1997](https://arxiv.org/abs/1302.1525)).
 
@@ -129,9 +129,9 @@ Pruning keeps the tiger's value function small, but it still grows with the hori
 
 The cheapest approximations solve the underlying MDP, as if the state were observed, and use its solution to act on the belief. **QMDP** ([Littman, Cassandra, and Kaelbling, 1995](https://doi.org/10.1016/B978-1-55860-377-6.50052-9)) averages the MDP's action values under the belief,
 
-$$
+```math
 Q_{\text{MDP}}(b,a)=\sum_sb(s)\,q_*(s,a),
-$$
+```
 
 and acts greedily. It assumes that all uncertainty will disappear after one step, so it overestimates: $`\max_aQ_{\text{MDP}}(b,a)\ge V^*(b)`$ (exercise 14.3). QMDP lets the next action depend on the next state; the **fast informed bound** of [Hauskrecht (2000)](https://doi.org/10.1613/jair.678) lets it depend on the next observation and the current state, but not on the next state, which gives a tighter upper bound. Upper bounds like these are useful in their own right, to guide search and to certify the quality of other solutions, as in HSVI and SARSOP below.
 
@@ -214,9 +214,9 @@ On the tiger, QMDP's estimate of its own value is ten times too high, 189 agains
 
 Most of the belief simplex is never visited. **Point-based value iteration** (PBVI) ([Pineau, Gordon, and Thrun, 2003](https://www.ijcai.org/Proceedings/03/Papers/147.pdf); [2006](https://doi.org/10.1613/jair.2078)) keeps one alpha-vector per belief in a finite set $`B`$ of beliefs reachable from the start, and backs up only at those points. The backup at a belief $`b`$ is cheap because the best projection for each observation can be chosen at $`b`$ alone:
 
-$$
+```math
 \boldsymbol\alpha_b=\arg\max_a\;b\cdot\Bigl(r(\cdot,a)+\sum_o\arg\max_{\boldsymbol\alpha\in\Gamma}\;b\cdot g_{a,o}^{\boldsymbol\alpha}\Bigr),
-$$
+```
 
 which costs $`O(|\mathcal A|\,|\mathcal O|\,|\Gamma|\,|\mathcal S|^2)`$ instead of an exponential number of vectors. Since each vector is the value of a real conditional plan, starting from a lower bound keeps every $`V_B`$ a lower bound on $`V^*`$, and the error is bounded by how densely $`B`$ covers the reachable beliefs: with $`\delta_B`$ the largest distance, in the 1-norm, from a reachable belief to the nearest point of $`B`$, the error is at most $`(R_{\max}-R_{\min})\,\delta_B/(1-\gamma)^2`$ ([Appendix B](#block-rl14-appendix-b)). PBVI alternates backups with expanding $`B`$ by simulating one step from each point and keeping the successors farthest from the set.
 
@@ -493,7 +493,9 @@ Show by induction that the finite-horizon value function $`V_t(b)`$ of a POMDP i
 
 $`V_0=0`$ is linear. Suppose $`V_{t-1}(b)=\max_{\boldsymbol\alpha\in\Gamma_{t-1}}b\cdot\boldsymbol\alpha`$. Then
 
-$$V_t(b)=\max_a\Bigl[b\cdot r(\cdot,a)+\gamma\sum_o\Pr(o\mid b,a)\,V_{t-1}(\tau(b,a,o))\Bigr].$$
+```math
+V_t(b)=\max_a\Bigl[b\cdot r(\cdot,a)+\gamma\sum_o\Pr(o\mid b,a)\,V_{t-1}(\tau(b,a,o))\Bigr].
+```
 
 The updated belief is $`\tau(b,a,o)(s')=\sum_sb(s)p(s'\mid s,a)Z(o\mid s',a)/\Pr(o\mid b,a)`$, so the normalizer cancels: $`\Pr(o\mid b,a)\,V_{t-1}(\tau(b,a,o))=\max_{\boldsymbol\alpha}\sum_sb(s)\sum_{s'}p(s'\mid s,a)Z(o\mid s',a)\alpha(s')=\max_{\boldsymbol\alpha}b\cdot\mathbf g_{a,o}^{\boldsymbol\alpha}/\gamma`$. A maximum of linear functions of $`b`$ is piecewise linear and convex; a sum over $`o`$ of such functions is a maximum over choices of one vector per observation, so it is also piecewise linear and convex; adding the linear reward term and maximizing over $`a`$ preserves the property. The vectors of $`\Gamma_t`$ are exactly the $`r(\cdot,a)+\sum_o\mathbf g_{a,o}^{\boldsymbol\alpha_o}`$ of the chapter's backup.
 
@@ -747,7 +749,9 @@ Q-learning's target for writing bit $`w`$ in the corridor is $`\gamma\max_{a'}Q(
 
 A $`t`$-step **conditional plan** $`\sigma`$ consists of an action $`a_\sigma`$ and, for each observation $`o`$, a $`(t-1)`$-step plan $`\sigma_o`$. Its value in state $`s`$ satisfies
 
-$$\alpha_\sigma(s)=r(s,a_\sigma)+\gamma\sum_{s'}p(s'\mid s,a_\sigma)\sum_oZ(o\mid s',a_\sigma)\,\alpha_{\sigma_o}(s'),$$
+```math
+\alpha_\sigma(s)=r(s,a_\sigma)+\gamma\sum_{s'}p(s'\mid s,a_\sigma)\sum_oZ(o\mid s',a_\sigma)\,\alpha_{\sigma_o}(s'),
+```
 
 and the expected return of following $`\sigma`$ from belief $`b`$ is $`b\cdot\boldsymbol\alpha_\sigma`$, linear in $`b`$ because the plan does not depend on the belief. Any $`t`$-step policy from $`b`$ is some conditional plan, since the histories it can meet are finite, so $`V_t(b)=\max_\sigma b\cdot\boldsymbol\alpha_\sigma`$: piecewise linear and convex, with one vector per useful plan. The backup of the chapter builds $`\boldsymbol\alpha_\sigma`$ from the vectors of the continuation plans by exactly the formula above, with $`\mathbf g_{a,o}^{\boldsymbol\alpha}`$ collecting the terms for one observation. A vector can be removed if it is not strictly the best at any belief, which the linear program $`\max\,\delta`$ subject to $`b\cdot(\boldsymbol\alpha-\boldsymbol\alpha')\ge\delta`$ for all other $`\boldsymbol\alpha'`$ and $`b`$ in the simplex decides.
 
@@ -765,7 +769,9 @@ The optimal policy of a plan-based value function is read off at each belief: th
 
 **The point-based error bound.** Let $`V_B`$ be the fixed point of point-based backups on a set $`B`$, started from a lower bound, and let $`\delta_B=\max_{b'\in\bar\Delta}\min_{b\in B}\|b-b'\|_1`$ be the density of $`B`$ in the set $`\bar\Delta`$ of reachable beliefs. Each backup at a point $`b`$ produces the exact backed-up vector at $`b`$; at a reachable belief $`b'`$ whose nearest point is $`b`$, the error of using the vector from $`b`$ instead of the one that would be best at $`b'`$ is at most $`(\boldsymbol\alpha'-\boldsymbol\alpha)\cdot(b'-b)\le\|\boldsymbol\alpha'-\boldsymbol\alpha\|_\infty\|b'-b\|_1`$. Alpha-vectors have entries between $`R_{\min}/(1-\gamma)`$ and $`R_{\max}/(1-\gamma)`$, so one backup adds at most $`(R_{\max}-R_{\min})\delta_B/(1-\gamma)`$, and the contraction of the backup by $`\gamma`$ accumulates these to
 
-$$\|V_B-V^*\|_\infty\le\frac{(R_{\max}-R_{\min})\,\delta_B}{(1-\gamma)^2}$$
+```math
+\|V_B-V^*\|_\infty\le\frac{(R_{\max}-R_{\min})\,\delta_B}{(1-\gamma)^2}
+```
 
 over the reachable beliefs ([Pineau, Gordon, and Thrun, 2003](https://www.ijcai.org/Proceedings/03/Papers/147.pdf)). The bound is loose, as exercise 14.6 shows, but it explains why points should be added where they reduce $`\delta_B`$ the most, which is PBVI's rule for expanding $`B`$.
 

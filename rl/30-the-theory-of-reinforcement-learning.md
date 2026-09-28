@@ -322,13 +322,21 @@ A pessimistic offline algorithm evaluates policies in the empirical model with t
 
 
 Fix a policy $`\pi`$ and write $`P^\pi`$ for its state-to-state transition matrix. The values in the true and empirical models satisfy $`V^\pi=(I-\gamma P^\pi)^{-1}r^\pi`$ and the same with $`\hat P^\pi`$, so
-$$\hat V^\pi-V^\pi=\gamma(I-\gamma\hat P^\pi)^{-1}(\hat P^\pi-P^\pi)V^\pi.$$
+```math
+\hat V^\pi-V^\pi=\gamma(I-\gamma\hat P^\pi)^{-1}(\hat P^\pi-P^\pi)V^\pi.
+```
 Exercise 30.1 bounded each entry of $`(\hat P-P)V^\pi`$ by the range of $`V^\pi`$ over $`\sqrt N`$, and the norm of $`(I-\gamma\hat P^\pi)^{-1}`$, a discounted sum of stochastic matrices, by $`1/(1-\gamma)`$: two factors of $`1/(1-\gamma)`$ besides the $`1/\sqrt N`$. The sharper argument keeps the variance. By Bernstein's inequality, with high probability, for every state
-$$|((\hat P^\pi-P^\pi)V^\pi)(s)|\lesssim\sqrt{\frac{\operatorname{Var}_{P^\pi(\cdot\mid s)}(V^\pi)\,L}N}+\frac{L}{(1-\gamma)N},$$
+```math
+|((\hat P^\pi-P^\pi)V^\pi)(s)|\lesssim\sqrt{\frac{\operatorname{Var}_{P^\pi(\cdot\mid s)}(V^\pi)\,L}N}+\frac{L}{(1-\gamma)N},
+```
 with $`L`$ a logarithmic factor. The key fact is a **law of total variance** for discounted returns: the one-step variances of the value, accumulated along the trajectory with discounting, account for the variance of the whole return, which is at most $`1/(1-\gamma)^2`$. In vector form,
-$$\Bigl\|(I-\gamma P^\pi)^{-1}\sqrt{\operatorname{Var}_{P^\pi}(V^\pi)}\Bigr\|_\infty\le\sqrt{\frac2{(1-\gamma)^3}},$$
+```math
+\Bigl\|(I-\gamma P^\pi)^{-1}\sqrt{\operatorname{Var}_{P^\pi}(V^\pi)}\Bigr\|_\infty\le\sqrt{\frac2{(1-\gamma)^3}},
+```
 by the Cauchy–Schwarz inequality applied to the discounted sum: $`\sum_t\gamma^t\sqrt{v_t}\le\sqrt{\sum_t\gamma^t}\sqrt{\sum_t\gamma^tv_t}`$, where the first factor is $`(1-\gamma)^{-1/2}`$ and the second is at most $`\sqrt2/(1-\gamma)`$ (with $`v_t`$ the expected one-step variance at step $`t`$, by Jensen's inequality): by the law of total variance, $`\gamma^2\sum_t\gamma^{2t}v_t`$ is the variance of the return after the fixed first reward, at most $`\gamma^2/(1-\gamma)^2`$, and weighting by $`\gamma^t`$ instead of $`\gamma^{2t}`$ costs at most a factor 2. Replacing the empirical matrix $`\hat P^\pi`$ by $`P^\pi`$ in the inverse costs lower-order terms, and the result is
-$$\|\hat V^\pi-V^\pi\|_\infty\lesssim\sqrt{\frac{L}{(1-\gamma)^3N}}+\frac{L}{(1-\gamma)^2N}.$$
+```math
+\|\hat V^\pi-V^\pi\|_\infty\lesssim\sqrt{\frac{L}{(1-\gamma)^3N}}+\frac{L}{(1-\gamma)^2N}.
+```
 Applied to an optimal policy of the true model and an optimal policy of the empirical model, with care for the dependence between $`\hat\pi^*`$ and the samples, this gives accuracy $`\varepsilon`$ with $`N=\tilde O\bigl(1/((1-\gamma)^3\varepsilon^2)\bigr)`$ samples per pair once $`N`$ exceeds a burn-in of order $`1/(1-\gamma)`$, as Li et al. showed after larger burn-ins in earlier work ([Azar, Munos, and Kappen, 2013](https://doi.org/10.1007/s10994-013-5368-1); [Agarwal, Kakade, and Yang, 2020](https://arxiv.org/abs/1906.03804); [Li et al., 2020](https://arxiv.org/abs/2005.12900)), matching the lower bound of exercise 30.3.
 
 </details>
@@ -340,13 +348,17 @@ Applied to an optimal policy of the true model and an optimal policy of the empi
 
 
 Consider an episodic MDP with horizon $`H`$, time-homogeneous unknown transitions, and known rewards in $`[0,1]`$. In episode $`k`$, UCBVI computes, from the empirical model $`\hat P_k`$ and counts $`n_k`$,
-$$\bar Q^k_h(s,a)=\min\bigl(H,\ r(s,a)+b_k(s,a)+\hat P_k\bar V^k_{h+1}(s,a)\bigr),\qquad\bar V^k_h(s)=\max_a\bar Q^k_h(s,a),$$
+```math
+\bar Q^k_h(s,a)=\min\bigl(H,\ r(s,a)+b_k(s,a)+\hat P_k\bar V^k_{h+1}(s,a)\bigr),\qquad\bar V^k_h(s)=\max_a\bar Q^k_h(s,a),
+```
 with $`\bar V^k_{H+1}=0`$ and $`b_k(s,a)=cH\sqrt{L/\max(n_k(s,a),1)}`$, and follows the greedy policy $`\pi_k`$. The analysis has three steps.
 
 **Optimism.** With $`V^*_{h+1}`$ fixed, Hoeffding's inequality and a union bound show that $`|(\hat P_k-P)V^*_{h+1}(s,a)|\le b_k(s,a)`$ for all $`k`$, $`h`$, $`s`$, $`a`$ with high probability, and exercise 30.5(a) then gives $`\bar V^k_1\ge V^*_1`$. The regret is therefore at most $`\sum_k(\bar V^k_1-V^{\pi_k}_1)(s^k_1)`$.
 
 **Decomposition along the trajectory.** At the state $`s^k_h`$ and action $`a^k_h=\pi_k(s^k_h)`$ actually visited,
-$$\bar V^k_h(s^k_h)-V^{\pi_k}_h(s^k_h)\le b_k+(\hat P_k-P)\bar V^k_{h+1}+P(\bar V^k_{h+1}-V^{\pi_k}_{h+1}),$$
+```math
+\bar V^k_h(s^k_h)-V^{\pi_k}_h(s^k_h)\le b_k+(\hat P_k-P)\bar V^k_{h+1}+P(\bar V^k_{h+1}-V^{\pi_k}_{h+1}),
+```
 all evaluated at $`(s^k_h,a^k_h)`$. The last term equals $`(\bar V^k_{h+1}-V^{\pi_k}_{h+1})(s^k_{h+1})`$ plus a martingale difference, the gap between the expected and the realized next state. Unrolling over $`h`$, the regret is bounded by the sum of the bonuses along the trajectories played, the sum of the model-error terms $`(\hat P_k-P)\bar V^k_{h+1}`$, and a martingale whose sum is $`\tilde O(H\sqrt T)`$ by the Azuma–Hoeffding inequality.
 
 **Summation.** The bonuses sum to $`\tilde O(H\sqrt{SAT})`$ by exercise 30.5(b). The model-error terms involve $`\bar V^k_{h+1}`$, which depends on the data, so they are handled by writing $`(\hat P_k-P)\bar V^k_{h+1}=(\hat P_k-P)V^*_{h+1}+(\hat P_k-P)(\bar V^k_{h+1}-V^*_{h+1})`$: the first part is at most the bonus, and the second is controlled with a concentration bound for each next-state probability, which contributes lower-order terms polynomial in $`S`$ and $`H`$. Altogether the regret is $`\tilde O(H\sqrt{SAT})`$ plus terms that do not grow with $`T`$, as [Azar, Osband, and Munos (2017)](https://arxiv.org/abs/1703.05449) proved; bonuses based on the empirical variance of $`\bar V^k_{h+1}`$, together with the law of total variance of appendix A, replace $`H`$ by $`\sqrt H`$ and give the minimax $`\tilde O(\sqrt{HSAT})`$.

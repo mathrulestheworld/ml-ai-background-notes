@@ -23,9 +23,9 @@ A Bayesian network is a generative process: sample each variable in topological 
 
 **Likelihood weighting** never rejects. It fixes the evidence variables to their observed values, samples the other variables in topological order as before, and gives each sample a **weight** equal to the likelihood of the evidence given the sampled parents:
 
-$$
+```math
 w=\prod_{E_i\in\text{evidence}}P\bigl(e_i\mid\mathrm{parents}(E_i)\bigr),\qquad\hat P(x\mid e)=\frac{\sum_kw_k\,\mathbb 1[x_k=x]}{\sum_kw_k}.
-$$
+```
 
 The estimate is consistent ([Appendix A](#block-ai10-appendix-a)). It is an instance of importance sampling, below, with the evidence clamped: the non-evidence variables are sampled from their priors, uninfluenced by evidence downstream. When the evidence is unlikely under the prior's typical samples, almost all the weight falls on a few samples, and the estimate is as noisy as a sample of that size.
 
@@ -69,15 +69,15 @@ Rejection sampling keeps 213 of 100,000 samples. Likelihood weighting uses all o
 
 Both methods are cases of **importance sampling**. To estimate $`\mathbb E_p[f]=\sum_xp(x)f(x)`$ when sampling from $`p`$ is hard, sample from a **proposal** $`q`$ instead, with $`q(x)>0`$ wherever $`p(x)f(x)\neq0`$, and reweight:
 
-$$
+```math
 \mathbb E_p[f]=\mathbb E_q\!\left[f(x)\frac{p(x)}{q(x)}\right]\approx\frac1N\sum_kf(x_k)\,w_k,\qquad w_k=\frac{p(x_k)}{q(x_k)}.
-$$
+```
 
 When $`p`$ is known only up to a constant, such as a posterior $`p(x\mid e)\propto p(x,e)`$, the **self-normalized** estimate $`\sum_kw_kf(x_k)/\sum_kw_k`$ uses unnormalized weights and is consistent though slightly biased. The quality of a proposal is summarized by the **effective sample size**
 
-$$
+```math
 N_{\mathrm{eff}}=\frac{\bigl(\sum_kw_k\bigr)^2}{\sum_kw_k^2},
-$$
+```
 
 which equals $`N`$ when all weights are equal and 1 when one weight dominates. The variance of importance sampling is small when $`q`$ is close to $`p`$ and enormous, even infinite, when $`q`$ has lighter tails than $`p`$. In high dimensions a product of many per-variable weight ratios almost always degenerates, which is why **sequential** importance sampling with resampling, the particle filter of chapter 11, periodically discards low-weight samples and duplicates high-weight ones.
 
@@ -87,9 +87,9 @@ which equals $`N`$ when all weights are equal and 1 when one weight dominates. T
 
 **Markov chain Monte Carlo** (MCMC) gives up independent samples. It runs a Markov chain whose states are complete assignments and whose long-run distribution is the target $`\pi`$, and uses the sequence of states as correlated samples. A chain with transition probabilities $`T(x\to x')`$ has **stationary distribution** $`\pi`$ if $`\sum_x\pi(x)T(x\to x')=\pi(x')`$: a state distributed according to $`\pi`$ stays so distributed after a step. A convenient sufficient condition is **detailed balance**,
 
-$$
+```math
 \pi(x)\,T(x\to x')=\pi(x')\,T(x'\to x)\qquad\text{for all }x,x',
-$$
+```
 
 which says that in equilibrium the flow from $`x`$ to $`x'`$ equals the flow back ([Appendix B](#block-ai10-appendix-b)). If the chain is also **ergodic**, able to reach every state from every other (irreducible) without being trapped in cycles (aperiodic), then from any starting state the distribution of the chain converges to $`\pi`$, and averages along the chain converge to expectations under $`\pi`$. The conditions are easy to verify and say nothing about how fast convergence happens, which is the whole practical question.
 
@@ -97,9 +97,9 @@ which says that in equilibrium the flow from $`x`$ to $`x'`$ equals the flow bac
 
 **Gibbs sampling** ([Geman and Geman, 1984](https://doi.org/10.1109/TPAMI.1984.4767596)) updates one variable at a time, resampling it from its conditional distribution given all the others. In a graphical model that conditional depends only on the variable's **Markov blanket** (chapter 8):
 
-$$
+```math
 P(x_i\mid x_{-i})\propto P\bigl(x_i\mid\mathrm{parents}(X_i)\bigr)\prod_{Y_j\in\mathrm{children}(X_i)}P\bigl(y_j\mid\mathrm{parents}(Y_j)\bigr)
-$$
+```
 
 in a Bayesian network, and $`\propto\prod_{c\ni i}\psi_c(x_c)`$ in a Markov network, so each update is cheap and local. Evidence variables are simply never resampled. Each update leaves the target invariant, and cycling through the variables gives an ergodic chain when all conditionals are positive. On the burglary network, Gibbs sampling over the three unobserved variables estimates $`P(B\mid j,m)`$ far more accurately than the sampling methods above for the same number of iterations, because it samples the alarm from its posterior instead of from its prior:
 
@@ -113,9 +113,9 @@ Gibbs sampling fails when variables are strongly coupled. If two variables are a
 
 **Metropolis–Hastings** ([Metropolis et al., 1953](https://doi.org/10.1063/1.1699114); [Hastings, 1970](https://doi.org/10.1093/biomet/57.1.97)) builds a chain for any target known up to a constant. From the current state $`x`$, propose $`x'\sim q(x'\mid x)`$, and accept with probability
 
-$$
+```math
 A(x\to x')=\min\left(1,\;\frac{\pi(x')\,q(x\mid x')}{\pi(x)\,q(x'\mid x)}\right),
-$$
+```
 
 otherwise stay at $`x`$. The normalizing constant of $`\pi`$ cancels in the ratio, and the acceptance rule enforces detailed balance for any proposal (Appendix B). Gibbs sampling is the special case whose proposal is the exact conditional, for which the acceptance probability is always 1; the simulated annealing of chapter 3 is the case $`\pi\propto e^{-E/T}`$ with a symmetric proposal and a falling temperature.
 
@@ -180,9 +180,9 @@ Practitioners discard an initial **burn-in** segment, run several chains from di
 
 Variational methods choose a family $`\mathcal Q`$ of tractable distributions and look for the member closest to the posterior. With the target $`p(x)=\tilde p(x)/Z`$ known up to its normalizing constant, the **reverse Kullback–Leibler divergence** gives
 
-$$
+```math
 \mathrm{KL}(q\,\|\,p)=\sum_xq(x)\log\frac{q(x)}{p(x)}=\log Z-\underbrace{\Bigl(\mathbb E_q[\log\tilde p(x)]+H(q)\Bigr)}_{\mathrm{ELBO}(q)}.
-$$
+```
 
 Since the divergence is nonnegative (Foundations chapter 5), the bracketed quantity is a lower bound on $`\log Z`$, the **evidence lower bound**, and maximizing it over $`q`$ minimizes the divergence without knowing $`Z`$. The same bound, with $`q`$ the distribution of the hidden variables, underlies EM (ML chapter 14), and in the Generative AI module it becomes the training objective of variational autoencoders, where $`q`$ is produced by a network (Generative AI chapter 3). The reverse divergence penalizes $`q`$ for putting mass where $`p`$ has little, not for missing mass where $`p`$ has some, so its minimizers are **mode-seeking**: a unimodal $`q`$ fitted to a bimodal $`p`$ locks onto one mode and underestimates the variance.
 
@@ -190,9 +190,9 @@ Since the divergence is nonnegative (Foundations chapter 5), the bracketed quant
 
 The **mean-field** family makes all variables independent, $`q(x)=\prod_iq_i(x_i)`$. Maximizing the ELBO over one factor with the others fixed has a closed form ([Appendix C](#block-ai10-appendix-c)):
 
-$$
+```math
 q_i(x_i)\propto\exp\Bigl(\mathbb E_{q_{-i}}\bigl[\log\tilde p(x_i,x_{-i})\bigr]\Bigr),
-$$
+```
 
 and cycling through the factors, **coordinate ascent variational inference**, increases the ELBO monotonically to a local optimum. For the Ising model with $`\tilde p(s)=\exp\bigl(J\sum_{(i,j)}s_is_j+\sum_ih_is_i\bigr)`$ the update gives the mean-field equations of statistical physics, $`m_i=\tanh\bigl(h_i+J\sum_{j\in N(i)}m_j\bigr)`$ for the means $`m_i=\mathbb E_q[s_i]`$: each spin sees its neighbors only through their averages. Mean field is cheap and always converges, but it ignores correlations, and it is overconfident: at strong coupling, the means lock into one aligned state.
 
@@ -280,15 +280,15 @@ Modern practice mixes the families: variational approximations serve as proposal
 
 Let $`Z`$ be the non-evidence variables and $`E=e`$ the evidence. Likelihood weighting samples each non-evidence variable from its CPT given its parents, with evidence variables clamped, so the probability of generating $`z`$ is
 
-$$
+```math
 q(z)=\prod_{Z_i\in Z}P\bigl(z_i\mid\mathrm{parents}(Z_i)\bigr),
-$$
+```
 
 with parents' values taken from $`z`$ and $`e`$. The weight is $`w(z)=\prod_{E_j}P\bigl(e_j\mid\mathrm{parents}(E_j)\bigr)`$. Their product is the full factorization, $`q(z)\,w(z)=P(z,e)`$. For any value $`x`$ of a query variable,
 
-$$
+```math
 \mathbb E_q\bigl[w\,\mathbb 1[x]\bigr]=\sum_zq(z)\,w(z)\,\mathbb 1[x\in z]=P(x,e),\qquad\mathbb E_q[w]=P(e),
-$$
+```
 
 so by the law of large numbers the ratio of the weighted count to the total weight converges to $`P(x,e)/P(e)=P(x\mid e)`$. This is importance sampling with proposal $`q`$ and weights $`w=P(z,e)/q(z)`$ for the unnormalized target $`P(z,e)`$.
 
@@ -304,17 +304,17 @@ so by the law of large numbers the ratio of the weighted count to the total weig
 
 **Metropolis–Hastings satisfies detailed balance.** For $`x\neq x'`$, the transition probability is $`T(x\to x')=q(x'\mid x)A(x\to x')`$. Suppose, without loss of generality, that $`\pi(x')q(x\mid x')\le\pi(x)q(x'\mid x)`$, so $`A(x\to x')=\frac{\pi(x')q(x\mid x')}{\pi(x)q(x'\mid x)}`$ and $`A(x'\to x)=1`$. Then
 
-$$
+```math
 \pi(x)\,q(x'\mid x)\,A(x\to x')=\pi(x')\,q(x\mid x')=\pi(x')\,q(x\mid x')\,A(x'\to x).
-$$
+```
 
 The self-transitions satisfy detailed balance trivially. Only ratios of $`\pi`$ appear, so the normalizing constant is never needed.
 
 **Gibbs sampling is Metropolis–Hastings with acceptance 1.** Updating variable $`i`$ proposes $`x'=(x_i',x_{-i})`$ with $`q(x'\mid x)=\pi(x_i'\mid x_{-i})`$. Then
 
-$$
+```math
 \frac{\pi(x')\,q(x\mid x')}{\pi(x)\,q(x'\mid x)}=\frac{\pi(x_i'\mid x_{-i})\pi(x_{-i})\;\pi(x_i\mid x_{-i})}{\pi(x_i\mid x_{-i})\pi(x_{-i})\;\pi(x_i'\mid x_{-i})}=1.
-$$
+```
 
 Each single-variable update therefore leaves $`\pi`$ invariant, and so does any sequence of them. A systematic sweep is not itself reversible, but it has $`\pi`$ as a stationary distribution, which is what convergence requires together with ergodicity.
 
@@ -328,9 +328,9 @@ Each single-variable update therefore leaves $`\pi`$ invariant, and so does any 
 
 Write the ELBO as a function of one factor $`q_j`$ with the others fixed. With $`q=\prod_iq_i`$,
 
-$$
+```math
 \mathrm{ELBO}=\sum_{x_j}q_j(x_j)\,\mathbb E_{q_{-j}}\bigl[\log\tilde p(x)\bigr]+H(q_j)+\text{const},
-$$
+```
 
 since the entropy of a product is the sum of the entropies. Let $`\log g(x_j)=\mathbb E_{q_{-j}}[\log\tilde p(x_j,x_{-j})]`$ and $`\hat q_j=g/\sum g`$. Then the ELBO equals $`-\mathrm{KL}(q_j\,\|\,\hat q_j)+\text{const}`$, maximized uniquely by $`q_j=\hat q_j`$, which is the update in the text. Each update increases the ELBO, which is bounded above by $`\log Z`$, so coordinate ascent converges, in general to a local optimum.
 

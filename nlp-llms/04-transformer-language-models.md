@@ -10,9 +10,9 @@
 
 A count-based model learns nothing about one context from another unless they match exactly (chapter 2). The **neural probabilistic language model** of [Bengio et al. (2003)](https://www.jmlr.org/papers/v3/bengio03a.html) removed this limitation. It kept the Markov window of an n-gram model but mapped each of the previous $`n-1`$ words to a learned embedding (chapter 3), concatenated the embeddings, passed them through a hidden layer, and produced the next-word distribution with a softmax:
 
-$$
+```math
 P(w_t\mid w_{t-n+1:t-1})=\operatorname{softmax}\bigl(U\tanh(H[e_{w_{t-n+1}};\dots;e_{w_{t-1}}]+b)+c\bigr)_{w_t}.
-$$
+```
 
 Words with similar embeddings now produce similar predictions, so evidence about *the cat is walking* transfers to *a dog was running*, and the number of parameters grows linearly with the window instead of exponentially. The model beat the best smoothed n-gram models of its time in perplexity, and did better still interpolated with them. Its costs were training time, dominated by the softmax over the whole vocabulary, and the fixed window.
 
@@ -30,9 +30,9 @@ A **decoder-only transformer** (DL chapter 9) computes the representation of eve
 
 A language model with parameters $`\theta`$ is trained by maximum likelihood: over a corpus of sequences, it minimizes the average negative log-probability of each token given the tokens before it,
 
-$$
+```math
 \mathcal L(\theta)=-\frac1N\sum_{\text{sequences }x}\ \sum_{t=1}^{|x|}\log p_\theta(x_t\mid x_{<t}),
-$$
+```
 
 with $`N`$ the total number of predicted tokens. Every position of every sequence is a training example with a classification target, the next token, and the loss is the cross-entropy of ML chapter 5 over a vocabulary of $`V`$ classes. The conditioning prefix is always the true text, never the model's own output, which is called **teacher forcing**. At generation time the model conditions on its own samples instead, a mismatch known as **exposure bias**: an early mistake produces a prefix unlike anything seen in training. Methods that train on the model's own samples ([Bengio et al., 2015](https://arxiv.org/abs/1506.03099); [Ranzato et al., 2016](https://arxiv.org/abs/1511.06732)) were proposed to close the gap, but at scale teacher forcing works well, and the effects of the mismatch are mostly addressed at decoding time (chapter 8).
 
@@ -254,9 +254,9 @@ Recipes have also converged: AdamW with $`\beta_2=0.95`$, weight decay 0.1, grad
 
 A dense model uses all its parameters for every token, so its cost per token grows with its size. A **mixture-of-experts** (MoE) layer replaces the MLP of a block by $`E`$ expert MLPs and a **router** that sends each token to only $`k`$ of them ([Shazeer et al., 2017](https://arxiv.org/abs/1701.06538)). For a token with hidden state $`x`$, the router computes probabilities $`p=\operatorname{softmax}(W_rx)`$ over experts, selects the set $`\mathcal T`$ of the $`k`$ largest, and outputs the gated sum of their outputs,
 
-$$
+```math
 y=\sum_{i\in\mathcal T}g_i\,\mathrm{MLP}_i(x),
-$$
+```
 
 with gates $`g_i`$ equal to $`p_i`$ or to $`p_i`$ renormalized over $`\mathcal T`$. The model then has many more parameters than it uses for any one token: Mixtral 8x7B has eight experts per layer, routes each token to two, and uses 13 billion of its 47 billion parameters per token ([Jiang et al., 2024](https://arxiv.org/abs/2401.04088)); DeepSeek-V3 routes each token to 8 of 256 small experts plus one shared expert that every token uses, and activates 37 of 671 billion parameters ([DeepSeek-AI, 2024](https://arxiv.org/abs/2412.19437)). Only the MLPs are sparse; attention remains dense.
 
@@ -264,9 +264,9 @@ with gates $`g_i`$ equal to $`p_i`$ or to $`p_i`$ renormalized over $`\mathcal T
 
 Routing is learned, and it tends to collapse: experts that receive more tokens early are trained more, become better, and receive still more tokens, while others are starved. Collapse wastes parameters and, when experts sit on different devices, overloads some devices while others idle. The **Switch Transformer** ([Fedus, Zoph, and Shazeer, 2022](https://arxiv.org/abs/2101.03961)), which routes each token to a single expert, adds an auxiliary **load-balancing loss**
 
-$$
+```math
 \mathcal L_{\mathrm{bal}}=\alpha\,E\sum_{i=1}^Ef_i\,P_i,
-$$
+```
 
 where $`f_i`$ is the fraction of tokens in the batch routed to expert $`i`$ and $`P_i`$ is the mean router probability of expert $`i`$. The fraction $`f_i`$ is not differentiable, but $`P_i`$ is, and the gradient lowers the router probabilities of the busiest experts; the loss equals $`\alpha`$ at uniform routing, its minimum when the router's choices and probabilities agree ([Appendix B](#block-nlp04-appendix-b)). The code trains a top-1 mixture of eight linear experts on a regression task with eight clusters of inputs, each needing its own linear map, with and without the balancing loss.
 
@@ -391,9 +391,9 @@ The cost of long contexts lies mostly in the key–value cache, which grows line
 
 Consider $`M`$ contexts with final hidden states $`h_1,\dots,h_M\in\mathbb R^d`$, stacked as rows of $`H\in\mathbb R^{M\times d}`$, and an output matrix $`W\in\mathbb R^{V\times d}`$ with rows $`w_x`$. The model's log-probabilities form the $`M\times V`$ matrix
 
-$$
+```math
 A=HW^\top-\ell\,\mathbf 1^\top,\qquad \ell_c=\log\sum_x\exp(h_c^\top w_x).
-$$
+```
 
 The first term has rank at most $`d`$ and the second rank at most one, so $`\operatorname{rank}A\le d+1`$. Now let $`A^*`$ be the matrix of true log-probabilities $`\log P^*(x\mid c)`$. A softmax model represents $`P^*`$ exactly only if $`A^*=HW^\top-\ell\mathbf 1^\top`$ for some $`H`$, $`W`$, and $`\ell`$, and adding any vector to the normalizers changes nothing about the probabilities, so the question is whether some matrix of the form $`A^*+\ell'\mathbf 1^\top`$ has rank at most $`d`$. If every such matrix has rank greater than $`d`$, no network before the output layer, however expressive, can produce hidden states that fit all $`M`$ contexts exactly. A mixture of $`K`$ softmaxes, $`p(x\mid c)=\sum_k\pi_{c,k}\operatorname{softmax}(W h_{c,k})_x`$, is not of this form: the log of a sum is not low-rank in general, which is why it escapes the bound.
 
@@ -407,9 +407,9 @@ The first term has rank at most $`d`$ and the second rank at most one, so $`\ope
 
 Let $`f_i\ge0`$ be the fractions of tokens routed to each of $`E`$ experts and $`P_i\ge0`$ the mean router probabilities, with $`\sum_if_i=\sum_iP_i=1`$. With top-1 routing, a token goes to the expert with the largest router probability, so experts that receive many tokens also tend to have large mean probabilities, and $`f`$ and $`P`$ are similarly ordered. If they are equal, $`f=P`$, then
 
-$$
+```math
 E\sum_if_iP_i=E\sum_iP_i^2\ge E\cdot\frac1E\Bigl(\sum_iP_i\Bigr)^2=1
-$$
+```
 
 by the Cauchy–Schwarz inequality, with equality exactly when $`P_i=1/E`$ for all $`i`$. So among consistent routings the uniform one minimizes the loss, at the value 1 (or $`\alpha`$ with the weight). A collapsed routing that sends everything to one expert with probability near one has $`f_1\approx P_1\approx1`$ and loss $`\approx E`$. The loss is not minimized by uniform routing when $`f`$ and $`P`$ disagree, for instance $`E\sum_if_iP_i`$ can be pushed below 1 by making the router probabilities of the busiest expert small without changing where tokens go; in practice top-1 routing ties the two together, because lowering the probability of the busiest expert eventually changes the routing. The gradient flows only through $`P`$: $`\partial\mathcal L_{\mathrm{bal}}/\partial P_i=\alpha Ef_i`$, so each expert's router probability is pushed down in proportion to its current load.
 
@@ -425,9 +425,9 @@ A rotary embedding rotates coordinate pair $`j=0,\dots,d/2-1`$ of queries and ke
 
 To run at length $`sL`$, **position interpolation** uses angles $`m\theta_j/s`$, so position $`sL`$ receives the angles that position $`L`$ had in training for every $`j`$; adjacent positions differ by $`\theta_j/s`$ instead of $`\theta_j`$. **Base scaling** replaces $`b`$ by $`b'=b\kappa`$, which gives $`\theta'_j=\theta_j\kappa^{-2j/d}`$. The highest frequency, $`j=0`$, is unchanged for any $`\kappa`$. Requiring the lowest frequency, $`j=d/2-1`$, to be interpolated exactly, $`\theta'_{d/2-1}=\theta_{d/2-1}/s`$, gives $`\kappa^{(d-2)/d}=s`$, that is,
 
-$$
+```math
 b'=b\,s^{d/(d-2)}.
-$$
+```
 
 In between, pair $`j`$ is slowed by the factor $`s^{2j/(d-2)}`$, which rises smoothly from 1 to $`s`$. A pair of middle frequency is therefore slowed by less than the factor $`s`$ it would need, and its angles at length $`sL`$ go beyond the range seen in training whenever its wavelength exceeds $`L`$ but the slowdown is less than $`s`$. YaRN chooses the factor per pair from its number of turns over $`L`$ instead: no interpolation for pairs with many turns, full interpolation for pairs with less than about one, and a linear ramp between.
 

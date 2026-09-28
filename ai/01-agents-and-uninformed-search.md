@@ -117,9 +117,9 @@ DFS is the method of choice when solutions are plentiful and deep and any soluti
 
 Repeating the shallow levels looks wasteful but costs little, because in a tree with a constant branching factor most nodes are at the bottom. Nodes at depth $`k`$ are generated once for each limit from $`k`$ to $`d`$, so IDS generates
 
-$$
+```math
 N_{\text{IDS}}=\sum_{k=1}^{d}(d-k+1)\,b^k,\qquad N_{\text{BFS}}=\sum_{k=1}^{d}b^k,
-$$
+```
 
 and the ratio is below $`b/(b-1)`$ for every depth, approaching it as $`d`$ grows ([Appendix B](#block-ai01-appendix-b)):
 
@@ -313,9 +313,9 @@ In particular, the first goal node removed has cost $`C^*`$, the optimal cost of
 
 On a uniform tree, iteration $`\ell`$ of iterative deepening generates $`\sum_{k=1}^{\ell}b^k`$ nodes, and the search stops at iteration $`d`$. Summing over iterations counts depth-$`k`$ nodes $`d-k+1`$ times, which gives $`N_{\text{IDS}}=\sum_{k=1}^d(d-k+1)b^k`$. Substituting $`j=d-k`$,
 
-$$
+```math
 N_{\text{IDS}}=b^d\sum_{j=0}^{d-1}(j+1)\,b^{-j}<b^d\sum_{j=0}^{\infty}(j+1)x^{j}=\frac{b^d}{(1-x)^2},\qquad x=\frac1b,
-$$
+```
 
 using $`\sum_{j\ge0}(j+1)x^j=(1-x)^{-2}`$ for $`|x|<1`$. Similarly $`N_{\text{BFS}}=\sum_{k=1}^db^k=b^d\sum_{j=0}^{d-1}x^j`$, which tends to $`b^d/(1-x)`$. The ratio therefore tends to $`1/(1-x)=b/(b-1)`$ as $`d\to\infty`$, and a term-by-term comparison, $`\sum_{j<d}(j+1)x^j\le\frac{1}{1-x}\sum_{j<d}x^j`$, whose difference is $`\frac{d\,x^d}{1-x}\ge0`$, shows that it stays below that limit for every $`d`$.
 

@@ -10,9 +10,9 @@
 
 A dictionary lookup compares a **query** with a set of **keys** and returns the **value** stored under the key that matches. Attention makes this differentiable: it compares the query with every key, turns the similarity scores $`s_i=s(q,k_i)`$ into weights with a softmax, and returns the weighted average of the values,
 
-$$
+```math
 \operatorname{attend}(q;\,k_{1:n},v_{1:n})=\sum_{i=1}^n\alpha_i v_i,\qquad \alpha_i=\frac{\exp s_i}{\sum_{j}\exp s_j}.
-$$
+```
 
 The weights are positive and sum to one, so the output is a convex combination of the values, and every weight depends smoothly on the query and the keys. When one score is much larger than the others the lookup is nearly hard; when the scores are similar, it averages.
 
@@ -28,9 +28,9 @@ The difference from kernel smoothing is that in a network the queries, keys, and
 
 Attention entered deep learning to remove the bottleneck of recurrent encoder–decoder models (chapter 8), which compressed an entire source sentence into the final encoder state. [Bahdanau, Cho, and Bengio (2015)](https://arxiv.org/abs/1409.0473) kept all encoder states $`h_1,\ldots,h_n`$ and, at every output step $`t`$, let the decoder state $`s_{t-1}`$ query them:
 
-$$
+```math
 e_{ti}=w^\top\tanh(W s_{t-1}+Uh_i),\qquad \alpha_{ti}=\frac{\exp e_{ti}}{\sum_j\exp e_{tj}},\qquad c_t=\sum_i\alpha_{ti}h_i .
-$$
+```
 
 The context vector $`c_t`$ is fed into the decoder together with the previous output word. The scores come from a small MLP ("additive" attention); [Luong, Pham, and Manning (2015)](https://arxiv.org/abs/1508.04025) found that the cheaper bilinear score $`s_{t}^\top W h_i`$ works as well. Translation quality degraded much less with sentence length, and the matrix of weights $`\alpha_{ti}`$ turned out to be a soft alignment between target and source words, learned without any alignment supervision. The same mechanism let an image captioning model attend to different regions of a convolutional feature map as it generated each word ([Xu et al., 2015](https://arxiv.org/abs/1502.03044)).
 
@@ -38,9 +38,9 @@ The context vector $`c_t`$ is fed into the decoder together with the previous ou
 
 Collect $`m`$ queries as the rows of $`Q\in\mathbb R^{m\times d_k}`$, $`n`$ keys as the rows of $`K\in\mathbb R^{n\times d_k}`$, and the corresponding values as the rows of $`V\in\mathbb R^{n\times d_v}`$. **Scaled dot-product attention** ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)) computes all lookups at once with two matrix products:
 
-$$
+```math
 \operatorname{Attention}(Q,K,V)=\operatorname{softmax}\!\Bigl(\frac{QK^\top}{\sqrt{d_k}}\Bigr)V,
-$$
+```
 
 where the softmax is applied to each row of the $`m\times n`$ score matrix. Row $`i`$ of the result is the lookup for query $`i`$. The division by $`\sqrt{d_k}`$ keeps the scores in a range where the softmax is not saturated. If the coordinates of a query and a key are independent with mean zero and variance one, their dot product has variance $`d_k`$; unscaled, the scores of wide heads would be so spread out that the softmax would put nearly all weight on one key, where its gradient with respect to the scores vanishes ([Appendix A](#block-dl9-appendix-a)).
 
@@ -77,9 +77,9 @@ Without scaling, the largest weight approaches one as $`d_k`$ grows and the Jaco
 
 In **self-attention** a sequence attends to itself. The input is a matrix $`X\in\mathbb R^{T\times d}`$ whose rows are the $`T`$ tokens, each a vector of width $`d`$, and three learned matrices produce the queries, keys, and values of every token:
 
-$$
+```math
 Q=XW_Q,\quad K=XW_K,\quad V=XW_V,\qquad Y=\operatorname{softmax}\!\Bigl(\frac{QK^\top}{\sqrt{d_k}}+M\Bigr)V .
-$$
+```
 
 Output $`y_i`$ is a mixture of the values of all tokens, with weights determined by how well token $`i`$'s query matches each token's key. The $`T\times T`$ weight matrix $`A`$ is computed from the input, so unlike a convolution kernel or a recurrent weight matrix, the pattern of interaction between positions changes from one input to the next. The matrix $`M`$ holds a **mask**: $`M_{ij}=0`$ where token $`i`$ may attend to token $`j`$ and $`-\infty`$ where it may not, which sets the corresponding weights to exactly zero.
 
@@ -98,9 +98,9 @@ Two masks are common.
 
 A single softmax produces one mixture per position, but a token may need information of several kinds at once, from different places: the subject of its verb, the previous occurrence of the same word, the preceding token. **Multi-head attention** runs $`H`$ attention operations in parallel, each with its own projections of width $`d_k=d/H`$, concatenates their outputs, and mixes them with an output matrix $`W_O\in\mathbb R^{d\times d}`$:
 
-$$
+```math
 \operatorname{head}_h=\operatorname{softmax}\!\Bigl(\frac{XW_Q^h(XW_K^h)^\top}{\sqrt{d_k}}+M\Bigr)XW_V^h,\qquad \operatorname{MHA}(X)=\bigl[\operatorname{head}_1,\ldots,\operatorname{head}_H\bigr]W_O .
-$$
+```
 
 The four $`d\times d`$ matrices give $`4d^2`$ parameters, whatever $`H`$ and $`T`$. Writing $`W_O`$ in blocks $`W_O^h`$ of $`d_k`$ rows shows that $`\operatorname{MHA}(X)=\sum_hA_hXW_V^hW_O^h`$: each head applies its own attention pattern $`A_h`$ and moves information through its own low-rank linear map $`W_V^hW_O^h`$, and the heads' contributions add. This decomposition, with the attention pattern determined by the bilinear form $`W_Q^h(W_K^h)^\top`$, is the starting point of mechanistic interpretability of transformers ([Elhage et al., 2021](https://transformer-circuits.pub/2021/framework/index.html)).
 
@@ -167,9 +167,9 @@ Attention connects every pair of positions in one layer, so the gradient between
 
 Permutation equivariance is wrong for sequences: "dog bites man" and "man bites dog" should differ. The simplest remedy adds a vector $`p_t`$ depending on the position to each token's embedding before the first layer. [Vaswani et al. (2017)](https://arxiv.org/abs/1706.03762) used fixed **sinusoidal encodings**, with pairs of coordinates oscillating at geometrically spaced frequencies,
 
-$$
+```math
 p_{t,2j}=\sin(\omega_jt),\qquad p_{t,2j+1}=\cos(\omega_jt),\qquad \omega_j=10000^{-2j/d},\qquad j=0,\ldots,d/2-1 .
-$$
+```
 
 Low coordinates change quickly with the position and high ones slowly, like the digits of a clock with hands of many speeds. For each frequency, the pair $`(p_{t+k,2j},p_{t+k,2j+1})`$ is the pair at position $`t`$ rotated by the angle $`\omega_jk`$, so $`p_{t+k}`$ is a fixed linear function of $`p_t`$ for every offset $`k`$, and the dot product $`p_t^\top p_{t+k}=\sum_j\cos(\omega_jk)`$ depends only on the offset. BERT and GPT-2 instead learned one vector per position, which works as well within the trained length but gives no representation for longer sequences.
 
@@ -221,9 +221,9 @@ A causal mask already breaks the permutation symmetry: the first token sees one 
 
 A **transformer** is a stack of identical blocks, each with two sublayers wrapped in residual connections and normalization (chapter 4). In the pre-normalization form used today,
 
-$$
+```math
 H=X+\operatorname{MHA}\bigl(\operatorname{LN}(X)\bigr),\qquad X'=H+\operatorname{MLP}\bigl(\operatorname{LN}(H)\bigr),
-$$
+```
 
 where the MLP is applied to each position independently, typically $`\operatorname{MLP}(z)=W_2\,\phi(W_1z+b_1)+b_2`$ with a hidden width of $`4d`$ and GELU activation (chapter 1). The two sublayers have complementary roles: attention is the only place where positions exchange information, and the MLP, which holds two thirds of the block's parameters, transforms each position's representation separately. The MLP layers behave partly as key–value memories that store associations learned from the training data ([Geva et al., 2021](https://arxiv.org/abs/2012.14913)).
 
@@ -428,9 +428,9 @@ UDL chapter 12, UMich lecture 13, and UNIGE sections 13.1–13.3, listed in the 
 
 **Saturation of the softmax.** For $`\alpha=\operatorname{softmax}(s)`$, the Jacobian is
 
-$$
+```math
 \frac{\partial\alpha_i}{\partial s_j}=\alpha_i(\delta_{ij}-\alpha_j),\qquad J=\operatorname{diag}(\alpha)-\alpha\alpha^\top .
-$$
+```
 
 If one score exceeds the others by a margin $`\Delta`$, the corresponding weight is at least $`1/\bigl(1+(n-1)e^{-\Delta}\bigr)`$ and every entry of $`J`$ is at most of order $`(n-1)e^{-\Delta}`$. The scores of $`n`$ random keys spread over a range of order $`\sqrt{d_k}`$, so without scaling the margin between the two largest scores grows like $`\sqrt{d_k}`$, $`J`$ decays accordingly, and the gradient reaching $`W_Q`$ and $`W_K`$ through the scores is small. At the other extreme, uniform weights $`\alpha_i=1/n`$ give $`\|J\|_F\approx1/\sqrt n`$. For 100 keys the Jacobian norm is therefore about 0.1 for uniform weights, larger for moderately peaked weights (0.28 for the unscaled scores with $`d_k=16`$ in the code above), and close to 0 for nearly one-hot weights; the scaled scores give 0.15 at every width.
 
@@ -446,9 +446,9 @@ If one score exceeds the others by a margin $`\Delta`$, the corresponding weight
 
 For each coordinate pair $`j`$, let $`R(\theta)=\begin{pmatrix}\cos\theta&-\sin\theta\\\sin\theta&\cos\theta\end{pmatrix}`$, and let $`R_t`$ be the block-diagonal matrix with blocks $`R(\omega_jt)`$. RoPE replaces a query $`q`$ at position $`m`$ by $`R_mq`$ and a key $`k`$ at position $`n`$ by $`R_nk`$. Rotations are orthogonal, $`R(\theta)^\top=R(-\theta)`$, and compose by adding angles, $`R(-\alpha)R(\beta)=R(\beta-\alpha)`$, so block by block
 
-$$
+```math
 (R_mq)^\top(R_nk)=q^\top R_m^\top R_nk=q^\top R_{n-m}k .
-$$
+```
 
 The score depends on the positions only through $`n-m`$, and since $`R_{n-m}`$ is orthogonal, the norms of queries and keys are unchanged. For $`n=m`$ the score is $`q^\top k`$.
 
@@ -464,21 +464,21 @@ Writing each pair as a complex number $`z_j=q_{2j}+iq_{2j+1}`$, the rotation is 
 
 Let the scores of one query be $`s_1,\ldots,s_T`$, processed in blocks. After the blocks containing indices $`\mathcal S`$ have been seen, the algorithm stores
 
-$$
+```math
 m=\max_{i\in\mathcal S}s_i,\qquad \ell=\sum_{i\in\mathcal S}e^{s_i-m},\qquad a=\sum_{i\in\mathcal S}e^{s_i-m}v_i .
-$$
+```
 
 When a new block $`\mathcal B`$ arrives, set $`m'=\max\bigl(m,\max_{i\in\mathcal B}s_i\bigr)`$. Then
 
-$$
+```math
 \ell e^{m-m'}+\sum_{i\in\mathcal B}e^{s_i-m'}=\sum_{i\in\mathcal S\cup\mathcal B}e^{s_i-m'},\qquad ae^{m-m'}+\sum_{i\in\mathcal B}e^{s_i-m'}v_i=\sum_{i\in\mathcal S\cup\mathcal B}e^{s_i-m'}v_i,
-$$
+```
 
 which are the stored quantities for $`\mathcal S\cup\mathcal B`$, so by induction they hold after the last block. Finally
 
-$$
+```math
 \frac{a}{\ell}=\frac{\sum_ie^{s_i-m}v_i}{\sum_je^{s_j-m}}=\sum_i\operatorname{softmax}(s)_iv_i ,
-$$
+```
 
 since the common factor $`e^{-m}`$ cancels. Every exponent is at most zero, so nothing overflows, and the memory needed is one block of scores plus $`O(d)`$ numbers per query. For the backward pass, FlashAttention keeps only $`m+\log\ell`$ for each query and recomputes the scores block by block.
 

@@ -104,9 +104,9 @@ Equilibrium is a demanding solution concept. It assumes that players know the ga
 
 In a two-player **zero-sum** game, $`B=-A`$, and Nash equilibria have a much simpler structure. The **minimax theorem** of von Neumann states that
 
-$$
+```math
 \max_x\min_y\;x^\top Ay=\min_y\max_x\;x^\top Ay=v,
-$$
+```
 
 the **value** of the game ([Appendix A](#block-ai15-appendix-a)). The row player can guarantee at least $`v`$ by playing its maximin strategy even if the column player knows it, and the column player can hold it to at most $`v`$. Equilibria are exactly the pairs of maximin and minimax strategies, all equilibria give the same payoff, and they are interchangeable. Unlike the general case, the value and optimal strategies are computed by a linear program in polynomial time, as in the code above. The minimax search of chapter 4 is the special case of perfect information, where the optimal strategies are pure.
 
@@ -120,9 +120,9 @@ A traffic light tells each driver whether to go or stop. If a driver believes th
 
 How can players who do not know the game, or cannot compute its equilibria, reach good play? Suppose a player repeatedly chooses mixed strategies $`x^1,x^2,\dots`$ and observes the payoff vector of all its actions after each round. Its **external regret** after $`T`$ rounds is
 
-$$
+```math
 R_T=\max_{a}\sum_{t=1}^Tu^t(a)-\sum_{t=1}^Tu^t(x^t),
-$$
+```
 
 how much better it would have done by playing the best single action in hindsight. The **multiplicative weights**, or **Hedge**, algorithm plays each action with probability proportional to $`\exp\bigl(\eta\sum_{s<t}u^s(a)\bigr)`$ and has regret $`O(\sqrt{T\log n})`$ for $`n`$ actions and payoffs in a bounded range, against any sequence of payoffs, even an adversarial one ([Freund and Schapire, 1999](https://doi.org/10.1006/game.1999.0738)); **regret matching** ([Hart and Mas-Colell, 2000](https://doi.org/10.1111/1468-0262.00153)) plays actions in proportion to their positive cumulative regrets and has the same guarantee. When all players run such algorithms against each other, their **time-averaged** joint play converges to the set of coarse correlated equilibria, and with **swap regret**, which compares against every mapping from actions to actions, to the set of correlated equilibria ([Appendix B](#block-ai15-appendix-b)). In two-player zero-sum games, the average strategies converge to the minimax strategies, which gives a simple algorithm for solving large games.
 
@@ -218,9 +218,9 @@ The easy inequality holds for any function: $`\max_x\min_yf(x,y)\le\min_y\max_xf
 
 Let every player $`i`$ run an algorithm with external regret $`R_T^i\le\varepsilon T`$, and let $`\sigma_T`$ be the empirical distribution of the action profiles played over $`T`$ rounds (with the players' mixed strategies, the average of the product distributions). For any fixed action $`a_i'`$,
 
-$$
+```math
 \mathbb E_{a\sim\sigma_T}\bigl[u_i(a)\bigr]=\frac1T\sum_tu_i(a^t)\ge\frac1T\sum_tu_i(a_i',a_{-i}^t)-\varepsilon=\mathbb E_{a\sim\sigma_T}\bigl[u_i(a_i',a_{-i})\bigr]-\varepsilon,
-$$
+```
 
 which says that no player gains more than $`\varepsilon`$ by committing to a fixed action instead of following the distribution: $`\sigma_T`$ is an $`\varepsilon`$-coarse correlated equilibrium. As $`\varepsilon=O(\sqrt{\log n/T})\to0`$, the empirical distributions approach the set of coarse correlated equilibria. With swap regret, the comparison is against $`\sum_tu_i(\phi(a_i^t),a_{-i}^t)`$ for every map $`\phi:A_i\to A_i`$, which is exactly the correlated-equilibrium condition.
 

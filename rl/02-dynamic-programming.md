@@ -10,9 +10,9 @@
 
 Dynamic programming (DP) computes value functions and optimal policies from a complete model of an MDP: the transition probabilities $`p(s'\mid s,a)`$ and expected rewards $`r(s,a)`$ of chapter 1. It solves two problems. **Policy evaluation**, or prediction, computes $`v_\pi`$ for a given policy. **Control** computes $`v_*`$ and an optimal policy. Both reduce to finding the fixed point of a Bellman operator, the expectation operator $`\mathcal T^\pi`$ for evaluation and the optimality operator $`\mathcal T`$ for control, and both operators are $`\gamma`$-contractions in the maximum norm (chapter 1, Appendix B):
 
-$$
+```math
 \|\mathcal T^\pi v-\mathcal T^\pi w\|_\infty\le\gamma\|v-w\|_\infty,\qquad\|\mathcal Tv-\mathcal Tw\|_\infty\le\gamma\|v-w\|_\infty .
-$$
+```
 
 Almost everything in the discounted theory of this chapter follows from these two inequalities and from the monotonicity of the operators, $`v\le w\Rightarrow\mathcal Tv\le\mathcal Tw`$.
 
@@ -24,15 +24,15 @@ Requiring a complete model limits DP as a practical method, and its cost grows w
 
 Starting from any $`v_0`$, **iterative policy evaluation** applies the expectation operator repeatedly:
 
-$$
+```math
 v_{k+1}(s)=\sum_a\pi(a\mid s)\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v_k(s')\Bigr]\quad\text{for all }s.
-$$
+```
 
 Each application is an **expected update**, or backup: it replaces the value of every state by the expected immediate reward plus the discounted value of its successors, averaged over the policy and the dynamics. One pass over the states is a **sweep**. By the contraction property, $`\|v_k-v_\pi\|_\infty\le\gamma^k\|v_0-v_\pi\|_\infty`$, so the error shrinks geometrically at rate $`\gamma`$. The error cannot be observed directly, but the change between sweeps bounds it: if $`\|v_{k+1}-v_k\|_\infty\le\varepsilon`$, then
 
-$$
+```math
 \|v_{k+1}-v_\pi\|_\infty\le\frac{\gamma\,\varepsilon}{1-\gamma}
-$$
+```
 
 (exercise 2.1), which gives a principled stopping rule. With $`\gamma=0.99`$ the error may be a hundred times the last change: a small change between sweeps does not mean the values are accurate.
 
@@ -114,9 +114,9 @@ Knowing $`v_\pi`$, can a better policy be found? Consider taking a different act
 
 The proof unrolls the assumption along trajectories of $`\pi'`$ ([Appendix A](#block-rl02-appendix-a)); it is also a special case of the performance difference lemma of chapter 1, since the assumption says that $`\pi'`$ has nonnegative expected advantage under $`\pi`$ in every state. The natural choice is the **greedy** policy,
 
-$$
+```math
 \pi'(s)\in\arg\max_a q_\pi(s,a)=\arg\max_a\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v_\pi(s')\Bigr],
-$$
+```
 
 which satisfies the condition because a maximum is at least the average under $`\pi`$. In operator form, $`\pi'`$ is greedy with respect to $`v_\pi`$ exactly when $`\mathcal T^{\pi'}v_\pi=\mathcal Tv_\pi`$. Greedy improvement fails to improve only if $`\mathcal Tv_\pi=v_\pi`$, the Bellman optimality equation, and then $`\pi`$ is already optimal. So every policy is either optimal or strictly improved by one greedy step.
 
@@ -124,9 +124,9 @@ which satisfies the condition because a maximum is at least the average under $`
 
 **Policy iteration** alternates the two steps: evaluate the current policy exactly, then make it greedy with respect to its values,
 
-$$
+```math
 \pi_0\xrightarrow{\ \text{evaluate}\ }v_{\pi_0}\xrightarrow{\ \text{improve}\ }\pi_1\xrightarrow{\ \text{evaluate}\ }v_{\pi_1}\xrightarrow{\ \text{improve}\ }\pi_2\longrightarrow\cdots\longrightarrow\pi_*.
-$$
+```
 
 Each policy is strictly better than the previous one unless the previous one is already optimal, and a finite MDP has finitely many deterministic policies, so policy iteration terminates with an optimal policy after finitely many iterations. To avoid cycling between equally good policies, the improvement step should keep the current action when it is among the maximizers. Introduced by Howard (1960), building on Bellman's approximation in policy space, policy iteration typically needs remarkably few iterations: on Jack's car rental problem in Sutton and Barto, four improvements suffice for 441 states (exercise 2.3), and on the random MDPs below, four or five, whatever the discount factor.
 
@@ -144,9 +144,9 @@ The price is the evaluation: each iteration solves a linear system. **Modified p
 
 **Value iteration** skips the policy altogether and applies the optimality operator directly:
 
-$$
+```math
 v_{k+1}(s)=\max_a\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v_k(s')\Bigr].
-$$
+```
 
 It is policy iteration with an evaluation of a single sweep, and it converges to $`v_*`$ from any start at rate $`\gamma`$, $`\|v_k-v_*\|_\infty\le\gamma^k\|v_0-v_*\|_\infty`$. Started from $`v_0=0`$, it has a second meaning: $`v_k`$ is the optimal expected return of the $`k`$-step problem, the finite-horizon values of chapter 1 (exercise 2.5), and value iteration looks ahead one step further with every sweep.
 
@@ -291,15 +291,15 @@ Policy iteration evaluates completely and then improves; value iteration improve
 
 The optimal value function is the smallest function that satisfies the Bellman inequalities $`v\ge\mathcal T^\pi v`$ for every policy, because any such $`v`$ satisfies $`v\ge\mathcal Tv`$ and hence, by monotonicity, $`v\ge\mathcal T^kv\to v_*`$. This gives the **primal linear program**: for any weights $`\mu(s)>0`$, taken below to sum to one so that $`\mu`$ is an initial distribution,
 
-$$
+```math
 \min_v\;\sum_s\mu(s)\,v(s)\quad\text{subject to}\quad v(s)\ge r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v(s')\ \text{ for all }s,a,
-$$
+```
 
 with $`|\mathcal S|`$ variables and $`|\mathcal S||\mathcal A|`$ constraints, whose solution is $`v_*`$. Its **dual** has one variable $`x(s,a)\ge0`$ per constraint:
 
-$$
+```math
 \max_{x\ge0}\;\sum_{s,a}r(s,a)\,x(s,a)\quad\text{subject to}\quad\sum_ax(s',a)-\gamma\sum_{s,a}p(s'\mid s,a)\,x(s,a)=\mu(s')\ \text{ for all }s'.
-$$
+```
 
 These are the flow constraints of chapter 1: the dual variables, scaled by $`1-\gamma`$, are the discounted occupancy measure of a policy, and the dual maximizes the expected return over all occupancy measures ([Appendix C](#block-rl02-appendix-c)). Complementary slackness says that $`x(s,a)>0`$ only where the primal constraint is tight, that is, only for actions that are greedy with respect to $`v_*`$.
 
@@ -358,15 +358,15 @@ With a horizon of $`H`$ steps, the optimal values $`v^{(h)}_*`$ for $`h`$ steps 
 
 For continuing tasks with no natural discount, the **average reward**, or **gain**, of a policy is
 
-$$
+```math
 g^\pi=\lim_{T\to\infty}\frac1T\,\mathbb E_\pi\Bigl[\sum_{t=1}^TR_t\Bigr],
-$$
+```
 
 which, when the Markov chain of $`\pi`$ has a single recurrent class, possibly with transient states, does not depend on the starting state and equals the stationary expected reward $`\sum_s\pi_\infty(s)\,r^\pi(s)`$ (an MDP is **unichain** when every deterministic stationary policy has this property). Values are then measured relative to the gain: the **bias**, or differential value, $`h^\pi(s)=\mathbb E_\pi\bigl[\sum_t(R_{t+1}-g^\pi)\mid S_0=s\bigr]`$ (a Cesàro limit if the chain is periodic), satisfies $`g^\pi+h^\pi=r^\pi+P^\pi h^\pi`$, and the optimal gain and bias satisfy the **average-reward optimality equation**
 
-$$
+```math
 g_*+h_*(s)=\max_a\Bigl[r(s,a)+\sum_{s'}p(s'\mid s,a)\,h_*(s')\Bigr],
-$$
+```
 
 which determines $`h_*`$ up to an additive constant. **Relative value iteration** solves it by applying the undiscounted operator and subtracting the value of a reference state after each sweep; the subtracted amount converges to the gain for aperiodic unichain MDPs. These conditions are sufficient, not necessary: the recycling robot of exercise 2.7 is not unichain, since waiting in both states gives two recurrent classes, but it is communicating, and relative value iteration still converges on it.
 
@@ -399,9 +399,9 @@ Show that if $`\|v_{k+1}-v_k\|_\infty\le\varepsilon`$ for the iterates of policy
 
 Since $`v_\pi=\mathcal T^\pi v_\pi`$ and $`v_{k+1}=\mathcal T^\pi v_k`$,
 
-$$
+```math
 \|v_{k+1}-v_\pi\|_\infty\le\gamma\|v_k-v_\pi\|_\infty\le\gamma\bigl(\|v_k-v_{k+1}\|_\infty+\|v_{k+1}-v_\pi\|_\infty\bigr),
-$$
+```
 
 and rearranging gives $`(1-\gamma)\|v_{k+1}-v_\pi\|_\infty\le\gamma\varepsilon`$. For equality, take a single state with reward 1 and a self-loop, so $`v_\pi=1/(1-\gamma)`$, and start from $`v_0=0`$: then $`v_k=(1-\gamma^k)/(1-\gamma)`$, the change is $`\gamma^k`$, and the error of $`v_{k+1}`$ is $`\gamma^{k+1}/(1-\gamma)=\gamma\cdot\gamma^k/(1-\gamma)`$. The same one-state example shows that value iteration's rate $`\gamma`$ cannot be improved in general, as observed in the random MDPs of the chapter.
 
@@ -419,9 +419,9 @@ Show that if $`\|v_{k+1}-v_k\|_\infty<\varepsilon(1-\gamma)/(2\gamma)`$, then th
 
 Write $`\delta=\|v_{k+1}-v_k\|_\infty`$. As in exercise 2.1 with $`\mathcal T`$ in place of $`\mathcal T^\pi`$, $`\|v_{k+1}-v_*\|_\infty\le\gamma\delta/(1-\gamma)`$. Since $`\pi`$ is greedy, $`\mathcal T^\pi v_{k+1}=\mathcal Tv_{k+1}`$, so
 
-$$
+```math
 \|v_\pi-v_{k+1}\|_\infty\le\|\mathcal T^\pi v_\pi-\mathcal T^\pi v_{k+1}\|_\infty+\|\mathcal Tv_{k+1}-\mathcal Tv_k\|_\infty\le\gamma\|v_\pi-v_{k+1}\|_\infty+\gamma\delta,
-$$
+```
 
 which gives $`\|v_\pi-v_{k+1}\|_\infty\le\gamma\delta/(1-\gamma)`$. By the triangle inequality, $`\|v_\pi-v_*\|_\infty\le2\gamma\delta/(1-\gamma)<\varepsilon`$. This is the standard stopping rule of value iteration (Puterman, theorem 6.3.1).
 
@@ -531,9 +531,9 @@ Show that the policies of policy iteration satisfy $`v_{\pi_{k+1}}\ge\mathcal Tv
 
 Greedy improvement gives $`\mathcal T^{\pi_{k+1}}v_{\pi_k}=\mathcal Tv_{\pi_k}\ge\mathcal T^{\pi_k}v_{\pi_k}=v_{\pi_k}`$. Applying the monotone operator $`\mathcal T^{\pi_{k+1}}`$ repeatedly to $`v_{\pi_k}\le\mathcal T^{\pi_{k+1}}v_{\pi_k}`$ gives an increasing sequence that converges to its fixed point $`v_{\pi_{k+1}}`$, so $`v_{\pi_{k+1}}\ge\mathcal T^{\pi_{k+1}}v_{\pi_k}=\mathcal Tv_{\pi_k}`$. Since also $`v_{\pi_{k+1}}\le v_*`$,
 
-$$
+```math
 0\le v_*-v_{\pi_{k+1}}\le v_*-\mathcal Tv_{\pi_k}=\mathcal Tv_*-\mathcal Tv_{\pi_k},
-$$
+```
 
 whose maximum norm is at most $`\gamma\|v_*-v_{\pi_k}\|_\infty`$. Induction gives the claim. Monotonicity of $`\mathcal T`$ gives more: by induction, $`v_{\pi_k}\ge\mathcal T^kv_{\pi_0}`$, so policy iteration dominates value iteration started from $`v_{\pi_0}`$ state by state and iteration by iteration, at the cost of a policy evaluation per iteration.
 
@@ -565,9 +565,9 @@ Derive the dual of the primal linear program from its Lagrangian, and use comple
 
 With multipliers $`x(s,a)\ge0`$ for the constraints $`r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)v(s')-v(s)\le0`$, the Lagrangian is
 
-$$
+```math
 L(v,x)=\sum_s\mu(s)v(s)+\sum_{s,a}x(s,a)\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)v(s')-v(s)\Bigr].
-$$
+```
 
 It is linear in the unconstrained $`v`$, so $`\min_vL`$ is $`-\infty`$ unless the coefficient of every $`v(s')`$ vanishes: $`\mu(s')+\gamma\sum_{s,a}p(s'\mid s,a)x(s,a)-\sum_ax(s',a)=0`$, the flow constraint. Then $`L=\sum_{s,a}r(s,a)x(s,a)`$, and the dual maximizes it over nonnegative $`x`$ satisfying the flow constraints. At optimal solutions, complementary slackness says $`x(s,a)>0`$ only where $`v_*(s)=r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)v_*(s')`$, that is, only on greedy actions. With $`\mu>0`$, every state has $`\sum_ax(s,a)\ge\mu(s)>0`$, so the policy $`\pi(a\mid s)\propto x(s,a)`$ is defined everywhere and uses only greedy actions, and a policy that is greedy with respect to $`v_*`$ is optimal.
 
@@ -677,9 +677,9 @@ With a favorable coin, the optimal stake is 1: each bet gains in expectation, so
 
 Assume $`\sum_a\pi'(a\mid s)q_\pi(s,a)\ge v_\pi(s)`$ for all $`s`$, which in operator form reads $`\mathcal T^{\pi'}v_\pi\ge v_\pi`$. Applying the monotone operator $`\mathcal T^{\pi'}`$ repeatedly,
 
-$$
+```math
 v_\pi\le\mathcal T^{\pi'}v_\pi\le(\mathcal T^{\pi'})^2v_\pi\le\cdots\le(\mathcal T^{\pi'})^kv_\pi\to v_{\pi'},
-$$
+```
 
 since $`(\mathcal T^{\pi'})^k`$ converges to its fixed point from any start. So $`v_\pi\le v_{\pi'}`$. Read along trajectories, $`(\mathcal T^{\pi'})^kv_\pi(s)`$ is the expected return of following $`\pi'`$ for $`k`$ steps and $`\pi`$ afterward, and each extra step of $`\pi'`$ helps. If $`\mathcal T^{\pi'}v_\pi(s)>v_\pi(s)`$ in some state $`s`$, then $`v_{\pi'}(s)\ge(\mathcal T^{\pi'})v_\pi(s)>v_\pi(s)`$, since the sequence is nondecreasing.
 
@@ -695,15 +695,15 @@ since $`(\mathcal T^{\pi'})^k`$ converges to its fixed point from any start. So 
 
 Let $`\|v-v_*\|_\infty\le\delta`$ and let $`\pi`$ be greedy with respect to $`v`$, so $`\mathcal T^\pi v=\mathcal Tv`$. Then
 
-$$
+```math
 v_*-v_\pi=(\mathcal Tv_*-\mathcal Tv)+(\mathcal T^\pi v-\mathcal T^\pi v_\pi),
-$$
+```
 
 and taking norms, $`\|v_*-v_\pi\|_\infty\le\gamma\delta+\gamma\|v-v_\pi\|_\infty\le\gamma\delta+\gamma(\delta+\|v_*-v_\pi\|_\infty)`$. Rearranging gives
 
-$$
+```math
 \|v_*-v_\pi\|_\infty\le\frac{2\gamma\delta}{1-\gamma}.
-$$
+```
 
 The factor $`1/(1-\gamma)`$ is the price of acting greedily on an inaccurate value function: a small error in every state can be exploited by the greedy policy at every step of a long horizon. The same factor, squared, reappears in the error bounds of approximate value and policy iteration, $`2\gamma\delta/(1-\gamma)^2`$ (chapter 12), where $`\delta`$ is the approximation error at each iteration. The bound cannot be improved. Suppose a state offers a self-loop with reward $`c`$ and a move with reward $`R=(c+2\gamma\delta)/(1-\gamma)`$ to an absorbing state worth 0. Moving is optimal, yet overestimating the first state by $`\delta`$ and underestimating the absorbing state by $`\delta`$ makes the loop a greedy choice, and the loop loses exactly $`2\gamma\delta/(1-\gamma)`$.
 

@@ -179,15 +179,15 @@ UDL chapters 8, 9, and 20, DLB chapter 7, UMich lectures 10 and 11, and UNIGE se
 
 Let the inputs be dropped independently: $`\tilde x=m\odot x/(1-p)`$ with $`m_j\sim\mathrm{Bernoulli}(1-p)`$, so $`\mathbb E[\tilde x\mid x]=x`$ and $`\operatorname{Var}(\tilde x_j\mid x)=x_j^2\bigl(\frac1{1-p}-1\bigr)=\frac p{1-p}x_j^2`$, with the coordinates independent. For one example and a fixed weight vector $`w`$,
 
-$$
+```math
 \mathbb E_m\bigl(y-w^\top\tilde x\bigr)^2=\bigl(y-w^\top x\bigr)^2+\operatorname{Var}\bigl(w^\top\tilde x\bigr)=\bigl(y-w^\top x\bigr)^2+\frac p{1-p}\sum_jw_j^2x_j^2 .
-$$
+```
 
 Averaging over the training set gives the expected dropout objective
 
-$$
+```math
 \frac1n\|y-Xw\|^2+\frac p{1-p}\,w^\top\operatorname{diag}\Bigl(\frac1nX^\top X\Bigr)w .
-$$
+```
 
 Setting its gradient to zero gives $`\bigl(G+\frac p{1-p}\operatorname{diag}G\bigr)w=\frac1nX^\top y`$ with $`G=\frac1nX^\top X`$, the dropout minimizer in the code. If the features are rescaled, $`x_j\mapsto c_jx_j`$, the penalty on the rescaled coefficient $`w_j/c_j`$ is unchanged, so the solution transforms exactly like least squares: dropout behaves like ridge regression on standardized features. If $`G`$ is diagonal, $`w_j=(1-p)\,w_j^{\text{LS}}`$. Stochastic gradient descent with dropout minimizes this expected objective only on average; its noise adds a further implicit regularization, as discussed in the last section.
 

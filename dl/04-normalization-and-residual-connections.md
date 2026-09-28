@@ -12,9 +12,9 @@ Chapter 2 chose the initial weights so that activations keep a stable scale. Onc
 
 **Batch normalization** ([Ioffe and Szegedy, 2015](https://arxiv.org/abs/1502.03167)) standardizes each feature over the examples of a minibatch. For a batch of pre-activations $`z_1,\ldots,z_B`$ of one unit (or one channel of a convolutional layer, pooled over all spatial positions),
 
-$$
+```math
 \mu=\frac1B\sum_bz_b,\qquad \sigma^2=\frac1B\sum_b(z_b-\mu)^2,\qquad \hat z_b=\frac{z_b-\mu}{\sqrt{\sigma^2+\epsilon}},\qquad y_b=\gamma\hat z_b+\beta .
-$$
+```
 
 The learned scale $`\gamma`$ and shift $`\beta`$ let the layer represent any mean and variance, including undoing the normalization, so no expressive power is lost. The bias of the preceding linear layer is redundant, since the mean is subtracted, and is usually omitted.
 
@@ -145,9 +145,9 @@ With normalization and good initialization, networks of 20 or so layers train we
 
 A **residual block** makes the identity the default:
 
-$$
+```math
 x_{l+1}=x_l+F_l(x_l),
-$$
+```
 
 where the **residual branch** $`F_l`$ is a small network, typically two or three layers with normalization. If a block is not useful, the branch only needs to output zero. He et al. trained residual networks with 152 layers on ImageNet and over 1,000 on CIFAR-10, and residual connections are now part of almost every deep architecture, including transformers (chapter 9). Earlier, **highway networks** ([Srivastava, Greff, and Schmidhuber, 2015](https://arxiv.org/abs/1505.00387)) used gated shortcuts, and DenseNets ([Huang et al., 2017](https://arxiv.org/abs/1608.06993)) concatenate the outputs of all earlier layers instead of adding them.
 
@@ -159,9 +159,9 @@ where the **residual branch** $`F_l`$ is a small network, typically two or three
 
 The Jacobian of a residual block is $`I+\partial F_l/\partial x_l`$, so the gradient reaching block $`l`$ is
 
-$$
+```math
 \frac{\partial\ell}{\partial x_l}=\frac{\partial\ell}{\partial x_L}\prod_{k=l}^{L-1}\Bigl(I+\frac{\partial F_k}{\partial x_k}\Bigr).
-$$
+```
 
 Expanding the product gives a sum over all subsets of blocks, and the term with no branch derivatives is $`\partial\ell/\partial x_L`$ itself: every block receives the output gradient directly, whatever happens in the branches. The same expansion shows the forward pass as a sum over $`2^L`$ paths of different lengths. [Veit, Wilber, and Belongie (2016)](https://arxiv.org/abs/1605.06431) found that trained residual networks behave like ensembles of relatively shallow paths: deleting a single block from a trained ResNet barely affects its accuracy, whereas deleting a layer of a plain network destroys it.
 
@@ -198,21 +198,21 @@ UDL chapter 11, UMich lecture 8, and UNIGE sections 6.4 and 6.5, listed in the r
 
 Fix one channel, and let $`g_b=\partial\ell/\partial y_b`$ be the incoming gradients for the batch. Since $`y_b=\gamma\hat z_b+\beta`$, the parameter gradients are $`\partial\ell/\partial\gamma=\sum_bg_b\hat z_b`$ and $`\partial\ell/\partial\beta=\sum_bg_b`$, and $`\partial\ell/\partial\hat z_b=\gamma g_b`$. Write $`s=\sqrt{\sigma^2+\epsilon}`$. Each $`\hat z_b`$ depends on every $`z_c`$ through $`\mu`$ and $`\sigma^2`$:
 
-$$
+```math
 \frac{\partial\hat z_b}{\partial z_c}=\frac1s\Bigl(\mathbf 1\{b=c\}-\frac1B\Bigr)-\frac{z_b-\mu}{s^3}\cdot\frac{\partial\sigma^2}{2\,\partial z_c},\qquad\frac{\partial\sigma^2}{\partial z_c}=\frac2B(z_c-\mu).
-$$
+```
 
 The second term used $`\sum_b(z_b-\mu)=0`$. Substituting $`z_b-\mu=s\hat z_b`$,
 
-$$
+```math
 \frac{\partial\hat z_b}{\partial z_c}=\frac1s\Bigl(\mathbf 1\{b=c\}-\frac1B-\frac1B\,\hat z_b\hat z_c\Bigr),
-$$
+```
 
 and therefore
 
-$$
+```math
 \frac{\partial\ell}{\partial z_c}=\frac{\gamma}{s}\Bigl(g_c-\frac1B\sum_bg_b-\hat z_c\cdot\frac1B\sum_bg_b\hat z_b\Bigr).
-$$
+```
 
 The bracket is $`g`$ minus its projections onto the constant vector and onto $`\hat z`$, up to the factor $`\frac1B\sum_b\hat z_b^2=\sigma^2/(\sigma^2+\epsilon)`$, which is 1 when $`\epsilon=0`$. For $`\epsilon=0`$ the gradient with respect to the batch is exactly orthogonal to $`\mathbf 1`$ and to $`\hat z`$: normalization removes the components of the incoming gradient that would change only the batch mean or scale. With $`\epsilon>0`$ the orthogonality to $`\mathbf 1`$ remains exact and that to $`\hat z`$ holds up to a relative error of order $`\epsilon/\sigma^2`$, as in the code above.
 

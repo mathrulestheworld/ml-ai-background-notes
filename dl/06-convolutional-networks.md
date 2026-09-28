@@ -22,9 +22,9 @@ A **convolutional layer** builds in the first two assumptions: each output depen
 
 Deep-learning libraries implement **cross-correlation** and call it convolution; the true convolution flips the kernel, which makes no difference for learned weights. For a single-channel input $`X`$ and a $`k\times k`$ kernel $`W`$,
 
-$$
+```math
 Y_{i,j}=b+\sum_{u=0}^{k-1}\sum_{v=0}^{k-1}W_{u,v}\,X_{i+u,\;j+v}.
-$$
+```
 
 <img src="sources/images/dl-conv-operation.png" alt="dl-conv-operation" width="840">
 
@@ -32,9 +32,9 @@ $$
 
 With several channels, each output channel $`o`$ has one kernel per input channel, and the results are summed:
 
-$$
+```math
 Y_{o,i,j}=b_o+\sum_{c=1}^{C_{\text{in}}}\sum_{u,v}W_{o,c,u,v}\,X_{c,\;i+u,\;j+v}.
-$$
+```
 
 The weight tensor has shape $`(C_{\text{out}},C_{\text{in}},k,k)`$, independent of the image size: $`C_{\text{out}}(C_{\text{in}}k^2+1)`$ parameters. Each output channel is a **feature map**, the response of one learned detector at every position. Written as a matrix acting on the flattened input, a convolution is a sparse matrix with a banded, repeated (doubly block-Toeplitz) structure: locality makes it sparse and weight sharing makes the nonzero entries repeat. A fully connected layer is the same computation with no constraints.
 
@@ -48,9 +48,9 @@ Classical image processing uses fixed kernels of exactly this kind, and they sho
 
 Three hyperparameters control the geometry of a convolution. **Padding** adds $`p`$ rows and columns of zeros around the input, so that kernels can be centered on border pixels; $`p=(k-1)/2`$ for odd $`k`$ keeps the size unchanged ("same" padding). **Stride** $`s`$ moves the kernel $`s`$ positions at a time, downsampling the output by a factor $`s`$. **Dilation** $`d`$ spaces the kernel entries $`d`$ positions apart, enlarging the region the kernel covers without adding weights ([Yu and Koltun, 2016](https://arxiv.org/abs/1511.07122)). Along each spatial dimension of size $`n`$,
 
-$$
+```math
 n_{\text{out}}=\Bigl\lfloor\frac{n+2p-d(k-1)-1}s\Bigr\rfloor+1 .
-$$
+```
 
 ```python
 import torch
@@ -99,9 +99,9 @@ Other symmetries can be built in the same way. **Group-equivariant networks** ([
 
 The **receptive field** of a unit is the region of the input that can affect it. A stack of $`L`$ convolutions with $`3\times3`$ kernels and stride 1 has a receptive field of $`(2L+1)\times(2L+1)`$: each layer adds one pixel on each side. Downsampling multiplies the growth: after a stride-2 layer, each further $`3\times3`$ convolution adds two input pixels on each side instead of one. In general, if layer $`l`$ has kernel size $`k_l`$ and stride $`s_l`$,
 
-$$
+```math
 r_L=1+\sum_{l=1}^L(k_l-1)\prod_{i<l}s_i .
-$$
+```
 
 Two $`3\times3`$ layers cover the same $`5\times5`$ region as one $`5\times5`$ layer with fewer weights ($`2\cdot9`$ against 25 per channel pair) and an extra nonlinearity, the observation behind the VGG networks of chapter 7.
 
@@ -214,17 +214,17 @@ Consider one input channel and one output channel with stride 1 and no padding; 
 
 **Weights.** Each weight multiplies one input entry at every output position, so
 
-$$
+```math
 \frac{\partial\ell}{\partial W_{u,v}}=\sum_{i,j}G_{i,j}\,X_{i+u,\,j+v},
-$$
+```
 
 the cross-correlation of the input with the output gradient. In im2col form, where column $`(i,j)`$ of the patch matrix holds the patch under output $`(i,j)`$, this is the product of the gradient row vector with the transposed patch matrix, as in the code.
 
 **Input.** Entry $`X_{a,b}`$ contributes to every output $`Y_{i,j}`$ with $`i+u=a`$ and $`j+v=b`$ for some kernel position $`(u,v)`$, so
 
-$$
+```math
 \frac{\partial\ell}{\partial X_{a,b}}=\sum_{u,v}W_{u,v}\,G_{a-u,\,b-v},
-$$
+```
 
 with $`G`$ taken as zero outside its range. This is a true convolution (with the kernel flipped relative to the forward cross-correlation) of the zero-padded output gradient with $`W`$, which is exactly what a transposed convolution computes. In matrix form, if the forward pass is $`y=Mx`$ for the structured matrix $`M`$, the backward pass is $`M^\top g`$, which explains the name.
 

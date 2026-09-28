@@ -21,9 +21,9 @@ In the search problems of chapters 1–3 the agent alone decides what happens. I
 
 What should MAX do? A plan that fixes MAX's moves in advance is useless, because the right move depends on MIN's replies. A solution is a **strategy**, which specifies a move for every position MAX may face. The **minimax value** of a state is the utility for MAX of reaching a terminal state when both players play optimally from there on:
 
-$$
+```math
 \mathrm{Minimax}(s)=\begin{cases}\mathrm{Utility}(s,\mathrm{MAX}) & \text{if }\mathrm{IsTerminal}(s),\\ \max_{a}\mathrm{Minimax}(\mathrm{Result}(s,a)) & \text{if }\mathrm{ToMove}(s)=\mathrm{MAX},\\ \min_{a}\mathrm{Minimax}(\mathrm{Result}(s,a)) & \text{if }\mathrm{ToMove}(s)=\mathrm{MIN}.\end{cases}
-$$
+```
 
 The **minimax decision** at the root chooses the move leading to the child of highest value. The minimax algorithm computes these values by a depth-first traversal of the whole tree, backing values up from the leaves. With branching factor $`b`$ and maximum depth $`m`$ it takes $`O(b^m)`$ time and $`O(bm)`$ space.
 
@@ -46,9 +46,9 @@ A MAX node updates $`\alpha`$ with each child's value, a MIN node updates $`\bet
 
 How much alpha–beta prunes depends on the order in which children are examined. If the best move is always tried first, alpha–beta evaluates
 
-$$
+```math
 b^{\lceil d/2\rceil}+b^{\lfloor d/2\rfloor}-1
-$$
+```
 
 leaves of a uniform tree of depth $`d`$, the minimum possible for any algorithm that proves the minimax value ([Knuth and Moore, 1975](https://www.sciencedirect.com/science/article/pii/0004370275900193)); that is $`O(b^{d/2})`$, as if the branching factor were $`\sqrt b`$, and it allows a search twice as deep in the same time. With children in random order, the number of leaves grows roughly as $`b^{3d/4}`$ for moderate $`b`$. Perfect ordering is impossible, since it would require knowing the values, but good ordering is cheap to approximate:
 
@@ -158,9 +158,9 @@ Chess cannot be searched to the end, so programs search to a limited depth and a
 
 A good evaluation function orders terminal states as the utility does, is cheap to compute, and, for nonterminal states, is strongly correlated with the actual chance of winning. Classical evaluation functions are **weighted linear functions of features**,
 
-$$
+```math
 \mathrm{Eval}(s)=w_1f_1(s)+w_2f_2(s)+\dots+w_kf_k(s),
-$$
+```
 
 such as the material balance (a pawn worth 1, a knight or bishop 3, a rook 5, a queen 9), mobility, king safety, and pawn structure. The weights can be tuned by hand or learned from games, and the features can be replaced altogether by a neural network trained on positions labeled with game outcomes or with the values of deeper searches. Evaluation functions are the game-playing counterpart of the heuristics of chapter 2, and learning them is the counterpart of learning heuristics: the evaluation of a position is an estimate of its value under good play, the quantity the RL module calls a value function.
 
@@ -178,9 +178,9 @@ These techniques produced the first superhuman programs by search and hand-tuned
 
 Backgammon combines skill and dice. Its game tree has **chance nodes** between the players' moves, whose children are the outcomes of a dice roll with their probabilities. Minimax generalizes to **expectiminimax**: a chance node's value is the probability-weighted average of its children's values,
 
-$$
+```math
 \mathrm{ExpectiMinimax}(s)=\sum_{r}P(r)\,\mathrm{ExpectiMinimax}(\mathrm{Result}(s,r))\quad\text{at chance nodes},
-$$
+```
 
 with max and min at the players' nodes as before. The cost grows to $`O(b^mn^m)`$, where $`n`$ is the number of distinct chance outcomes (21 for a roll of two dice), so programs search only a few plies. Alpha–beta can be extended to chance nodes when utilities are bounded, since a bound on the average follows from bounds on the children, but it prunes much less.
 
@@ -207,9 +207,9 @@ When time runs out, the move with the most visits is played.
 
 The selection policy must balance **exploitation**, descending into moves with a high average reward, and **exploration**, trying moves with few visits whose average is uncertain. The **UCT** rule ([Kocsis and Szepesvári, 2006](https://doi.org/10.1007/11871842_29)) applies the UCB1 algorithm for multi-armed bandits ([Auer, Cesa-Bianchi, and Fischer, 2002](https://doi.org/10.1023/A:1013689704352)) at every node: from node $`n`$, choose the child $`c`$ maximizing
 
-$$
+```math
 \frac{W(c)}{N(c)}+C\sqrt{\frac{\ln N(n)}{N(c)}},
-$$
+```
 
 where $`W(c)/N(c)`$ is the average reward of $`c`$ for the player who moves at $`n`$, $`N(n)`$ and $`N(c)`$ are visit counts, and $`C`$ is an exploration constant, $`\sqrt2`$ in the original analysis. The bonus shrinks as a child is visited and grows slowly for children that are neglected, so every child is visited infinitely often but the best ones overwhelmingly more. Kocsis and Szepesvári showed that UCT's estimate at the root converges to the minimax value and that the probability of choosing a suboptimal move goes to zero as the number of iterations grows. Bandits and the exploration–exploitation trade-off in general belong to the RL module.
 

@@ -35,9 +35,9 @@ A good representation is invariant to what the downstream tasks ignore, such as 
 
 An **autoencoder** trains an encoder $`f`$ and a decoder $`g`$ to reconstruct the input through a bottleneck,
 
-$$
+```math
 \min_{f,g}\ \mathbb E\,\bigl\|x-g\bigl(f(x)\bigr)\bigr\|^2,
-$$
+```
 
 where $`h=f(x)`$ has fewer dimensions than $`x`$, so the network cannot copy its input and must keep the directions that matter most for reconstruction. With linear maps and squared error, the optimal encoder–decoder pair projects onto the principal subspace of the data, the subspace spanned by the top $`k`$ principal components ([Baldi and Hornik, 1989](https://www.sciencedirect.com/science/article/pii/0893608089900142); ML chapter 12; [Appendix B](#block-dl10-appendix-b)). The code below trains a linear autoencoder by gradient descent on the digits and compares it with PCA.
 
@@ -94,9 +94,9 @@ Contrastive methods learn by comparison. Two random **augmentations** of the sam
 
 **SimCLR** ([Chen et al., 2020](https://arxiv.org/abs/2002.05709)) gives the standard recipe. A batch of $`N`$ images yields $`2N`$ views; each passes through the encoder $`f`$ and a small **projection head** $`g`$ to an embedding $`z`$, normalized to unit length. For a positive pair $`(i,j)`$, the loss is
 
-$$
+```math
 \ell_{ij}=-\log\frac{\exp(z_i^\top z_j/\tau)}{\sum_{k\ne i}\exp(z_i^\top z_k/\tau)},
-$$
+```
 
 averaged over all $`2N`$ views. This is a cross-entropy: each view must classify which of the other $`2N-1`$ views is its partner, with cosine similarities divided by a **temperature** $`\tau`$ as logits. The loss comes from noise-contrastive estimation ([Gutmann and Hyvärinen, 2010](https://proceedings.mlr.press/v9/gutmann10a.html)) and was named **InfoNCE** by [van den Oord, Li, and Vinyals (2018)](https://arxiv.org/abs/1807.03748), who used it to predict future segments of audio, text, and images from past ones.
 
@@ -113,9 +113,9 @@ With a ResNet-50, a linear probe on SimCLR features reached 69.3% top-1 accuracy
 
 InfoNCE is a lower bound on the **mutual information** between the two views (Foundations chapter 5). If a critic $`f(x,y)`$ scores how likely $`y`$ is to be the partner of $`x`$, and the loss $`\mathcal L`$ is the cross-entropy of picking the true partner among $`N`$ candidates, then
 
-$$
+```math
 I(X;Y)\ \ge\ \log N-\mathcal L ,
-$$
+```
 
 with near equality for the optimal critic $`f^*(x,y)=\log p(y\mid x)/p(y)`$ when $`I(X;Y)`$ is small compared with $`\log N`$ ([Poole et al., 2019](https://arxiv.org/abs/1905.06922); [Appendix A](#block-dl10-appendix-a)). Because $`\mathcal L\ge0`$, the estimate can never exceed $`\log N`$. The code below uses the optimal critic for correlated Gaussians, whose mutual information is known, to show both properties.
 
@@ -152,9 +152,9 @@ Mutual information is not, however, what makes the representations good. Two vie
 
 [Wang and Isola (2020)](https://arxiv.org/abs/2005.10242) give a more useful description. As the number of negatives grows, the InfoNCE loss minus $`\log N`$ approaches the sum of two terms ([Appendix C](#block-dl10-appendix-c)):
 
-$$
+```math
 \underbrace{-\frac1\tau\,\mathbb E\bigl[z_a^\top z_b\bigr]}_{\text{alignment}}\;+\;\underbrace{\mathbb E_x\log\mathbb E_{x'}\exp\bigl(z(x)^\top z(x')/\tau\bigr)}_{\text{uniformity}} .
-$$
+```
 
 The first pulls positive pairs together; the second is smallest when the embeddings of different images spread uniformly over the sphere. Alignment alone is minimized by collapse; uniformity is what prevents it.
 
@@ -274,23 +274,23 @@ UNIGE sections 7.2 and 7.3 and the *Cookbook of Self-Supervised Learning* of [Ba
 
 Let $`(X,Y)\sim p(x,y)`$, and form $`N`$ candidates $`Y_1,\ldots,Y_N`$ by placing the true partner $`Y`$ at a uniformly random position $`K`$ and filling the other positions with independent draws from $`p(y)`$. A critic $`f`$ defines a guess for the position,
 
-$$
+```math
 q(k\mid X,Y_{1:N})=\frac{e^{f(X,Y_k)}}{\sum_{j=1}^Ne^{f(X,Y_j)}},
-$$
+```
 
 and the InfoNCE loss is $`\mathcal L=-\mathbb E\log q(K\mid X,Y_{1:N})`$.
 
 **Step 1: a cross-entropy bounds an entropy.** For any conditional distribution $`q`$, $`-\mathbb E\log q(K\mid X,Y_{1:N})\ge H(K\mid X,Y_{1:N})`$, because the difference is an expected Kullback–Leibler divergence (Foundations chapter 5). Hence
 
-$$
+```math
 \log N-\mathcal L\le\log N-H(K\mid X,Y_{1:N})=H(K)-H(K\mid X,Y_{1:N})=I(K;X,Y_{1:N}).
-$$
+```
 
 **Step 2: the position carries at most $`I(X;Y)`$.** The candidates alone reveal nothing about $`K`$, since marginally they are $`N`$ independent draws from $`p(y)`$ whatever $`K`$ is; so $`I(K;X,Y_{1:N})=I(K;X\mid Y_{1:N})`$. By the chain rule, $`I(X;K,Y_{1:N})=I(X;Y_{1:N})+I(X;K\mid Y_{1:N})\ge I(K;X\mid Y_{1:N})`$. And $`X`$ depends on $`(K,Y_{1:N})`$ only through the true partner $`Y_K`$, so $`I(X;K,Y_{1:N})=I(X;Y)`$. Combining,
 
-$$
+```math
 \log N-\mathcal L\ \le\ I(X;Y).
-$$
+```
 
 **The optimal critic.** The posterior of the position is $`p(k\mid x,y_{1:N})\propto p(y_k\mid x)\prod_{j\ne k}p(y_j)\propto p(y_k\mid x)/p(y_k)`$, which is $`q`$ with $`f^*(x,y)=\log p(y\mid x)/p(y)`$ plus any function of $`x`$. With this critic Step 1 is an equality, and the only gap is Step 2, which is small when $`I(X;Y)\ll\log N`$. Since $`\mathcal L\ge0`$, the estimate never exceeds $`\log N`$: measuring large mutual information requires exponentially many negatives ([McAllester and Stratos, 2020](https://arxiv.org/abs/1811.04251)).
 
@@ -316,15 +316,15 @@ Let the centered data matrix $`X\in\mathbb R^{n\times p}`$ have singular value d
 
 Write the InfoNCE loss for a view $`x`$ with positive $`x^+`$ and $`M`$ negatives $`x_1^-,\ldots,x_M^-`$, with unit-norm embeddings $`z`$:
 
-$$
+```math
 \mathcal L_M=-\frac1\tau\,\mathbb E\bigl[z(x)^\top z(x^+)\bigr]+\mathbb E\log\Bigl(e^{z(x)^\top z(x^+)/\tau}+\sum_{i=1}^Me^{z(x)^\top z(x_i^-)/\tau}\Bigr).
-$$
+```
 
 Subtract $`\log M`$. Inside the second logarithm, $`\frac1M\sum_ie^{z(x)^\top z(x_i^-)/\tau}`$ converges to $`\mathbb E_{x'}e^{z(x)^\top z(x')/\tau}`$ by the law of large numbers, and the single positive term, bounded by $`e^{1/\tau}`$, becomes negligible after division by $`M`$. Hence
 
-$$
+```math
 \lim_{M\to\infty}\bigl(\mathcal L_M-\log M\bigr)=-\frac1\tau\,\mathbb E\bigl[z(x)^\top z(x^+)\bigr]+\mathbb E_x\log\mathbb E_{x'}e^{z(x)^\top z(x')/\tau}.
-$$
+```
 
 The first term is minimized when positive pairs coincide. The second is a log-partition function over the negatives; by Jensen's inequality it is at least $`\frac1\tau\mathbb E_{x,x'}[z(x)^\top z(x')]=\frac1\tau\bigl\|\mathbb E\,z\bigr\|^2`$, which is minimized when the mean embedding is zero, and [Wang and Isola (2020)](https://arxiv.org/abs/2005.10242) show that its minimizers are uniform distributions on the sphere when these exist. A collapsed encoder makes the second term $`1/\tau`$, its maximum.
 

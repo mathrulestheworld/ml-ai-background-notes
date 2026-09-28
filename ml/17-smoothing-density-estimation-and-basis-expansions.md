@@ -14,9 +14,9 @@ Given observations $`x_1,\ldots,x_n`$ drawn independently from an unknown densit
 
 The **kernel density estimator** centers a smooth bump at every observation instead:
 
-$$
+```math
 \hat f_h(x)=\frac1{nh}\sum_{i=1}^nK\Bigl(\frac{x-x_i}h\Bigr),
-$$
+```
 
 where the **kernel** $`K`$ is a symmetric probability density, such as the standard normal or the Epanechnikov kernel $`\frac34(1-u^2)_+`$, with $`t_+=\max\{t,0\}`$, and the **bandwidth** $`h>0`$ sets its width. The term for observation $`i`$ is a copy of $`K`$ stretched to width $`h`$, centered at $`x_i`$, and scaled to have area $`1/n`$. The estimate is itself a density: nonnegative and integrating to one. It is in fact the density of $`X^\ast+hZ`$, where $`X^\ast`$ is drawn from the empirical distribution of the sample and $`Z\sim K`$ is independent of it, because the density of a sum of independent variables is the convolution of their laws. The kernel estimate thus smooths the empirical distribution, which puts mass $`1/n`$ on each observation and has no density, into a distribution that has one.
 
@@ -32,10 +32,10 @@ The choice of kernel matters little; the choice of bandwidth matters a great dea
 
 The bandwidth trades bias against variance exactly as $`k`$ does for nearest neighbors (chapter 1). At a fixed $`x`$, the mean squared error of $`\hat f_h(x)`$ as an estimate of the number $`f(x)`$ is its squared bias plus its variance, the decomposition of Probability and Statistics. For a twice-differentiable density $`f`$, [Appendix A](#block-smooth-appendix-a) shows that
 
-$$
+```math
 \mathbb E\hat f_h(x)-f(x)\approx\frac{h^2}2\mu_2(K)f''(x),\qquad
 \operatorname{Var}\hat f_h(x)\approx\frac{f(x)R(K)}{nh},
-$$
+```
 
 with $`\mu_2(K)=\int u^2K(u)\,du`$, the variance of the kernel, and $`R(K)=\int K(u)^2\,du`$, a measure of its roughness. The letter $`R`$ for this integral of a square is standard in density estimation; it has nothing to do with the risk $`R(f)`$ of chapter 1. The bias is proportional to the curvature $`f''(x)`$, so it is negative at peaks, where $`f''<0`$, and positive in valleys. A small bandwidth follows every observation and has high variance; a large one flattens peaks and valleys, where $`|f''|`$ is large.
 
@@ -107,17 +107,17 @@ In $`d`$ dimensions, a product of one-dimensional kernels or a kernel with a ban
 
 The **Nadaraya–Watson** estimator of the regression function $`m(x)=\mathbb E[Y\mid X=x]`$, introduced in chapter 1, averages the responses with kernel weights:
 
-$$
+```math
 \hat m(x_0)=\frac{\sum_iK_h(x_i-x_0)\,y_i}{\sum_iK_h(x_i-x_0)},\qquad K_h(u)=K(u/h).
-$$
+```
 
 Here $`x_0`$ is the point at which the regression function is estimated, and the factor $`1/h`$ of the density estimator is left out of $`K_h`$ because it cancels in the ratio. The estimate is a weighted average $`\sum_iw_i(x_0)y_i`$ whose weights $`w_i(x_0)`$ are proportional to $`K_h(x_i-x_0)`$ and sum to one. It solves a local least-squares problem: $`\hat m(x_0)`$ is the constant $`\theta`$ minimizing $`\sum_iK_h(x_i-x_0)(y_i-\theta)^2`$, since setting the derivative in $`\theta`$ to zero gives exactly this weighted mean.
 
 Near the boundary of the data, the kernel sees observations on one side only. If the function slopes upward toward the boundary, all nearby observations lie below its value there, and the local constant is biased, with a bias of order $`h`$ rather than $`h^2`$. A first-order Taylor expansion makes this precise. With the inputs held fixed, the bias is
 
-$$
+```math
 \mathbb E\hat m(x_0)-m(x_0)=\sum_iw_i(x_0)\bigl(m(x_i)-m(x_0)\bigr)\approx m'(x_0)\sum_iw_i(x_0)(x_i-x_0),
-$$
+```
 
 the slope times the weighted mean offset of the inputs from $`x_0`$. In the interior, offsets on the two sides nearly cancel and the bias is of order $`h^2`$, although it still depends on how the density of the inputs changes across the window. At the boundary all offsets have the same sign, so their weighted mean, and with it the bias, is of order $`h`$.
 
@@ -125,9 +125,9 @@ the slope times the weighted mean offset of the inputs from $`x_0`$. In the inte
 
 **Local linear regression** fits a weighted line at each target point instead:
 
-$$
+```math
 (\hat\alpha,\hat\beta)=\arg\min_{\alpha,\beta}\sum_iK_h(x_i-x_0)\bigl(y_i-\alpha-\beta(x_i-x_0)\bigr)^2,\qquad \hat m(x_0)=\hat\alpha .
-$$
+```
 
 In matrix form, let $`B`$ be the $`n\times2`$ matrix with rows $`(1,x_i-x_0)`$ and $`W=\operatorname{diag}\bigl(K_h(x_i-x_0)\bigr)`$. Weighted least squares gives $`\hat m(x_0)=e_1^\top(B^\top WB)^{-1}B^\top Wy`$, where $`e_1=(1,0)^\top`$ picks out the intercept. The fitted value is again a weighted average of the responses, $`\hat m(x_0)=\sum_iw_i(x_0)y_i`$, but the weights, called the **equivalent kernel**, satisfy $`\sum_iw_i=1`$ and $`\sum_iw_i(x_i-x_0)=0`$. Both identities hold because a weighted line fitted to responses that lie exactly on a line reproduces that line: the fit at $`x_0`$ returns $`1`$ for the responses $`y_i=1`$ and $`0`$ for $`y_i=x_i-x_0`$. Local linear regression is therefore exact for linear functions, its bias comes only from curvature, and it is of order $`h^2`$ everywhere, including at the boundary. In the expansion above, the first-order term now vanishes, and the bias is approximately $`\tfrac12m''(x_0)\sum_iw_i(x_0)(x_i-x_0)^2`$.
 
@@ -147,9 +147,9 @@ Without the robustness iterations, all of these fits are **linear smoothers**, $
 
 Chapter 3 noted that linear regression on transformed inputs $`\phi_1(x),\ldots,\phi_p(x)`$ fits any function in their span. Global polynomials are a poor choice of basis: a high-degree polynomial fitted to local wiggles oscillates wildly elsewhere, especially near the ends of the data. **Splines** are piecewise polynomials joined smoothly at **knots** $`\xi_1<\cdots<\xi_M`$. A cubic spline is a cubic polynomial between consecutive knots, with continuous first and second derivatives at each knot, so the joins are invisible to the eye. One basis is the **truncated power basis**
 
-$$
+```math
 1,\ x,\ x^2,\ x^3,\ (x-\xi_1)_+^3,\ \ldots,\ (x-\xi_M)_+^3,
-$$
+```
 
 with $`M+4`$ functions. Each $`(x-\xi_k)_+^3`$ is zero to the left of its knot and adds a new cubic piece to the right. It has two continuous derivatives at $`\xi_k`$ and a jump only in the third, so adding a multiple of it changes the cubic to the right of $`\xi_k`$ without breaking the smoothness of the join. A direct count agrees: the $`M+1`$ cubic pieces have $`4(M+1)`$ coefficients, and matching the value and the first two derivatives at each knot removes $`3M`$ of them.
 
@@ -169,9 +169,9 @@ Splines behave erratically beyond the extreme knots, where the fit is determined
 
 A **smoothing spline** avoids choosing knots by penalizing roughness instead. Among all functions with a square-integrable second derivative, it minimizes
 
-$$
+```math
 \sum_{i=1}^n\bigl(y_i-f(x_i)\bigr)^2+\lambda\int f''(t)^2\,dt .
-$$
+```
 
 The penalty measures total curvature, and $`\lambda\ge0`$ sets its weight. As $`\lambda\to\infty`$ the solution is the least-squares line, the best fit among the functions with zero penalty, and as $`\lambda\to0`$ it interpolates the data. Although the problem is posed over an infinite-dimensional space, the minimizer $`\hat f_\lambda`$ is a natural cubic spline with a knot at every distinct $`x_i`$ ([Appendix B](#block-smooth-appendix-b)).
 
@@ -187,17 +187,17 @@ The smoothing spline is a kernel method in disguise. Its penalty vanishes on lin
 
 In many dimensions, fully nonparametric regression suffers from the curse of dimensionality. A **generalized additive model** (GAM) ([Hastie and Tibshirani, 1986](https://projecteuclid.org/journals/statistical-science/volume-1/issue-3/Generalized-Additive-Models/10.1214/ss/1177013604.full)) keeps the flexibility in each coordinate but assumes that the effects add:
 
-$$
+```math
 \mathbb E[Y\mid X=x]=\alpha+\sum_{j=1}^df_j(x_j),
-$$
+```
 
 or, for classification, that the log-odds are additive. Here $`x_j`$ is the $`j`$th coordinate of the input $`x`$, and below $`x_{ij}`$ is that coordinate of observation $`i`$. Each $`f_j`$ is a smooth function of one variable, estimated at the one-dimensional rate. The fitted model can be read by plotting each $`f_j`$, which makes GAMs popular where interpretability matters. The price is that interactions are absent unless added explicitly, for example as a smooth function of two variables. Gradient boosting with stumps (chapter 11) fits the same kind of additive model by a different route.
 
 GAMs are fitted by **backfitting**, a block coordinate descent: cycle through the features, and replace each $`f_j`$ by a one-dimensional smoother applied to the partial residuals $`y-\alpha-\sum_{k\ne j}f_k`$. Each $`f_j`$ is centered to have mean zero, so that the intercept is identified. With cubic smoothing splines as the smoothers, each update minimizes the penalized criterion
 
-$$
+```math
 \sum_{i=1}^n\Bigl(y_i-\alpha-\sum_{j=1}^df_j(x_{ij})\Bigr)^2+\sum_{j=1}^d\lambda_j\int f_j''(t)^2\,dt
-$$
+```
 
 exactly over one $`f_j`$ with the others held fixed, which is why backfitting is coordinate descent ([ESL §9.1.1](https://hastie.su.domains/ElemStatLearn/)). The intercept is the mean response, $`\hat\alpha=\bar y`$.
 
@@ -328,25 +328,25 @@ For large collections in high dimension, exact search is abandoned in favor of *
 
 Let $`K`$ be a symmetric density with $`\mu_2(K)=\int u^2K(u)\,du<\infty`$, and let $`f`$ have two continuous derivatives. Since the observations are iid,
 
-$$
+```math
 \mathbb E\hat f_h(x)=\frac1h\int K\Bigl(\frac{x-t}h\Bigr)f(t)\,dt=\int K(u)f(x-hu)\,du .
-$$
+```
 
 The second form substitutes $`t=x-hu`$. A second-order Taylor expansion $`f(x-hu)=f(x)-huf'(x)+\frac12h^2u^2f''(x)+o(h^2)`$, together with $`\int K=1`$ and $`\int uK(u)\,du=0`$, gives the bias $`\frac12h^2\mu_2(K)f''(x)+o(h^2)`$.
 
 The estimator is an average of $`n`$ iid terms $`h^{-1}K((x-X_i)/h)`$, so its variance is $`1/n`$ times their variance. Their second moment is
 
-$$
+```math
 \frac1{h^2}\int K\Bigl(\frac{x-t}h\Bigr)^2f(t)\,dt=\frac1h\int K(u)^2f(x-hu)\,du=\frac{f(x)R(K)}h+O(1),
-$$
+```
 
 and their squared mean is $`O(1)`$, so $`\operatorname{Var}\hat f_h(x)=f(x)R(K)/(nh)+O(1/n)`$.
 
 Integrating over $`x`$, the mean integrated squared error is approximately
 
-$$
+```math
 \operatorname{AMISE}(h)=\frac{h^4}4\mu_2(K)^2R(f'')+\frac{R(K)}{nh},\qquad R(g)=\int g^2 .
-$$
+```
 
 Setting the derivative in $`h`$ to zero gives $`h^\ast=\bigl[R(K)/(\mu_2(K)^2R(f'')\,n)\bigr]^{1/5}`$, and substituting shows that the minimal AMISE is proportional to $`n^{-4/5}`$. For a Gaussian kernel, $`\mu_2=1`$ and $`R(K)=1/(2\sqrt\pi)`$. If $`f`$ is normal with standard deviation $`\sigma`$, then $`R(f'')=3/(8\sqrt\pi\sigma^5)`$, and $`h^\ast=(4/3)^{1/5}\sigma n^{-1/5}\approx1.06\,\sigma n^{-1/5}`$, the normal reference rule.
 
@@ -364,15 +364,15 @@ Let the distinct inputs be $`t_1<\cdots<t_q`$ with $`q\ge2`$, contained in an in
 
 **Proof.** Let $`e=f-g`$, which vanishes at every knot. Integrating by parts over $`[a,b]`$,
 
-$$
+```math
 \int_a^bg''e''=\bigl[g''e'\bigr]_a^b-\int_a^bg'''e' .
-$$
+```
 
 The boundary term vanishes because a natural spline is linear outside $`[t_1,t_q]`$, so $`g''(a)=g''(b)=0`$. On each interval between consecutive knots, $`g`$ is cubic and $`g'''`$ is a constant $`c_k`$, while outside $`[t_1,t_q]`$ it is zero. Hence
 
-$$
+```math
 \int_a^bg'''e'=\sum_kc_k\bigl(e(t_{k+1})-e(t_k)\bigr)=0 .
-$$
+```
 
 Therefore $`\int f''^2=\int(g''+e'')^2=\int g''^2+\int e''^2\ge\int g''^2`$. Equality requires $`e''=0`$, so $`e`$ is linear; since it vanishes at two or more points, $`e=0`$.
 

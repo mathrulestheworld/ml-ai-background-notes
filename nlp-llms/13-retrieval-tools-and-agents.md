@@ -14,10 +14,10 @@ A language model's knowledge is fixed when training ends, stored diffusely in it
 
 Classical retrieval represents documents and queries by the words they contain and scores matches with weights that reward rare words. A document is a sparse vector over the vocabulary, and an **inverted index**, which maps each word to the list of documents containing it with their counts, lets a query touch only the documents that share a word with it ([Manning, Raghavan, and Schütze, 2008](https://nlp.stanford.edu/IR-book/)). **TF-IDF** weights a word in a document by its term frequency, damped logarithmically, times its inverse document frequency $`\log(N/\mathrm{df}_w)`$, which is large for words in few of the $`N`$ documents. **BM25** ([Robertson and Zaragoza, 2009](https://doi.org/10.1561/1500000019)) refines both parts:
 
-$$
+```math
 \mathrm{BM25}(q,d)=\sum_{w\in q}\mathrm{idf}(w)\,\frac{c(w,d)\,(k_1+1)}{c(w,d)+k_1\bigl(1-b+b\,|d|/\overline{|d|}\bigr)},
 \qquad\mathrm{idf}(w)=\log\Bigl(1+\frac{N-\mathrm{df}_w+0.5}{\mathrm{df}_w+0.5}\Bigr),
-$$
+```
 
 where $`c(w,d)`$ is the count of $`w`$ in $`d`$. The term-frequency factor saturates, so the tenth occurrence of a word adds much less than the first, with $`k_1`$ around 1.2 setting how fast; and $`b`$ around 0.75 normalizes for document length, so long documents are not favored merely for containing more words. The form derives from a probabilistic model of relevance ([Appendix A](#block-nlp13-appendix-a)). The code builds an inverted index over the 1,446 speeches of Tiny Shakespeare with at least 40 words and tests **known-item search**: each query is five words drawn at random from one speech, and the task is to rank that speech first.
 
@@ -205,9 +205,9 @@ Long tasks compound errors: if each of $`n`$ steps succeeds independently with p
 
 The **probability ranking principle** ranks documents by the probability that they are relevant to the query, equivalently by the log odds $`\log\frac{P(R=1\mid d,q)}{P(R=0\mid d,q)}`$. In the **binary independence model**, a document is the set of query words it contains, independent given relevance. With $`p_w=P(w\in d\mid R=1)`$ and $`u_w=P(w\in d\mid R=0)`$, the log odds, up to terms that do not depend on the document, are
 
-$$
+```math
 \sum_{w\in q\cap d}\log\frac{p_w(1-u_w)}{u_w(1-p_w)}.
-$$
+```
 
 Without relevance information, take $`p_w=1/2`$ and estimate $`u_w`$ by the fraction of all documents containing $`w`$, since most documents are not relevant: $`u_w\approx(\mathrm{df}_w+0.5)/(N+1)`$ with smoothing. The weight becomes $`\log\frac{N-\mathrm{df}_w+0.5}{\mathrm{df}_w+0.5}`$, the Robertson–Spärck Jones form of inverse document frequency; BM25 adds 1 inside the logarithm to keep it positive for very common words.
 
@@ -223,9 +223,9 @@ To account for how often a word occurs, the **2-Poisson** model supposes that a 
 
 Let $`E_Q`$ and $`E_P`$ map questions and passages to vectors, and score a pair by $`s(q,p)=E_Q(q)^\top E_P(p)`$. For a batch of $`B`$ questions with their positive passages $`p_1^+,\dots,p_B^+`$, and optionally one hard negative each, the loss for question $`i`$ is
 
-$$
+```math
 \mathcal L_i=-\log\frac{\exp s(q_i,p_i^+)}{\sum_{j=1}^B\exp s(q_i,p_j^+)+\sum_{j}\exp s(q_i,p_j^-)},
-$$
+```
 
 a softmax classification of the right passage among all passages in the batch, the InfoNCE loss of DL chapter 10. Each passage embedding computed for the batch serves as a negative for every other question, so a batch of $`B`$ supplies $`B(B-1)`$ negatives at the cost of $`B`$ encodings, which is why large batches help. Random negatives are mostly easy to reject, and the gradient they supply is small; hard negatives, passages that share many words with the question but do not answer it, force the encoders to represent what the question asks. Their risk is false negatives, passages that do answer the question but were not labeled, which the loss pushes away; filtering hard negatives with a cross-encoder reduces it.
 
@@ -239,9 +239,9 @@ a softmax classification of the right passage among all passages in the batch, t
 
 **Product quantization.** Split $`x\in\mathbb R^d`$ into $`M`$ blocks $`x^{(1)},\dots,x^{(M)}`$ of dimension $`d/M`$ and learn for each block a codebook of $`K`$ centroids $`c^{(m)}_1,\dots,c^{(m)}_K`$ by k-means on the corresponding blocks of the data. A vector is stored as the indices $`i_m(x)`$ of its nearest centroid in each block, $`M\log_2K`$ bits in all, and approximated by the concatenation $`\hat x=(c^{(1)}_{i_1},\dots,c^{(M)}_{i_M})`$, a vector from an implicit codebook of $`K^M`$ points built from only $`MK`$ stored centroids. For a query $`q`$, the squared distance to the approximation decomposes over blocks,
 
-$$
+```math
 \|q-\hat x\|^2=\sum_{m=1}^M\bigl\|q^{(m)}-c^{(m)}_{i_m(x)}\bigr\|^2,
-$$
+```
 
 so computing the $`M\times K`$ table of query-to-centroid distances once lets each database vector's distance be evaluated with $`M`$ lookups and additions, the **asymmetric distance computation**: the query is not quantized, only the database. The error in the distance is bounded by the quantization error of $`x`$, which is small when the blocks are nearly independent and the codebooks fine.
 

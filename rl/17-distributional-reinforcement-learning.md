@@ -10,9 +10,9 @@
 
 Every method so far has estimated expected returns. The return itself is random: it depends on the rewards, the transitions, and the agent's own choices, and two situations with the same expected return can be very different. A bet that pays 0 for sure and one that pays $`+100`$ or $`-100`$ with equal probability have the same value. **Distributional reinforcement learning** learns the whole distribution of the return, the random variable
 
-$$
+```math
 Z^\pi(s,a)=\sum_{t=0}^\infty\gamma^tR_{t+1}\quad\text{given }S_0=s,\;A_0=a\text{, and then }\pi,
-$$
+```
 
 whose expectation is $`q_\pi(s,a)`$. Interest in the distribution is old: [Sobel (1982)](https://doi.org/10.2307/3213832) derived Bellman equations for the variance of the return, and risk-sensitive control has always needed more than the mean. What made the distributional view central to deep reinforcement learning was the discovery by [Bellemare, Dabney, and Munos (2017)](https://arxiv.org/abs/1707.06887) that learning the distribution, even when only its mean is used to act, makes deep Q-learning agents much better. This chapter develops the theory of the distributional Bellman equation, the two main ways of representing distributions, categorical and quantile, the deep agents built on them, and the uses of the distribution for risk-sensitive decisions. The book by [Bellemare, Dabney, and Rowland (2023)](https://www.distributional-rl.org/) covers the subject in depth.
 
@@ -20,9 +20,9 @@ whose expectation is $`q_\pi(s,a)`$. Interest in the distribution is old: [Sobel
 
 The return satisfies a recursion in distribution. Writing $`\overset{D}{=}`$ for equality in distribution,
 
-$$
+```math
 Z^\pi(s,a)\overset{D}{=}R(s,a)+\gamma Z^\pi(S',A'),\qquad S'\sim p(\cdot\mid s,a),\;A'\sim\pi(\cdot\mid S'),
-$$
+```
 
 where, given $`(s,a)`$, the reward $`R`$ and the next pair $`(S',A')`$ come from the MDP and the policy, and, given $`(S',A')`$, the return $`Z^\pi(S',A')`$ from there is independent of $`R`$. Taking expectations gives the Bellman equation for $`q_\pi`$ of chapter 1. The **distributional Bellman operator** $`\mathcal T^\pi`$ maps a collection of distributions $`\eta(s,a)`$ to the distribution of $`R+\gamma Z(S',A')`$ with $`Z(S',A')\sim\eta(S',A')`$: it mixes the next distributions over the possible next states and actions, scales them by $`\gamma`$, and shifts them by the reward.
 
@@ -149,9 +149,9 @@ The projected operator has a fixed point close to the truth but not equal to its
 
 The **quantile** representation turns the categorical one around: it fixes the probabilities, $`1/N`$ each, and learns the locations $`\theta_1(s,a),\dots,\theta_N(s,a)`$ of $`N`$ atoms ([Dabney, Rowland, Bellemare, and Munos, 2018](https://arxiv.org/abs/1710.10044)). Among all such distributions, a closest one to a given distribution in the Wasserstein-1 distance places its atoms at the quantiles at the midpoints $`\tau_i=(2i-1)/2N`$ of the probability intervals, so the natural target is the $`\tau_i`$-quantile of the backed-up distribution. Quantiles can be learned by **quantile regression**: the $`\tau`$-quantile of a distribution minimizes the expected **pinball loss** $`\rho_\tau(u)=u\,(\tau-\mathbb 1[u<0])`$ of the residual $`u=Z-\theta`$, whose gradient in $`\theta`$ is $`\mathbb 1[Z<\theta]-\tau`$ (exercise 17.5). Quantile TD therefore updates each atom by
 
-$$
+```math
 \theta_i(s)\leftarrow\theta_i(s)+\alpha\Bigl(\tau_i-\frac1N\sum_j\mathbb 1\bigl[r+\gamma\theta_j(s')<\theta_i(s)\bigr]\Bigr),
-$$
+```
 
 a step up by $`\tau_i`$ and down by 1 for each target atom below it, averaged over the $`N`$ atoms of the target. The update needs no bounds on the returns, since the atoms go wherever the quantiles are; its steps have a fixed size, whatever the scale of the rewards, so the step size must be chosen for that scale. The projected quantile operator is a contraction in the maximal $`\infty`$-Wasserstein distance, so quantile dynamic programming converges ([Dabney, Rowland, Bellemare, and Munos, 2018](https://arxiv.org/abs/1710.10044)), and quantile TD converges too, with probability one under the usual step-size conditions ([Rowland et al., 2023](https://arxiv.org/abs/2301.04462)).
 
@@ -308,7 +308,9 @@ Using the coupling definition $`W_p(X,Y)=\inf\bigl(\mathbb E|X'-Y'|^p\bigr)^{1/p
 
 Fix $`(s,a)`$. Draw the reward $`R`$, the next state and action $`(S',A')`$, and then, for each possible $`(s',a')`$, a pair $`(X_{s'a'},Y_{s'a'})`$ from an optimal coupling of $`\eta(s',a')`$ and $`\eta'(s',a')`$, independently of $`R`$ and $`(S',A')`$. Then $`R+\gamma X_{S'A'}`$ has distribution $`(\mathcal T^\pi\eta)(s,a)`$ and $`R+\gamma Y_{S'A'}`$ has distribution $`(\mathcal T^\pi\eta')(s,a)`$, so they form a coupling of the two, and
 
-$$W_p^p\bigl((\mathcal T^\pi\eta)(s,a),(\mathcal T^\pi\eta')(s,a)\bigr)\le\mathbb E\bigl|\gamma(X_{S'A'}-Y_{S'A'})\bigr|^p=\gamma^p\,\mathbb E\bigl[W_p^p(\eta(S',A'),\eta'(S',A'))\bigr]\le\gamma^p\,\bar W_p(\eta,\eta')^p.$$
+```math
+W_p^p\bigl((\mathcal T^\pi\eta)(s,a),(\mathcal T^\pi\eta')(s,a)\bigr)\le\mathbb E\bigl|\gamma(X_{S'A'}-Y_{S'A'})\bigr|^p=\gamma^p\,\mathbb E\bigl[W_p^p(\eta(S',A'),\eta'(S',A'))\bigr]\le\gamma^p\,\bar W_p(\eta,\eta')^p.
+```
 
 The reward cancels because it is shared, and taking the supremum over $`(s,a)`$ gives the result. The same coupling argument fails for KL, which is not defined through couplings, as the next exercise shows.
 
@@ -444,7 +446,9 @@ The control operator backs up the distribution of the action that is greedy with
 
 Let the support be $`z_i=V_{\min}+(i-1)\Delta`$ for $`i=1,\dots,N`$, with $`\Delta=(V_{\max}-V_{\min})/(N-1)`$. Given a target distribution with atoms $`y_j`$ and probabilities $`q_j`$, for example $`y_j=r+\gamma z_j`$ and $`q_j=p_j(s',a^*)`$, the projection is
 
-$$(\Pi_C\,q)_i=\sum_j\Bigl[1-\frac{|\,[y_j]_{V_{\min}}^{V_{\max}}-z_i|}{\Delta}\Bigr]_0^1\,q_j,$$
+```math
+(\Pi_C\,q)_i=\sum_j\Bigl[1-\frac{|\,[y_j]_{V_{\min}}^{V_{\max}}-z_i|}{\Delta}\Bigr]_0^1\,q_j,
+```
 
 where $`[\cdot]_a^b`$ clips to $`[a,b]`$: each clipped atom gives weight to the grid points within $`\Delta`$ of it, linearly decreasing with distance. In code, compute $`b_j=([y_j]-V_{\min})/\Delta`$, add $`q_j(\lceil b_j\rceil-b_j)`$ to the lower neighbor $`z_{\lfloor b_j\rfloor+1}`$ and $`q_j(b_j-\lfloor b_j\rfloor)`$ to the upper one, $`z_{\lceil b_j\rceil+1}`$, taking care when $`b_j`$ is an integer. In terms of cumulative distribution functions, the projection is the distribution on the grid whose CDF is closest to the target's in the $`L^2`$ sense: this is why it pairs with the Cramér distance, in which the projected operator $`\Pi_C\mathcal T^\pi`$ is a $`\sqrt\gamma`$-contraction. Its fixed point $`\eta_C`$ satisfies $`\bar\ell_2(\eta_C,\eta^\pi)\le(1-\gamma)^{-1/2}\,\bar\ell_2(\Pi_C\eta^\pi,\eta^\pi)`$, with $`\bar\ell_2`$ the supremum over state–action pairs ([Rowland et al., 2018](https://arxiv.org/abs/1802.08163)): the compounded projection error is at most a constant times that of a single projection. The C51 loss is the cross-entropy $`-\sum_i(\Pi_Cq)_i\ln p_i(s,a)`$, whose gradient with respect to the logits is the difference between the predicted and target probabilities.
 

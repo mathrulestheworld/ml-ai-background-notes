@@ -34,15 +34,15 @@ The theorem does not make clustering meaningless. It shows that every method mus
 
 Given $`k`$, **k-means** chooses a partition $`C_1,\ldots,C_k`$ of the observations and centers $`\mu_1,\ldots,\mu_k\in\mathbb R^d`$ to minimize the **within-cluster sum of squares**
 
-$$
+```math
 W(C,\mu)=\sum_{j=1}^k\sum_{i\in C_j}\|x_i-\mu_j\|_2^2 .
-$$
+```
 
 Each observation pays the squared Euclidean distance to the center of its own cluster. For a fixed partition, the best center of each cluster is its mean $`\bar x_{C_j}=\frac1{|C_j|}\sum_{i\in C_j}x_i`$ ([Appendix A](#block-clust-appendix-a)), so the objective of a partition alone is $`W(C)=\min_\mu W(C,\mu)=\sum_j\sum_{i\in C_j}\|x_i-\bar x_{C_j}\|^2`$. It is equivalent to a sum of pairwise squared distances within clusters:
 
-$$
+```math
 \sum_{i\in C_j}\|x_i-\bar x_{C_j}\|^2=\frac1{2|C_j|}\sum_{i,i'\in C_j}\|x_i-x_{i'}\|^2 .
-$$
+```
 
 The total sum of squares around the overall mean $`\bar x`$ splits into the within-cluster part and a between-cluster part $`\sum_j|C_j|\,\|\bar x_{C_j}-\bar x\|^2`$, so minimizing within-cluster scatter is the same as maximizing between-cluster separation ([Appendix A](#block-clust-appendix-a)). After division by $`n`$, this split is the law of total variance, applied to each coordinate and summed, for the empirical distribution of the data with the cluster label as the conditioning variable. Finding the global minimum is NP-hard, even for two clusters in general dimension ([Aloise, Deshpande, Hansen, and Popat, 2009](https://link.springer.com/article/10.1007/s10994-009-5103-0)).
 
@@ -151,9 +151,9 @@ The algorithm needs a dissimilarity between clusters, called the **linkage**, bu
 
 For Ward linkage ([Ward, 1963](https://www.tandfonline.com/doi/abs/10.1080/01621459.1963.10500845)), merging $`A`$ and $`B`$ increases the within-cluster sum of squares by
 
-$$
+```math
 \Delta(A,B)=\frac{|A|\,|B|}{|A|+|B|}\,\|\bar x_A-\bar x_B\|^2 ,
-$$
+```
 
 derived in [Appendix B](#block-clust-appendix-b). Here $`\bar x_A`$ and $`\bar x_B`$ are the means of the two clusters. Each merge is the greedy choice for the k-means objective, although the partitions obtained by cutting the tree need not be k-means optima.
 
@@ -195,18 +195,18 @@ The reading plan's advice to keep these separate is worth following literally. A
 
 The **Rand index** is the fraction of pairs of observations on which two partitions agree, meaning both put the pair together or both separate it. Its value for unrelated partitions is not zero and depends on the numbers and sizes of clusters. The **adjusted Rand index** (ARI) of [Hubert and Arabie (1985)](https://link.springer.com/article/10.1007/BF01908075) subtracts its expected value under random relabeling with the same cluster sizes and rescales, so that identical partitions score one and unrelated ones score about zero. With $`n_{ab}`$ the number of observations in cluster $`a`$ of the first partition and cluster $`b`$ of the second, and row and column totals $`n_{a\cdot}`$ and $`n_{\cdot b}`$,
 
-$$
+```math
 \operatorname{ARI}=\frac{\sum_{a,b}\binom{n_{ab}}2-E}{\frac12\Bigl[\sum_a\binom{n_{a\cdot}}2+\sum_b\binom{n_{\cdot b}}2\Bigr]-E},\qquad
 E=\frac{\sum_a\binom{n_{a\cdot}}2\sum_b\binom{n_{\cdot b}}2}{\binom n2}.
-$$
+```
 
 The first sum counts the pairs placed together by both partitions, and $`E`$ is its expected value when the second partition's labels are randomly permuted among the observations, keeping all cluster sizes. In the denominator, the count is replaced by an upper bound on it, the average of the numbers of pairs that each partition places together on its own, so that identical partitions score exactly one.
 
 **Normalized mutual information** (NMI) instead measures the mutual information between the two labelings (Information and Learning Theory), divided by an average of their entropies. Let $`Z`$ and $`Z'`$ be the labels that the two partitions give to an observation chosen uniformly at random, so that $`P(Z=a,Z'=b)=n_{ab}/n`$. With entropies computed from these frequencies, scikit-learn's default is
 
-$$
+```math
 \operatorname{NMI}=\frac{I(Z;Z')}{\tfrac12\bigl[H(Z)+H(Z')\bigr]} ,
-$$
+```
 
 which lies in $`[0,1]`$ and does not depend on the base of the logarithm. Both indices are unchanged by renaming the clusters.
 
@@ -269,9 +269,9 @@ In DBSCAN, the density threshold has two parts, a radius $`\varepsilon`$ and a c
 
 Spectral clustering starts from symmetric, nonnegative similarity weights $`\omega_{ii'}`$ between observations, for example $`\omega_{ii'}=1`$ when one of $`x_i`$ and $`x_{i'}`$ is among the ten nearest neighbors of the other and $`\omega_{ii'}=0`$ otherwise. Collect the weights in the matrix $`\Omega`$ and the degrees $`\deg_i=\sum_{i'}\omega_{ii'}`$ in the diagonal matrix $`D_\Omega`$. The **graph Laplacian** $`L=D_\Omega-\Omega`$ has the quadratic form
 
-$$
+```math
 f^\top Lf=\frac12\sum_{i,i'}\omega_{ii'}(f_i-f_{i'})^2,\qquad f\in\mathbb R^n,
-$$
+```
 
 which measures how much a vector $`f`$, holding one value per observation, changes across the edges of the graph. $`L`$ is symmetric because $`\Omega`$ is, the form shows that it is positive semidefinite, and $`f^\top Lf=0`$ exactly when $`f`$ is constant on each connected component of the graph. The eigenvalue $`0`$ therefore has multiplicity equal to the number of connected components, and the indicator vectors of the components span its eigenspace ([Appendix C](#block-clust-appendix-c)). If the graph has exactly $`k`$ components, place orthonormal eigenvectors of the $`k`$ smallest eigenvalues as the columns of an $`n\times k`$ matrix $`U`$. All observations of one component then have the same row of $`U`$, different components have orthogonal rows, and k-means on the rows recovers the components exactly.
 
@@ -296,9 +296,9 @@ Real groups are usually joined by a few weak edges. The smallest eigenvalues are
 
 **Pairwise form.** For a cluster $`C`$ with mean $`\bar x`$,
 
-$$
+```math
 \sum_{i,i'\in C}\|x_i-x_{i'}\|^2=\sum_{i,i'\in C}\bigl\|(x_i-\bar x)-(x_{i'}-\bar x)\bigr\|^2=2|C|\sum_{i\in C}\|x_i-\bar x\|^2,
-$$
+```
 
 because the cross terms vanish after summing $`x_i-\bar x`$ over the cluster.
 
@@ -314,21 +314,21 @@ because the cross terms vanish after summing $`x_i-\bar x`$ over the cluster.
 
 **Ward's cost.** Let clusters $`A`$ and $`B`$ have sizes $`n_A=|A|`$ and $`n_B=|B|`$ and means $`\bar x_A,\bar x_B`$, and write $`\operatorname{SS}(C)=\sum_{i\in C}\|x_i-\bar x_C\|^2`$ for the sum of squares of a cluster $`C`$ around its own mean. The union has mean $`\bar x=(n_A\bar x_A+n_B\bar x_B)/(n_A+n_B)`$. By the within–between decomposition of Appendix A applied to the two-cluster partition of $`A\cup B`$,
 
-$$
+```math
 \operatorname{SS}(A\cup B)=\operatorname{SS}(A)+\operatorname{SS}(B)+n_A\|\bar x_A-\bar x\|^2+n_B\|\bar x_B-\bar x\|^2 .
-$$
+```
 
 Since $`\bar x_A-\bar x=\frac{n_B}{n_A+n_B}(\bar x_A-\bar x_B)`$ and $`\bar x_B-\bar x=\frac{n_A}{n_A+n_B}(\bar x_B-\bar x_A)`$, the increase is
 
-$$
+```math
 \frac{n_An_B^2+n_Bn_A^2}{(n_A+n_B)^2}\|\bar x_A-\bar x_B\|^2=\frac{n_An_B}{n_A+n_B}\|\bar x_A-\bar x_B\|^2 .
-$$
+```
 
 **Lance–Williams recurrence.** After clusters $`A`$ and $`B`$ merge, the dissimilarity from any other cluster $`Q`$, of size $`n_Q`$, to the merged cluster can be computed from the old dissimilarities:
 
-$$
+```math
 d(Q,A\cup B)=\alpha_Ad(Q,A)+\alpha_Bd(Q,B)+\beta\,d(A,B)+\gamma\,\bigl\lvert d(Q,A)-d(Q,B)\bigr\rvert .
-$$
+```
 
 Single linkage uses $`\alpha_A=\alpha_B=\frac12`$, $`\beta=0`$, $`\gamma=-\frac12`$, which gives the minimum; complete linkage uses $`\gamma=+\frac12`$, which gives the maximum. Average linkage uses $`\alpha_A=n_A/(n_A+n_B)`$ and $`\beta=\gamma=0`$. Ward linkage, with $`d`$ equal to twice the merge cost (squared Euclidean distance between singletons), uses $`\alpha_A=(n_A+n_Q)/(n_A+n_B+n_Q)`$, $`\beta=-n_Q/(n_A+n_B+n_Q)`$, and $`\gamma=0`$. In each case $`\alpha_B`$ is $`\alpha_A`$ with the roles of $`A`$ and $`B`$ exchanged. The recurrence lets one algorithm implement all four linkages by updating a single row and column of the dissimilarity matrix after each merge.
 
@@ -342,9 +342,9 @@ Single linkage uses $`\alpha_A=\alpha_B=\frac12`$, $`\beta=0`$, $`\gamma=-\frac1
 
 **Quadratic form.** Let $`\Omega`$ be symmetric with nonnegative entries $`\omega_{ii'}`$, let $`D_\Omega=\operatorname{diag}(\deg_1,\ldots,\deg_n)`$ hold the degrees $`\deg_i=\sum_{i'}\omega_{ii'}`$, and let $`L=D_\Omega-\Omega`$. For $`f\in\mathbb R^n`$,
 
-$$
+```math
 f^\top Lf=\sum_i\deg_if_i^2-\sum_{i,i'}\omega_{ii'}f_if_{i'}=\frac12\sum_{i,i'}\omega_{ii'}\bigl(f_i^2+f_{i'}^2-2f_if_{i'}\bigr)=\frac12\sum_{i,i'}\omega_{ii'}(f_i-f_{i'})^2 ,
-$$
+```
 
 where the middle step writes $`\sum_i\deg_if_i^2`$ as half of $`\sum_{i,i'}\omega_{ii'}f_i^2`$ plus half of $`\sum_{i,i'}\omega_{ii'}f_{i'}^2`$, using the symmetry of $`\Omega`$. The form is nonnegative, so $`L`$ is positive semidefinite and all its eigenvalues are nonnegative.
 

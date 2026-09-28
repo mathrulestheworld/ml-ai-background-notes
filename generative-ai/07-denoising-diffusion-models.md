@@ -10,9 +10,9 @@
 
 A **diffusion model** generates data by learning to undo a process that destroys it. The destruction is fixed and simple: starting from a data point $`x_0`$, a Markov chain adds a little Gaussian noise at each of $`T`$ steps,
 
-$$
+```math
 q(x_t\mid x_{t-1})=\mathcal N\bigl(x_t;\ \sqrt{1-\beta_t}\,x_{t-1},\ \beta_tI\bigr),\qquad t=1,\dots,T,
-$$
+```
 
 with small variances $`\beta_1,\dots,\beta_T`$ called the **noise schedule**. Scaling by $`\sqrt{1-\beta_t}`$ keeps the variance from growing: if $`x_{t-1}`$ has unit variance, so does $`x_t`$. After enough steps nothing of $`x_0`$ remains, and $`x_T`$ is a standard Gaussian whatever the data were. Generation runs the chain backward: draw $`x_T`$ from the Gaussian and remove the noise one step at a time, with a network trained to predict what each step added. [Sohl-Dickstein et al. (2015)](https://arxiv.org/abs/1503.03585) proposed the idea, inspired by nonequilibrium thermodynamics, and used $`T=1000`$ steps for most image experiments; their samples were far from competitive. [Ho, Jain, and Abbeel (2020)](https://arxiv.org/abs/2006.11239) revived it as **denoising diffusion probabilistic models** (DDPM), with a reparameterization that turned training into denoising and connected it to the score models of chapter 6, and obtained the best FID then reported for unconditional generation on CIFAR-10.
 
@@ -22,9 +22,9 @@ Seen as a latent-variable model, a diffusion model is a hierarchical VAE with $`
 
 Because a sum of independent Gaussians is Gaussian, the noisy version at any step can be sampled from $`x_0`$ directly. With $`\alpha_t=1-\beta_t`$ and $`\bar\alpha_t=\prod_{s\le t}\alpha_s`$,
 
-$$
+```math
 q(x_t\mid x_0)=\mathcal N\bigl(x_t;\ \sqrt{\bar\alpha_t}\,x_0,\ (1-\bar\alpha_t)I\bigr),\qquad\text{that is,}\qquad x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon,\quad\epsilon\sim\mathcal N(0,I)
-$$
+```
 
 ([Appendix A](#block-gen07-appendix-a)). The data are shrunk toward zero by $`\sqrt{\bar\alpha_t}`$ and mixed with noise of variance $`1-\bar\alpha_t`$, and the two coefficients have squares summing to one. This closed form is what makes training cheap: a training example at step $`t`$ costs one draw of $`\epsilon`$, not $`t`$ steps of the chain. The code checks it against the chain itself.
 
@@ -63,15 +63,15 @@ After 400 steps of the chain, the mean of 2,000 simulated trajectories is the st
 
 What matters about a schedule is how fast it destroys information, which the **signal-to-noise ratio** measures,
 
-$$
+```math
 \operatorname{SNR}(t)=\frac{\bar\alpha_t}{1-\bar\alpha_t},
-$$
+```
 
 the ratio of the variance of the signal to that of the noise in $`x_t`$, for data of unit variance. It decreases from very large at $`t=1`$ to nearly zero at $`t=T`$. DDPM used a **linear schedule**, $`\beta_t`$ rising linearly from $`10^{-4}`$ to $`0.02`$ over $`T=1000`$ steps, chosen to keep the steps small while making the final signal-to-noise ratio so small that $`x_T`$ is indistinguishable from pure noise: the gap costs about $`10^{-5}`$ bits per dimension. [Nichol and Dhariwal (2021)](https://arxiv.org/abs/2102.09672) observed that with this schedule the end of the forward process is too noisy to contribute much, and that a trained model loses little in sample quality when the last 20% of its reverse steps are skipped. Their **cosine schedule** sets
 
-$$
+```math
 \bar\alpha_t=\frac{f(t)}{f(0)},\qquad f(t)=\cos^2\Bigl(\frac{t/T+s}{1+s}\cdot\frac\pi2\Bigr),\qquad s=0.008,
-$$
+```
 
 with each $`\beta_t`$ clipped at 0.999, so that $`\log\operatorname{SNR}`$ falls roughly linearly through the middle of the process and the steps are spread more evenly over the noise levels at which the image is still recognizable. In the code, the linear schedule reaches equal signal and noise, $`\log_{10}\operatorname{SNR}=0`$, a quarter of the way through, at $`t=250`$, and spends the remaining 750 steps below it; the cosine schedule reaches it halfway.
 
@@ -87,23 +87,23 @@ The best schedule depends on the data. Neighboring pixels of a large image are s
 
 To generate, one needs the reverse conditionals $`q(x_{t-1}\mid x_t)`$. These depend on the whole data distribution and are intractable, but for small $`\beta_t`$ they are nearly Gaussian: the reversal of a diffusion with small steps has the same functional form as the diffusion itself, a classical result of William Feller from 1949 on which Sohl-Dickstein et al. built. The reason is that, as a function of $`x_{t-1}`$, the forward step $`q(x_t\mid x_{t-1})`$ is a Gaussian of width $`\sqrt{\beta_t}`$, and over so small a region the density of $`x_{t-1}`$ is nearly log-linear; multiplying a Gaussian by the exponential of a linear function gives a Gaussian shifted along the gradient. To first order in $`\beta_t`$,
 
-$$
+```math
 q(x_{t-1}\mid x_t)\approx\mathcal N\Bigl(x_{t-1};\ \frac{x_t+\beta_t\nabla\log q_t(x_t)}{\sqrt{\alpha_t}},\ \beta_tI\Bigr),
-$$
+```
 
 where $`q_t`$ is the marginal density of $`x_t`$ ([Appendix A](#block-gen07-appendix-a)). Each reverse step rescales, moves by $`\beta_t`$ times the score of the noisy data, and adds fresh noise, a step of Langevin dynamics. The model therefore takes the reverse conditionals to be Gaussian,
 
-$$
+```math
 p_\theta(x_{t-1}\mid x_t)=\mathcal N\bigl(x_{t-1};\ \mu_\theta(x_t,t),\ \sigma_t^2I\bigr),\qquad p(x_T)=\mathcal N(0,I),
-$$
+```
 
 with a mean computed by a network that receives the step $`t`$ as an input and a variance $`\sigma_t^2`$ fixed by the schedule.
 
 Although $`q(x_{t-1}\mid x_t)`$ is intractable, it becomes tractable once $`x_0`$ is known. The **forward posterior** is Gaussian,
 
-$$
+```math
 q(x_{t-1}\mid x_t,x_0)=\mathcal N\bigl(x_{t-1};\ \tilde\mu_t(x_t,x_0),\ \tilde\beta_tI\bigr),\qquad\tilde\mu_t=\frac{\sqrt{\bar\alpha_{t-1}}\,\beta_t}{1-\bar\alpha_t}\,x_0+\frac{\sqrt{\alpha_t}\,(1-\bar\alpha_{t-1})}{1-\bar\alpha_t}\,x_t,\qquad\tilde\beta_t=\frac{1-\bar\alpha_{t-1}}{1-\bar\alpha_t}\,\beta_t,
-$$
+```
 
 an interpolation between the noisy point and the clean one with a variance slightly smaller than $`\beta_t`$ ([Appendix A](#block-gen07-appendix-a)). The true reverse conditional is its average over the clean images that could have produced $`x_t`$, and the training objective compares the model with it.
 
@@ -111,9 +111,9 @@ an interpolation between the noisy point and the clean one with a variance sligh
 
 Maximum likelihood needs $`p_\theta(x_0)=\int p_\theta(x_{0:T})\,dx_{1:T}`$, an integral over all trajectories. As for any latent-variable model, the evidence lower bound with the forward chain as the approximate posterior replaces it (chapter 3), and rewriting the forward steps with the forward posterior turns the bound into a sum of one term per step ([Appendix B](#block-gen07-appendix-b)):
 
-$$
+```math
 -\log p_\theta(x_0)\le\underbrace{D_{\mathrm{KL}}\bigl(q(x_T\mid x_0)\,\|\,p(x_T)\bigr)}_{L_T}+\sum_{t=2}^T\underbrace{\mathbb E_q\,D_{\mathrm{KL}}\bigl(q(x_{t-1}\mid x_t,x_0)\,\|\,p_\theta(x_{t-1}\mid x_t)\bigr)}_{L_{t-1}}\ \underbrace{-\ \mathbb E_q\log p_\theta(x_0\mid x_1)}_{L_0}.
-$$
+```
 
 The first term has no parameters and is nearly zero for a good schedule. Each middle term is a KL divergence between two Gaussians, available in closed form, so the bound is estimated without simulating the chain: draw $`x_0`$, a step $`t`$, and $`x_t`$ from the closed form, and evaluate one term. The last term is the likelihood of the data under the final denoising step; for images of 8-bit pixels, DDPM made it a discrete distribution over the 256 intensities, so that the bound is a bound on a codelength in bits.
 
@@ -121,29 +121,29 @@ The first term has no parameters and is nearly zero for a good schedule. Each mi
 
 With the variance fixed, the KL divergence at step $`t`$ is a squared distance between the means, $`L_{t-1}=\mathbb E\,\|\tilde\mu_t-\mu_\theta\|^2/2\sigma_t^2`$ up to a constant. Substituting $`x_0=(x_t-\sqrt{1-\bar\alpha_t}\,\epsilon)/\sqrt{\bar\alpha_t}`$ into the forward posterior mean gives
 
-$$
+```math
 \tilde\mu_t=\frac1{\sqrt{\alpha_t}}\Bigl(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\,\epsilon\Bigr),
-$$
+```
 
 so the network needs only to predict the noise $`\epsilon`$ that was added, from $`x_t`$ and $`t`$. With the same form for the model, $`\mu_\theta=\bigl(x_t-\beta_t\,\epsilon_\theta(x_t,t)/\sqrt{1-\bar\alpha_t}\bigr)/\sqrt{\alpha_t}`$, each term of the bound becomes a weighted regression on the noise,
 
-$$
+```math
 L_{t-1}=\frac{\beta_t^2}{2\sigma_t^2\,\alpha_t\,(1-\bar\alpha_t)}\,\mathbb E_{x_0,\epsilon}\bigl\|\epsilon-\epsilon_\theta\bigl(\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon,\ t\bigr)\bigr\|^2.
-$$
+```
 
 Ho et al. found that dropping the weights gave better samples. Their **simplified loss**
 
-$$
+```math
 L_{\text{simple}}=\mathbb E_{t\sim\mathcal U\{1,\dots,T\},\ x_0,\ \epsilon}\bigl\|\epsilon-\epsilon_\theta\bigl(\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon,\ t\bigr)\bigr\|^2
-$$
+```
 
 is a weighted variational bound that, relative to the true bound, down-weights the terms at small $`t`$, where the noise is slight and the denoising easy, so that the network can focus on the more difficult denoising at larger $`t`$. Training is a loop of four lines: sample an image, a step, and a noise vector, form $`x_t`$, and take a gradient step on the squared error of the predicted noise. There is no adversary, no sampling from the model during training, and no posterior to infer, which is the main reason diffusion models train so reliably.
 
 The noise predictor is a score model in disguise. The noisy data at step $`t`$ are the clean data scaled by $`\sqrt{\bar\alpha_t}`$ plus Gaussian noise of variance $`1-\bar\alpha_t`$, and the target of denoising score matching at that noise level is $`-\epsilon/\sqrt{1-\bar\alpha_t}`$ (chapter 6). So
 
-$$
+```math
 \epsilon_\theta(x_t,t)=-\sqrt{1-\bar\alpha_t}\;s_\theta(x_t,t),
-$$
+```
 
 and $`L_{\text{simple}}`$ is denoising score matching summed over noise levels with weights $`1-\bar\alpha_t`$, the same weighting by the noise variance that noise-conditional score networks used. The model mean becomes $`\mu_\theta=(x_t+\beta_t\,s_\theta(x_t,t))/\sqrt{\alpha_t}`$, the Langevin-like step of the previous section with the learned score in place of the true one. DDPM and the noise-conditional score network are the same model, reached from the likelihood side and from the score side; chapter 8 places both in one framework of stochastic differential equations.
 
@@ -155,9 +155,9 @@ Given $`x_t`$, the noise and the clean image determine each other, $`x_0=(x_t-\s
 
 Every one of these losses can be written as a weighted squared error in $`x_0`$. Since $`\|\epsilon-\epsilon_\theta\|^2=\operatorname{SNR}(t)\,\|x_0-\hat x_0\|^2`$ and $`\|v-v_\theta\|^2=(1+\operatorname{SNR}(t))\,\|x_0-\hat x_0\|^2`$, noise prediction weights the steps by $`\operatorname{SNR}(t)`$, velocity prediction by $`1+\operatorname{SNR}(t)`$, and data prediction by one. The variational bound has its own weighting, which takes a simple form when the model variance is $`\tilde\beta_t`$:
 
-$$
+```math
 L_{t-1}=\frac12\bigl(\operatorname{SNR}(t-1)-\operatorname{SNR}(t)\bigr)\,\mathbb E\,\|x_0-\hat x_\theta(x_t,t)\|^2
-$$
+```
 
 ([Appendix B](#block-gen07-appendix-b)). **Variational diffusion models** ([Kingma et al., 2021](https://arxiv.org/abs/2107.00630)) took the number of steps to infinity. The sum becomes an integral of the error against $`d\operatorname{SNR}`$, and changing variables from $`t`$ to the signal-to-noise ratio shows that the continuous-time bound does not depend on the schedule at all, except through its values at the two endpoints. The schedule only changes the variance of the Monte Carlo estimate of the bound, so they learned it to minimize that variance, added Fourier features of the input to help the network model fine detail, and reached 2.65 bits per dimension on CIFAR-10, better than the autoregressive models that had led likelihood benchmarks for years (chapter 2).
 
@@ -169,9 +169,9 @@ The bound concentrates its weight on small noise levels, where $`\operatorname{S
 
 The trained model generates by running its reverse chain: draw $`x_T\sim\mathcal N(0,I)`$ and, for $`t=T,\dots,1`$, set
 
-$$
+```math
 x_{t-1}=\frac1{\sqrt{\alpha_t}}\Bigl(x_t-\frac{\beta_t}{\sqrt{1-\bar\alpha_t}}\,\epsilon_\theta(x_t,t)\Bigr)+\sigma_tz,\qquad z\sim\mathcal N(0,I),
-$$
+```
 
 with no noise added at the last step. This **ancestral sampling** takes one network evaluation per step, a thousand for DDPM, against one for an adversarial network or a VAE; [Song, Meng, and Ermon (2021)](https://arxiv.org/abs/2010.02502) noted that 50,000 samples of $`32\times32`$ images took about 20 hours from a DDPM and less than a minute from an adversarial network on the same GPU. The variance $`\sigma_t^2`$ of each step is a choice. The two natural ones are $`\beta_t`$, the variance of the reverse step when the data are themselves standard Gaussian, and $`\tilde\beta_t`$, the variance when the data are a single point; they bound the variance of the true reverse step for data of unit variance, and Ho et al. found that they gave similar samples. They differ only in the first few steps, where $`\tilde\beta_t`$ is much smaller than $`\beta_t`$, and those steps matter for the likelihood bound though not for how samples look. Nichol and Dhariwal made the variance an output of the network, an interpolation between the two in the log domain, trained with a small weight on the variational bound added to $`L_{\text{simple}}`$; the learned variances improved the bound, to 2.94 bits per dimension on CIFAR-10 with a variant trained on the bound alone, and made sampling with 100 steps nearly as good as with the full chain.
 
@@ -179,9 +179,9 @@ with no noise added at the last step. This **ancestral sampling** takes one netw
 
 The training loss involves only the marginals $`q(x_t\mid x_0)`$, never the joint distribution of the forward chain. [Song, Meng, and Ermon (2021)](https://arxiv.org/abs/2010.02502) used this to build a family of forward processes, most of them not Markov, that share the DDPM marginals and therefore share its trained network. Their reverse step first predicts the clean image and then re-noises it to the previous level, in a way that keeps the marginals exact for any amount of fresh noise $`\sigma_t`$:
 
-$$
+```math
 \hat x_0=\frac{x_t-\sqrt{1-\bar\alpha_t}\,\epsilon_\theta(x_t,t)}{\sqrt{\bar\alpha_t}},\qquad x_{t-1}=\sqrt{\bar\alpha_{t-1}}\,\hat x_0+\sqrt{1-\bar\alpha_{t-1}-\sigma_t^2}\;\epsilon_\theta(x_t,t)+\sigma_tz
-$$
+```
 
 ([Appendix C](#block-gen07-appendix-c)). With $`\sigma_t^2=\eta^2\,\frac{1-\bar\alpha_{t-1}}{1-\bar\alpha_t}\bigl(1-\frac{\bar\alpha_t}{\bar\alpha_{t-1}}\bigr)`$, which for consecutive steps equals $`\eta^2\tilde\beta_t`$, the choice $`\eta=1`$ recovers ancestral sampling and $`\eta=0`$ gives the **denoising diffusion implicit model** (DDIM), a deterministic map from $`x_T`$ to $`x_0`$. Two consequences follow. Since only the marginals matter, the sampler can visit any subsequence of the steps, taking large jumps from one noise level to the next. And since the map is deterministic, every sample has a latent code $`x_T`$: running the sampler backward encodes a real image into its noise, which reconstructs the image and can be interpolated. On CIFAR-10, DDIM with 50 steps reached an FID of 4.67 and with 100 steps 4.16, where ancestral sampling with $`\eta=1`$ needed 1,000 steps for 4.73 and gave 41.07 with 10 steps against 13.36 for DDIM. The code trains a small DDPM on the two moons of chapter 4 and compares its bound and its samplers.
 
@@ -323,9 +323,9 @@ The comparison with the other families, in the terms of chapter 1, is this. Diff
 
 **Posterior.** By Bayes' rule and the Markov property, $`q(x_{t-1}\mid x_t,x_0)\propto q(x_t\mid x_{t-1})\,q(x_{t-1}\mid x_0)`$, a product of two Gaussians in $`x_{t-1}`$: one with mean $`x_t/\sqrt{\alpha_t}`$ and precision $`\alpha_t/\beta_t`$, one with mean $`\sqrt{\bar\alpha_{t-1}}\,x_0`$ and precision $`1/(1-\bar\alpha_{t-1})`$. Precisions add:
 
-$$
+```math
 \frac{\alpha_t}{\beta_t}+\frac1{1-\bar\alpha_{t-1}}=\frac{\alpha_t(1-\bar\alpha_{t-1})+\beta_t}{\beta_t(1-\bar\alpha_{t-1})}=\frac{1-\bar\alpha_t}{\beta_t(1-\bar\alpha_{t-1})}=\frac1{\tilde\beta_t}.
-$$
+```
 
 The mean is the precision-weighted average, $`\tilde\mu_t=\tilde\beta_t\bigl(\sqrt{\alpha_t}\,x_t/\beta_t+\sqrt{\bar\alpha_{t-1}}\,x_0/(1-\bar\alpha_{t-1})\bigr)`$, which simplifies to the expression in the text. Substituting $`x_0=(x_t-\sqrt{1-\bar\alpha_t}\,\epsilon)/\sqrt{\bar\alpha_t}`$ and using $`\sqrt{\bar\alpha_{t-1}/\bar\alpha_t}=1/\sqrt{\alpha_t}`$, the coefficient of $`x_t`$ is $`\bigl(\alpha_t(1-\bar\alpha_{t-1})+\beta_t\bigr)/\bigl((1-\bar\alpha_t)\sqrt{\alpha_t}\bigr)=1/\sqrt{\alpha_t}`$ and that of $`\epsilon`$ is $`-\beta_t/(\sqrt{\alpha_t}\sqrt{1-\bar\alpha_t})`$, which gives the noise form of $`\tilde\mu_t`$.
 
@@ -341,17 +341,17 @@ The mean is the precision-weighted average, $`\tilde\mu_t=\tilde\beta_t\bigl(\sq
 
 **Decomposition.** With the forward chain as the approximate posterior, $`\log p_\theta(x_0)\ge\mathbb E_q\bigl[\log p(x_T)+\sum_{t\ge1}\log p_\theta(x_{t-1}\mid x_t)-\sum_{t\ge1}\log q(x_t\mid x_{t-1})\bigr]`$. For $`t\ge2`$, the Markov property and Bayes' rule give $`q(x_t\mid x_{t-1})=q(x_t\mid x_{t-1},x_0)=q(x_{t-1}\mid x_t,x_0)\,q(x_t\mid x_0)/q(x_{t-1}\mid x_0)`$. The ratios $`q(x_t\mid x_0)/q(x_{t-1}\mid x_0)`$ telescope to $`q(x_T\mid x_0)/q(x_1\mid x_0)`$, and collecting terms,
 
-$$
+```math
 \log p_\theta(x_0)\ge\mathbb E_q\log p_\theta(x_0\mid x_1)-D_{\mathrm{KL}}\bigl(q(x_T\mid x_0)\,\|\,p(x_T)\bigr)-\sum_{t=2}^T\mathbb E_q\,D_{\mathrm{KL}}\bigl(q(x_{t-1}\mid x_t,x_0)\,\|\,p_\theta(x_{t-1}\mid x_t)\bigr).
-$$
+```
 
 **Gaussian terms.** For $`D`$-dimensional Gaussians with covariances $`\tilde\beta_tI`$ and $`\sigma_t^2I`$, $`D_{\mathrm{KL}}=\|\tilde\mu_t-\mu_\theta\|^2/2\sigma_t^2+\frac D2\bigl(\tilde\beta_t/\sigma_t^2-1-\log(\tilde\beta_t/\sigma_t^2)\bigr)`$. With both means in noise form, $`\tilde\mu_t-\mu_\theta=\beta_t(\epsilon_\theta-\epsilon)/(\sqrt{\alpha_t}\sqrt{1-\bar\alpha_t})`$, which gives the weight $`\beta_t^2/(2\sigma_t^2\alpha_t(1-\bar\alpha_t))`$ of the text. The code in the text evaluates this sum with one draw of $`\epsilon`$ per step and point, with $`L_0`$ a Gaussian of variance $`\beta_1`$ since the moons are continuous data.
 
 **In terms of the signal-to-noise ratio.** Since $`\hat x_0-x_0=-\sqrt{1-\bar\alpha_t}\,(\epsilon_\theta-\epsilon)/\sqrt{\bar\alpha_t}`$, $`\|\epsilon-\epsilon_\theta\|^2=\operatorname{SNR}(t)\,\|x_0-\hat x_0\|^2`$. With $`\sigma_t^2=\tilde\beta_t`$, the weight on $`\|x_0-\hat x_0\|^2`$ is
 
-$$
+```math
 \frac{\beta_t^2}{2\tilde\beta_t\alpha_t(1-\bar\alpha_t)}\cdot\frac{\bar\alpha_t}{1-\bar\alpha_t}=\frac{\bar\alpha_{t-1}\beta_t}{2(1-\bar\alpha_{t-1})(1-\bar\alpha_t)}=\frac12\bigl(\operatorname{SNR}(t-1)-\operatorname{SNR}(t)\bigr),
-$$
+```
 
 using $`\bar\alpha_t=\alpha_t\bar\alpha_{t-1}`$ and $`\bar\alpha_{t-1}-\bar\alpha_t=\bar\alpha_{t-1}\beta_t`$. As the steps become infinitesimal, the sum becomes $`-\frac12\int_0^1\operatorname{SNR}'(t)\,\mathbb E\|x_0-\hat x_\theta(x_t,t)\|^2\,dt`$. Writing $`x_t`$ as a function of the signal-to-noise ratio $`\lambda`$ instead of $`t`$, the integral is $`\frac12\int_{\lambda_{\min}}^{\lambda_{\max}}\mathbb E\|x_0-\hat x_\theta(x_\lambda,\lambda)\|^2\,d\lambda`$, which depends on the schedule only through the endpoints $`\lambda_{\min}=\operatorname{SNR}(1)`$ and $`\lambda_{\max}=\operatorname{SNR}(0)`$.
 
@@ -365,9 +365,9 @@ using $`\bar\alpha_t=\alpha_t\bar\alpha_{t-1}`$ and $`\bar\alpha_{t-1}-\bar\alph
 
 **Construction.** For any $`\sigma_t`$ with $`\sigma_t^2\le1-\bar\alpha_{t-1}`$, define, backward from $`q_\sigma(x_T\mid x_0)=\mathcal N(\sqrt{\bar\alpha_T}\,x_0,(1-\bar\alpha_T)I)`$,
 
-$$
+```math
 q_\sigma(x_{t-1}\mid x_t,x_0)=\mathcal N\Bigl(\sqrt{\bar\alpha_{t-1}}\,x_0+\sqrt{1-\bar\alpha_{t-1}-\sigma_t^2}\;\frac{x_t-\sqrt{\bar\alpha_t}\,x_0}{\sqrt{1-\bar\alpha_t}},\ \sigma_t^2I\Bigr).
-$$
+```
 
 If $`x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon`$, the fraction is $`\epsilon`$, and $`x_{t-1}=\sqrt{\bar\alpha_{t-1}}\,x_0+\sqrt{1-\bar\alpha_{t-1}-\sigma_t^2}\,\epsilon+\sigma_tz`$ has noise variance $`1-\bar\alpha_{t-1}`$. By induction downward from $`T`$, every marginal $`q_\sigma(x_t\mid x_0)`$ equals the DDPM marginal. The forward process implied by Bayes' rule, $`q_\sigma(x_t\mid x_{t-1},x_0)`$, depends on $`x_0`$ in general, so it is not a Markov chain; for $`\sigma_t^2=\tilde\beta_t`$, the posterior above is exactly the DDPM forward posterior and the process is the DDPM chain.
 

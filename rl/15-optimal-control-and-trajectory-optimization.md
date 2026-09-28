@@ -12,9 +12,9 @@ Reinforcement learning and optimal control study the same problem from two direc
 
 The Bellman equation is the same. With a finite horizon $`T`$, the optimal cost-to-go satisfies
 
-$$
+```math
 V_t(\mathbf x)=\min_{\mathbf u}\bigl[c(\mathbf x,\mathbf u)+V_{t+1}(f(\mathbf x,\mathbf u))\bigr],\qquad V_T(\mathbf x)=c_T(\mathbf x),
-$$
+```
 
 and in continuous time it becomes the **Hamilton–Jacobi–Bellman** equation, $`-\partial_tV=\min_{\mathbf u}[c(\mathbf x,\mathbf u)+\nabla_{\mathbf x}V\cdot f(\mathbf x,\mathbf u)]`$ with $`f`$ the continuous-time dynamics $`\dot{\mathbf x}=f(\mathbf x,\mathbf u)`$, a partial differential equation over the state space. Solving either on a grid suffers the curse of dimensionality that chapter 2 described. Control theory escapes it in two ways: by restricting the problem to linear dynamics and quadratic costs, where the value function is quadratic and the Bellman equation can be solved in closed form; and by giving up global solutions, and optimizing a single trajectory from the current state, which needs only local approximations of the dynamics and the value along it.
 
@@ -24,21 +24,21 @@ and in continuous time it becomes the **Hamilton–Jacobi–Bellman** equation, 
 
 The **linear–quadratic regulator** (LQR) has linear dynamics and a quadratic cost,
 
-$$
+```math
 \mathbf x_{t+1}=A\mathbf x_t+B\mathbf u_t,\qquad c(\mathbf x,\mathbf u)=\mathbf x^\top Q\mathbf x+\mathbf u^\top R\mathbf u,
-$$
+```
 
 with $`Q\succeq0`$ and $`R\succ0`$. Suppose the cost-to-go from time $`t+1`$ is quadratic, $`V_{t+1}(\mathbf x)=\mathbf x^\top P_{t+1}\mathbf x`$. Then the cost of taking $`\mathbf u`$ in $`\mathbf x`$ and continuing optimally is a quadratic function of $`\mathbf u`$,
 
-$$
+```math
 \mathbf x^\top Q\mathbf x+\mathbf u^\top R\mathbf u+(A\mathbf x+B\mathbf u)^\top P_{t+1}(A\mathbf x+B\mathbf u),
-$$
+```
 
 minimized by setting its gradient to zero. The optimal control is linear feedback, $`\mathbf u=-K_t\mathbf x`$, with the **gain** $`K_t=(R+B^\top P_{t+1}B)^{-1}B^\top P_{t+1}A`$, and substituting it back shows that $`V_t`$ is quadratic too, with
 
-$$
+```math
 P_t=Q+A^\top P_{t+1}A-A^\top P_{t+1}B\,(R+B^\top P_{t+1}B)^{-1}B^\top P_{t+1}A,
-$$
+```
 
 the discrete-time **Riccati recursion**, run backward from $`P_T`$. It is value iteration, with the value function represented exactly by a matrix ([Appendix A](#block-rl15-appendix-a)). Kalman worked out the problem in 1960, in "Contributions to the theory of optimal control" (*Boletín de la Sociedad Matemática Mexicana*), together with its dual, the filtering problem ([Kalman, 1960](https://doi.org/10.1115/1.3662552)). Each step costs a few matrix products, whatever the size of the state space, which is continuous.
 
@@ -220,9 +220,9 @@ These results are a useful corrective to intuitions formed on finite MDPs. On th
 
 For nonlinear dynamics and costs, a global solution is out of reach, but an optimal trajectory from a given state is not: it is a finite-dimensional optimization problem,
 
-$$
+```math
 \min_{\mathbf u_0,\dots,\mathbf u_{T-1}}\;\sum_{t=0}^{T-1}c(\mathbf x_t,\mathbf u_t)+c_T(\mathbf x_T)\quad\text{subject to}\quad\mathbf x_{t+1}=f(\mathbf x_t,\mathbf u_t),\;\mathbf x_0\text{ given}.
-$$
+```
 
 **Shooting** methods optimize over the controls only, computing the states by simulating the dynamics, so every iterate is a feasible trajectory; but the effect of an early control on the late states can be enormous for unstable systems, which makes the problem badly conditioned. **Collocation** methods optimize over states and controls together, with the dynamics as equality constraints that are satisfied only at convergence; the problem is larger but sparse and better conditioned, and it is solved by general nonlinear programming ([Kelly, 2017](https://doi.org/10.1137/16M1062569)). The classical necessary conditions for optimality in continuous time are **Pontryagin's maximum principle**, which describes the optimal control through costates that evolve backward in time; they are the continuous-time counterpart of the backward pass below, and of backpropagation through the dynamics (Foundations chapter 3).
 
@@ -230,9 +230,9 @@ $$
 
 **Differential dynamic programming** (DDP) ([Mayne, 1966](https://doi.org/10.1080/00207176608921369); Jacobson and Mayne, 1970) is a shooting method that uses dynamic programming to compute its steps. Around a nominal trajectory $`(\bar{\mathbf x}_t,\bar{\mathbf u}_t)`$, it expands the Bellman equation to second order in the deviations $`\delta\mathbf x`$ and $`\delta\mathbf u`$. With $`V'`$ the next step's cost-to-go, the quadratic model of the Q-function has coefficients
 
-$$
+```math
 Q_{\mathbf x}=c_{\mathbf x}+f_{\mathbf x}^\top V'_{\mathbf x},\quad Q_{\mathbf u}=c_{\mathbf u}+f_{\mathbf u}^\top V'_{\mathbf x},\quad Q_{\mathbf{xx}}=c_{\mathbf{xx}}+f_{\mathbf x}^\top V'_{\mathbf{xx}}f_{\mathbf x},\quad Q_{\mathbf{uu}}=c_{\mathbf{uu}}+f_{\mathbf u}^\top V'_{\mathbf{xx}}f_{\mathbf u},\quad Q_{\mathbf{ux}}=c_{\mathbf{ux}}+f_{\mathbf u}^\top V'_{\mathbf{xx}}f_{\mathbf x},
-$$
+```
 
 plus, in full DDP, terms with the second derivatives of the dynamics. Minimizing over $`\delta\mathbf u`$ gives a local controller $`\delta\mathbf u=\mathbf k_t+K_t\delta\mathbf x`$, with $`\mathbf k_t=-Q_{\mathbf{uu}}^{-1}Q_{\mathbf u}`$ and $`K_t=-Q_{\mathbf{uu}}^{-1}Q_{\mathbf{ux}}`$, and a quadratic model of $`V`$ at time $`t`$ to pass backward. The **forward pass** then simulates the new trajectory with $`\mathbf u_t=\bar{\mathbf u}_t+\alpha\mathbf k_t+K_t(\mathbf x_t-\bar{\mathbf x}_t)`$, where the step size $`\alpha`$ is chosen by a line search. Dropping the second derivatives of the dynamics gives **iLQR** ([Li and Todorov, 2004](https://doi.org/10.5220/0001143902220229)), which solves an LQR problem around the current trajectory at each iteration: a Gauss–Newton method, where DDP is a Newton-like method that converges quadratically near a solution ([Appendix B](#block-rl15-appendix-b)). Practical implementations add a regularization $`\mu I`$ to $`Q_{\mathbf{uu}}`$ or, as Tassa et al. recommend, to $`V'_{\mathbf{xx}}`$, adjusted like the damping of Levenberg–Marquardt, and handle bounds on the controls by squashing or by solving a small box-constrained problem at each step ([Tassa, Erez, and Todorov, 2012](https://doi.org/10.1109/IROS.2012.6386025); [Tassa, Mansard, and Todorov, 2014](https://doi.org/10.1109/ICRA.2014.6907001)).
 
@@ -842,7 +842,9 @@ On the linear model, the estimated Q-function is exact, since the data satisfy t
 
 Let $`V'`$ have the quadratic expansion $`V'(\bar{\mathbf x}'+\delta\mathbf x')\approx V'+V'_{\mathbf x}\cdot\delta\mathbf x'+\tfrac12\delta\mathbf x'^\top V'_{\mathbf{xx}}\delta\mathbf x'`$ around the nominal next state. The next state's deviation is, to second order, $`\delta\mathbf x'=f_{\mathbf x}\delta\mathbf x+f_{\mathbf u}\delta\mathbf u+\tfrac12(\text{second-order terms in }f)`$. Substituting into $`c(\bar{\mathbf x}+\delta\mathbf x,\bar{\mathbf u}+\delta\mathbf u)+V'(\cdot)`$ and collecting terms of first and second order gives the coefficients of the chapter, with, in full DDP, the additional terms $`V'_{\mathbf x}\cdot f_{\mathbf{xx}}`$ in $`Q_{\mathbf{xx}}`$, $`V'_{\mathbf x}\cdot f_{\mathbf{uu}}`$ in $`Q_{\mathbf{uu}}`$, and $`V'_{\mathbf x}\cdot f_{\mathbf{ux}}`$ in $`Q_{\mathbf{ux}}`$. Minimizing the quadratic in $`\delta\mathbf u`$ gives $`\delta\mathbf u=\mathbf k+K\delta\mathbf x`$, and substituting back gives the expansion of the cost-to-go at time $`t`$:
 
-$$V_{\mathbf x}=Q_{\mathbf x}+K^\top Q_{\mathbf{uu}}\mathbf k+K^\top Q_{\mathbf u}+Q_{\mathbf{ux}}^\top\mathbf k,\qquad V_{\mathbf{xx}}=Q_{\mathbf{xx}}+K^\top Q_{\mathbf{uu}}K+K^\top Q_{\mathbf{ux}}+Q_{\mathbf{ux}}^\top K,$$
+```math
+V_{\mathbf x}=Q_{\mathbf x}+K^\top Q_{\mathbf{uu}}\mathbf k+K^\top Q_{\mathbf u}+Q_{\mathbf{ux}}^\top\mathbf k,\qquad V_{\mathbf{xx}}=Q_{\mathbf{xx}}+K^\top Q_{\mathbf{uu}}K+K^\top Q_{\mathbf{ux}}+Q_{\mathbf{ux}}^\top K,
+```
 
 and the expected change of the cost (negative: a decrease), $`\alpha\,\mathbf k^\top Q_{\mathbf u}+\tfrac{\alpha^2}2\mathbf k^\top Q_{\mathbf{uu}}\mathbf k`$ summed over time, which the line search compares with the actual decrease. The expansion is valid only near the nominal trajectory, which is why the step size and the regularization of $`Q_{\mathbf{uu}}`$ matter: if $`Q_{\mathbf{uu}}`$ is not positive definite, the quadratic model has no minimum, and the regularization $`\mu I`$ makes it positive definite, interpolating between Newton's method ($`\mu=0`$) and small gradient steps (large $`\mu`$). If the dynamics are linear and the cost quadratic, the expansion is exact, and one iteration with $`\alpha=1`$ and $`\mu=0`$ solves the LQR.
 

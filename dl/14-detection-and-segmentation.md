@@ -209,9 +209,9 @@ Recall levels beyond the maximum recall contribute zero, so objects that are nev
 
 For a binary label with predicted probability $`p`$ of the positive class, let $`p_t=p`$ for a positive example and $`1-p`$ for a negative one. The cross-entropy is $`-\log p_t`$, and the **focal loss** is
 
-$$
+```math
 \mathrm{FL}(p_t)=-\alpha_t(1-p_t)^\gamma\log p_t ,
-$$
+```
 
 where $`\alpha_t`$ is $`\alpha`$ for positives and $`1-\alpha`$ for negatives. The modulating factor $`(1-p_t)^\gamma`$ is close to 1 for misclassified examples ($`p_t`$ small) and vanishes for well-classified ones: with $`\gamma=2`$, an example with $`p_t=0.9`$ contributes 100 times less than under cross-entropy, and one with $`p_t=0.99`$ contributes $`10^4`$ times less. The weight $`\alpha`$ balances positives and negatives; RetinaNet used $`\gamma=2`$ and $`\alpha=0.25`$.
 
@@ -229,9 +229,9 @@ CenterNet's variant, used in that detector, treats the heatmap as soft targets: 
 
 For a binary mask with predicted probabilities $`p_i`$ and labels $`y_i\in\{0,1\}`$ over pixels $`i`$, the **Dice coefficient** of hard predictions is $`2|P\cap Y|/(|P|+|Y|)`$, the F1 score of the pixel classification. Its soft version and the loss are
 
-$$
+```math
 \mathrm{Dice}=\frac{2\sum_ip_iy_i+\epsilon}{\sum_ip_i+\sum_iy_i+\epsilon},\qquad\mathcal L_{\text{Dice}}=1-\mathrm{Dice},
-$$
+```
 
 with a small $`\epsilon`$ for empty masks. Dice and IoU are monotone functions of each other for hard masks, $`\mathrm{Dice}=2\,\mathrm{IoU}/(1+\mathrm{IoU})`$, so optimizing one optimizes the other. Unlike the pixel-averaged cross-entropy, the Dice loss is normalized by the size of the object, so a small structure matters as much as a large one, which is why it is popular for medical segmentation; it is often added to the cross-entropy, which gives smoother gradients early in training.
 

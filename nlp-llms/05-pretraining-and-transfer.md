@@ -212,9 +212,9 @@ The MLM loss for a sequence $`x=(x_1,\dots,x_T)`$ with selected positions $`S`$ 
 
 Full conditionals determine a joint distribution when they come from one, by Brook's lemma, but a set learned independently for each position need not be compatible with any joint distribution, and even when it is, recovering the joint requires Gibbs sampling (AI chapter 10) rather than a single left-to-right pass. A practical score is the **pseudo-log-likelihood**
 
-$$
+```math
 \operatorname{PLL}(x)=\sum_{t=1}^T\log q_\theta(x_t\mid x_{\setminus t}),
-$$
+```
 
 which masks each position in turn and so costs $`T`$ forward passes. It is not a log-probability and is not comparable with the log-likelihood of a causal model, but it ranks sentences well for tasks such as rescoring and acceptability judgments ([Salazar et al., 2020](https://arxiv.org/abs/1910.14659)).
 
@@ -228,9 +228,9 @@ which masks each position in turn and so costs $`T`$ forward passes. It is not a
 
 Let $`Z`$ be a frozen representation and $`Y`$ a property with entropy $`H(Y)`$. A probe is a conditional distribution $`q(y\mid z)`$ from some family, trained to minimize the cross-entropy $`\mathcal L(q)=\mathbb E[-\log q(Y\mid Z)]`$. For any $`q`$,
 
-$$
+```math
 \mathcal L(q)=H(Y\mid Z)+\mathbb E_Z\bigl[D_{\mathrm{KL}}\bigl(P(\cdot\mid Z)\,\Vert\,q(\cdot\mid Z)\bigr)\bigr]\ge H(Y\mid Z),
-$$
+```
 
 so the mutual information satisfies $`I(Y;Z)=H(Y)-H(Y\mid Z)\ge H(Y)-\mathcal L(q)`$. Every trained probe gives a lower bound on how much information about $`Y`$ the representation contains, and a more expressive family can only tighten the bound ([Pimentel et al., 2020](https://arxiv.org/abs/2004.03061)). This is why "the information is there" is an easy claim to support and a weak one: by the data-processing inequality $`I(Y;Z)\le I(Y;X)`$ for the input $`X`$, and a sufficiently flexible probe could extract from any invertible representation everything the input contains. The informative questions concern how easily the information can be extracted, for instance by a linear map, and whether the model uses it, which requires interventions on the representation rather than probes alone.
 

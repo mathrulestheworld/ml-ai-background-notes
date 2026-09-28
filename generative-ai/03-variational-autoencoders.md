@@ -10,9 +10,9 @@
 
 A handwritten digit is determined by a few underlying factors: which digit it is, the slant, the thickness of the stroke, the writer's habits. A **latent-variable model** makes such factors explicit. It draws a latent vector $`z`$ from a simple prior $`p(z)`$, usually a standard Gaussian, and then draws the data from a conditional distribution $`p_\theta(x\mid z)`$ computed by a network, the **decoder**:
 
-$$
+```math
 p_\theta(x)=\int p_\theta(x\mid z)\,p(z)\,dz .
-$$
+```
 
 Earlier modules met the simplest cases. A Gaussian mixture has a discrete $`z`$, the component (ML chapter 14), and probabilistic PCA has a Gaussian $`z`$ and a linear decoder with Gaussian noise (ML chapter 12). In both, the integral and the posterior $`p(z\mid x)`$ are tractable, and EM fits the model. With a neural decoder, the model can represent complicated distributions, since a simple distribution pushed through a flexible function can be almost anything; but the integral has no closed form, the posterior is intractable, and both maximum likelihood and EM break down.
 
@@ -22,9 +22,9 @@ Sampling remains easy: draw $`z\sim p(z)`$ and decode. The difficulty is entirel
 
 Variational inference replaces the intractable posterior with an approximation $`q(z\mid x)`$ and bounds the log-likelihood (AI chapter 10). For any $`q`$,
 
-$$
+```math
 \log p_\theta(x)=\underbrace{\mathbb E_{q(z\mid x)}\bigl[\log p_\theta(x\mid z)\bigr]-\mathrm{KL}\bigl(q(z\mid x)\,\big\|\,p(z)\bigr)}_{\mathrm{ELBO}(x)}+\mathrm{KL}\bigl(q(z\mid x)\,\big\|\,p_\theta(z\mid x)\bigr),
-$$
+```
 
 and since the last term is nonnegative, the first two form the **evidence lower bound** ([Appendix A](#block-gen03-appendix-a)). Its two terms have a direct reading. The first is a **reconstruction** term: sample a latent code for $`x`$ from $`q`$ and measure how well the decoder reproduces $`x`$ from it. The second is a **regularizer**: the codes for each $`x`$ should not stray far from the prior, which is what makes sampling from the prior produce sensible data. Maximizing the bound over the model raises the likelihood; maximizing it over $`q`$ tightens the bound, by bringing $`q`$ closer to the true posterior.
 
@@ -38,9 +38,9 @@ Classical variational inference fits a separate $`q`$ to every data point by opt
 
 Training needs the gradient of $`\mathbb E_{q_\phi(z\mid x)}[f(z)]`$ with respect to the encoder's parameters $`\phi`$, where the distribution itself depends on $`\phi`$. The general-purpose **score-function** estimator, also called REINFORCE ([Williams, 1992](https://doi.org/10.1007/BF00992696)), uses $`\nabla_\phi\mathbb E_q[f]=\mathbb E_q\bigl[f(z)\nabla_\phi\log q_\phi(z)\bigr]`$, which needs only samples and log-probabilities, but its variance is large. For a Gaussian, the **reparameterization trick** writes the sample as a deterministic function of the parameters and independent noise,
 
-$$
+```math
 z=\mu_\phi(x)+\sigma_\phi(x)\odot\epsilon,\qquad\epsilon\sim\mathcal N(0,I),
-$$
+```
 
 so that $`\mathbb E_q[f(z)]=\mathbb E_\epsilon\bigl[f(\mu_\phi+\sigma_\phi\odot\epsilon)\bigr]`$ and the gradient passes through $`f`$ by ordinary backpropagation ([Appendix B](#block-gen03-appendix-b)). The code compares the two estimators on a one-dimensional example with a known gradient.
 
@@ -182,17 +182,17 @@ A single layer of Gaussian latents limits how complex the posterior and the prio
 
 **Two derivations.** Jensen's inequality gives the bound directly: $`\log p_\theta(x)=\log\mathbb E_{q(z\mid x)}\bigl[p_\theta(x,z)/q(z\mid x)\bigr]\ge\mathbb E_q\bigl[\log p_\theta(x,z)-\log q(z\mid x)\bigr]`$. The exact identity shows what is lost. Since $`p_\theta(z\mid x)=p_\theta(x,z)/p_\theta(x)`$,
 
-$$
+```math
 \mathrm{KL}\bigl(q\,\|\,p_\theta(z\mid x)\bigr)=\mathbb E_q[\log q(z\mid x)-\log p_\theta(x,z)]+\log p_\theta(x)=\log p_\theta(x)-\mathrm{ELBO},
-$$
+```
 
 so the gap equals the divergence of $`q`$ from the true posterior. Writing $`\log p_\theta(x,z)=\log p_\theta(x\mid z)+\log p(z)`$ splits the ELBO into reconstruction and KL terms. Maximizing the ELBO over $`\theta`$ and $`\phi`$ jointly therefore trades off fitting the data against keeping the posterior simple: the model is pushed toward decoders whose posteriors are close to Gaussian.
 
 **Gaussian KL.** For $`q=\mathcal N(\mu,\operatorname{diag}\sigma^2)`$ and $`p=\mathcal N(0,I)`$ in $`d`$ dimensions,
 
-$$
+```math
 \mathrm{KL}(q\,\|\,p)=\frac12\sum_{j=1}^d\bigl(\mu_j^2+\sigma_j^2-1-\log\sigma_j^2\bigr),
-$$
+```
 
 which is zero only when $`\mu=0`$ and $`\sigma=1`$. Each dimension contributes separately: a dimension whose $`\mu_j`$ is always near zero and $`\sigma_j`$ near one carries no information and costs nothing, which is how a VAE switches off latent dimensions it does not need.
 
@@ -218,9 +218,9 @@ which is zero only when $`\mu=0`$ and $`\sigma=1`$. Each dimension contributes s
 
 With $`z_1,\dots,z_K`$ drawn independently from $`q(z\mid x)`$ and weights $`w_k=p_\theta(x,z_k)/q(z_k\mid x)`$, each $`w_k`$ has expectation $`p_\theta(x)`$, so by Jensen's inequality
 
-$$
+```math
 \mathcal L_K=\mathbb E\Bigl[\log\frac1K\sum_{k=1}^Kw_k\Bigr]\le\log p_\theta(x).
-$$
+```
 
 $`\mathcal L_1`$ is the ELBO. The bounds increase with $`K`$: the average of $`K+1`$ weights equals the average, over the $`K+1`$ ways to leave one out, of the averages of $`K`$ weights, and Jensen's inequality applied to the logarithm gives $`\mathcal L_{K+1}\ge\mathcal L_K`$. If the weights are bounded, the average converges to $`p_\theta(x)`$ by the law of large numbers and $`\mathcal L_K\to\log p_\theta(x)`$, with a bias of order $`\operatorname{Var}(w)/(2Kp^2)`$ for large $`K`$. Training on $`\mathcal L_K`$ instead of the ELBO gives the importance-weighted autoencoder, whose encoder is no longer forced to cover only one region of a multimodal posterior. Evaluating trained models with large $`K`$ is the standard way to report the log-likelihood of VAEs, as in the code.
 

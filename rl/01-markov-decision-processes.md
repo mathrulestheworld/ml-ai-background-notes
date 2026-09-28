@@ -41,9 +41,9 @@ All of these rest on the mathematical model of this chapter, the Markov decision
 
 Everything the agent has seen up to time $`t`$ is its **history** $`H_t=(O_0,A_0,R_1,O_1,\dots,A_{t-1},R_t,O_t)`$. The history grows without bound, so agents summarize it in a **state** $`S_t=f(H_t)`$. The summary is good enough for decision making when it has the **Markov property**: the future is independent of the past given the present,
 
-$$
+```math
 \Pr(S_{t+1}=s',R_{t+1}=r\mid S_t,A_t)=\Pr(S_{t+1}=s',R_{t+1}=r\mid H_t,A_t).
-$$
+```
 
 The state then carries all the information in the history that matters for predicting what happens next. The full history is always a Markov state, trivially; so is the complete configuration of the environment, the **environment state**, which the agent usually cannot see. The board position in chess is nearly Markov (castling and en passant rights and the repetition and fifty-move rules also depend on the history); a single frame of a video game is not, because it does not show which way the ball is moving, but a stack of the last four frames nearly is, which is why the Atari agents of chapter 16 stack frames. When the observation is Markov, $`S_t=O_t`$ and the environment is **fully observable**; otherwise it is **partially observable**, and the agent must build its own **agent state** from the history, a problem previewed at the end of this chapter and developed in chapter 14. Most of the theory assumes a Markov state, and most of this chapter does too.
 
@@ -57,15 +57,15 @@ Without actions or rewards, a sequence of Markov states is a **Markov chain**, d
 
 A **Markov reward process** adds a reward to each transition. Its object of interest is the **return**, the total reward collected from time $`t`$ on. With a **discount factor** $`\gamma\in[0,1]`$,
 
-$$
+```math
 G_t=R_{t+1}+\gamma R_{t+2}+\gamma^2R_{t+3}+\cdots=\sum_{k=0}^\infty\gamma^kR_{t+k+1},
-$$
+```
 
 and the return satisfies the one-step recursion that underlies everything that follows:
 
-$$
+```math
 G_t=R_{t+1}+\gamma\,G_{t+1}.
-$$
+```
 
 A reward received $`k`$ steps later is worth $`\gamma^k`$ times as much. Discounting has several justifications. Mathematically, it keeps returns finite: if $`|R_t|\le R_{\max}`$, then $`|G_t|\le R_{\max}/(1-\gamma)`$. Economically, a reward now can be invested, and a reward later is uncertain. Probabilistically, discounting is equivalent to an undiscounted problem in which the process ends at each step with probability $`1-\gamma`$ (exercise 1.1). And practically, it expresses a preference for sooner rewards and reduces the variance of long-horizon estimates. The **effective horizon** is about $`1/(1-\gamma)`$ steps: rewards much later than that carry little weight, since $`\gamma^{1/(1-\gamma)}\approx e^{-1}`$. A discount of $`0.99`$ looks about a hundred steps ahead, $`0.9`$ about ten. With $`\gamma=0`$ the agent is myopic and cares only about the next reward.
 
@@ -75,15 +75,15 @@ Many tasks end: a game is won or lost, a robot reaches its goal or falls. These 
 
 The **value** of a state is its expected return, $`v(s)=\mathbb E[G_t\mid S_t=s]`$. Taking expectations in the recursion $`G_t=R_{t+1}+\gamma G_{t+1}`$ and using the Markov property gives the **Bellman equation**
 
-$$
+```math
 v(s)=r(s)+\gamma\sum_{s'}P_{ss'}\,v(s'),\qquad r(s)=\mathbb E[R_{t+1}\mid S_t=s],
-$$
+```
 
 a system of linear equations, one per state: the value of a state is the immediate reward plus the discounted value of where the process goes next. In matrix form, $`v=r+\gamma Pv`$, so for $`\gamma<1`$
 
-$$
+```math
 v=(I-\gamma P)^{-1}r=\sum_{k=0}^\infty\gamma^kP^k\,r.
-$$
+```
 
 The inverse exists because the eigenvalues of $`\gamma P`$ have magnitude at most $`\gamma<1`$, and the series is the definition of the value read backward: $`P^kr`$ is the expected reward $`k`$ steps ahead ([Appendix A](#block-rl01-appendix-a)). For episodic tasks with $`\gamma=1`$, the same holds on the non-terminal states as long as termination is certain, since the transition matrix restricted to them then has spectral radius below one. Solving the system costs $`O(|\mathcal S|^3)`$ operations, which is fine for thousands of states and hopeless for the $`10^{170}`$ positions of Go; iterative methods (chapter 2), sampling (chapters 5–6), and approximation (chapter 11) are the answers to size.
 
@@ -93,9 +93,9 @@ The inverse exists because the eigenvalues of $`\gamma P`$ have magnitude at mos
 
 A **Markov decision process** (MDP) adds actions. A finite MDP consists of a set of states $`\mathcal S`$, a set of actions $`\mathcal A`$ (possibly depending on the state), the **dynamics**
 
-$$
+```math
 p(s',r\mid s,a)=\Pr(S_{t+1}=s',R_{t+1}=r\mid S_t=s,A_t=a),
-$$
+```
 
 a discount factor $`\gamma`$, and often a distribution $`\mu`$ of the initial state. The dynamics specify everything about the environment; the quantities used most often are derived from them, the transition probabilities $`p(s'\mid s,a)=\sum_rp(s',r\mid s,a)`$ and the expected reward $`r(s,a)=\sum_{s',r}r\,p(s',r\mid s,a)`$. Some texts write the reward as a function $`r(s,a,s')`$ or $`r(s)`$; for expected returns, only $`r(s,a)`$ matters. The name comes from the Markov property, now required of the state given the action. The framework goes back to [Bellman (1957)](https://press.princeton.edu/books/paperback/9780691146683/dynamic-programming) and Howard (1960); [Puterman (1994)](https://doi.org/10.1002/9780470316887) is the reference on its theory.
 
@@ -103,9 +103,9 @@ Two running examples appear in the code below. **Sutton and Barto's gridworld** 
 
 A **policy** $`\pi`$ gives the probability $`\pi(a\mid s)`$ of each action in each state. A policy is **deterministic** if it puts all its probability on one action, written $`a=\pi(s)`$, and **stationary Markov** if it depends only on the current state and not on the time or the history; unless said otherwise, "policy" means a stationary Markov policy, possibly stochastic. A fixed policy turns the MDP into a Markov reward process with
 
-$$
+```math
 P^\pi_{ss'}=\sum_a\pi(a\mid s)\,p(s'\mid s,a),\qquad r^\pi(s)=\sum_a\pi(a\mid s)\,r(s,a),
-$$
+```
 
 which is why reward processes came first.
 
@@ -113,24 +113,24 @@ which is why reward processes came first.
 
 The **state-value function** of a policy is the expected return when starting in $`s`$ and following $`\pi`$, and the **action-value function** is the expected return when starting in $`s`$, taking $`a`$, and following $`\pi`$ afterward:
 
-$$
+```math
 v_\pi(s)=\mathbb E_\pi[G_t\mid S_t=s],\qquad q_\pi(s,a)=\mathbb E_\pi[G_t\mid S_t=s,A_t=a].
-$$
+```
 
 The two are related by averaging over the policy's first action and over the environment's first transition:
 
-$$
+```math
 v_\pi(s)=\sum_a\pi(a\mid s)\,q_\pi(s,a),\qquad q_\pi(s,a)=r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v_\pi(s').
-$$
+```
 
 Substituting each into the other gives the **Bellman expectation equations**,
 
-$$
+```math
 \begin{aligned}
 v_\pi(s)&=\sum_a\pi(a\mid s)\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v_\pi(s')\Bigr],\\
 q_\pi(s,a)&=r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\sum_{a'}\pi(a'\mid s')\,q_\pi(s',a').
 \end{aligned}
-$$
+```
 
 Each expresses a value as an average over one step of the process of an immediate reward and a discounted successor value. Sutton and Barto draw these relations as **backup diagrams**: a state at the top branches into the actions the policy might take, each action branches into the states and rewards the environment might produce, and the value at the top is "backed up" from the leaves by averaging. In matrix form the first equation is $`v_\pi=r^\pi+\gamma P^\pi v_\pi`$, the Bellman equation of the reward process induced by $`\pi`$, so $`v_\pi=(I-\gamma P^\pi)^{-1}r^\pi`$. The code below solves it for the random policy on the gridworld and checks the answer by simulation.
 
@@ -203,21 +203,21 @@ The values reproduce Figure 3.2 of Sutton and Barto. Cell A is worth only 8.8 de
 
 The code ended by computing a second description of a policy, the distribution of where it spends its time. From an initial distribution $`\mu`$, the **discounted state occupancy** of $`\pi`$ is
 
-$$
+```math
 d^\pi_\mu(s)=(1-\gamma)\sum_{t=0}^\infty\gamma^t\Pr_\pi(S_t=s\mid S_0\sim\mu),\qquad d^{\pi\top}_\mu=(1-\gamma)\,\mu^\top(I-\gamma P^\pi)^{-1},
-$$
+```
 
 a probability distribution over states that weights time $`t`$ by $`\gamma^t`$; the state–action occupancy is $`d^\pi_\mu(s,a)=d^\pi_\mu(s)\,\pi(a\mid s)`$. It is the distribution of the state at a random time $`T`$ drawn from a geometric distribution, $`\Pr(T=t)=(1-\gamma)\gamma^t`$. The expected return of the policy from $`\mu`$, written $`J(\pi)=\mathbb E_{S_0\sim\mu}[v_\pi(S_0)]`$, is then an expectation of the one-step reward under the occupancy:
 
-$$
+```math
 J(\pi)=\frac1{1-\gamma}\sum_{s,a}d^\pi_\mu(s,a)\,r(s,a).
-$$
+```
 
 In the gridworld, both sides equal 0.9045. The occupancy also satisfies a linear **flow constraint**: probability that arrives at a state either starts there or flows in from a predecessor,
 
-$$
+```math
 \sum_ad^\pi_\mu(s',a)=(1-\gamma)\,\mu(s')+\gamma\sum_{s,a}p(s'\mid s,a)\,d^\pi_\mu(s,a)\quad\text{for all }s',
-$$
+```
 
 and every nonnegative $`d`$ that satisfies these constraints is the occupancy of some stationary policy, namely $`\pi(a\mid s)\propto d(s,a)`$ ([Appendix C](#block-rl01-appendix-c)). Policies and occupancy measures are therefore two descriptions of the same object, and the expected return is linear in the occupancy. This fact turns the search for an optimal policy into a linear program (chapter 2); the occupancy is the distribution under which policy gradients are computed (chapter 13); and the mismatch between the occupancy of a learned policy and that of the data it was trained on is the central difficulty of offline RL (chapter 26).
 
@@ -225,9 +225,9 @@ and every nonnegative $`d`$ that satisfies these constraints is the occupancy of
 
 The **advantage** of an action, $`A_\pi(s,a)=q_\pi(s,a)-v_\pi(s)`$, measures how much better it is to take $`a`$ once and then follow $`\pi`$ than to follow $`\pi`$ from the start; averaged over $`\pi`$'s own actions, it is zero. The advantage connects the values of two policies exactly. The **performance difference lemma** ([Kakade and Langford, 2002](https://dl.acm.org/doi/10.5555/645531.656005)) states that for any policies $`\pi`$ and $`\pi'`$,
 
-$$
+```math
 J(\pi')-J(\pi)=\frac1{1-\gamma}\,\mathbb E_{s\sim d^{\pi'}_\mu}\,\mathbb E_{a\sim\pi'(\cdot\mid s)}\bigl[A_\pi(s,a)\bigr].
-$$
+```
 
 The improvement of $`\pi'`$ over $`\pi`$ is the advantage, measured by $`\pi`$'s values, of the actions $`\pi'`$ takes, accumulated over the states $`\pi'`$ visits ([Appendix D](#block-rl01-appendix-d)). If $`\pi'`$ chooses actions with nonnegative advantage everywhere, it is at least as good as $`\pi`$: the policy improvement theorem of chapter 2. The lemma's catch is that the expectation is over the new policy's occupancy, which is unknown until the new policy is run; replacing it with the old policy's occupancy gives the surrogate objective of trust-region methods, accurate only when the two policies are close (chapter 20).
 
@@ -237,9 +237,9 @@ The improvement of $`\pi'`$ over $`\pi`$ is the advantage, measured by $`\pi`$'s
 
 Policies are compared state by state: $`\pi\ge\pi'`$ if $`v_\pi(s)\ge v_{\pi'}(s)`$ for every $`s`$. This is only a partial order, since one policy may be better in some states and worse in others. The **optimal value functions** are the best values achievable in each state,
 
-$$
+```math
 v_*(s)=\max_\pi v_\pi(s),\qquad q_*(s,a)=\max_\pi q_\pi(s,a),
-$$
+```
 
 where the maximum for each state might a priori be attained by a different policy. The fundamental theorem of MDPs says it is not: for a finite MDP with $`\gamma<1`$ there is a policy $`\pi_*`$ that attains $`v_*(s)`$ in every state simultaneously, and it can be taken to be **deterministic and stationary**. Moreover, no history-dependent or time-dependent policy does better ([Appendix B](#block-rl01-appendix-b)). An optimal policy therefore exists in a simple form, and finding it is a well-posed problem.
 
@@ -247,20 +247,20 @@ where the maximum for each state might a priori be attained by a different polic
 
 An optimal policy must choose, in every state, an action that is best when followed by optimal behavior. This gives the **Bellman optimality equations**,
 
-$$
+```math
 \begin{aligned}
 v_*(s)&=\max_a\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v_*(s')\Bigr],\\
 q_*(s,a)&=r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\max_{a'}q_*(s',a'),
 \end{aligned}
-$$
+```
 
 with $`v_*(s)=\max_aq_*(s,a)`$. Unlike the expectation equations, these are nonlinear because of the maximum, and they are not solved by a single linear system. But once $`v_*`$ or $`q_*`$ is known, acting optimally is easy: any policy that is **greedy** with respect to them, choosing $`\pi_*(s)\in\arg\max_aq_*(s,a)`$, is optimal. With $`q_*`$ this requires no model at all, which is why so many methods learn action values. The optimality equations express **Bellman's principle of optimality**: whatever the first action, an optimal policy must behave optimally from the state it leads to.
 
 It is convenient to write the right-hand sides as operators on value functions. The **Bellman expectation operator** of $`\pi`$ and the **Bellman optimality operator** are
 
-$$
+```math
 (\mathcal T^\pi v)(s)=\sum_a\pi(a\mid s)\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v(s')\Bigr],\qquad(\mathcal Tv)(s)=\max_a\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v(s')\Bigr],
-$$
+```
 
 so that $`v_\pi`$ is the fixed point of $`\mathcal T^\pi`$ and $`v_*`$ the fixed point of $`\mathcal T`$. Both operators are **contractions** in the maximum norm with modulus $`\gamma`$, $`\|\mathcal Tv-\mathcal Tw\|_\infty\le\gamma\|v-w\|_\infty`$, which guarantees that each fixed point exists, is unique, and is reached by applying the operator repeatedly from any starting point. Iterating $`\mathcal T`$ is value iteration, and iterating $`\mathcal T^\pi`$ is iterative policy evaluation, the subjects of chapter 2. For a small MDP, the optimal policy can also be found by brute force, since a finite MDP has only $`\prod_s|\mathcal A(s)|`$ deterministic stationary policies ($`|\mathcal A|^{|\mathcal S|}`$ when every state has the same actions). The code enumerates them for the recycling robot.
 
@@ -364,9 +364,9 @@ Other transformations of the reward change nothing. Multiplying all rewards by a
 
 If the episode ends after a fixed number of steps $`H`$, the problem is not stationary: with two steps left, the best action may be to grab a small reward, and with a hundred, to head for a larger one. The optimal values then depend on the time remaining, $`v_*^{(h)}(s)`$ for $`h`$ steps to go, and satisfy
 
-$$
+```math
 v_*^{(0)}(s)=0,\qquad v_*^{(h)}(s)=\max_a\Bigl[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)\,v_*^{(h-1)}(s')\Bigr],
-$$
+```
 
 computed backward from the end by **backward induction**, the dynamic programming of game trees and of the finite-horizon controllers in chapter 15. The optimal policy is deterministic and Markov in the pair (state, steps remaining), but not stationary. Equivalently, the time remaining can be added to the state, which restores the stationary theory.
 
@@ -378,9 +378,9 @@ This matters in practice because simulated environments usually impose a time li
 
 When the agent sees only an observation $`O_t`$ that depends on a hidden state, the environment is a **partially observable MDP** (POMDP): an MDP together with observation probabilities $`\Pr(O_{t+1}=o\mid S_{t+1}=s',A_t=a)`$. The observation alone is not Markov, but the posterior distribution over hidden states given the history, the **belief state** $`b_t(s)=\Pr(S_t=s\mid H_t)`$, is. It is updated after each action and observation by Bayes' rule,
 
-$$
+```math
 b_{t+1}(s')\propto\Pr(o\mid s',a)\sum_sp(s'\mid s,a)\,b_t(s),
-$$
+```
 
 the filtering recursion of AI chapter 11 with the action added. A POMDP is thus equivalent to an MDP whose states are beliefs, the **belief MDP**, and the theory of this chapter applies to it, with the difficulty that the belief space is continuous.
 
@@ -677,9 +677,9 @@ In Sutton and Barto's short corridor, the agent starts in the leftmost of three 
 
 With $`p=0`$ the agent stays in the first cell forever; with $`p=1`$ it moves to the middle cell and is sent back, forever. For $`0<p<1`$ the values satisfy $`v_0=-1+(1-p)v_0+pv_1`$, $`v_1=-1+pv_0+(1-p)v_2`$, and $`v_2=-1+(1-p)v_1`$, whose solution is
 
-$$
+```math
 v_0(p)=-\frac{2(2-p)}{p(1-p)}.
-$$
+```
 
 Setting the derivative to zero gives $`p^2-4p+2=0`$, so $`p_*=2-\sqrt2\approx0.586`$ and $`v_0(p_*)=-(6+4\sqrt2)\approx-11.66`$.
 
@@ -740,9 +740,9 @@ The $`\varepsilon`$-greedy policies that favor right or left ($`p=0.95`$ and $`0
 
 Let $`P`$ be a row-stochastic matrix and $`0\le\gamma<1`$. For any vector $`x`$, $`\|Px\|_\infty\le\|x\|_\infty`$, because each entry of $`Px`$ is an average of entries of $`x`$. Hence $`\|\gamma Px\|_\infty\le\gamma\|x\|_\infty`$, every eigenvalue $`\lambda`$ of $`\gamma P`$ satisfies $`|\lambda|\le\gamma<1`$, and $`I-\gamma P`$ is invertible. The Neumann series converges:
 
-$$
+```math
 (I-\gamma P)^{-1}=\sum_{k=0}^\infty\gamma^kP^k,
-$$
+```
 
 since the partial sums $`S_n`$ satisfy $`(I-\gamma P)S_n=I-\gamma^{n+1}P^{n+1}\to I`$. Applied to $`r`$, the series is $`\sum_k\gamma^k\,\mathbb E[R_{t+k+1}\mid S_t]`$, because the distribution $`k`$ steps ahead is given by $`P^k`$; by linearity of expectation and dominated convergence (the rewards are bounded), this equals $`\mathbb E[G_t\mid S_t]`$. So the value exists, is the unique solution of $`v=r+\gamma Pv`$, and satisfies $`\|v\|_\infty\le\|r\|_\infty/(1-\gamma)`$.
 
@@ -758,10 +758,9 @@ For episodic problems with $`\gamma=1`$, let $`Q`$ be the transition matrix rest
 
 Work with bounded functions on a finite $`\mathcal S`$ and the maximum norm. **Contraction.** For any $`v,w`$ and any state $`s`$, using $`|\max_af(a)-\max_ag(a)|\le\max_a|f(a)-g(a)|`$,
 
-$$
-
+```math
 |(\mathcal Tv)(s)-(\mathcal Tw)(s)|\le\max_a\gamma\sum_{s'}p(s'\mid s,a)\,|v(s')-w(s')|\le\gamma\|v-w\|_\infty .
-$$
+```
 
 The same bound holds for $`\mathcal T^\pi`$. By the Banach fixed-point theorem, $`\mathcal T`$ has a unique fixed point $`v^\star`$, and $`\mathcal T^kv\to v^\star`$ from any $`v`$. Both operators are also **monotone**: $`v\le w`$ pointwise implies $`\mathcal Tv\le\mathcal Tw`$ and $`\mathcal T^\pi v\le\mathcal T^\pi w`$.
 
@@ -795,15 +794,15 @@ Take $`\mu(s)>0`$ for every state. Maximizing the linear function $`\sum d(s,a)\
 
 Fix a start state $`s_0`$ and let the trajectory $`S_0=s_0,A_0,R_1,S_1,\dots`$ be generated by $`\pi'`$. Write $`v_\pi(s_0)`$ as a telescoping sum:
 
-$$
+```math
 v_{\pi'}(s_0)-v_\pi(s_0)=\mathbb E_{\pi'}\Bigl[\sum_{t\ge0}\gamma^tR_{t+1}\Bigr]-v_\pi(s_0)=\mathbb E_{\pi'}\Bigl[\sum_{t\ge0}\gamma^t\bigl(R_{t+1}+\gamma v_\pi(S_{t+1})-v_\pi(S_t)\bigr)\Bigr],
-$$
+```
 
 because the terms $`\gamma^{t+1}v_\pi(S_{t+1})-\gamma^tv_\pi(S_t)`$ telescope to $`-v_\pi(s_0)`$ (the tail vanishes since $`v_\pi`$ is bounded). Conditioning each term on $`(S_t,A_t)`$ gives $`\mathbb E[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t,A_t]=q_\pi(S_t,A_t)`$, so the summand has expectation $`\gamma^tA_\pi(S_t,A_t)`$. Therefore
 
-$$
+```math
 v_{\pi'}(s_0)-v_\pi(s_0)=\sum_t\gamma^t\,\mathbb E_{\pi'}\bigl[A_\pi(S_t,A_t)\bigr]=\frac1{1-\gamma}\sum_{s,a}d^{\pi'}_{s_0}(s,a)\,A_\pi(s,a),
-$$
+```
 
 and averaging over $`s_0\sim\mu`$ gives the lemma. The quantity $`R_{t+1}+\gamma v_\pi(S_{t+1})-v_\pi(S_t)`$ is a **temporal-difference error**, the central quantity of chapter 6: the lemma says that the gain of switching policies is the discounted sum of the TD errors of the old values along the new policy's trajectories.
 

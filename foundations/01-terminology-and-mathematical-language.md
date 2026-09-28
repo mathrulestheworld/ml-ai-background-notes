@@ -140,9 +140,9 @@ A practical problem includes an application, its constraints, and a criterion fo
 
 An **instance** is one example being considered. A **feature** is an attribute used to represent it, and a **target** is the output to be predicted. For instance, an email may be represented by word counts and sender information, with a target label indicating spam or legitimate mail. A supervised dataset can be written as
 
-$$
+```math
 D=\{(x_i,y_i)\}_{i=1}^{n},
-$$
+```
 
 where $`x_i\in\mathcal X`$ is the input representation and $`y_i\in\mathcal Y`$ is its target. Here $`D`$ is an indexed collection: repeated examples are allowed. The input must contain only information available at prediction time. An unlabeled dataset contains the inputs without supplied targets. A task formulation determines what belongs in these spaces and what counts as a useful output.
 
@@ -202,9 +202,9 @@ A **predictive model** represents a relationship between inputs and outputs. A p
 
 A **model class**, or hypothesis space, is the collection of candidate models considered by a learning procedure. Writing $`\theta`$ for the model parameters and $`\Theta`$ for their allowed values, a parameterized family is
 
-$$
+```math
 \mathcal H=\{f_\theta:\theta\in\Theta\}.
-$$
+```
 
 For example, a one-feature linear model family is $`f_{a,b}(x)=a+bx`$, where $`a`$ is the intercept and $`b`$ is the slope. Specifying the family leaves $`a`$ and $`b`$ open. Fitting the model produces values $`\hat a,\hat b`$ and therefore a particular **trained model** $`f_{\hat a,\hat b}`$. With a vector input, the same idea becomes $`f_\theta(x)=w^\top x+b_0`$, with $`\theta=(w,b_0)`$. These are affine functions, conventionally included under linear models. The word model is often used for both the family and the fitted instance; the distinction matters when discussing what is chosen before training and what is learned from data.
 
@@ -260,9 +260,9 @@ Generation can also be **conditional**: a model can represent a distribution ove
 
 An [algorithm](https://en.wikipedia.org/wiki/Algorithm) specifies a computational procedure. A **learning algorithm** uses the available data and feedback to construct or update a model. In a simple supervised formulation, with the model class and training choices understood,
 
-$$
+```math
 \mathcal A:D_{\mathrm{train}}\longmapsto\hat f\in\mathcal H.
-$$
+```
 
 Here $`D_{\mathrm{train}}`$ contains the examples used for fitting. For a randomized algorithm, the output also depends on randomness, which this notation suppresses. The algorithm is the procedure that produces the fitted model. Applying that fitted model to an input is a further computation. Different training algorithms can fit the same model family, and a general optimization algorithm can be used with many different families.
 
@@ -272,23 +272,23 @@ A [loss function](https://en.wikipedia.org/wiki/Loss_function) assigns a cost to
 
 For a population distribution $`\mathcal D`$ over input–target pairs, the corresponding **population risk** is
 
-$$
+```math
 R(f)=\mathbb E_{(x,y)\sim\mathcal D}\big[\ell(y,f(x))\big].
-$$
+```
 
 For a nonempty index set $`I\subseteq\{1,\ldots,n\}`$, the **empirical risk** is the average loss on those examples:
 
-$$
+```math
 \widehat R_I(f)=\frac{1}{|I|}\sum_{i\in I}\ell(y_i,f(x_i)).
-$$
+```
 
 Taking $`I=\{1,\ldots,n\}`$ gives the average over all of $`D`$. For a training split, $`\widehat R_{\mathrm{train}}`$ is shorthand for $`\widehat R_{I_{\mathrm{train}}}`$; validation and test risk are defined similarly. The subscript records which examples are being evaluated.
 
 The [empirical risk minimization](https://en.wikipedia.org/wiki/Empirical_risk_minimization) principle selects a model with low average **training** loss within the chosen class. Its idealized formulation is
 
-$$
+```math
 \hat f\in\operatorname*{arg\,min}_{f\in\mathcal H}\widehat R_{\mathrm{train}}(f).
-$$
+```
 
 This defines an optimization objective; an actual algorithm determines how to seek its solution. Practical training may only approximate the minimum and may add regularization. Generalization concerns performance on new examples, which is not established merely by obtaining a small training loss.
 

@@ -15,9 +15,9 @@ An agent in a changing, partially observable world must track a state it cannot 
 
 With **stationary** models, the same in every slice, the whole process is specified by a prior $`P(X_0)`$ and the two conditional distributions, and the joint distribution factors as
 
-$$
+```math
 P(X_{0:t},E_{1:t})=P(X_0)\prod_{i=1}^tP(X_i\mid X_{i-1})\,P(E_i\mid X_i),
-$$
+```
 
 a Bayesian network (chapter 8) unrolled in time. If the first-order Markov assumption is inaccurate, the state can be augmented, for example with velocity in addition to position, until it holds approximately.
 
@@ -35,9 +35,9 @@ A **hidden Markov model** (HMM) has a single discrete state variable, with trans
 
 **Filtering**, or **state estimation**, computes the belief state $`P(X_t\mid e_{1:t})`$ from all evidence so far. It is done recursively: predict the next state from the current belief, then condition on the new evidence,
 
-$$
+```math
 P(X_{t+1}\mid e_{1:t+1})=\alpha\,P(e_{t+1}\mid X_{t+1})\sum_{x_t}P(X_{t+1}\mid x_t)\,P(x_t\mid e_{1:t}),
-$$
+```
 
 or in matrix form $`f_{t+1}=\alpha\,O_{e_{t+1}}T^\top f_t`$ for the **forward message** $`f_t`$. Each step costs $`O(S^2)`$ for $`S`$ states, independent of $`t`$, so an agent can track its world indefinitely with constant memory ([Appendix A](#block-ai11-appendix-a)). The normalizing constants give the likelihood of the evidence, $`P(e_{1:t})=\prod_s1/\alpha_s`$, which is how HMMs are compared and trained. **Prediction** runs the transition step without evidence and converges to the stationary distribution.
 
@@ -45,9 +45,9 @@ or in matrix form $`f_{t+1}=\alpha\,O_{e_{t+1}}T^\top f_t`$ for the **forward me
 
 **Smoothing** computes $`P(X_k\mid e_{1:t})`$ for a past slice $`k<t`$, using evidence that arrived later, which usually sharpens the estimate. It combines the forward message with a **backward message** $`b_k(x)=P(e_{k+1:t}\mid X_k=x)`$, computed by a recursion running back from $`b_t=\mathbf 1`$:
 
-$$
+```math
 b_k=T\,O_{e_{k+1}}\,b_{k+1},\qquad P(X_k\mid e_{1:t})=\alpha\,f_k\odot b_k.
-$$
+```
 
 The **forward–backward algorithm** computes all smoothed estimates in $`O(S^2t)`$ time; it is the sum-product algorithm of chapter 9 on a chain.
 
@@ -55,9 +55,9 @@ The **forward–backward algorithm** computes all smoothed estimates in $`O(S^2t
 
 **Decoding** asks for the most likely sequence of states, $`\arg\max_{x_{1:t}}P(x_{1:t}\mid e_{1:t})`$, which is not the sequence of individually most likely states: the latter can even be an impossible sequence under the transition model. The **Viterbi algorithm** ([Viterbi, 1967](https://doi.org/10.1109/TIT.1967.1054010)) replaces the sum in the forward recursion by a maximum,
 
-$$
+```math
 m_{t+1}(x_{t+1})=P(e_{t+1}\mid x_{t+1})\max_{x_t}P(x_{t+1}\mid x_t)\,m_t(x_t),
-$$
+```
 
 keeps a back pointer to the maximizing $`x_t`$ for every state, and follows the pointers back from the best final state ([Appendix B](#block-ai11-appendix-b)). It is max-product on a chain, run in log space to avoid underflow, and it is the decoder of speech recognizers, gene finders, and convolutional error-correcting codes.
 
@@ -196,9 +196,9 @@ From three thousand rolls and a poor starting guess, Baum–Welch recovers switc
 
 For continuous states such as positions and velocities, the analogue of the HMM is the **linear-Gaussian** model:
 
-$$
+```math
 x_{t+1}=Fx_t+w_t,\quad w_t\sim\mathcal N(0,Q),\qquad z_t=Hx_t+v_t,\quad v_t\sim\mathcal N(0,R).
-$$
+```
 
 Because linear maps and conditioning preserve Gaussianity (Foundations chapter 4), the belief state stays Gaussian, $`\mathcal N(\mu_t,\Sigma_t)`$, and filtering reduces to updating a mean and a covariance.
 
@@ -276,21 +276,21 @@ Propagation and weighting are the likelihood weighting of chapter 10 applied one
 
 **Forward.** By the product rule and the sensor Markov assumption,
 
-$$
+```math
 P(X_{t+1}\mid e_{1:t+1})=\alpha\,P(e_{t+1}\mid X_{t+1},e_{1:t})\,P(X_{t+1}\mid e_{1:t})=\alpha\,P(e_{t+1}\mid X_{t+1})\,P(X_{t+1}\mid e_{1:t}).
-$$
+```
 
 The one-step prediction sums over the current state, using the Markov assumption $`P(X_{t+1}\mid x_t,e_{1:t})=P(X_{t+1}\mid x_t)`$:
 
-$$
+```math
 P(X_{t+1}\mid e_{1:t})=\sum_{x_t}P(X_{t+1}\mid x_t)\,P(x_t\mid e_{1:t}).
-$$
+```
 
 **Backward.** For $`k<t`$, conditioning on $`X_{k+1}`$ and using the conditional independence of $`e_{k+1}`$ and $`e_{k+2:t}`$ given $`X_{k+1}`$,
 
-$$
+```math
 P(e_{k+1:t}\mid X_k)=\sum_{x_{k+1}}P(x_{k+1}\mid X_k)\,P(e_{k+1}\mid x_{k+1})\,P(e_{k+2:t}\mid x_{k+1}),
-$$
+```
 
 which is $`b_k=TO_{e_{k+1}}b_{k+1}`$ in matrix form. Finally, since $`e_{k+1:t}`$ is independent of $`e_{1:k}`$ given $`X_k`$, Bayes' rule gives $`P(X_k\mid e_{1:t})=\alpha\,P(X_k\mid e_{1:k})\,P(e_{k+1:t}\mid X_k)=\alpha\,f_k\odot b_k`$.
 
@@ -304,9 +304,9 @@ which is $`b_k=TO_{e_{k+1}}b_{k+1}`$ in matrix form. Finally, since $`e_{k+1:t}`
 
 Define $`m_t(x)=\max_{x_{1:t-1}}P(x_{1:t-1},X_t=x,e_{1:t})`$, the probability of the best path that ends in state $`x`$ at time $`t`$, jointly with the evidence. By the factorization of the joint,
 
-$$
+```math
 m_{t+1}(x')=\max_{x}\;\max_{x_{1:t-1}}P(x_{1:t-1},X_t=x,e_{1:t})\,P(x'\mid x)\,P(e_{t+1}\mid x')=P(e_{t+1}\mid x')\max_xP(x'\mid x)\,m_t(x),
-$$
+```
 
 because the new factors depend on the past only through $`x`$. This is the **principle of optimality** of dynamic programming: the best path to $`x'`$ at time $`t+1`$ extends the best path to some $`x`$ at time $`t`$. Recording the maximizing $`x`$ for each $`x'`$ and following these pointers back from $`\arg\max_xm_t(x)`$ reconstructs a most probable sequence, since $`\max_{x_{1:t}}P(x_{1:t}\mid e_{1:t})\propto\max_xm_t(x)`$. The cost is $`O(S^2t)`$ time and $`O(St)`$ memory for the pointers; the memory can be reduced when only a delayed decision is needed.
 
@@ -320,9 +320,9 @@ because the new factors depend on the past only through $`x`$. This is the **pri
 
 Given the prediction $`x\sim\mathcal N(\mu^-,\Sigma^-)`$ and the observation model $`z=Hx+v`$ with $`v\sim\mathcal N(0,R)`$, the pair $`(x,z)`$ is jointly Gaussian with
 
-$$
+```math
 \mathbb E\begin{bmatrix}x\\z\end{bmatrix}=\begin{bmatrix}\mu^-\\H\mu^-\end{bmatrix},\qquad\mathrm{Cov}\begin{bmatrix}x\\z\end{bmatrix}=\begin{bmatrix}\Sigma^-&\Sigma^-H^\top\\H\Sigma^-&H\Sigma^-H^\top+R\end{bmatrix}.
-$$
+```
 
 Gaussian conditioning gives $`\mathbb E[x\mid z]=\mu^-+\Sigma^-H^\top(H\Sigma^-H^\top+R)^{-1}(z-H\mu^-)`$ and $`\mathrm{Cov}[x\mid z]=\Sigma^--\Sigma^-H^\top(H\Sigma^-H^\top+R)^{-1}H\Sigma^-`$, which are the update equations with the gain $`K`$. In one dimension with $`H=1`$, the posterior precision is the sum of the prior and measurement precisions, $`1/\sigma^2=1/\sigma_-^2+1/r`$, and the mean is their precision-weighted average; the gain $`K=\sigma_-^2/(\sigma_-^2+r)`$ is the fraction of the weight given to the measurement. For the random walk of the text, the fixed point of $`\sigma^2=(\sigma^2+q)r/(\sigma^2+q+r)`$ solves $`\sigma^4+q\sigma^2-qr=0`$.
 

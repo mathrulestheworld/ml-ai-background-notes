@@ -294,9 +294,9 @@ A trained model is run many more times than it was trained, often under a latenc
 
 **Quantization** stores weights, and sometimes activations, as low-bit integers. Uniform symmetric quantization with $`b`$ bits maps a real number $`w`$ to an integer
 
-$$
+```math
 q=\operatorname{clamp}\Bigl(\operatorname{round}\bigl(w/s\bigr),\,-q_{\max},\,q_{\max}\Bigr),\qquad q_{\max}=2^{b-1}-1,
-$$
+```
 
 and represents it as $`sq`$. The **scale** $`s`$ is chosen so that the largest magnitude maps to $`q_{\max}`$. It can be shared by a whole tensor, by each output channel (each row of a weight matrix), or by each group of, say, 128 consecutive weights; finer granularity costs a few bytes for the scales and protects small weights from being rounded to zero because of a large weight elsewhere ([Nagel et al., 2021](https://arxiv.org/abs/2106.08295)). If both weights and activations are quantized, the matrix product runs in integer arithmetic with exact 32-bit accumulation, and the scales are applied once to the result ([Jacob et al., 2018](https://arxiv.org/abs/1712.05877)).
 
@@ -356,9 +356,9 @@ The **lottery ticket hypothesis** ([Frankle and Carbin, 2019](https://arxiv.org/
 
 **Knowledge distillation** ([Hinton, Vinyals, and Dean, 2015](https://arxiv.org/abs/1503.02531); earlier [Buciluǎ, Caruana, and Niculescu-Mizil, 2006](https://doi.org/10.1145/1150402.1150464)) trains a small **student** to imitate a large **teacher**. The student matches the teacher's predicted distribution rather than only the labels, and both distributions are softened by dividing the logits by a **temperature** $`T>1`$:
 
-$$
+```math
 \mathcal L=\alpha\,T^2\,\mathrm{KL}\Bigl(\operatorname{softmax}(z_t/T)\,\Big\|\,\operatorname{softmax}(z_s/T)\Bigr)+(1-\alpha)\,\mathrm{CE}\bigl(y,\operatorname{softmax}(z_s)\bigr).
-$$
+```
 
 The softened teacher reveals which wrong classes it finds plausible, information absent from one-hot labels (the "dark knowledge"), so each example teaches the student about the similarity structure of the classes. The factor $`T^2`$ compensates for the gradients of the softened term shrinking like $`1/T^2`$.
 
@@ -412,9 +412,9 @@ UMich lecture 9, UNIGE section 6.6, the [*Ultra-Scale Playbook*](https://hugging
 
 Multiplying $`A\in\mathbb R^{m\times k}`$ by $`B\in\mathbb R^{k\times n}`$ computes $`mn`$ dot products of length $`k`$, each with $`k`$ multiplications and $`k`$ additions: $`2mkn`$ floating-point operations. With $`\beta`$ bytes per number, it must at least read both inputs and write the output, $`\beta(mk+kn+mn)`$ bytes. The arithmetic intensity is therefore at most
 
-$$
+```math
 I=\frac{2mkn}{\beta(mk+kn+mn)} .
-$$
+```
 
 - **Square matrices**, $`m=k=n`$: $`I=2n^3/(3\beta n^2)=2n/(3\beta)`$, which is $`n/3`$ for 16-bit numbers. The product is compute-bound on an H100 (ridge point 295) for $`n`$ above about 900, and on an A100 (ridge 153) for $`n`$ above about 460.
 - **A weight matrix times a batch of $`B`$ vectors**, $`m=B`$, $`k=n=d`$ with $`B\ll d`$: $`I=2Bd^2/\bigl(\beta(2Bd+d^2)\bigr)\approx 2B/\beta=B`$ for 16-bit numbers, since reading the $`d^2`$ weights dominates. Generating one token ($`B=1`$) has intensity about 1; the throughput of decoding grows almost linearly with the batch size until $`B`$ approaches the ridge point.
@@ -432,9 +432,9 @@ These are upper bounds: if the operands do not fit in on-chip memory, a naive im
 
 Consider a chain of $`L`$ layers, each producing an activation of unit size. Ordinary backpropagation stores all $`L`$ activations. Split the chain into segments of $`k`$ layers and store only the $`L/k`$ activations at segment boundaries during the forward pass. In the backward pass, process the segments from the last to the first: recompute the $`k`$ activations inside the current segment from its stored input, backpropagate through it, and discard them. The peak memory is
 
-$$
+```math
 M(k)=\frac Lk+k,
-$$
+```
 
 minimized at $`k=\sqrt L`$ with $`M=2\sqrt L`$. Every layer's forward computation is done twice, so the extra cost is one forward pass, about a third of the cost of a training step. Applying the idea recursively inside segments reduces memory to $`O(\log L)`$ at a cost of $`O(\log L)`$ forward passes ([Chen et al., 2016](https://arxiv.org/abs/1604.06174)); in practice, frameworks checkpoint at the granularity of transformer blocks, where the $`L`$ stored block inputs are small compared with the activations inside each block.
 
@@ -450,9 +450,9 @@ minimized at $`k=\sqrt L`$ with $`M=2\sqrt L`$. Every layer's forward computatio
 
 **The pipeline bubble.** Let a forward pass of one micro-batch on one stage take $`t_f`$ and a backward pass $`t_b`$, with $`p`$ stages and $`m`$ micro-batches. In GPipe the last stage starts its first forward pass after $`(p-1)t_f`$, and the first stage starts its last backward pass after the last stage has finished its $`m`$ backward passes plus a further $`(p-1)t_b`$ of backward propagation. The total time is $`(m+p-1)(t_f+t_b)`$, while each stage is busy for $`m(t_f+t_b)`$, so the idle fraction is
 
-$$
+```math
 \frac{(m+p-1)-m}{m+p-1}=\frac{p-1}{m+p-1}.
-$$
+```
 
 1F1B reorders the work of each stage without changing the length of the fill and drain phases, so its bubble is the same, while the number of micro-batches whose activations a stage holds is at most $`p`$ rather than $`m`$.
 

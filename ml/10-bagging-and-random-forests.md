@@ -10,9 +10,9 @@
 
 Chapter 9 ended with a diagnosis: a fully grown tree has low bias and high variance, because small changes in the data change its splits. Averaging is the standard remedy for variance. Let $`T_1,\ldots,T_B`$ be the predictions of $`B`$ predictors at a fixed input $`x`$; each is random, through the training data and through any randomization in the fitting. If they are identically distributed with variance $`\sigma^2`$ and every pair has correlation $`\rho`$, then
 
-$$
+```math
 \operatorname{Var}\Bigl(\frac1B\sum_{b=1}^BT_b\Bigr)=\rho\,\sigma^2+\frac{1-\rho}{B}\,\sigma^2 .
-$$
+```
 
 The derivation is one line: the variance of the sum has $`B`$ diagonal terms $`\sigma^2`$ and $`B(B-1)`$ off-diagonal terms $`\rho\sigma^2`$ ([Appendix A](#block-ens-appendix-a)). This is the equicorrelated case of the variance of a sum in Probability and Statistics. The average has the same expectation as each $`T_b`$, so averaging leaves bias unchanged. The mean squared error of a prediction is its squared bias plus its variance (Probability and Statistics; chapter 6 gives the version for a fitted predictor), so averaging lowers the error through the variance alone. As $`B`$ grows, the second term vanishes and the first remains. **Correlation sets the floor**: averaging independent predictors ($`\rho=0`$) removes all variance in the limit, while averaging perfectly correlated ones removes none.
 
@@ -22,9 +22,9 @@ Three conclusions shape this chapter. Averaging helps most for learners with low
 
 For squared loss the benefit of averaging has an exact form. Let $`f_1,\ldots,f_B`$ be the members' predictions at some input, $`y`$ a target value there, and $`\bar f=\frac1B\sum_bf_b`$ the ensemble's prediction. For every input and target,
 
-$$
+```math
 (\bar f-y)^2=\frac1B\sum_b(f_b-y)^2-\frac1B\sum_b(f_b-\bar f)^2 .
-$$
+```
 
 The ensemble's error equals the average member's error minus the spread of the members around their mean ([Krogh and Vedelsby, 1994](https://proceedings.neurips.cc/paper/1994/hash/b8c37e33defde51cf91e1e03e51657da-Abstract.html)), a spread they called the ensemble's *ambiguity*. The identity holds pointwise, so it also holds for expected errors. The ensemble is never worse than its average member, and it is better by exactly the members' disagreement, or **diversity**. Diversity bought by making every member much worse is no bargain, however: the first term grows as the second does. The rest of the chapter is about obtaining diversity cheaply.
 
@@ -38,9 +38,9 @@ The diversity is the variance reduction of the previous subsection seen from ano
 
 Independent training sets would give diverse predictors, but only one training set is available. The **bootstrap** of Probability and Statistics substitutes samples of size $`n`$ drawn with replacement from the data, each draw picking every example with probability $`1/n`$. A given example is missed by all $`n`$ independent draws, and so left out of a bootstrap sample, with probability
 
-$$
+```math
 \Bigl(1-\frac1n\Bigr)^n\;\longrightarrow\;e^{-1}\approx0.368,
-$$
+```
 
 so each bootstrap sample contains about 63.2% of the distinct examples, some of them several times. The limit is approached quickly: the probability is $`0.352`$ for $`n=12`$ and $`0.366`$ for $`n=100`$. (The same calculation explains, in Probability and Statistics, why the bootstrap fails for a sample maximum.) Predictors trained on different bootstrap samples differ in roughly the way predictors trained on independent samples would, but they are more strongly correlated, since the samples overlap heavily.
 
@@ -54,9 +54,9 @@ so each bootstrap sample contains about 63.2% of the distinct examples, some of 
 
 **Bootstrap aggregating**, or **bagging** ([Breiman, 1996](https://link.springer.com/article/10.1007/BF00058655)), trains the same learner on $`B`$ bootstrap samples and averages:
 
-$$
+```math
 \hat f_{\text{bag}}(x)=\frac1B\sum_{b=1}^B\hat f^{\ast b}(x),
-$$
+```
 
 where $`\hat f^{\ast b}`$ is the learner fitted to the $`b`$th bootstrap sample. For classification, the members either vote or have their class-probability estimates averaged. Averaging probabilities is usually preferable: it produces a smoother score and better probability estimates, and it tends to have lower variance when $`B`$ is small.
 
@@ -141,9 +141,9 @@ With $`m=d`$ this is bagging. Smaller $`m`$ forces the trees to use other featur
 
 For a forest of $`B`$ trees, the variance formula applies at each input $`x`$ with $`\sigma^2(x)`$ the variance of a single tree over training sets and randomization, and $`\rho(x)`$ the correlation between two trees grown on the *same* training set with independent randomization. That correlation equals the fraction of a tree's variance explained by the training set alone,
 
-$$
+```math
 \rho(x)=\frac{\operatorname{Var}_{\mathcal D}\bigl[\mathbb E_\Theta\,T(x;\Theta,\mathcal D)\bigr]}{\sigma^2(x)},
-$$
+```
 
 where $`T(x;\Theta,\mathcal D)`$ is the prediction at $`x`$ of a tree grown on the training set $`\mathcal D`$ with randomization $`\Theta`$, the bootstrap sample and the features drawn at each node, and $`\mathbb E_\Theta`$ averages over the randomization with $`\mathcal D`$ fixed ([Appendix A](#block-ens-appendix-a)). The figure estimates it this way: the variance of the forests across the 20 training sets gives the numerator, after a correction for using 100 trees rather than infinitely many, and the spread of the trees within each forest supplies the rest of $`\sigma^2(x)`$.
 
@@ -153,9 +153,9 @@ As $`B\to\infty`$ the forest's expected error at $`x`$ becomes $`\text{bias}^2(x
 
 Breiman stated the tradeoff as a bound for classification. Let the **margin** of the infinite forest at $`(x,y)`$ be the fraction of randomized trees that vote for the correct class minus the largest fraction voting for any other class, and let the **strength** $`s`$ be its expected value. If $`s>0`$ then
 
-$$
+```math
 P(\text{forest errs})\le\frac{\bar\rho\,(1-s^2)}{s^2},
-$$
+```
 
 where $`\bar\rho`$ is an average correlation between the margin functions of two random trees. The bound follows from Chebyshev's inequality ([Appendix B](#block-ens-appendix-b)). It is usually loose numerically, but it identifies the two quantities a forest trades against each other: individual trees should be strong, and they should be weakly correlated.
 
@@ -182,10 +182,10 @@ The scikit-learn example [OOB Errors for Random Forests](https://scikit-learn.or
 
 A regression forest's prediction is a weighted average of the training responses:
 
-$$
+```math
 \hat f(x)=\sum_{i=1}^nw_i(x)\,y_i,\qquad
 w_i(x)=\frac1B\sum_{b=1}^B\frac{\mathbf 1\{x_i\in L_b(x)\}}{|L_b(x)|},
-$$
+```
 
 where $`L_b(x)`$ is the leaf of tree $`b`$ containing $`x`$, $`\lvert L_b(x)\rvert`$ is the number of training points in it, and, for simplicity, each tree's leaf averages its training points with equal weight. The weights are nonnegative and sum to one. With bootstrap samples, a leaf averages the responses of its in-bag points, each counted as often as it was drawn; replacing the indicator by that count, and $`\lvert L_b(x)\rvert`$ by the total count in the leaf, gives weights that reproduce the forest's prediction exactly and are still nonnegative with sum one. The forest is therefore a nearest-neighbor method (chapter 1) whose neighborhoods are chosen by the data: they are narrow along directions in which the response changes and wide along irrelevant directions ([Lin and Jeon, 2006](https://www.tandfonline.com/doi/abs/10.1198/016214505000001230)). The same weights define a **proximity** between two inputs, the fraction of trees in which they share a leaf, which can be used for clustering, outlier detection, or imputation.
 
@@ -267,25 +267,25 @@ The measures answer different questions. Permutation importance asks how much *t
 
 **Variance of an average.** If $`\operatorname{Var}(T_b)=\sigma^2`$ and $`\operatorname{Cov}(T_b,T_{b'})=\rho\sigma^2`$ for $`b\ne b'`$, then
 
-$$
+```math
 \operatorname{Var}\Bigl(\frac1B\sum_bT_b\Bigr)
 =\frac1{B^2}\Bigl[B\sigma^2+B(B-1)\rho\sigma^2\Bigr]
 =\rho\sigma^2+\frac{1-\rho}B\sigma^2 .
-$$
+```
 
 For a forest, let $`T_b=T(x;\Theta_b,\mathcal D)`$ with $`\Theta_1,\ldots,\Theta_B`$ independent given the training set $`\mathcal D`$. By the law of total covariance (Probability and Statistics),
 
-$$
+```math
 \operatorname{Cov}(T_b,T_{b'})=\mathbb E_{\mathcal D}\bigl[\operatorname{Cov}(T_b,T_{b'}\mid\mathcal D)\bigr]+\operatorname{Cov}_{\mathcal D}\bigl(\mathbb E[T_b\mid\mathcal D],\mathbb E[T_{b'}\mid\mathcal D]\bigr)=0+\operatorname{Var}_{\mathcal D}\bigl[\mathbb E_\Theta T(x;\Theta,\mathcal D)\bigr],
-$$
+```
 
 since the trees are conditionally independent and have the same conditional mean. Dividing by $`\sigma^2(x)`$ gives the expression for $`\rho(x)`$ in the main text. Being a ratio of variances, this correlation is nonnegative. The same argument applies to bagging, with $`\Theta_b`$ the $`b`$th bootstrap sample alone.
 
 **Ambiguity decomposition.** Write $`f_b-y=(f_b-\bar f)+(\bar f-y)`$ and average the squares over $`b`$:
 
-$$
+```math
 \frac1B\sum_b(f_b-y)^2=\frac1B\sum_b(f_b-\bar f)^2+(\bar f-y)^2+\frac2B(\bar f-y)\sum_b(f_b-\bar f).
-$$
+```
 
 The last sum is zero by the definition of $`\bar f`$, which gives the identity. With unequal weights $`w_b\ge0`$ summing to one, the same argument applies with weighted averages.
 
@@ -299,28 +299,28 @@ The last sum is zero by the definition of $`\bar f`$, which gives the identity. 
 
 Let $`h(x;\Theta)`$ be a randomized tree classifier and write $`P_\Theta`$ for probability over its randomization, with the training set fixed. The margin of the infinite forest is
 
-$$
+```math
 \operatorname{mr}(x,y)=P_\Theta\bigl(h(x;\Theta)=y\bigr)-\max_{k\ne y}P_\Theta\bigl(h(x;\Theta)=k\bigr),
-$$
+```
 
 and the forest errs at $`(x,y)`$ when $`\operatorname{mr}(x,y)<0`$. Let $`s=\mathbb E_{X,Y}\operatorname{mr}(X,Y)>0`$. Chebyshev's inequality gives
 
-$$
+```math
 P(\operatorname{mr}<0)\le P\bigl(|\operatorname{mr}-s|\ge s\bigr)\le\frac{\operatorname{Var}(\operatorname{mr})}{s^2}.
-$$
+```
 
 To bound the variance, let $`\hat k(x,y)`$ be the class maximizing $`P_\Theta(h=k)`$ among $`k\ne y`$, and define the raw margin of a single tree, $`\operatorname{rmg}(\Theta;x,y)=\mathbf 1\{h(x;\Theta)=y\}-\mathbf 1\{h(x;\Theta)=\hat k\}`$, so that $`\operatorname{mr}=\mathbb E_\Theta\operatorname{rmg}`$. For independent copies $`\Theta,\Theta'`$,
 
-$$
+```math
 \operatorname{Var}(\operatorname{mr})=\mathbb E_{\Theta,\Theta'}\bigl[\operatorname{Cov}_{X,Y}\bigl(\operatorname{rmg}(\Theta),\operatorname{rmg}(\Theta')\bigr)\bigr]
 =\bar\rho\,\bigl(\mathbb E_\Theta\operatorname{sd}(\Theta)\bigr)^2,
-$$
+```
 
 where $`\operatorname{sd}(\Theta)`$ is the standard deviation of $`\operatorname{rmg}(\Theta;X,Y)`$ over $`(X,Y)`$ and $`\bar\rho`$ is the correlation between $`\operatorname{rmg}(\Theta)`$ and $`\operatorname{rmg}(\Theta')`$, averaged with weights $`\operatorname{sd}(\Theta)\operatorname{sd}(\Theta')`$. The first equality holds because $`\operatorname{mr}^2=\mathbb E_{\Theta,\Theta'}\bigl[\operatorname{rmg}(\Theta)\operatorname{rmg}(\Theta')\bigr]`$ for independent copies, and the expectations over $`(X,Y)`$ and over $`\Theta,\Theta'`$ can be exchanged. Finally, by Jensen's inequality and $`\operatorname{rmg}^2\le1`$,
 
-$$
+```math
 \bigl(\mathbb E_\Theta\operatorname{sd}(\Theta)\bigr)^2\le\mathbb E_\Theta\operatorname{Var}_{X,Y}\operatorname{rmg}(\Theta)\le1-\mathbb E_\Theta\bigl[(\mathbb E_{X,Y}\operatorname{rmg}(\Theta))^2\bigr]\le1-s^2 .
-$$
+```
 
 Combining the three displays gives $`P(\operatorname{mr}<0)\le\bar\rho(1-s^2)/s^2`$. The derivation follows Section 2 of Breiman's paper.
 

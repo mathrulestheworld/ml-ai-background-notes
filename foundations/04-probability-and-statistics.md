@@ -14,13 +14,13 @@ Probability theory starts from a mathematical model of an experiment whose outco
 
 Repeat an experiment $`n`$ times under the same conditions, and let $`N_n(A)`$ count the repetitions in which an event $`A`$ occurs. The **relative frequency** $`f_n(A)=N_n(A)/n`$ has three properties at every $`n`$. Writing $`\Omega`$ for the event that some outcome occurs,
 
-$$
+```math
 0\le f_n(A)\le1,
 \qquad
 f_n(\Omega)=1,
 \qquad
-f_n(A\cup B)=f_n(A)+f_n(B)\quad\text{when $`A`$ and $`B`$ cannot occur together.}
-$$
+f_n(A\cup B)=f_n(A)+f_n(B)\quad\text{when $A$ and $B$ cannot occur together.}
+```
 
 For many physical and computational experiments, $`f_n(A)`$ also settles near a fixed number as $`n`$ grows. The **frequentist interpretation** identifies the probability of $`A`$ with this long-run value.
 
@@ -45,21 +45,21 @@ For a finite or countable sample space, $`\mathcal F`$ contains every subset. Fo
 1. $`P(\Omega)=1`$;
 2. **countable additivity**: for pairwise disjoint events $`A_1,A_2,\ldots\in\mathcal F`$,
 
-$$
+```math
 P\Big(\bigcup_{i=1}^\infty A_i\Big)=\sum_{i=1}^\infty P(A_i).
-$$
+```
 
 The triple $`(\Omega,\mathcal F,P)`$ is a **probability space**.
 
 Every other rule of probability follows from these axioms. Taking every $`A_i=\varnothing`$ gives $`P(\varnothing)=0`$, so countable additivity includes finite additivity. For events $`A`$ and $`B`$ it follows that
 
-$$
+```math
 P(A^c)=1-P(A),
 \qquad
 A\subseteq B\ \Rightarrow\ P(A)\le P(B),
 \qquad
 P(A\cup B)=P(A)+P(B)-P(A\cap B).
-$$
+```
 
 The last identity splits $`A\cup B`$ into the disjoint pieces $`A\setminus B`$, $`A\cap B`$, and $`B\setminus A`$. The **union bound** states that $`P(\bigcup_i A_i)\le\sum_iP(A_i)`$ for any countable collection of events, without an independence assumption. If each of $`m`$ possible failures has probability at most $`\alpha/m`$, the probability of any failure is at most $`\alpha`$. Countable additivity also makes probability continuous along increasing or decreasing sequences of events, which is what lets probabilities pass to limits ([Appendix A](#block-probability-appendix-a)).
 
@@ -71,9 +71,9 @@ Under the uniform law, each single outcome has probability zero, although every 
 
 When $`\Omega`$ is finite and every outcome is equally likely, probabilities are ratios of counts:
 
-$$
+```math
 P(A)=\frac{|A|}{|\Omega|}.
-$$
+```
 
 The assumption of equal weights carries the whole argument. When the ordered outcomes of an experiment are equally likely, its unordered selections with replacement and its occupancy patterns generally are not, so the sample space must be chosen before counting. Choosing $`k`$ items from $`n`$ distinct items gives four standard counts:
 
@@ -92,10 +92,10 @@ An outcome can be complicated, such as a sequence of tosses, an image, or a whol
 
 **Definition (random variable).** Let $`(\Omega,\mathcal F,P)`$ be a probability space, and let $`E`$ be a set of values with a σ-algebra $`\mathcal E`$, such as $`\mathbb R^d`$ with its Borel sets. A **random variable** with values in $`E`$ is a function $`X:\Omega\to E`$ that is **measurable**:
 
-$$
+```math
 X^{-1}(B)=\{\omega\in\Omega:X(\omega)\in B\}\in\mathcal F
 \qquad\text{for every }B\in\mathcal E.
-$$
+```
 
 It is a **real random variable** when $`E=\mathbb R`$, and a **random vector** when $`E=\mathbb R^d`$.
 
@@ -103,10 +103,10 @@ A random variable is an ordinary function; the randomness lies in which outcome 
 
 **Definition (law).** The **distribution**, or **law**, of $`X`$ is the probability measure $`P_X`$ on $`(E,\mathcal E)`$ given by
 
-$$
+```math
 P_X(B)=P(X\in B)=P\big(X^{-1}(B)\big),
 \qquad B\in\mathcal E.
-$$
+```
 
 The law is the **pushforward** of $`P`$ through $`X`$, and it makes $`(E,\mathcal E,P_X)`$ a probability space of its own. Most calculations need only the law, so the underlying $`\Omega`$ usually stays in the background. Variables with the same law are **equal in distribution**, written $`X\overset{d}{=}Y`$, even if they are defined on different probability spaces or never take equal values. For one toss of a fair coin, the indicators of heads and of tails are equal in distribution, but they never agree.
 
@@ -124,10 +124,10 @@ An observation may itself be a pair $`Z=(X,Y)`$ containing an input vector and a
 
 **Definition (mass function and density).** A real random variable $`Z`$ is **discrete** if $`P(Z\in S)=1`$ for some countable set $`S`$. Its **probability mass function** is $`p_Z(z)=P(Z=z)`$, with $`\sum_{z\in S}p_Z(z)=1`$. It is **absolutely continuous** if there is a **probability density function** $`p_Z\ge0`$ such that
 
-$$
+```math
 P(Z\in B)=\int_B p_Z(z)\,dz
 \qquad\text{for every }B\in\mathcal B(\mathbb R),
-$$
+```
 
 and in particular $`\int_{\mathbb R}p_Z(z)\,dz=1`$.
 
@@ -135,32 +135,32 @@ The notation $`p`$ will denote either a mass function or a density; the support 
 
 **Definition (distribution function).** The **cumulative distribution function** (CDF) of a real random variable $`Z`$ is
 
-$$
+```math
 F_Z(z)=P(Z\le z),\qquad z\in\mathbb R.
-$$
+```
 
 It is nondecreasing and right-continuous, with limits zero and one at the two ends of the real line, and it determines the law $`P_Z`$ completely ([Appendix A](#block-probability-appendix-a)). Conversely, every nondecreasing, right-continuous function with these limits is the CDF of some random variable; the inverse-CDF construction later in the chapter builds one from a uniform variable. For a density, $`F_Z(z)=\int_{-\infty}^z p_Z(u)\,du`$ and $`F_Z'(z)=p_Z(z)`$ almost everywhere. CDF differences give interval probabilities:
 
-$$
+```math
 P(a<Z\le b)=F_Z(b)-F_Z(a),\qquad a<b.
-$$
+```
 
 Define the left limit $`F_Z(z^-)=\lim_{u\uparrow z}F_Z(u)=P(Z<z)`$. The jump at $`z`$ is therefore
 
-$$
+```math
 P(Z=z)=F_Z(z)-F_Z(z^-).
-$$
+```
 
 These identities apply to continuous, discrete, and mixed laws. For the uniform example, integrating the density gives
 
-$$
+```math
 F_Z(z)=
 \begin{cases}
 0,&z\le0,\\
 2z,&0<z<1/2,\\
 1,&z\ge1/2.
 \end{cases}
-$$
+```
 
 <img src="sources/images/probability-density-cdf.png" alt="probability-density-cdf" width="680">
 
@@ -168,9 +168,9 @@ $$
 
 The generalized **quantile** is
 
-$$
+```math
 F_Z^{-1}(q)=\inf\{z:F_Z(z)\ge q\},\qquad 0<q<1.
-$$
+```
 
 The median is a $`1/2`$ quantile. The survival function $`1-F_Z(z)`$ gives $`P(Z>z)`$ and is useful for tail probabilities.
 
@@ -180,24 +180,24 @@ Blitzstein and Hwang's [*Introduction to Probability*](https://probabilitybook.n
 
 **Definition (conditional probability).** For an event $`B`$ with $`P(B)>0`$, the **conditional probability** of $`A`$ given $`B`$ is
 
-$$
+```math
 P(A\mid B)=\frac{P(A\cap B)}{P(B)}.
-$$
+```
 
 Conditioning restricts attention to outcomes consistent with the observation and renormalizes their weights. For fixed $`B`$, the map $`A\mapsto P(A\mid B)`$ is again a probability measure on $`(\Omega,\mathcal F)`$, so every rule of the previous section applies to conditional probabilities. Rearranging gives the product rule, $`P(A\cap B)=P(A\mid B)P(B)`$. If positive-probability events $`B_1,\ldots,B_k`$ partition the sample space up to a null set, summing over the disjoint cases gives **total probability**. When $`P(A)>0`$, it also gives **Bayes' rule**. Zero-probability partition cells can be omitted:
 
-$$
+```math
 P(A)=\sum_j P(A\mid B_j)P(B_j),\qquad
 P(B_j\mid A)=\frac{P(A\mid B_j)P(B_j)}{\sum_iP(A\mid B_i)P(B_i)}.
-$$
+```
 
 For example, suppose one percent of messages are spam. A filter flags $`90\%`$ of spam and $`5\%`$ of ordinary messages. Among $`10{,}000`$ messages, the expected flagged counts are $`90`$ spam and $`495`$ ordinary messages. Therefore
 
-$$
+```math
 P(\text{spam}\mid\text{flagged})
 =\frac{0.90(0.01)}{0.90(0.01)+0.05(0.99)}
 \approx0.154.
-$$
+```
 
 The prevalence, or **base rate**, matters alongside the filter's behavior within each class. Reversing the conditioning event changes the question.
 
@@ -207,10 +207,10 @@ The prevalence, or **base rate**, matters alongside the filter's behavior within
 
 Bayes' rule is often clearest in **odds form**. For two hypotheses $`H_1,H_2`$ and data $`D`$,
 
-$$
+```math
 \frac{P(H_1\mid D)}{P(H_2\mid D)}
 =\frac{P(H_1)}{P(H_2)}\cdot\frac{P(D\mid H_1)}{P(D\mid H_2)}.
-$$
+```
 
 Posterior odds are prior odds multiplied by the **likelihood ratio**. In the filter example, the prior odds of spam are $`1/99`$, and a flag multiplies them by $`0.90/0.05=18`$. The posterior odds $`18/99`$ correspond to the probability $`18/117\approx0.154`$ found above. The likelihood ratio measures what the observation says; the prior odds say how rare the hypothesis was to begin with.
 
@@ -218,17 +218,17 @@ Posterior odds are prior odds multiplied by the **likelihood ratio**. In the fil
 
 A joint distribution describes variables together. If $`(X,Y)`$ has a joint mass function, then $`p_X(x)=\sum_y p_{X,Y}(x,y)`$; for a joint density, replace the sum with an integral. This operation is **marginalization**. A conditional density is
 
-$$
+```math
 p_{Y\mid X}(y\mid x)=\frac{p_{X,Y}(x,y)}{p_X(x)},\qquad p_X(x)>0.
-$$
+```
 
 It remains meaningful for continuous $`X`$, even though $`P(X=x)=0`$: it describes the conditional law through densities, rather than dividing two point probabilities. Conditional laws are only determined up to changes on sets of conditioning values having probability zero.
 
 Repeated factorization gives the **probability chain rule**:
 
-$$
+```math
 p(z_1,\ldots,z_n)=p(z_1)\prod_{i=2}^n p(z_i\mid z_1,\ldots,z_{i-1}).
-$$
+```
 
 This identity requires no independence. An autoregressive language model uses this factorization to describe a sequence by distributions for successive tokens.
 
@@ -245,10 +245,10 @@ Summing rows gives $`P(X=0)=P(X=1)=0.5`$; summing the second column gives $`P(Y=
 
 **Definition (independence).** Events $`A`$ and $`B`$ are **independent** if $`P(A\cap B)=P(A)P(B)`$. Events $`A_1,\ldots,A_n`$ are **mutually independent** if
 
-$$
+```math
 P\Big(\bigcap_{i\in S}A_i\Big)=\prod_{i\in S}P(A_i)
 \qquad\text{for every subset }S\subseteq\{1,\ldots,n\}.
-$$
+```
 
 Random variables $`X_1,\ldots,X_n`$ are **independent** if $`P(X_1\in B_1,\ldots,X_n\in B_n)=\prod_iP(X_i\in B_i)`$ for all measurable sets $`B_1,\ldots,B_n`$: any events determined by different variables are independent, and the joint law is the product of the marginal laws. An infinite family is independent when every finite subfamily is. Independence of two variables is written $`X\perp Y`$.
 
@@ -274,9 +274,9 @@ Conditioning on a third variable can reverse a comparison. The table gives succe
 
 Treatment A has the higher success rate for small stones and for large stones, yet the lower rate overall. There is no arithmetic error. Writing $`S`$ for success, $`T`$ for treatment, and $`G`$ for stone size, total probability expresses each overall rate as a weighted average of the group rates:
 
-$$
+```math
 P(S\mid T=t)=\sum_g P(S\mid T=t,G=g)\,P(G=g\mid T=t).
-$$
+```
 
 The weights differ between treatments: $`263`$ of the $`350`$ patients given A had large stones, the harder cases, against $`80`$ of the $`350`$ given B. This reversal is **Simpson's paradox**.
 
@@ -290,72 +290,72 @@ Which comparison answers a question depends on how treatments were assigned and 
 
 **Definition (expectation).** The **expectation** of a real random variable $`Z`$ is its probability-weighted average, the integral of $`Z`$ over the sample space:
 
-$$
+```math
 \mathbb EZ=\int_\Omega Z(\omega)\,P(d\omega).
-$$
+```
 
 The integral is the Lebesgue integral of $`Z`$ with respect to $`P`$. It is always defined for $`Z\ge0`$, possibly as $`+\infty`$, and a general $`Z`$ is **integrable** when $`\mathbb E|Z|<\infty`$, in which case its expectation is finite. [Appendix A](#block-probability-appendix-a) defines this integral, compares it with the Riemann integral, and proves that it equals an integral over the values of $`Z`$, as in the next paragraph.
 
 The integral over $`\Omega`$ can be moved to the law of $`Z`$: for measurable $`g`$ with $`\mathbb E|g(Z)|<\infty`$, $`\mathbb E[g(Z)]=\int_{\mathbb R}g(z)\,P_Z(dz)`$, an integral over the real line ([Appendix A](#block-probability-appendix-a)). This **law of the unconscious statistician** becomes a sum or an ordinary integral for a mass function or a density:
 
-$$
+```math
 \mathbb E[g(Z)]=\sum_z g(z)p_Z(z)
 \quad\text{or}\quad
 \mathbb E[g(Z)]=\int g(z)p_Z(z)\,dz.
-$$
+```
 
 For a law with neither a mass function nor a density, the same integral is taken against the CDF and written $`\int g(z)\,dF_Z(z)`$. In every case there is no need to first find the distribution of $`g(Z)`$. Expectations are linear: $`\mathbb E[\sum_i a_iZ_i]=\sum_i a_i\mathbb E Z_i`$ whenever each $`Z_i`$ is integrable. Independence is unnecessary. In particular, an indicator $`\mathbf1_A`$ equals one on $`A`$ and zero elsewhere, so $`\mathbb E\mathbf1_A=P(A)`$. Expected counts are therefore sums of event probabilities, including when the counted events are dependent.
 
 For a uniformly random ordering of $`n`$ items, let $`I_i`$ indicate that item $`i`$ stays in its original position. The number of fixed points $`\sum_iI_i`$ has expectation $`n\cdot(1/n)=1`$ for every $`n`$, although the indicators are dependent. Indicators also give the **tail-sum formula**. A variable with values in $`\{0,1,2,\ldots\}`$ satisfies $`X=\sum_{k\ge1}\mathbf1\{X\ge k\}`$, so
 
-$$
+```math
 \mathbb EX=\sum_{k\ge1}P(X\ge k),
 \qquad\text{and}\qquad
 \mathbb EX=\int_0^\infty P(X>t)\,dt
-$$
+```
 
 for any nonnegative variable.
 
 For $`\mu=\mathbb E Z`$ and finite second moment,
 
-$$
+```math
 \operatorname{Var}(Z)=\mathbb E[(Z-\mu)^2]
 =\mathbb E[Z^2]-\mu^2,
 \qquad \operatorname{SD}(Z)=\sqrt{\operatorname{Var}(Z)}.
-$$
+```
 
 Variance has squared units; standard deviation has the same units as $`Z`$. For finite second moments,
 
-$$
+```math
 \operatorname{Cov}(X,Y)=\mathbb E[(X-\mathbb EX)(Y-\mathbb EY)],
-$$
+```
 
 and correlation divides this by the two standard deviations, when both are positive. Covariance measures linear association. Independence implies zero covariance, but the converse fails: for $`X\sim\operatorname{Unif}(-1,1)`$ and $`Y=X^2`$, symmetry gives $`\operatorname{Cov}(X,Y)=0`$ although $`Y`$ is determined by $`X`$.
 
 Expanding a squared sum gives
 
-$$
+```math
 \operatorname{Var}\!\left(\sum_i a_iZ_i\right)
 =\sum_i a_i^2\operatorname{Var}(Z_i)
 +2\sum_{i<j}a_i a_j\operatorname{Cov}(Z_i,Z_j).
-$$
+```
 
 Thus averaging iid observations with variance $`\sigma^2`$ gives variance $`\sigma^2/n`$. Correlation changes this reduction; duplicating the same observation $`n`$ times does not supply $`n`$ independent pieces of information.
 
 For instance, if each observation has variance $`\sigma^2`$ and every distinct pair has correlation $`\rho`$, then
 
-$$
+```math
 \operatorname{Var}(\bar Z_n)=\frac{\sigma^2}{n}\bigl(1+(n-1)\rho\bigr).
-$$
+```
 
 For fixed positive $`\rho`$, this variance approaches $`\rho\sigma^2`$ rather than zero. This calculation is one reason to distinguish the number of recorded rows from the amount of independent information. It also shows why an iid standard-error formula can be misleading for clustered or temporally correlated observations.
 
 For a column vector $`Z\in\mathbb R^d`$, define
 
-$$
+```math
 \mu=\mathbb EZ,\qquad
 \Sigma=\mathbb E[(Z-\mu)(Z-\mu)^\top].
-$$
+```
 
 The covariance matrix is symmetric positive semidefinite because $`a^\top\Sigma a=\operatorname{Var}(a^\top Z)\ge0`$. An affine transformation satisfies $`\mathbb E[AZ+b]=A\mu+b`$ and $`\operatorname{Cov}(AZ+b)=A\Sigma A^\top`$.
 
@@ -363,42 +363,42 @@ The covariance matrix is symmetric positive semidefinite because $`a^\top\Sigma 
 
 **Definition (conditional expectation).** For an integrable $`Y`$, let $`m(x)=\mathbb E[Y\mid X=x]`$ be the mean of the conditional law of $`Y`$ given $`X=x`$. With a conditional density,
 
-$$
+```math
 m(x)=\int y\,p_{Y\mid X}(y\mid x)\,dy,
-$$
+```
 
 and with a conditional mass function the integral becomes a sum. The **conditional expectation** $`\mathbb E[Y\mid X]`$ is the random variable $`m(X)`$. It is a function of $`X`$ rather than a number: its value depends on the observed $`X`$.
 
 The **tower property**, or law of total expectation, says
 
-$$
+```math
 \mathbb E[\mathbb E(Y\mid X)]=\mathbb EY.
-$$
+```
 
 It follows by integrating first over $`y`$ and then over $`x`$. [Appendix A](#block-probability-appendix-a) gives the general definition, which needs no density and can condition on any body of information, such as a whole past. It characterizes $`m(X)`$ as the function of $`X`$ whose average over every event determined by $`X`$ equals that of $`Y`$.
 
 Assume now that $`\mathbb E[Y^2]<\infty`$. Write $`Y= m(X)+R`$, where $`R=Y-m(X)`$ satisfies $`\mathbb E[R\mid X]=0`$. Expanding $`(Y-\mathbb EY)^2=(m(X)-\mathbb EY+R)^2`$ and taking expectations eliminates the cross term, yielding the **law of total variance**:
 
-$$
+```math
 \boxed{\operatorname{Var}(Y)
 =\mathbb E[\operatorname{Var}(Y\mid X)]
 +\operatorname{Var}(\mathbb E[Y\mid X]).}
-$$
+```
 
 The first term measures average variation within groups defined by $`X`$; the second measures variation between their means. The same residual argument shows that, for any square-integrable prediction rule $`h(X)`$,
 
-$$
+```math
 \mathbb E[(Y-h(X))^2]
 =\mathbb E[\operatorname{Var}(Y\mid X)]
 +\mathbb E[(m(X)-h(X))^2].
-$$
+```
 
 More explicitly, $`Y-h(X)=R+[m(X)-h(X)]`$. After squaring, the cross term has expectation
 
-$$
+```math
 \mathbb E\{R[m(X)-h(X)]\}
 =\mathbb E\{[m(X)-h(X)]\mathbb E[R\mid X]\}=0.
-$$
+```
 
 The factor depending only on $`X`$ can be taken outside the inner conditional expectation. This **orthogonality** of the residual to functions of $`X`$ is stronger than having zero ordinary covariance with $`X`$. A population linear predictor that minimizes expected squared error has residuals orthogonal to its chosen features in expectation. Ordinary least squares on one sample instead gives empirical orthogonality to the columns of its design matrix. The true conditional mean removes every square-integrable predictable component.
 
@@ -406,11 +406,11 @@ Consequently, the conditional mean minimizes expected squared prediction error. 
 
 There is also a **law of total covariance**:
 
-$$
+```math
 \operatorname{Cov}(U,V)
 =\mathbb E[\operatorname{Cov}(U,V\mid C)]
 +\operatorname{Cov}(\mathbb E[U\mid C],\mathbb E[V\mid C]).
-$$
+```
 
 It follows by subtracting the conditional means and expanding, just as for total variance. Returning to the shared random probability $`Q`$, conditionally independent Bernoulli draws $`U,V\mid Q`$ have conditional covariance zero and conditional means both equal to $`Q`$. Consequently, $`\operatorname{Cov}(U,V)=\operatorname{Var}(Q)`$. Variation in a shared hidden variable explains their positive marginal association.
 
@@ -456,19 +456,19 @@ A distribution family specifies its support, parameters, and probability rule. W
 
 A binomial variable counts successes in $`n`$ independent Bernoulli trials. The categorical distribution describes a class or token, while its one-hot representation is a random vector. Counts of the $`K`$ outcomes across $`n`$ iid categorical draws have a **multinomial distribution**:
 
-$$
+```math
 P(N_1=n_1,\ldots,N_K=n_K)
 =\frac{n!}{\prod_k n_k!}\prod_kq_k^{n_k},
 \qquad \sum_k n_k=n.
-$$
+```
 
 The binomial formula follows by counting which $`k`$ of the $`n`$ trials succeed. Each such sequence has probability $`q^k(1-q)^{n-k}`$, and there are $`\binom nk`$ such sequences. Its moments follow more simply by writing the count as a sum of indicators: linearity gives mean $`nq`$, and independence removes covariance terms to give variance $`nq(1-q)`$. The same random variable can therefore be analyzed through its probability mass function or through its construction, whichever makes a calculation clearer.
 
 A **geometric** variable counts the failures before the first success in independent trials with success probability $`q`$. Since $`P(X\ge k)=(1-q)^k`$, it is **memoryless**:
 
-$$
+```math
 P(X\ge a+b\mid X\ge a)=P(X\ge b).
-$$
+```
 
 Failures already observed do not change the distribution of the remaining wait. The number of failures before the $`r`$th success is a sum of $`r`$ independent geometric counts and has the **negative binomial** distribution.
 
@@ -476,9 +476,9 @@ Sampling without replacement changes the binomial. Draw $`n`$ items from a popul
 
 The Poisson family is the law of rare events. If $`X_n\sim\operatorname{Binomial}(n,\lambda/n)`$ with $`\lambda`$ fixed, then for each $`k`$,
 
-$$
+```math
 \binom nk\Big(\frac\lambda n\Big)^k\Big(1-\frac\lambda n\Big)^{n-k}\longrightarrow e^{-\lambda}\frac{\lambda^k}{k!}.
-$$
+```
 
 Many independent opportunities, each unlikely, produce a moderate total count. Independent Poisson counts add their rates. Conversely, if $`X\sim\operatorname{Poisson}(\lambda)`$ and $`Y\sim\operatorname{Poisson}(\mu)`$ are independent, then $`X\mid X+Y=m\sim\operatorname{Binomial}(m,\lambda/(\lambda+\mu))`$. Equality of mean and variance is a modeling restriction, not a property of counts in general; counts whose variance exceeds their mean are called **overdispersed**.
 
@@ -498,11 +498,11 @@ Many independent opportunities, each unlikely, produce a moderate total count. I
 
 The normalizing functions are
 
-$$
+```math
 \Gamma(\alpha)=\int_0^\infty t^{\alpha-1}e^{-t}\,dt,
 \qquad
 B(\alpha,\beta)=\frac{\Gamma(\alpha)\Gamma(\beta)}{\Gamma(\alpha+\beta)}.
-$$
+```
 
 The gamma function $`\Gamma(\alpha)`$ is distinct from the distribution name $`\operatorname{Gamma}(\alpha,\lambda)`$. Setting the shape to one gives $`\operatorname{Gamma}(1,\lambda)=\operatorname{Exp}(\lambda)`$.
 
@@ -520,9 +520,9 @@ assert np.allclose([law.mean(), law.var()], [alpha/rate, alpha/rate**2])
 
 The exponential distribution is the continuous memoryless law:
 
-$$
+```math
 P(Z>s+t\mid Z>s)=\frac{e^{-\lambda(s+t)}}{e^{-\lambda s}}=P(Z>t),
-$$
+```
 
 and among continuous distributions on $`[0,\infty)`$ it is the only one with this property. It is the limit of a geometric waiting time when time is divided into short intervals, each containing an event with probability about $`\lambda`$ times its length. For independent $`Z_i\sim\operatorname{Exp}(\lambda_i)`$, the minimum satisfies $`P(\min_iZ_i>t)=\prod_ie^{-\lambda_it}`$, so it is $`\operatorname{Exp}(\sum_i\lambda_i)`$, and $`Z_j`$ is the smallest with probability $`\lambda_j/\sum_i\lambda_i`$. Sums of independent gamma variables with a common rate add their shapes: $`\operatorname{Gamma}(\alpha_1,\lambda)+\operatorname{Gamma}(\alpha_2,\lambda)`$ is $`\operatorname{Gamma}(\alpha_1+\alpha_2,\lambda)`$. In particular, a sum of $`k`$ independent $`\operatorname{Exp}(\lambda)`$ variables is $`\operatorname{Gamma}(k,\lambda)`$.
 
@@ -536,11 +536,11 @@ A beta distribution models a probability or fraction on $`(0,1)`$. It also arise
 
 The **Dirichlet distribution** generalizes beta to a random probability vector $`Q\sim\operatorname{Dirichlet}(\alpha_1,\ldots,\alpha_K)`$. For $`q_k>0`$, $`\sum_kq_k=1`$, and $`\alpha_k>0`$, its density in the first $`K-1`$ coordinates is
 
-$$
+```math
 p_Q(q_1,\ldots,q_{K-1})
 =\frac{\Gamma(\alpha_0)}{\prod_k\Gamma(\alpha_k)}\prod_kq_k^{\alpha_k-1},
 \quad q_K=1-\sum_{k<K}q_k,\quad \alpha_0=\sum_k\alpha_k.
-$$
+```
 
 Its mean is $`\mathbb E Q_k=\alpha_k/\alpha_0`$. The total $`\alpha_0`$ controls concentration around the mean when the ratios $`\alpha_k/\alpha_0`$ are held fixed. Normalizing independent $`\operatorname{Gamma}(\alpha_k,1)`$ variables by their sum gives a $`\operatorname{Dirichlet}(\alpha_1,\ldots,\alpha_K)`$ vector; with every $`\alpha_k=1`$, it is uniform on the simplex.
 
@@ -566,9 +566,9 @@ For $`Z\sim\mathcal N(\mu,\sigma^2)`$, standardizing gives $`(Z-\mu)/\sigma\sim\
 
 The **moment generating function** (MGF) of $`Z`$ is $`M_Z(s)=\mathbb E[e^{sZ}]`$, where this expectation is finite. When it is finite on an open interval around zero, it determines the distribution, and its derivatives at zero are the moments: $`M_Z^{(k)}(0)=\mathbb E[Z^k]`$. Its most useful property concerns sums. For independent $`X`$ and $`Y`$,
 
-$$
+```math
 M_{X+Y}(s)=\mathbb E[e^{sX}e^{sY}]=M_X(s)\,M_Y(s).
-$$
+```
 
 | Distribution | $`M(s)`$ |
 |---|---|
@@ -588,9 +588,9 @@ Many quantities are computed from other random variables: a total, a transformed
 
 If $`X`$ and $`Y`$ are independent with densities $`p_X`$ and $`p_Y`$, then $`S=X+Y`$ has density
 
-$$
+```math
 p_S(s)=\int p_X(x)\,p_Y(s-x)\,dx.
-$$
+```
 
 This is the **convolution** of the two densities: to reach the total $`s`$, the first term takes some value $`x`$ and the second must equal $`s-x`$. For integer-valued variables, the integral becomes a sum. Two independent $`\operatorname{Unif}(0,1)`$ variables have the triangular density $`\min(s,2-s)`$ on $`[0,2]`$, and each further term smooths the density again. Repeated convolution is why sums of many independent terms become approximately Normal, the subject of the central limit theorem below. Moment generating functions turn convolution into multiplication, which is often the easier calculation.
 
@@ -602,10 +602,10 @@ This is the **convolution** of the two densities: to reach the total $`s`$, the 
 
 Let $`Y=g(X)`$, where $`g`$ is strictly increasing and differentiable with a differentiable inverse. The events $`\{X\le x\}`$ and $`\{Y\le g(x)\}`$ coincide, so $`F_Y(y)=F_X(g^{-1}(y))`$. Differentiating gives
 
-$$
+```math
 p_Y(y)=p_X(g^{-1}(y))\left|\frac{d}{dy}g^{-1}(y)\right|
 =\frac{p_X(x)}{|g'(x)|},\qquad x=g^{-1}(y).
-$$
+```
 
 The absolute value makes the same formula hold for decreasing maps. The formula conserves probability: a short interval of length $`dx`$ near $`x`$ carries probability $`p_X(x)\,dx`$, and $`g`$ maps it to an interval of length $`|g'(x)|\,dx`$ near $`y`$. Where $`g`$ stretches intervals, density falls; where it compresses them, density rises.
 
@@ -615,16 +615,16 @@ The absolute value makes the same formula hold for decreasing maps. The formula 
 
 The same argument works in $`d`$ dimensions. Suppose $`g:\mathbb R^d\to\mathbb R^d`$ is invertible and continuously differentiable with a continuously differentiable inverse on the relevant open domains. With the numerator-layout Jacobian $`J_g(x)=(\partial g_i/\partial x_j)_{ij}`$, the transformed density is
 
-$$
+```math
 p_Y(y)=p_X(g^{-1}(y))\left|\det J_{g^{-1}}(y)\right|
 =\frac{p_X(x)}{|\det J_g(x)|},\qquad x=g^{-1}(y).
-$$
+```
 
 The determinant corrects for local volume change: a region expanded by a factor $`c`$ must have its density divided by $`c`$ to preserve probability. For a map with several inverse branches, add the contributions of the branches. For $`Y=X^2`$ and $`y>0`$,
 
-$$
+```math
 p_Y(y)=\frac{p_X(\sqrt y)+p_X(-\sqrt y)}{2\sqrt y}.
-$$
+```
 
 These formulas assume an absolutely continuous $`X`$; point masses require separate accounting. Maps between spaces of different dimensions need an extra step, given in [Appendix B](#block-probability-appendix-b). Change of variables reappears with MAP estimates in Bayesian inference, and generative models use it to turn simple noise into complicated data.
 
@@ -632,9 +632,9 @@ These formulas assume an absolutely continuous $`X`$; point masses require separ
 
 The CDF is itself a useful transformation. If $`F`$ is continuous and $`X\sim F`$, then $`U=F(X)`$ is uniform on $`(0,1)`$: $`P(F(X)\le u)=u`$ for $`0<u<1`$. Conversely, let $`U\sim\operatorname{Unif}(0,1)`$ and let $`F^{-1}`$ be the generalized quantile function. Since $`F^{-1}(u)\le x`$ exactly when $`u\le F(x)`$,
 
-$$
+```math
 P\{F^{-1}(U)\le x\}=P\{U\le F(x)\}=F(x),
-$$
+```
 
 so $`F^{-1}(U)`$ has CDF $`F`$. This converse holds for discrete and mixed laws as well. It is **inverse-CDF sampling**: uniform random numbers become draws from any distribution whose quantile function can be evaluated. For $`\operatorname{Exp}(\lambda)`$, solving $`u=1-e^{-\lambda x}`$ gives $`F^{-1}(u)=-\log(1-u)/\lambda`$.
 
@@ -646,15 +646,15 @@ so $`F^{-1}(U)`$ has CDF $`F`$. This converse holds for discrete and mixed laws 
 
 Sorting iid observations $`X_1,\ldots,X_n`$ with CDF $`F`$ gives the **order statistics** $`X_{(1)}\le\cdots\le X_{(n)}`$. The extremes have simple laws, because the maximum is at most $`x`$ exactly when every observation is:
 
-$$
+```math
 P(X_{(n)}\le x)=F(x)^n,\qquad P(X_{(1)}>x)=[1-F(x)]^n.
-$$
+```
 
 When $`F`$ has density $`p`$, the $`k`$th smallest value has density
 
-$$
+```math
 p_{X_{(k)}}(x)=\frac{n!}{(k-1)!\,(n-k)!}\,F(x)^{k-1}[1-F(x)]^{n-k}\,p(x):
-$$
+```
 
 $`k-1`$ observations fall below $`x`$, one falls at $`x`$, and $`n-k`$ fall above it, and the factorials count the ways to choose which. For uniform observations on $`(0,1)`$, $`X_{(k)}\sim\operatorname{Beta}(k,n+1-k)`$, with mean $`k/(n+1)`$. Sample medians and other sample quantiles are order statistics, and so is the sample maximum that estimates an unknown endpoint in [Appendix E](#block-probability-appendix-e). Gaps between order statistics, extremes, and records appear in [Appendix B](#block-probability-appendix-b).
 
@@ -666,10 +666,10 @@ $`k-1`$ observations fall below $`x`$, one falls at $`x`$, and $`n-k`$ fall abov
 
 A vector $`Z\in\mathbb R^d`$ is **jointly Gaussian** if every linear combination $`a^\top Z`$ is Gaussian, allowing constant combinations. With mean $`\mu`$ and positive definite covariance $`\Sigma`$, its density is
 
-$$
+```math
 p(z)=\frac{\exp[-\tfrac12(z-\mu)^\top\Sigma^{-1}(z-\mu)]}
 {(2\pi)^{d/2}\det(\Sigma)^{1/2}}.
-$$
+```
 
 The quadratic form measures distance relative to the covariance: directions with greater variance are penalized less. If $`Z\sim\mathcal N(\mu,\Sigma)`$, then $`AZ+b\sim\mathcal N(A\mu+b,A\Sigma A^\top)`$. A singular covariance describes a Gaussian supported on a lower-dimensional affine subspace; the full-dimensional density above does not apply.
 
@@ -677,22 +677,22 @@ An explicit construction links this distribution to linear algebra. If $`G`$ has
 
 Partition a jointly Gaussian vector and its parameters as
 
-$$
+```math
 \begin{pmatrix}X\\Y\end{pmatrix}
 \sim\mathcal N\!\left(
 \begin{pmatrix}\mu_X\\\mu_Y\end{pmatrix},
 \begin{pmatrix}\Sigma_{XX}&\Sigma_{XY}\\\Sigma_{YX}&\Sigma_{YY}\end{pmatrix}
 \right).
-$$
+```
 
 If $`\Sigma_{XX}`$ is invertible, then
 
-$$
+```math
 Y\mid X=x\sim\mathcal N\!\left(
 \mu_Y+\Sigma_{YX}\Sigma_{XX}^{-1}(x-\mu_X),
 \Sigma_{YY}-\Sigma_{YX}\Sigma_{XX}^{-1}\Sigma_{XY}
 \right).
-$$
+```
 
 To see the structure, define $`A=\Sigma_{YX}\Sigma_{XX}^{-1}`$ and $`R=Y-\mu_Y-A(X-\mu_X)`$. Direct calculation gives $`\operatorname{Cov}(R,X)=0`$. Jointly Gaussian blocks with zero cross-covariance are independent, so conditioning on $`X`$ changes the affine term but leaves $`R`$ unchanged in distribution. Calculating $`\operatorname{Cov}(R)`$ gives the displayed conditional covariance. Thus Gaussian conditional means are affine and conditional variances do not depend on the observed value $`x`$.
 
@@ -721,19 +721,19 @@ Almost-sure convergence and $`L^r`$ convergence each imply convergence in probab
 
 The iid **strong law of large numbers** states that
 
-$$
+```math
 \mathbb E|Z_1|<\infty
 \quad\Longrightarrow\quad
 \bar Z_n\longrightarrow\mu\quad\text{almost surely}.
-$$
+```
 
 It implies convergence in probability, the **weak law of large numbers**. Finite variance is sufficient but not necessary for either law.
 
 The iid **central limit theorem** (CLT), assuming $`0<\sigma^2<\infty`$, states
 
-$$
+```math
 \frac{\sqrt n(\bar Z_n-\mu)}{\sigma}\Rightarrow\mathcal N(0,1).
-$$
+```
 
 The law of large numbers describes where the average settles. The CLT describes the distribution of its fluctuations after rescaling. It does not say that individual observations become Gaussian. Its usual practical approximation is $`\bar Z_n\approx\mathcal N(\mu,\sigma^2/n)`$, and there is no universal sample size at which this approximation becomes accurate. Strong skewness and rare large observations can require much larger samples.
 
@@ -770,43 +770,43 @@ The limit theorems describe what happens as the sample grows. The inequalities b
 
 **Markov's inequality.** For $`W\ge0`$ and $`a>0`$,
 
-$$
+```math
 P(W\ge a)\le\frac{\mathbb EW}{a}.
-$$
+```
 
 The proof is $`W\ge a\mathbf1_{\{W\ge a\}}`$, followed by expectation. Applying this to $`W=(Z-\mu)^2`$ gives **Chebyshev's inequality**:
 
-$$
+```math
 P(|Z-\mu|\ge\varepsilon)\le\frac{\sigma^2}{\varepsilon^2}.
-$$
+```
 
 For iid averages, it gives $`P(|\bar Z_n-\mu|\ge\varepsilon)\le\sigma^2/(n\varepsilon^2)`$, proving the weak law when the variance is finite. These bounds hold for every sample size but can be loose. [Appendix C](#block-probability-appendix-c) gives a one-sided refinement, Cantelli's inequality.
 
 **Chernoff bounds.** Markov's inequality applied to $`e^{sW}`$ and to $`e^{-sW}`$ with $`s>0`$ gives
 
-$$
+```math
 P(W\ge t)\le\inf_{s>0}e^{-st}M_W(s),
 \qquad
 P(W\le t)\le\inf_{s>0}e^{st}M_W(-s).
-$$
+```
 
 For a sum of independent terms, the MGF is a product, so these bounds decay exponentially in the number of terms. For $`W\sim\operatorname{Binomial}(n,q)`$ with mean $`\mu=nq`$, bounding each factor $`1-q+qe^s`$ of the MGF by $`e^{q(e^s-1)}`$ and then minimizing gives
 
-$$
+```math
 \begin{aligned}
 P\{W\ge(1+\delta)\mu\}&\le\left(\frac{e^\delta}{(1+\delta)^{1+\delta}}\right)^{\mu}, &&\delta>0,\\
 P\{W\le(1-\delta)\mu\}&\le\left(\frac{e^{-\delta}}{(1-\delta)^{1-\delta}}\right)^{\mu}\le e^{-\mu\delta^2/2}, &&0<\delta<1.
 \end{aligned}
-$$
+```
 
 With $`n=1000`$ and $`q=0.01`$, the probability of at least $`20`$ events, twice the mean of $`10`$, is at most $`(e/4)^{10}\approx0.021`$. Chebyshev's inequality gives only $`9.9/10^2\approx0.099`$, and the exact probability is about $`0.0033`$. Near the mean, the exponent of a Chernoff bound is close to the Gaussian exponent $`t^2/(2\sigma^2)`$ of the Normal approximation. Far from the mean it can grow much more slowly, and the Normal approximation then understates the tail by orders of magnitude.
 
 **Hoeffding's inequality.** If $`Z_i`$ are independent and $`a_i\le Z_i\le b_i`$ almost surely, then for $`t>0`$ and $`\sum_i(b_i-a_i)^2>0`$,
 
-$$
+```math
 P\!\left(\left|\sum_i(Z_i-\mathbb EZ_i)\right|\ge t\right)
 \le2\exp\!\left(-\frac{2t^2}{\sum_i(b_i-a_i)^2}\right).
-$$
+```
 
 For iid observations in $`[0,1]`$, this becomes $`P(|\bar Z_n-\mu|\ge\varepsilon)\le2e^{-2n\varepsilon^2}`$. Thus $`n\ge\log(2/\alpha)/(2\varepsilon^2)`$ guarantees an error below $`\varepsilon`$ with probability at least $`1-\alpha`$. Unlike the CLT approximation, this conclusion is a finite-sample guarantee under the stated boundedness and independence assumptions. Evaluating a fixed classifier's zero-one loss on iid test examples fits this setting; choosing the classifier using the same examples changes the dependence structure and needs additional analysis.
 
@@ -816,10 +816,10 @@ Hoeffding's inequality is a Chernoff bound that uses only the ranges of the summ
 
 For an expectation $`I=\mathbb E[h(Z)]`$ that is difficult to integrate analytically, **Monte Carlo** draws iid samples and computes $`\widehat I_n=n^{-1}\sum_i h(Z_i)`$. If $`h(Z)`$ has finite variance $`v`$, then
 
-$$
+```math
 \mathbb E\widehat I_n=I,\qquad
 \operatorname{Var}(\widehat I_n)=v/n.
-$$
+```
 
 The usual error scale is therefore $`\sqrt{v/n}`$. Multiplying the sample count by four halves this scale. The exponent $`n^{-1/2}`$ does not depend on the dimension of $`Z`$, although the variance and cost of generating samples can depend strongly on dimension.
 
@@ -845,11 +845,11 @@ The **standard error** describes variation of the estimate across repeated simul
 
 When the integrand is concentrated where $`Z`$ rarely falls, plain Monte Carlo wastes most of its draws. **Importance sampling** draws from a proposal density $`q`$ instead and reweights:
 
-$$
+```math
 \mathbb E_p[h(Z)]=\mathbb E_q\!\left[h(Z)\frac{p(Z)}{q(Z)}\right]
 \approx\frac1n\sum_{i=1}^n h(Z_i)\frac{p(Z_i)}{q(Z_i)},
 \qquad Z_i\overset{\mathrm{iid}}{\sim}q.
-$$
+```
 
 The estimator is unbiased when $`q>0`$ wherever $`h\,p\ne0`$. To estimate the Normal tail probability $`P(G>4)\approx3.2\times10^{-5}`$, plain sampling needs about $`32{,}000`$ draws per tail event, while drawing from $`\mathcal N(4,1)`$ puts half the draws in the tail. The weighted terms $`h\,p/q`$ can have a large or infinite variance when $`q`$ has lighter tails than $`|h|\,p`$, and the estimate then becomes unstable. The same reweighting reappears in approximate inference and in evaluating one policy with data collected under another.
 
@@ -863,9 +863,9 @@ Probability describes observations generated from a specified law. **Statistical
 
 A **population** is the collection of units or possible observations to which a conclusion refers. It can be finite, such as the messages received during one month, or represented by a distribution for possible observations. A **sample** is the collection actually observed. Write
 
-$$
+```math
 D=(Z_1,\ldots,Z_n),\qquad Z_i\sim P_*,
-$$
+```
 
 where $`P_\ast`$ is the true population distribution. Chapter 1 writes this distribution as $`\mathcal D`$ when it defines population risk; this chapter uses $`P_\ast`$ to keep it visibly distinct from the dataset $`D`$. Capital letters denote random observations; $`z_i`$ denotes a realized value. The dataset $`D`$ is random before collection. After collection, its realized values are fixed, although the same symbol is often used when the distinction is clear. An observation may be a scalar, a vector, or an input–target pair $`Z_i=(X_i,Y_i)`$.
 
@@ -881,9 +881,9 @@ Random **sampling** supports inference from the sample to a population. Random *
 
 A **statistical model** is a family of candidate probability laws,
 
-$$
+```math
 \mathcal P=\{P_\theta:\theta\in\Theta\}.
-$$
+```
 
 The parameter $`\theta`$ indexes a law, and $`p_\theta`$ denotes its mass function or density. A model with a fixed, finite-dimensional parameter space is **parametric**. A **nonparametric** model allows an unknown distribution or function without a fixed finite-dimensional restriction. A **semiparametric** model contains a finite-dimensional parameter of interest together with an infinite-dimensional component. All three kinds impose assumptions.
 
@@ -895,9 +895,9 @@ Suppose the model is $`Z\sim\mathcal N(a+b,1)`$. The distribution identifies $`a
 
 An **estimand** is the quantity the analysis aims to learn. It can be a parameter or a functional of a distribution:
 
-$$
+```math
 \tau=T(P_*).
-$$
+```
 
 Examples are a population mean, a quantile, the difference between two means, or the expected loss of a fixed predictor. Defining the population and the estimand comes before selecting a formula for estimating it.
 
@@ -916,40 +916,40 @@ The same statistic can serve different purposes. A sample average estimates a pr
 
 The **empirical distribution** places probability $`1/n`$ on each observed value, counting repetitions:
 
-$$
+```math
 \widehat P_n=\frac1n\sum_{i=1}^n\delta_{Z_i},
-$$
+```
 
 where $`\delta_z`$ is the point mass at $`z`$. It replaces an unknown distribution by a distribution constructed entirely from the sample. For scalar observations, its cumulative distribution function is
 
-$$
+```math
 \widehat F_n(x)=\frac1n\sum_{i=1}^n\mathbf1\{Z_i\le x\}.
-$$
+```
 
 Under iid sampling, each indicator is Bernoulli with probability $`F_\ast(x)`$, so, at each fixed $`x`$,
 
-$$
+```math
 \mathbb E[\widehat F_n(x)]=F_*(x),\qquad
 \operatorname{Var}(\widehat F_n(x))=\frac{F_*(x)(1-F_*(x))}{n}.
-$$
+```
 
 The law of large numbers gives pointwise convergence. The Glivenko–Cantelli theorem strengthens this to simultaneous convergence over all thresholds: $`\sup_x|\widehat F_n(x)-F_\ast(x)|\to0`$ almost surely. Estimating a distribution therefore has a concrete meaning even without fitting a named family.
 
 The **Dvoretzky–Kiefer–Wolfowitz inequality** makes the uniform convergence quantitative at every sample size:
 
-$$
+```math
 P\Big(\sup_x|\widehat F_n(x)-F_*(x)|>\varepsilon\Big)\le2e^{-2n\varepsilon^2}.
-$$
+```
 
 Setting the right side equal to $`\alpha`$ gives a band of half-width $`\sqrt{\log(2/\alpha)/(2n)}`$ around $`\widehat F_n`$ that contains the entire population CDF with probability at least $`1-\alpha`$.
 
 The **plug-in principle** estimates $`T(P_\ast)`$ by $`T(\widehat P_n)`$. For the population mean and variance, it gives
 
-$$
+```math
 \widehat\mu=\overline Z=\frac1n\sum_i Z_i,
 \qquad
 \widehat v_n=\frac1n\sum_i(Z_i-\overline Z)^2.
-$$
+```
 
 The plug-in estimate of a quantile $`F_\ast^{-1}(q)`$ is $`\widehat F_n^{-1}(q)`$, using the generalized inverse defined above. For observations $`2,4,4,7,10`$, this gives median $`4`$ and $`0.8`$-quantile $`7`$. Software sometimes interpolates between order statistics, so finite-sample quantile conventions can differ.
 
@@ -967,62 +967,62 @@ The **sampling distribution** of $`\widehat\tau=t(D)`$ is its distribution over 
 
 For a scalar estimand $`\tau`$ and an estimator with finite second moment, define
 
-$$
+```math
 \operatorname{Bias}(\widehat\tau)=\mathbb E[\widehat\tau]-\tau,
 \qquad
 \operatorname{SE}(\widehat\tau)=\sqrt{\operatorname{Var}(\widehat\tau)}.
-$$
+```
 
 The expectation holds the population law fixed and averages over datasets. An estimator is **unbiased** if this bias is zero throughout the model. Its **standard error** is the standard deviation of its sampling distribution. An **estimated standard error** replaces unknown features of that distribution by estimates.
 
 The **mean squared error** is
 
-$$
+```math
 \operatorname{MSE}(\widehat\tau)
 =\mathbb E[(\widehat\tau-\tau)^2]
 =\operatorname{Var}(\widehat\tau)
 +\operatorname{Bias}(\widehat\tau)^2.
-$$
+```
 
 To obtain the decomposition, write $`\widehat\tau-\tau=(\widehat\tau-\mathbb E\widehat\tau)+(\mathbb E\widehat\tau-\tau)`$, expand the square, and observe that the cross term has expectation zero. Bias and variance contribute differently. A modest increase in bias can be worthwhile if it produces a larger decrease in variance.
 
 For iid observations with mean $`\mu`$ and finite variance $`\sigma^2`$,
 
-$$
+```math
 \mathbb E[\overline Z]=\mu,
 \qquad
 \operatorname{Var}(\overline Z)=\frac{\sigma^2}{n}.
-$$
+```
 
 The observation standard deviation $`\sigma`$ measures variation among individual values; the standard error $`\sigma/\sqrt n`$ measures variation among sample means. Multiplying the sample size by four halves this standard error. For dependent observations, however,
 
-$$
+```math
 \operatorname{Var}(\overline Z)
 =\frac1{n^2}\sum_{i,j=1}^n\operatorname{Cov}(Z_i,Z_j),
-$$
+```
 
 so positive correlations can substantially increase uncertainty.
 
 The plug-in variance $`\widehat v_n`$ is biased. The identity
 
-$$
+```math
 \sum_i(Z_i-\overline Z)^2
 =\sum_i(Z_i-\mu)^2-n(\overline Z-\mu)^2
-$$
+```
 
 gives $`\mathbb E[\widehat v_n]=(n-1)\sigma^2/n`$. Thus
 
-$$
+```math
 S^2=\frac1{n-1}\sum_i(Z_i-\overline Z)^2
-$$
+```
 
 is unbiased when $`n\ge2`$. Both denominators yield consistent variance estimators. Unbiasedness is one criterion, rather than a universal reason to prefer one estimator.
 
 For iid vector observations $`Z_i\in\mathbb R^d`$ with finite second moments, the corresponding **sample covariance matrix** is
 
-$$
+```math
 \widehat\Sigma=\frac1{n-1}\sum_{i=1}^n(Z_i-\overline Z)(Z_i-\overline Z)^\top.
-$$
+```
 
 It is unbiased for the population covariance matrix. The empirical-distribution plug-in version uses denominator $`n`$. If the centered observations form the rows of a matrix $`X_c\in\mathbb R^{n\times d}`$, then $`\widehat\Sigma=X_c^\top X_c/(n-1)`$. The **sample correlation** between coordinates $`j`$ and $`k`$ is $`\widehat\Sigma_{jk}/\sqrt{\widehat\Sigma_{jj}\widehat\Sigma_{kk}}`$ when both sample variances are positive. These estimates summarize variation and linear association within the observed sample; their accuracy depends on the sampling assumptions and sample size.
 
@@ -1055,20 +1055,20 @@ Each entry of `estimates` comes from a fresh dataset. The simulation therefore a
 
 Most sampling distributions are known only approximately, but Normal samples have exact results at every sample size. For iid $`\mathcal N(\mu,\sigma^2)`$ observations and $`n\ge2`$,
 
-$$
+```math
 \overline Z\sim\mathcal N\Big(\mu,\frac{\sigma^2}{n}\Big),
 \qquad
 \frac{(n-1)S^2}{\sigma^2}\sim\chi^2_{n-1},
 \qquad \overline Z\ \text{and}\ S^2\ \text{are independent}.
-$$
+```
 
 There is a geometric reason for these identities. Standardize the sample to a vector $`G=(Z-\mu\mathbf1)/\sigma`$ with independent standard Normal coordinates, where $`Z=(Z_1,\ldots,Z_n)^\top`$ and $`\mathbf1`$ is the all-ones vector. Its projection onto the direction $`\mathbf1/\sqrt n`$ is $`\sqrt n(\overline Z-\mu)/\sigma`$. Its orthogonal projection onto the $`(n-1)`$-dimensional residual subspace has squared norm $`\sum_i(Z_i-\overline Z)^2/\sigma^2`$. Orthogonal Gaussian components are independent, and the residual squared norm is a sum of $`n-1`$ independent squared standard Normals. This gives both the chi-square law and the independence.
 
 Consequently, the **studentized mean** has an exact Student $`t`$ distribution:
 
-$$
+```math
 \frac{\overline Z-\mu}{S/\sqrt n}\sim t_{n-1},
-$$
+```
 
 since it is a standard Normal divided by the square root of an independent $`\chi^2_{n-1}/(n-1)`$. The independence of $`\overline Z`$ and $`S^2`$ is special to Normal samples, and the same projection argument gives the exact theory of Normal linear regression later in the chapter. Write $`z_q=\Phi^{-1}(q)`$, $`t_{\nu,q}`$, and $`\chi^2_{\nu,q}`$ for the $`q`$ quantiles of the standard Normal, $`t_\nu`$, and $`\chi^2_\nu`$ distributions.
 
@@ -1078,41 +1078,41 @@ An estimator sequence is **consistent** if $`\widehat\tau_n\xrightarrow{p}\tau`$
 
 An estimator is **asymptotically Normal at rate $`\sqrt n`$** if
 
-$$
+```math
 \sqrt n(\widehat\tau_n-\tau)\Rightarrow\mathcal N(0,V),
-$$
+```
 
 with $`0<V<\infty`$. The asymptotic variance $`V`$ is the variance of the scaled limiting distribution. The resulting Normal approximation has variance $`V/n`$; the stronger conclusion $`n\operatorname{Var}(\widehat\tau_n)\to V`$ requires additional control of moments. **Slutsky's theorem** allows a quantity converging in probability to a constant to replace that constant in sums, products, and ratios of distributional limits, with a nonzero limiting denominator for ratios. No independence between the converging quantities is required. If $`\widehat V\xrightarrow{p}V`$, it gives
 
-$$
+```math
 \frac{\widehat\tau_n-\tau}{\sqrt{\widehat V/n}}
 \Rightarrow\mathcal N(0,1).
-$$
+```
 
 This **studentization** replaces an unknown scale by a consistent estimate. It is the basis of many intervals and tests. A large sample alone does not guarantee the approximation: finite variance, suitable dependence assumptions, and regularity of the estimator matter.
 
 The **delta method** applies a local linear approximation to a random estimator. If $`\widehat\theta_n\in\mathbb R^d`$ satisfies
 
-$$
+```math
 \sqrt n(\widehat\theta_n-\theta)\Rightarrow\mathcal N(0,V)
-$$
+```
 
 and $`g:\mathbb R^d\to\mathbb R^k`$ is differentiable at $`\theta`$, then
 
-$$
+```math
 \sqrt n\{g(\widehat\theta_n)-g(\theta)\}
 \Rightarrow
 \mathcal N\!\left(0,J_g(\theta)VJ_g(\theta)^\top\right).
-$$
+```
 
 Here the numerator-layout Jacobian has shape $`k\times d`$. The result follows by expanding $`g(\widehat\theta_n)-g(\theta)`$ as $`J_g(\theta)(\widehat\theta_n-\theta)`$ plus a remainder negligible on the $`n^{-1/2}`$ scale. For scalar $`g`$, the variance is $`\nabla g(\theta)^\top V\nabla g(\theta)`$, with a column gradient.
 
 For a Bernoulli proportion with fixed $`0<p<1`$ and $`g(p)=\log[p/(1-p)]`$, $`g'(p)=1/[p(1-p)]`$. The delta method gives the **asymptotic standard-error approximation**
 
-$$
+```math
 \operatorname{SE}_{\mathrm{asymp}}\{g(\widehat p)\}
 \approx\frac1{\sqrt{np(1-p)}}.
-$$
+```
 
 Replacing $`p`$ by $`\widehat p`$ gives an estimated standard error when $`0<\widehat p<1`$; at $`\widehat p=0`$ or $`1`$ the log-odds estimate is undefined. If $`J_g(\theta)=0`$, the first-order limit is degenerate and a higher-order expansion is needed.
 
@@ -1130,30 +1130,30 @@ Maximum likelihood is the main general-purpose way to construct estimators, and 
 
 The **likelihood** evaluates a model on the observed data, treating the parameter as variable. Under iid sampling,
 
-$$
+```math
 L_n(\theta)=\prod_{i=1}^n p_\theta(z_i),
 \qquad
 \log L_n(\theta)=\sum_{i=1}^n\log p_\theta(z_i).
-$$
+```
 
 For dependent observations, the appropriate joint density or conditional factorization replaces the iid product. $`L_n`$ is not a probability distribution over $`\theta`$ and need not integrate to one. Likelihood values are compared across parameters for the same observed data. Multiplying every likelihood value by the same positive, parameter-independent constant changes none of those comparisons.
 
 The **maximum likelihood estimator** satisfies
 
-$$
+```math
 \widehat\theta_{\mathrm{MLE}}
 \in\operatorname*{arg\,max}_{\theta\in\Theta}\log L_n(\theta).
-$$
+```
 
 A maximum can be nonunique or fail to exist. Solving a derivative equation finds an interior stationary point, which still must be checked against boundaries and other candidates. Minimizing average negative log-likelihood gives the same maximizer; this is the connection between likelihood estimation and empirical risk minimization with log loss. Here $`L_n`$ denotes likelihood, whereas $`\ell(y,a)`$ elsewhere denotes a prediction loss.
 
 For Bernoulli observations, let $`k=\sum_i z_i`$. Then
 
-$$
+```math
 \log L_n(p)=k\log p+(n-k)\log(1-p),
 \qquad
 \frac{d}{dp}\log L_n(p)=\frac{k}{p}-\frac{n-k}{1-p}.
-$$
+```
 
 For $`0<k<n`$, setting the derivative to zero gives $`\widehat p=k/n`$. The log-likelihood is strictly concave on $`(0,1)`$, so this is its unique maximum. If all observations are failures or all are successes, the maximum is respectively $`0`$ or $`1`$ when those endpoints belong to the parameter space.
 
@@ -1163,10 +1163,10 @@ For $`0<k<n`$, setting the derivative to zero gives $`\widehat p=k/n`$. The log-
 
 For iid $`\mathcal N(\mu,v)`$ observations, writing $`v=\sigma^2>0`$ for the variance,
 
-$$
+```math
 \log L_n(\mu,v)
 =-\frac n2\log(2\pi v)-\frac1{2v}\sum_i(z_i-\mu)^2.
-$$
+```
 
 Differentiating first in $`\mu`$ gives $`\widehat\mu=\overline z`$. Substituting that value and differentiating in $`v`$ gives $`\widehat v=n^{-1}\sum_i(z_i-\overline z)^2`$, provided the residual sum of squares is positive. The MLE uses denominator $`n`$ because likelihood maximization and unbiasedness are different requirements. If all observations coincide, the likelihood increases without bound as $`v\downarrow0`$, so this model has no positive-variance MLE for that dataset.
 
@@ -1178,10 +1178,10 @@ The Bernoulli, Normal, and exponential models above are **exponential families**
 
 Why should maximizing likelihood recover the parameter? By the law of large numbers, $`n^{-1}\log L_n(\theta)\to\mathbb E_{P_\ast}[\log p_\theta(Z)]`$ for each fixed $`\theta`$. When the model is correct, $`P_\ast=P_{\theta_\ast}`$, and
 
-$$
+```math
 \mathbb E_{\theta_*}[\log p_{\theta_*}(Z)]-\mathbb E_{\theta_*}[\log p_\theta(Z)]
 =D_{\mathrm{KL}}(P_{\theta_*}\,\|\,P_\theta)\ge0,
-$$
+```
 
 the Kullback–Leibler divergence of chapter 5. For an identifiable model it is zero only at $`\theta=\theta_\ast`$, so the limiting average log-likelihood is maximized at the true parameter. Turning this pointwise limit into **consistency** of the maximizer requires control that is uniform over $`\theta`$, which standard regularity conditions supply.
 
@@ -1189,39 +1189,39 @@ the Kullback–Leibler divergence of chapter 5. For an identifiable model it is 
 
 The **score** is the column gradient $`U_n(\theta)=\nabla_\theta\log L_n(\theta)`$. The **observed information** is its negative derivative,
 
-$$
+```math
 J_n(\theta)=-\nabla_\theta^2\log L_n(\theta).
-$$
+```
 
 For one observation, write $`s_\theta(Z)=\nabla_\theta\log p_\theta(Z)`$. The **Fisher information** is
 
-$$
+```math
 I_1(\theta)=\mathbb E_\theta[s_\theta(Z)s_\theta(Z)^\top].
-$$
+```
 
 Under conditions permitting differentiation under the integral, with parameter-independent support,
 
-$$
+```math
 \mathbb E_\theta[s_\theta(Z)]=0,
 \qquad
 I_1(\theta)=-\mathbb E_\theta[\nabla_\theta^2\log p_\theta(Z)].
-$$
+```
 
 The first identity follows by differentiating $`\int p_\theta(z)\,dz=1`$. Differentiating again gives the second. Independence makes information add: $`I_n(\theta)=nI_1(\theta)`$. Curvature measures how rapidly the log-likelihood changes locally; greater information corresponds to smaller uncertainty in regular estimation problems.
 
 In a correctly specified regular model with an interior true parameter, a consistent MLE typically satisfies
 
-$$
+```math
 \sqrt n(\widehat\theta-\theta_*)
 \Rightarrow\mathcal N(0,I_1(\theta_*)^{-1}).
-$$
+```
 
 The conditions include identifiability, smoothness, finite nonsingular information, and sufficient control of derivatives and sample averages. A Taylor expansion of the score equation explains the result:
 
-$$
+```math
 0=U_n(\widehat\theta)
 \approx U_n(\theta_*)-nI_1(\theta_*)(\widehat\theta-\theta_*).
-$$
+```
 
 The score is a sum of iid mean-zero vectors. Its CLT produces the Normal limit, and the inverse curvature translates score fluctuations into parameter fluctuations. The limiting Normal approximation has covariance $`I_1(\theta_\ast)^{-1}/n`$, estimated by $`[nI_1(\widehat\theta)]^{-1}`$ or, when justified, $`J_n(\widehat\theta)^{-1}`$. Boundary and parameter-dependent-support problems can have different limits and rates. The Cramér–Rao bound, which turns information into a lower bound on the variance of unbiased estimators, is in [Appendix E](#block-probability-appendix-e).
 
@@ -1229,10 +1229,10 @@ The score is a sum of iid mean-zero vectors. Its CLT produces the Normal limit, 
 
 Even a misspecified family can provide a useful fitted description. Under suitable consistency conditions, maximum likelihood then targets
 
-$$
+```math
 \theta^\dagger\in\operatorname*{arg\,max}_{\theta\in\Theta}
 \mathbb E_{P_*}[\log p_\theta(Z)],
-$$
+```
 
 rather than a true parameter whose model distribution equals $`P_\ast`$. This population optimum is sometimes called the **pseudo-true parameter**. Equivalently, $`\theta^\dagger`$ minimizes the Kullback–Leibler divergence $`D_{\mathrm{KL}}(P_\ast\,\|\,P_\theta)`$ over the model: it indexes the member of the family closest to the population in that sense. For example, fitting a Normal distribution to a non-Normal population still targets its mean and variance when these are finite. A useful estimator can therefore outlive an inaccurate distributional assumption, but its uncertainty calculation must be reconsidered.
 
@@ -1242,9 +1242,9 @@ Under misspecification, the information identity need not equate log-likelihood 
 
 A $`1-\alpha`$ **confidence procedure** returns a random set $`C(D)`$ such that
 
-$$
+```math
 P_\theta\{\tau(\theta)\in C(D)\}\ge1-\alpha
-$$
+```
 
 for every parameter value covered by its guarantee. Exact procedures satisfy this at the stated sample size; asymptotic procedures approach the nominal coverage under their assumptions. In repeated sampling, the target is fixed and the interval changes. After observation, a particular interval either contains the target or does not. The confidence level describes the generating procedure rather than a posterior probability for that realized interval.
 
@@ -1258,15 +1258,15 @@ A **pivot** is a function of the sample and unknown parameters whose distributio
 
 If observations are iid $`\mathcal N(\mu,\sigma^2)`$ with known $`\sigma`$, then $`(\overline Z-\mu)/(\sigma/\sqrt n)`$ is exactly standard Normal. Rearranging its central probability statement gives
 
-$$
+```math
 \overline Z\pm z_{1-\alpha/2}\frac{\sigma}{\sqrt n}.
-$$
+```
 
 For unknown variance, the exact results for Normal samples make the studentized mean a pivot with the $`t_{n-1}`$ distribution. The same rearrangement gives the exact interval
 
-$$
+```math
 \overline Z\pm t_{n-1,1-\alpha/2}\frac S{\sqrt n}.
-$$
+```
 
 The heavier tails of $`t`$ account for estimating the scale. For iid non-Normal observations with finite nonzero variance, studentized means have a large-sample Normal limit; the same $`t`$ formula is then an approximation rather than an exact finite-sample statement. The chi-square pivot $`(n-1)S^2/\sigma^2`$ gives a similarly exact interval for a Normal variance, but that interval relies heavily on Normal tails and does not become approximately valid for other distributions ([Appendix F](#block-probability-appendix-f)). NIST gives the [mean-interval derivation and interpretation](https://www.itl.nist.gov/div898/handbook/eda/section3/eda352.htm).
 
@@ -1282,18 +1282,18 @@ The Wald approximation $`\widehat p\pm z_{1-\alpha/2}\sqrt{\widehat p(1-\widehat
 
 The **Wilson interval** asks, for each candidate $`p`$, whether the observed proportion is unusually far from that value relative to the sampling variation implied by $`p`$. Keeping the candidates that are not rejected gives an interval. For $`0<p<1`$, its Normal approximation retains values satisfying
 
-$$
+```math
 \frac{|\widehat p-p|}{\sqrt{p(1-p)/n}}\le z,
 \qquad z=z_{1-\alpha/2}.
-$$
+```
 
 Equivalently, solve $`n(\widehat p-p)^2\le z^2p(1-p)`$ over $`0\le p\le1`$, including the degenerate boundary cases by continuity. This avoids division by zero at the endpoints. Solving the quadratic inequality yields
 
-$$
+```math
 \frac{\widehat p+z^2/(2n)
 \ \pm\ z\sqrt{\widehat p(1-\widehat p)/n+z^2/(4n^2)}}
 {1+z^2/n}.
-$$
+```
 
 The endpoints stay in $`[0,1]`$. This is an approximate interval obtained by inverting a score test ([Appendix F](#block-probability-appendix-f)), and its finite-sample coverage is not uniformly at least the nominal level. **Clopper–Pearson intervals** invert exact binomial tails and provide at least nominal coverage, generally with some conservatism because counts are discrete. NIST develops [both proportion-interval constructions](https://www.itl.nist.gov/div898/handbook/prc/section2/prc241.htm).
 
@@ -1324,11 +1324,11 @@ Analytic standard errors can be difficult for medians, correlations, and other s
 
 Let $`\widehat\tau^\ast`$ denote an estimate from such a bootstrap sample. Conditional on the observed dataset, the bootstrap attempts to approximate
 
-$$
+```math
 \operatorname{Law}_{P_*}(\widehat\tau-\tau)
 \quad\text{by}\quad
 \operatorname{Law}_{\widehat P_n}(\widehat\tau^*-\widehat\tau).
-$$
+```
 
 There are two approximations: replacing the population by the empirical distribution, and estimating the resulting law using finitely many simulations. Increasing the number of bootstrap replicates improves the second approximation but does not provide additional original observations. The foundational construction is due to [Efron (1979)](https://doi.org/10.1214/aos/1176344552).
 
@@ -1338,9 +1338,9 @@ There are two approximations: replacing the population by the empirical distribu
 
 For $`B`$ replicates $`\widehat\tau^{\ast(1)},\ldots,\widehat\tau^{\ast(B)}`$, their sample standard deviation $`\widehat{\operatorname{SE}}_{\mathrm{boot}}`$ estimates the standard error of $`\widehat\tau`$, and $`\widehat\tau\pm z_{1-\alpha/2}\widehat{\operatorname{SE}}_{\mathrm{boot}}`$ is the **normal bootstrap interval**. The replicates' $`\alpha/2`$ and $`1-\alpha/2`$ quantiles form a **percentile interval**. If those quantiles are $`q^\ast_{\alpha/2}`$ and $`q^\ast_{1-\alpha/2}`$, a **basic interval** is
 
-$$
+```math
 [2\widehat\tau-q^*_{1-\alpha/2},\ 2\widehat\tau-q^*_{\alpha/2}].
-$$
+```
 
 It inverts the bootstrap distribution of the centered error. Studentized and bias-corrected-and-accelerated methods refine these constructions; none is automatically reliable for every statistic and sample size.
 
@@ -1380,19 +1380,19 @@ A **parametric bootstrap** instead simulates data from a fitted model $`P_{\wide
 
 A **hypothesis** is a restriction on the population distribution. In a parametric model, write
 
-$$
+```math
 H_0:\theta\in\Theta_0,
 \qquad
 H_1:\theta\in\Theta_1,
-$$
+```
 
 with disjoint sets. A simple hypothesis specifies one distribution; a composite hypothesis allows several. A test chooses a rejection region, often through a scalar statistic that measures departure from the null.
 
 A **Type I error** rejects a true null. A **Type II error** fails to reject at a specified alternative. A level-$`\alpha`$ test satisfies
 
-$$
+```math
 \sup_{\theta\in\Theta_0}P_\theta(\text{reject }H_0)\le\alpha.
-$$
+```
 
 Its **power function** is $`\operatorname{Power}(\theta)=P_\theta(\text{reject }H_0)`$, and its Type II error probability at an alternative is $`1-\operatorname{Power}(\theta)`$. Power is a function of the alternative, not a single property of the test independent of effect size.
 
@@ -1402,16 +1402,16 @@ Its **power function** is $`\operatorname{Power}(\theta)=P_\theta(\text{reject }
 
 For a simple null and a statistic $`T`$ whose larger values indicate stronger disagreement, the tail probability
 
-$$
+```math
 p_{\mathrm{val}}=P_{H_0}\{T(D')\ge T(D_{\mathrm{obs}})\}
-$$
+```
 
 uses a hypothetical fresh dataset $`D'`$ drawn under the null. Two-sided tests choose an appropriate measure of extremeness, often an absolute standardized difference. A valid p-value obeys
 
-$$
+```math
 P_\theta(p_{\mathrm{val}}\le u)\le u
 \qquad(0\le u\le1,\ \theta\in\Theta_0).
-$$
+```
 
 This property justifies rejecting when $`p_{\mathrm{val}}\le\alpha`$. Continuous exact-null p-values are often uniform; discreteness can make them conservative. Composite hypotheses require validity across nuisance parameters, possibly through conditioning, a pivot, or a worst-case calculation.
 
@@ -1419,9 +1419,9 @@ The p-value is a probability calculated under the null, not the probability that
 
 For example, suppose the observations are Normal with known $`\sigma`$, so that $`T=\sqrt n(\overline Z-\mu_0)/\sigma`$ is standard Normal under $`H_0:\mu=\mu_0`$, and the observed value of $`T`$ is $`2.10`$. The two-sided p-value is
 
-$$
+```math
 P_{H_0}(|T|\ge2.10)=2[1-\Phi(2.10)]\approx0.036.
-$$
+```
 
 A level-$`0.05`$ test rejects, and a level-$`0.01`$ test does not. The value $`0.036`$ is not the probability that the null hypothesis is true.
 
@@ -1431,9 +1431,9 @@ A level-$`0.05`$ test rejects, and a level-$`0.01`$ test does not. The value $`0
 
 For $`K\sim\operatorname{Binomial}(n,p)`$, testing $`p=p_0`$ against $`p>p_0`$ gives the exact p-value
 
-$$
+```math
 \sum_{j=k}^n {n\choose j}p_0^j(1-p_0)^{n-j}.
-$$
+```
 
 No large-sample Normal approximation is needed. For a two-sided discrete test, “at least as extreme” must be specified; doubling the smaller tail and summing outcomes with probability no greater than the observed outcome can produce different valid conventions. SciPy documents its exact binomial implementation in [`binomtest`](https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.binomtest.html).
 
@@ -1441,17 +1441,17 @@ No large-sample Normal approximation is needed. For a two-sided discrete test, �
 
 In a Normal mean problem with known $`\sigma`$, a two-sided level-$`\alpha`$ test rejects when $`|\overline Z-\mu_0|>z_{1-\alpha/2}\sigma/\sqrt n`$. At a true mean $`\mu=\mu_0+\Delta`$, define $`d=\sqrt n\Delta/\sigma`$ and $`z=z_{1-\alpha/2}`$. Its power is
 
-$$
+```math
 \operatorname{Power}(\mu)=1-\Phi(z-d)+\Phi(-z-d).
-$$
+```
 
 The standardized shift grows as $`\sqrt n`$. A tiny nonzero effect can therefore become statistically significant with enough data, while an important effect can be missed by a small noisy sample. Reporting an effect estimate and uncertainty interval conveys information that a thresholded test result discards.
 
 For a one-sided Normal test against a prespecified positive difference $`\Delta`$, with $`0<\alpha,\beta<1/2`$, achieving power $`1-\beta`$ requires
 
-$$
+```math
 n\ge\frac{\sigma^2(z_{1-\alpha}+z_{1-\beta})^2}{\Delta^2},
-$$
+```
 
 rounded up to an integer. The calculation specifies an alternative and assumes known variance; planning with an estimated scale adds uncertainty. Choosing the direction of a one-sided test after looking at the sign of the data invalidates its stated error rate.
 
@@ -1463,9 +1463,9 @@ rounded up to an integer. The calculation specifies an alternative and assumes k
 
 A common experiment compares success rates in two independent groups, such as the conversion rates of users randomly shown two versions of a web page. With $`K_A\sim\operatorname{Binomial}(n_A,p_A)`$ and $`K_B\sim\operatorname{Binomial}(n_B,p_B)`$, the estimated difference $`\widehat p_B-\widehat p_A`$ has variance $`p_A(1-p_A)/n_A+p_B(1-p_B)/n_B`$. Under $`H_0:p_A=p_B`$, both groups share one rate, estimated by the **pooled proportion** $`\widehat p=(K_A+K_B)/(n_A+n_B)`$, and
 
-$$
+```math
 Z=\frac{\widehat p_B-\widehat p_A}{\sqrt{\widehat p(1-\widehat p)\,(1/n_A+1/n_B)}}
-$$
+```
 
 is approximately standard Normal for large samples. With $`200`$ conversions among $`2{,}000`$ users in group A and $`250`$ among $`2{,}000`$ in group B, $`\widehat p=0.1125`$, $`Z\approx2.50`$, and the two-sided p-value is about $`0.012`$. An interval for the difference is not computed under the null, so it uses the unpooled variance: here $`0.025\pm0.020`$. The calculation assumes independent users, random assignment, and a sample size fixed in advance. Checking the p-value repeatedly and stopping at the first significant result inflates the Type I error rate. The same test is Pearson's chi-square test of independence for the $`2\times2`$ table of counts; [Appendix F](#block-probability-appendix-f) gives chi-square tests for general tables.
 
@@ -1504,9 +1504,9 @@ The **familywise error rate** is $`P(V\ge1)`$, where $`V`$ counts false rejectio
 
 The **false discovery rate** is instead
 
-$$
+```math
 \operatorname{FDR}=\mathbb E\!\left[\frac{V}{\max(R,1)}\right],
-$$
+```
 
 where $`R`$ is the total number of rejections. The [Benjamini–Hochberg procedure](https://doi.org/10.1111/j.2517-6161.1995.tb02031.x) finds the largest $`k`$ with $`p_{(k)}\le qk/m`$ and rejects the first $`k`$ hypotheses; it rejects none if no such $`k`$ exists. For valid independent p-values it controls FDR at most $`q`$. Extensions permit specified positive-dependence conditions, but arbitrary dependence is not covered by the ordinary guarantee. FDR control bounds an expected proportion and does not promise that each realized rejection set contains at most a fraction $`q`$ of errors.
 
@@ -1522,12 +1522,12 @@ Frequentist analysis studies how a procedure behaves when the data are repeatedl
 
 Let $`D=(Z_1,\ldots,Z_n)`$ denote the random sample, $`L_n(\theta)=p_\theta(D)`$ its likelihood, and $`\pi(\theta)`$ a **prior density**. Conditioning on the observed value of $`D`$, Bayes' rule gives the **posterior density**
 
-$$
+```math
 \pi(\theta\mid D)
 =\frac{L_n(\theta)\pi(\theta)}{m(D)},
 \qquad
 m(D)=\int L_n(u)\pi(u)\,du.
-$$
+```
 
 The denominator is the **marginal likelihood**, or evidence. It normalizes the posterior; the integral averages likelihood values using the prior. For discrete parameters, replace the integral by a sum. A proper prior integrates to one, and the posterior requires $`0<m(D)<\infty`$.
 
@@ -1537,36 +1537,36 @@ The prior and likelihood have distinct roles: the prior describes parameter unce
 
 Suppose $`Z_i\mid\theta\sim\operatorname{Bernoulli}(\theta)`$ independently, with $`s=\sum_i Z_i`$ successes. Choose $`\theta\sim\operatorname{Beta}(\alpha_0,\beta_0)`$, where $`\alpha_0,\beta_0>0`$ are the prior shape parameters. Subscript $`0`$ denotes the prior; subscript $`n`$ will denote the posterior after $`n`$ observations. Multiplication gives
 
-$$
+```math
 \pi(\theta\mid D)
 \propto \theta^s(1-\theta)^{n-s}
 \theta^{\alpha_0-1}(1-\theta)^{\beta_0-1}
 =\theta^{\alpha_0+s-1}(1-\theta)^{\beta_0+n-s-1}.
-$$
+```
 
 Therefore
 
-$$
+```math
 \theta\mid D\sim\operatorname{Beta}(\alpha_0+s,\beta_0+n-s).
-$$
+```
 
 The prior is **conjugate** because updating stays within its distribution family; Gamma priors for Poisson counts and Dirichlet priors for categories work the same way ([Appendix H](#block-probability-appendix-h)). The posterior mean is
 
-$$
+```math
 \mathbb E[\theta\mid D]
 =\frac{\alpha_0+s}{\alpha_0+\beta_0+n}
 =\frac{\alpha_0+\beta_0}{\alpha_0+\beta_0+n}\frac{\alpha_0}{\alpha_0+\beta_0}
 +\frac{n}{\alpha_0+\beta_0+n}\frac{s}{n}.
-$$
+```
 
 This is a weighted average of the prior mean and the sample proportion. For this formula, $`\alpha_0+\beta_0`$ measures the prior's weight relative to the sample size; the pseudo-count interpretation depends on whether one is discussing the mean or the mode.
 
 Writing $`\alpha_n=\alpha_0+s`$ and $`\beta_n=\beta_0+n-s`$, the posterior variance is
 
-$$
+```math
 \operatorname{Var}(\theta\mid D)
 =\frac{\alpha_n \beta_n}{(\alpha_n+\beta_n)^2(\alpha_n+\beta_n+1)}.
-$$
+```
 
 The estimate and its uncertainty are separate outputs. Observing eight successes in ten trials and eighty successes in a hundred trials gives similar evidence about the location of $`\theta`$, but substantially different posterior concentration. A point estimate alone conceals that difference.
 
@@ -1574,9 +1574,9 @@ For example, a $`\operatorname{Beta}(2,2)`$ prior and eight successes in ten tri
 
 A **credible set** $`C(D)`$ satisfies
 
-$$
+```math
 P\{\theta\in C(D)\mid D\}\ge1-\alpha
-$$
+```
 
 under the specified prior and model. An equal-tailed interval uses posterior quantiles $`\alpha/2`$ and $`1-\alpha/2`$; for a continuous posterior its probability is exactly $`1-\alpha`$. Discrete posteriors can prevent exact equality. Its probability concerns the uncertain parameter after conditioning on the observed sample. A confidence interval instead guarantees repeated-sampling coverage for a fixed parameter. A credible interval need not have its nominal frequentist coverage at every parameter value.
 
@@ -1607,36 +1607,36 @@ assert np.isclose(np.diff(posterior.cdf(credible_interval))[0], 0.95)
 
 Inference about $`\theta`$ is different from prediction of a new observation. If $`Z_{\mathrm{new}}`$ and $`D`$ are conditionally independent given $`\theta`$, the **posterior predictive distribution** is
 
-$$
+```math
 p(z_{\mathrm{new}}\mid D)
 =\int p_\theta(z_{\mathrm{new}})\pi(\theta\mid D)\,d\theta.
-$$
+```
 
 For the Bernoulli example, its success probability is $`\mathbb E[\theta\mid D]`$. Future trials are independent conditional on $`\theta`$, but generally dependent after averaging over their shared uncertain parameter. A **posterior predictive interval** $`A(D)`$ satisfies $`P\{Z_{\mathrm{new}}\in A(D)\mid D\}\ge1-\alpha`$. It concerns the next observation, including its own variability, rather than only an unknown parameter.
 
 For a continuous example, let $`Z_i\mid\mu\sim\mathcal N(\mu,\sigma^2)`$ independently, with known $`\sigma^2>0`$, and let $`\mu\sim\mathcal N(m_0,v_0)`$ with $`v_0>0`$. Completing the square in the posterior exponent gives
 
-$$
+```math
 \mu\mid D\sim\mathcal N(m_n,v_n),
 \qquad
 v_n^{-1}=v_0^{-1}+n\sigma^{-2},
 \qquad
 m_n=v_n\left(\frac{m_0}{v_0}+\frac{n\bar Z}{\sigma^2}\right).
-$$
+```
 
 Here inverse variance, called **precision**, adds across the prior and observations. The posterior mean shrinks $`\bar Z`$ toward $`m_0`$ according to their relative uncertainty. More data increase the weight on $`\bar Z`$. The predictive distribution is
 
-$$
+```math
 Z_{\mathrm{new}}\mid D\sim\mathcal N(m_n,\sigma^2+v_n).
-$$
+```
 
 The extra $`\sigma^2`$ is future observation noise. More generally, total variance gives
 
-$$
+```math
 \operatorname{Var}(Z_{\mathrm{new}}\mid D)
 =\mathbb E_{\theta\mid D}[\operatorname{Var}(Z_{\mathrm{new}}\mid\theta)]
 +\operatorname{Var}_{\theta\mid D}[\mathbb E(Z_{\mathrm{new}}\mid\theta)].
-$$
+```
 
 The terms describe variation within a specified parameter value and uncertainty across parameter values. They are often called **aleatoric** and **epistemic** uncertainty. This decomposition is model-dependent; it does not automatically include uncertainty about an incorrectly specified model.
 
@@ -1650,11 +1650,11 @@ Posterior predictive checks and prior sensitivity analysis examine whether the m
 
 A posterior distribution can be summarized in several ways. The posterior mean minimizes posterior squared-error loss. A **maximum a posteriori** estimate is a maximizer of the posterior density:
 
-$$
+```math
 \widehat\theta_{\mathrm{MAP}}
 \in\operatorname*{arg\,max}_\theta
 \{\log L_n(\theta)+\log\pi(\theta)\}.
-$$
+```
 
 Thus a negative log prior becomes a penalty. For example, a Gaussian prior on coefficients yields a quadratic penalty. MAP retains one point and does not propagate parameter uncertainty into prediction. Unlike posterior probabilities, a density mode is not preserved under a change of parameterization, so a MAP estimate depends on the coordinates chosen ([Appendix H](#block-probability-appendix-h)).
 
@@ -1662,25 +1662,25 @@ Thus a negative log prior becomes a penalty. For example, a Gaussian prior on co
 
 An estimate, a prediction, and a test result are all actions chosen from data. Let $`a`$ be an action, $`d(D)`$ a **decision rule**, and $`\ell(\tau(\theta),a)`$ the loss when the estimand is $`\tau(\theta)`$. Its **frequentist risk** is
 
-$$
+```math
 R(\theta,d)
 =\mathbb E_\theta[\ell(\tau(\theta),d(D))].
-$$
+```
 
 The expectation varies the sample while holding $`\theta`$ fixed. Under squared-error loss, risk is MSE; the sample mean in the known-variance Normal model has risk $`\sigma^2/n`$. Unbiasedness alone cannot rank all estimators, because a biased estimator can have smaller MSE.
 
 Given a prior, the **Bayes risk** averages this sampling risk:
 
-$$
+```math
 r(\pi,d)=\int R(\theta,d)\pi(\theta)\,d\theta.
-$$
+```
 
 Interchanging expectations shows that it is minimized by minimizing posterior expected loss for each observed sample:
 
-$$
+```math
 d^*(D)\in\operatorname*{arg\,min}_a
 \mathbb E[\ell(\tau(\theta),a)\mid D].
-$$
+```
 
 For a scalar target $`T=\tau(\theta)`$, the principal cases are:
 
@@ -1692,19 +1692,19 @@ For a scalar target $`T=\tau(\theta)`$, the principal cases are:
 
 For squared loss, write
 
-$$
+```math
 \mathbb E[(T-a)^2\mid D]
 =\operatorname{Var}(T\mid D)
 +\big(\mathbb E[T\mid D]-a\big)^2.
-$$
+```
 
 Only the second term depends on $`a`$, proving the first row. For a continuous target, exact zero-one loss gives expected loss one for every individual action under a continuous posterior; it does **not** justify MAP without changing the loss or taking a suitable small-neighborhood limit.
 
 An action also depends on its costs. Suppose $`Y\in\{0,1\}`$ and $`p=P(Y=1\mid\text{available information})`$. With false-positive cost $`c_{\mathrm{FP}}>0`$, false-negative cost $`c_{\mathrm{FN}}>0`$, and zero cost for correct decisions, predicting one costs $`c_{\mathrm{FP}}(1-p)`$ in expectation. Predicting zero costs $`c_{\mathrm{FN}}p`$. Therefore the optimal threshold is
 
-$$
+```math
 p\ge\frac{c_{\mathrm{FP}}}{c_{\mathrm{FP}}+c_{\mathrm{FN}}}.
-$$
+```
 
 The familiar threshold $`1/2`$ is a consequence of equal costs.
 
@@ -1720,11 +1720,11 @@ Regression concerns the conditional distribution of a response $`Y`$ given a cov
 
 For observed covariate column vectors $`x_i\in\mathbb R^d`$, define the **design matrix** $`\mathbf X\in\mathbb R^{n\times d}`$ with rows $`x_i^\top`$. Stack the random responses into $`\mathbf Y\in\mathbb R^n`$, with observed realization $`y`$. The model is
 
-$$
+```math
 \mathbf Y=\mathbf X\beta+\varepsilon,
 \qquad
 \mathbb E[\varepsilon\mid \mathbf X]=0.
-$$
+```
 
 An intercept is represented by a column of ones and counts among the $`d`$ coefficients. Conditioning on $`\mathbf X`$ separates variation in the responses from variation in the observed design. Each coefficient describes a conditional comparison for this particular set of covariates; changing the covariate set can change its meaning.
 
@@ -1732,41 +1732,41 @@ An intercept is represented by a column of ones and counts among the $`d`$ coeff
 
 Assume $`\mathbf X`$ has full column rank. Ordinary least squares minimizes $`\|\mathbf Y-\mathbf X\beta\|^2`$ and satisfies
 
-$$
+```math
 \mathbf X^\top \mathbf X\widehat\beta=\mathbf X^\top \mathbf Y,
 \qquad
 \widehat\beta=(\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top \mathbf Y.
-$$
+```
 
 Geometrically, $`\mathbf X\widehat\beta`$ is the orthogonal projection of $`\mathbf Y`$ onto the column space of $`\mathbf X`$. Statistically,
 
-$$
+```math
 \widehat\beta-\beta=(\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top\varepsilon.
-$$
+```
 
 This identity gives conditional unbiasedness. Writing $`\Omega=\operatorname{Cov}(\varepsilon\mid \mathbf X)`$ gives
 
-$$
+```math
 \operatorname{Cov}(\widehat\beta\mid \mathbf X)
 =(\mathbf X^\top \mathbf X)^{-1}\mathbf X^\top\Omega \mathbf X(\mathbf X^\top \mathbf X)^{-1}.
-$$
+```
 
 If $`\Omega=\sigma^2I_n`$, the covariance simplifies to $`\sigma^2(\mathbf X^\top \mathbf X)^{-1}`$. Under these mean and covariance assumptions, the **Gauss–Markov theorem** says that OLS has smallest covariance among estimators that are linear in $`\mathbf Y`$ and unbiased for every $`\beta`$. It does not claim superiority to every biased estimator, and it does not require Normal errors. [Appendix G](#block-probability-appendix-g) proves it and develops the projection geometry of the fit.
 
 Exact small-sample inference adds the assumption $`\varepsilon\mid \mathbf X\sim\mathcal N(0,\sigma^2I_n)`$ and requires $`n>d`$. Set
 
-$$
+```math
 \widehat\sigma^2=\frac{\|\mathbf Y-\mathbf X\widehat\beta\|^2}{n-d},
 \qquad
 \widehat{\operatorname{SE}}(\widehat\beta_j)
 =\widehat\sigma\sqrt{[(\mathbf X^\top \mathbf X)^{-1}]_{jj}}.
-$$
+```
 
 Then $`(\widehat\beta_j-\beta_j)/\widehat{\operatorname{SE}}(\widehat\beta_j)`$ has a Student $`t`$ distribution with $`n-d`$ degrees of freedom. Consequently,
 
-$$
+```math
 \widehat\beta_j\pm t_{n-d,1-\alpha/2}\widehat{\operatorname{SE}}(\widehat\beta_j)
-$$
+```
 
 is an exact marginal confidence interval. These intervals are not automatically simultaneous statements about all coefficients.
 
@@ -1778,19 +1778,19 @@ With $`\mathrm{RSS}=\|\mathbf Y-\mathbf X\widehat\beta\|^2`$ and $`\mathrm{TSS}=
 
 At a fixed covariate vector $`x_0`$, define
 
-$$
+```math
 \widehat m(x_0)=x_0^\top\widehat\beta,
 \qquad
 h_0=x_0^\top(\mathbf X^\top \mathbf X)^{-1}x_0.
-$$
+```
 
 Under the Gaussian model, a confidence interval for the conditional mean and a prediction interval for an independent future response are, respectively,
 
-$$
+```math
 \underbrace{\widehat m(x_0)\pm t_{n-d,1-\alpha/2}\widehat\sigma\sqrt{h_0}}_{\text{mean response}},
 \qquad
 \underbrace{\widehat m(x_0)\pm t_{n-d,1-\alpha/2}\widehat\sigma\sqrt{1+h_0}}_{\text{future observation}}.
-$$
+```
 
 The prediction interval is wider because a new observation contains its own random error. The extra one represents this error variance in units of $`\sigma^2`$. These are pointwise intervals at a specified $`x_0`$, not simultaneous bands for every covariate value. The [NIST discussion of mean-response uncertainty](https://www.itl.nist.gov/div898/handbook/pmd/section5/pmd511.htm) illustrates their repeated-sampling interpretation. With only an intercept, $`h_0=1/n`$ and $`\widehat\sigma`$ is the sample standard deviation $`S_Y`$ of the responses, so a new response from a Normal population has the prediction interval $`\overline Y\pm t_{n-1,1-\alpha/2}S_Y\sqrt{1+1/n}`$, with exact coverage jointly over the sample and the new observation.
 
@@ -1826,19 +1826,19 @@ The formulas express assumptions as well as calculations. Heteroskedastic errors
 
 A coefficient's meaning depends on the other covariates in the model. Suppose $`Y=\beta_0+\beta_1X+\beta_2W+\varepsilon`$ with $`\mathbb E[\varepsilon\mid X,W]=0`$, but $`Y`$ is regressed on $`X`$ alone, with an intercept. The population slope of that shorter regression is
 
-$$
+```math
 \frac{\operatorname{Cov}(X,Y)}{\operatorname{Var}(X)}
 =\beta_1+\beta_2\frac{\operatorname{Cov}(X,W)}{\operatorname{Var}(X)}.
-$$
+```
 
 The second term is **omitted-variable bias**. It vanishes only if the omitted variable has no effect on $`Y`$ or is uncorrelated with $`X`$. The short regression still estimates a well-defined quantity, the best linear predictor of $`Y`$ from $`X`$ alone, but not the coefficient $`\beta_1`$ of the longer model. [Appendix G](#block-probability-appendix-g) gives the general form of this bias and the attenuation caused by measurement error in a covariate, and it shows that each coefficient of a multiple regression is a partial association.
 
 If the conditional mean is nonlinear, a best linear approximation can still be a useful estimand. With finite second moments and invertible $`\mathbb E[XX^\top]`$, its population coefficient is
 
-$$
+```math
 \beta^*=\operatorname*{arg\,min}_\beta\mathbb E[(Y-X^\top\beta)^2]
 =\mathbb E[XX^\top]^{-1}\mathbb E[XY].
-$$
+```
 
 Its residual is orthogonal to the covariates in expectation. This weaker property does not imply a correctly specified linear conditional mean, so the preceding exact Gaussian intervals cannot simply be carried over unchanged.
 
@@ -1848,11 +1848,11 @@ Finally, an observational coefficient measures association under the chosen cond
 
 Let a fresh pair $`(X,Y)`$ have the true distribution $`P_\ast`$, and let $`f(X)`$ be a prediction. Its population risk and the corresponding empirical risk are
 
-$$
+```math
 R_*(f)=\mathbb E_{P_*}[\ell(Y,f(X))],
 \qquad
 \widehat R_n(f)=\frac1n\sum_{i=1}^n\ell(Y_i,f(X_i)).
-$$
+```
 
 Conditioning on $`X=x`$ reduces prediction to the decision problem above. Squared loss is minimized by $`\mathbb E[Y\mid X=x]`$; absolute loss by a conditional median; classification under zero-one loss by a class of greatest conditional probability. The phrase **Bayes predictor** refers to these population-optimal rules even when no prior over parameters is used. [*The Elements of Statistical Learning*, Section 2.4](https://hastie.su.domains/ElemStatLearn/) develops this decision-theoretic view.
 
@@ -1885,11 +1885,11 @@ The **σ-algebra generated** by a collection $`\mathcal C`$ of subsets, written 
 
 Countable additivity is equivalent to finite additivity together with **continuity** along monotone sequences of events:
 
-$$
+```math
 A_1\subseteq A_2\subseteq\cdots\ \Rightarrow\ P\Big(\bigcup_nA_n\Big)=\lim_{n\to\infty}P(A_n),
 \qquad
 A_1\supseteq A_2\supseteq\cdots\ \Rightarrow\ P\Big(\bigcap_nA_n\Big)=\lim_{n\to\infty}P(A_n).
-$$
+```
 
 For an increasing sequence, write the union as the disjoint union of $`A_1,A_2\setminus A_1,A_3\setminus A_2,\ldots`$ and apply countable additivity; complements give the decreasing case. Applied to the shrinking events $`\{Z\le z+1/k\}`$, continuity shows that every CDF is right-continuous. Applied to the growing events $`\{Z\le z-1/k\}`$, it gives the left limit $`F_Z(z^-)=P(Z<z)`$.
 
@@ -1909,11 +1909,11 @@ More generally, a σ-algebra $`\mathcal G\subseteq\mathcal F`$ represents inform
 
 The Riemann integral of a bounded $`f`$ on $`[a,b]`$ partitions the domain into intervals $`a=x_0<x_1<\cdots<x_n=b`$ and forms the upper and lower sums
 
-$$
+```math
 U=\sum_i\sup_{[x_{i-1},x_i]}f\;(x_i-x_{i-1}),
 \qquad
 L=\sum_i\inf_{[x_{i-1},x_i]}f\;(x_i-x_{i-1}).
-$$
+```
 
 The function is integrable when the infimum of the upper sums over all partitions equals the supremum of the lower sums. This construction needs a domain that can be cut into intervals, which a sample space of coin-toss sequences or images does not have. The **Lebesgue integral** partitions the range instead: it groups the points of the domain by the value of $`f`$ and weights each value by the measure of the set on which $`f`$ takes it. It therefore needs only a measure on the domain.
 
@@ -1925,21 +1925,21 @@ The function is integrable when the infimum of the upper sums over all partition
 
 Over a set $`A\in\mathcal S`$, $`\int_Af\,d\mu=\int f\mathbf 1_A\,d\mu`$. The forms $`\int_S f\,d\mu`$, $`\int_S f(s)\,\mu(ds)`$, and $`\int_S f(s)\,d\mu(s)`$ all denote the same number. The variable $`s`$ is bound, and $`\mu(ds)`$ names the measure of integration; neither $`ds`$ nor $`\mu(ds)`$ has a meaning of its own. The expectation of the main text is the case $`(S,\mathcal S,\mu)=(\Omega,\mathcal F,P)`$:
 
-$$
+```math
 \mathbb EZ=\int_\Omega Z(\omega)\,P(d\omega)=\int_\Omega Z\,dP.
-$$
+```
 
 The **monotone convergence theorem** states that if $`0\le f_1\le f_2\le\cdots`$ and $`f_n\to f`$ pointwise, then $`\int f_n\,d\mu\to\int f\,d\mu`$. The dyadic simple functions
 
-$$
+```math
 s_n=\sum_{k=0}^{n2^n-1}\frac k{2^n}\,\mathbf 1\Big\{\frac k{2^n}\le f<\frac{k+1}{2^n}\Big\}+n\,\mathbf 1\{f\ge n\}
-$$
+```
 
 increase to $`f`$, so the theorem turns the supremum in step 2 into a limit of slicings of the range:
 
-$$
+```math
 \int f\,d\mu=\lim_{n\to\infty}\Big[\sum_{k=0}^{n2^n-1}\frac k{2^n}\,\mu\Big(\frac k{2^n}\le f<\frac{k+1}{2^n}\Big)+n\,\mu(f\ge n)\Big].
-$$
+```
 
 Measurability of $`f`$ is exactly what makes these sets measurable. Linearity passes from simple functions to general ones through such limits. An equivalent form for $`f\ge0`$ is $`\int f\,d\mu=\int_0^\infty\mu(f>t)\,dt`$, a one-dimensional integral of a nonincreasing function.
 
@@ -1949,17 +1949,17 @@ On $`[a,b]`$ with Lebesgue measure $`\lambda`$, every continuous function, and m
 
 **Proposition (change of variables).** Let $`X:(\Omega,\mathcal F)\to(E,\mathcal E)`$ be a random variable with law $`P_X`$, and let $`g:E\to\mathbb R`$ be measurable, with $`g\ge0`$ or $`\mathbb E|g(X)|<\infty`$. Then
 
-$$
+```math
 \int_\Omega g(X(\omega))\,P(d\omega)=\int_E g(x)\,P_X(dx).
-$$
+```
 
 *Proof.* For $`g=\mathbf 1_B`$ with $`B\in\mathcal E`$, $`g(X(\omega))=\mathbf 1_{X^{-1}(B)}(\omega)`$, so both sides equal $`P(X^{-1}(B))=P_X(B)`$. Linearity extends the identity to simple $`g`$. For measurable $`g\ge0`$, take simple $`g_n\uparrow g`$; the compositions $`g_n\circ X`$ are simple and increase to $`g\circ X`$, and monotone convergence on both sides gives the identity. Integrable $`g`$ follows by splitting $`g=g^+-g^-`$. ∎
 
 For a real random variable and $`g(z)=z`$, the proposition gives
 
-$$
+```math
 \mathbb EZ=\int_\Omega Z(\omega)\,P(d\omega)=\int_{\mathbb R}z\,P_Z(dz),
-$$
+```
 
 a Lebesgue integral over the real line against the law of $`Z`$. This is the precise form of the informal $`\int z\,P(Z\in[z,z+dz])`$. It takes one of three concrete forms:
 
@@ -1975,9 +1975,9 @@ A direct computation on $`\Omega`$ can also be easier than finding a law. For fa
 
 **Definition (conditional expectation given a σ-algebra).** For an integrable $`Y`$ and a σ-algebra $`\mathcal G\subseteq\mathcal F`$, the **conditional expectation** $`\mathbb E[Y\mid\mathcal G]`$ is a $`\mathcal G`$-measurable, integrable random variable with the same average as $`Y`$ over every event in $`\mathcal G`$:
 
-$$
+```math
 \mathbb E\big[\mathbb E[Y\mid\mathcal G]\,\mathbf1_A\big]=\mathbb E[Y\mathbf1_A]\qquad\text{for every }A\in\mathcal G.
-$$
+```
 
 It exists by the Radon–Nikodym theorem and is unique up to a null event. Conditioning on $`X`$ takes $`\mathcal G=\sigma(X)`$. By the Doob–Dynkin lemma, $`\mathbb E[Y\mid\sigma(X)]=m(X)`$ for a measurable $`m`$, and when a conditional density exists, $`m`$ is the function $`x\mapsto\int y\,p_{Y\mid X}(y\mid x)\,dy`$ of the main text. The definition needs no density, and it also covers conditioning on an infinite sequence of variables or on a whole past.
 
@@ -1999,15 +1999,15 @@ Three properties follow from the definition and carry the calculations of the ma
 
 For events $`A_1,\ldots,A_n`$,
 
-$$
+```math
 P\Big(\bigcup_{i=1}^nA_i\Big)=\sum_iP(A_i)-\sum_{i<j}P(A_i\cap A_j)+\sum_{i<j<k}P(A_i\cap A_j\cap A_k)-\cdots+(-1)^{n+1}P(A_1\cap\cdots\cap A_n).
-$$
+```
 
 An outcome that lies in exactly $`r\ge1`$ of the events is counted $`\binom r1-\binom r2+\cdots\pm\binom rr=1`$ times, as it should be. For a uniformly random ordering of $`n`$ items, let $`A_i`$ be the event that item $`i`$ stays in place. Any $`k`$ specified items all stay in place with probability $`(n-k)!/n!`$, and there are $`\binom nk`$ such sets, so the $`k`$th sum equals $`1/k!`$. Hence
 
-$$
+```math
 P(\text{no item stays in place})=\sum_{k=0}^n\frac{(-1)^k}{k!}\longrightarrow e^{-1}\approx0.368.
-$$
+```
 
 #### <a id="maps-between-spaces-of-different-dimension"></a>Maps between spaces of different dimension
 
@@ -2015,9 +2015,9 @@ The change-of-variables formula of the main text needs an invertible map between
 
 The gamma–beta relation of the main text is a standard example. For independent $`X_k\sim\operatorname{Gamma}(\alpha_k,\lambda)`$, $`k=1,\ldots,K`$, set $`S=\sum_kX_k`$ and $`Q_k=X_k/S`$. The inverse map $`x_k=sq_k`$, with $`q_K=1-\sum_{k<K}q_k`$, has Jacobian determinant $`s^{K-1}`$ with respect to $`(q_1,\ldots,q_{K-1},s)`$. The joint density of $`(Q,S)`$ is therefore proportional to
 
-$$
+```math
 \Big(\prod_kq_k^{\alpha_k-1}\Big)\,s^{\sum_k\alpha_k-1}e^{-\lambda s},
-$$
+```
 
 which factors into a Dirichlet density for $`Q`$ and a gamma density for $`S`$. Thus $`Q\sim\operatorname{Dirichlet}(\alpha_1,\ldots,\alpha_K)`$, independently of $`S\sim\operatorname{Gamma}(\sum_k\alpha_k,\lambda)`$. For $`K=2`$, $`X_1/(X_1+X_2)\sim\operatorname{Beta}(\alpha_1,\alpha_2)`$.
 
@@ -2025,9 +2025,9 @@ which factors into a Dirichlet density for $`Q`$ and a gamma density for $`S`$. 
 
 The order-statistic density of the main text comes from a count. For small $`dx`$, the probability that $`k-1`$ observations fall below $`x`$, one falls in $`[x,x+dx]`$, and $`n-k`$ fall above $`x+dx`$ is
 
-$$
+```math
 \frac{n!}{(k-1)!\,(n-k)!}F(x)^{k-1}\,p(x)\,dx\,[1-F(x)]^{n-k}
-$$
+```
 
 up to terms of smaller order than $`dx`$; the factorials count the ways to choose which observations play each role.
 
@@ -2035,9 +2035,9 @@ For iid $`\operatorname{Unif}(0,1)`$ observations, the unordered sample is unifo
 
 Extremes need rescaling to have a nondegenerate limit. For the maximum $`M_n`$ of $`n`$ uniform observations and fixed $`t\ge0`$,
 
-$$
+```math
 P\{n(1-M_n)>t\}=\Big(1-\frac tn\Big)^n\longrightarrow e^{-t},
-$$
+```
 
 so $`n(1-M_n)\Rightarrow\operatorname{Exp}(1)`$: the maximum sits about $`1/n`$ below the endpoint. Extreme-value theory classifies the possible limits of rescaled maxima for other distributions.
 
@@ -2057,10 +2057,10 @@ The **characteristic function** $`\varphi_Z(s)=\mathbb E[e^{isZ}]`$ exists for e
 
 This gives a short proof of the central limit theorem. Let $`Y_i=(Z_i-\mu)/\sigma`$, so that $`\mathbb EY_i=0`$ and $`\mathbb EY_i^2=1`$. A second-order expansion gives $`\varphi_Y(u)=1-u^2/2+o(u^2)`$ as $`u\to0`$. For $`T_n=n^{-1/2}\sum_iY_i`$, independence gives
 
-$$
+```math
 \varphi_{T_n}(s)=\Big[\varphi_Y\Big(\frac s{\sqrt n}\Big)\Big]^n
 =\Big[1-\frac{s^2}{2n}+o\Big(\frac1n\Big)\Big]^n\longrightarrow e^{-s^2/2},
-$$
+```
 
 which is the characteristic function of $`\mathcal N(0,1)`$.
 
@@ -2068,9 +2068,9 @@ which is the characteristic function of $`\mathcal N(0,1)`$.
 
 Chebyshev's inequality bounds both tails at once. For $`Z`$ with mean $`\mu`$ and variance $`\sigma^2`$, a one-sided version, **Cantelli's inequality**, states that for $`t>0`$
 
-$$
+```math
 P(Z-\mu\ge t)\le\frac{\sigma^2}{\sigma^2+t^2}.
-$$
+```
 
 For any $`u\ge0`$, the event $`\{Z-\mu\ge t\}`$ implies $`(Z-\mu+u)^2\ge(t+u)^2`$, so Markov's inequality bounds its probability by $`(\sigma^2+u^2)/(t+u)^2`$; the choice $`u=\sigma^2/t`$ minimizes this bound. For $`t>\sigma`$ the bound is below $`1/2`$, so no median exceeds $`\mu+\sigma`$. Applying the same bound to $`-Z`$ shows that every median lies within one standard deviation of the mean.
 
@@ -2078,15 +2078,15 @@ For any $`u\ge0`$, the event $`\{Z-\mu\ge t\}`$ implies $`(Z-\mu+u)^2\ge(t+u)^2`
 
 As in the main text, applying Markov's inequality to $`e^{sW}`$ and optimizing over $`s`$ gives the **Chernoff bound**
 
-$$
+```math
 P(W\ge t)\le\inf_{s>0}e^{-st}\mathbb E[e^{sW}].
-$$
+```
 
 Independence turns the exponential moment of a sum into a product. For a centered bounded variable $`W\in[a,b]`$, **Hoeffding's lemma** gives
 
-$$
+```math
 \mathbb E[e^{sW}]\le\exp\!\left(\frac{s^2(b-a)^2}{8}\right),\qquad s\in\mathbb R.
-$$
+```
 
 One proof sets $`\psi(s)=\log\mathbb E[e^{sW}]`$. Its second derivative is the variance of $`W`$ under exponentially tilted probabilities proportional to $`e^{sW}`$. Any distribution on $`[a,b]`$ has variance at most $`(b-a)^2/4`$: subtract the midpoint, use the bound on its squared distance, and recall that variance is no larger than the mean squared distance from any fixed point. Thus $`\psi''(s)\le(b-a)^2/4`$, while $`\psi(0)=\psi'(0)=0`$. Integrating twice proves the lemma.
 
@@ -2096,11 +2096,11 @@ A centered variable is called **sub-Gaussian with variance proxy $`v`$** if $`\m
 
 For a binomial count, the Chernoff optimization can be carried out exactly. For $`W\sim\operatorname{Binomial}(n,q)`$ and $`q<a<1`$, minimizing $`e^{-sna}(1-q+qe^s)^n`$ over $`s>0`$ gives
 
-$$
+```math
 P(W\ge na)\le\exp\{-n\,D(a\,\|\,q)\},
 \qquad
 D(a\,\|\,q)=a\log\frac aq+(1-a)\log\frac{1-a}{1-q},
-$$
+```
 
 where $`D(a\,\|\,q)`$ is the Kullback–Leibler divergence between Bernoulli laws with success probabilities $`a`$ and $`q`$, in nats because the bound exponentiates it with base $`e`$. For $`0<a<q`$, the same optimization over $`s<0`$ gives the lower-tail bound $`P(W\le na)\le\exp\{-n\,D(a\,\|\,q)\}`$. Weakening these bounds gives the multiplicative forms quoted in the main text.
 
@@ -2118,17 +2118,17 @@ The range-only argument also extends to dependent sums. Applying Hoeffding's lem
 
 Bounded and Gaussian variables are sub-Gaussian. Squares and products of sub-Gaussian variables have heavier, **sub-exponential** tails: a centered $`W`$ is sub-exponential with parameters $`(\nu,b)`$ if $`\mathbb Ee^{sW}\le e^{\nu^2s^2/2}`$ for $`|s|\le1/b`$, which implies
 
-$$
+```math
 P(|W|\ge t)\le2\exp\Big[-\frac12\min\Big(\frac{t^2}{\nu^2},\frac tb\Big)\Big].
-$$
+```
 
 The tail is Gaussian for small $`t`$ and exponential for large $`t`$. Sample variances, chi-square statistics, and quadratic forms in sub-Gaussian vectors behave this way.
 
 When the variances of bounded summands are much smaller than their ranges, **Bernstein's inequality** is sharper than Hoeffding's. For independent centered $`W_i`$ with $`|W_i|\le b`$ and $`\sum_i\operatorname{Var}(W_i)=v`$,
 
-$$
+```math
 P\Big(\Big|\sum_iW_i\Big|\ge t\Big)\le2\exp\Big(-\frac{t^2/2}{v+bt/3}\Big).
-$$
+```
 
 For $`t`$ small relative to $`v/b`$, this is close to the Gaussian rate $`e^{-t^2/(2v)}`$, which is set by the variance rather than the range.
 
@@ -2143,17 +2143,17 @@ The exponent of the best upper-tail Chernoff bound for a centered sum $`W`$ is $
 
 For sub-exponential sums, the exponent is therefore roughly the smaller of a Gaussian and an exponential exponent, and the bound is the larger of the two tail bounds. Bernstein's inequality makes this precise up to a factor of two. With $`A=t^2/(2v)`$ and $`B=3t/(2b)`$, its exponent is
 
-$$
+```math
 \frac{t^2/2}{v+bt/3}=\Big(\frac1A+\frac1B\Big)^{-1},
-$$
+```
 
 which lies between $`\tfrac12\min(A,B)`$ and $`\min(A,B)`$. The Normal approximation keeps the Gaussian exponent at every $`t`$, so far from the mean it can understate a tail by many orders of magnitude.
 
 Lower tails behave differently. For independent nonnegative summands, the inequality $`e^{-x}\le1-x+x^2/2`$ for $`x\ge0`$ gives $`\mathbb Ee^{-sZ_i}\le\exp(-s\mathbb EZ_i+s^2\mathbb EZ_i^2/2)`$, and optimizing over $`s`$ gives
 
-$$
+```math
 P(W\le\mathbb EW-t)\le\exp\Big(-\frac{t^2}{2\sum_i\mathbb EZ_i^2}\Big).
-$$
+```
 
 The lower tail of a sum of nonnegative terms is therefore always Gaussian-type, with no exponential regime, because the sum cannot fall below zero. For the binomial, the main text's lower-tail bound has exponent at least $`\mu\delta^2/2=t^2/(2\mu)`$ for a shortfall $`t=\delta\mu`$. With $`n=1000`$ and $`q=0.01`$, at most $`5`$ events has probability at most $`0.22`$, against an exact value of about $`0.066`$.
 
@@ -2165,9 +2165,9 @@ The lower tail of a sum of nonnegative terms is therefore always Gaussian-type, 
 
 A version of Bernstein's inequality holds for sums of random matrices, at the cost of a dimension factor. For independent, centered, symmetric $`d\times d`$ random matrices $`S_i`$ with spectral norms $`\|S_i\|\le L`$ and $`v=\|\sum_i\mathbb E[S_i^2]\|`$, the **matrix Bernstein inequality** gives
 
-$$
+```math
 P\Big(\Big\|\sum_iS_i\Big\|\ge t\Big)\le2d\exp\Big(-\frac{t^2/2}{v+Lt/3}\Big).
-$$
+```
 
 The dimension enters only through the factor $`d`$, so the typical deviation grows only logarithmically with dimension: it is of order $`\sqrt{v\log d}+L\log d`$. Bounds of this kind control how quickly sample covariance matrices approach their population values. A simpler high-dimensional fact comes from the chi-square law: for $`G\sim\mathcal N(0,I_d)`$, $`\|G\|^2\sim\chi^2_d`$ has mean $`d`$ and variance $`2d`$, so $`\|G\|/\sqrt d\xrightarrow{p}1`$ as $`d`$ grows. A standard Gaussian vector in high dimension lies near the sphere of radius $`\sqrt d`$, far from the origin where its density is largest. Vershynin's [*High-Dimensional Probability*](https://webapps.math.uci.edu/~rvershyn/papers/HDP-book/HDP-book.html) develops these tools and their applications.
 
@@ -2175,9 +2175,9 @@ The dimension enters only through the factor $`d`$, so the typical deviation gro
 
 Almost-sure statements concern infinitely many events at once. Write $`\{A_n\text{ i.o.}\}`$ for the event that infinitely many of the events $`A_n`$ occur. The **first Borel–Cantelli lemma** states that if $`\sum_nP(A_n)<\infty`$, then $`P(A_n\text{ i.o.})=0`$. For every $`N`$,
 
-$$
+```math
 P(A_n\text{ i.o.})\le P\Big(\bigcup_{n\ge N}A_n\Big)\le\sum_{n\ge N}P(A_n),
-$$
+```
 
 and the right side tends to zero. The **second lemma** is a partial converse: if the events are independent and $`\sum_nP(A_n)=\infty`$, then $`P(A_n\text{ i.o.})=1`$.
 
@@ -2203,9 +2203,9 @@ A **stochastic process** is a collection of random variables indexed by time and
 
 A sequence $`X_0,X_1,\ldots`$ on a finite or countable state space is a **Markov chain** if the next state depends on the past only through the present:
 
-$$
+```math
 P(X_{t+1}=j\mid X_t=i,X_{t-1},\ldots,X_0)=P(X_{t+1}=j\mid X_t=i)=P_{ij}.
-$$
+```
 
 The **transition matrix** $`P`$ has nonnegative entries and rows summing to one, and the $`k`$-step transition probabilities are the entries of $`P^k`$. If the row vector $`\pi_t`$ holds the distribution of $`X_t`$, then $`\pi_{t+1}=\pi_tP`$. A **stationary distribution** satisfies $`\pi P=\pi`$. A finite chain in which every state can reach every other state has exactly one stationary distribution; if the chain is also aperiodic, the distribution of $`X_t`$ converges to it from any starting state. The **detailed balance** condition $`\pi_iP_{ij}=\pi_jP_{ji}`$ implies stationarity, and Markov chain Monte Carlo methods are constructed to satisfy it for a target distribution. A random walk on a connected undirected graph, which moves to a uniformly chosen neighbor, has stationary probabilities proportional to the vertex degrees.
 
@@ -2231,10 +2231,10 @@ A sequence $`M_0,M_1,\ldots`$ is a **martingale** with respect to the informatio
 
 The **method of moments** matches expectations implied by a model to averages observed in the sample. Choose functions $`h_1,\ldots,h_k`$ and solve
 
-$$
+```math
 \mathbb E_{\widehat\theta}[h_j(Z)]
 =\frac1n\sum_{i=1}^n h_j(Z_i),\qquad j=1,\ldots,k.
-$$
+```
 
 The choices $`h_1(z)=z`$ and $`h_2(z)=z^2`$ match the first two raw moments. Matching Bernoulli or Poisson means gives $`\widehat p=\overline Z`$ or $`\widehat\lambda=\overline Z`$. In an Exponential model parameterized by its rate $`\lambda`$, the mean is $`1/\lambda`$, so $`\widehat\lambda=1/\overline Z`$.
 
@@ -2246,9 +2246,9 @@ Two-parameter families need two moments. A $`\operatorname{Gamma}(\alpha,\lambda
 
 A statistic $`S(D)`$ is **sufficient** for $`\theta`$ if the conditional distribution of the full data given $`S(D)`$ does not depend on $`\theta`$. Under the usual dominated-model assumptions, the factorization criterion expresses this as
 
-$$
+```math
 p_\theta(z_1,\ldots,z_n)=g_\theta(S(z_1,\ldots,z_n))h(z_1,\ldots,z_n),
-$$
+```
 
 where $`h`$ is independent of $`\theta`$. All parameter dependence in the likelihood is retained by $`S`$.
 
@@ -2260,35 +2260,35 @@ Conditioning an estimator on a sufficient statistic gives a useful improvement p
 
 Many of the families in the main text share one algebraic form. An **exponential family** has densities or mass functions
 
-$$
+```math
 p_\eta(z)=h(z)\exp\{\eta^\top t(z)-A(\eta)\},
 \qquad
 A(\eta)=\log\int h(z)e^{\eta^\top t(z)}\,d\nu(z),
-$$
+```
 
 with **natural parameter** $`\eta`$, a vector $`t(z)`$ of sufficient-statistic contributions, a base function $`h`$ that does not depend on $`\eta`$, and a log-normalizer $`A`$ that makes the total probability one. Here $`\nu`$ is a fixed reference measure, and the integral includes summation as a discrete special case. The support is assumed independent of $`\eta`$. The Poisson law has $`t(z)=z`$, $`\eta=\log\lambda`$, and $`A(\eta)=e^\eta`$, and the Bernoulli law is worked out below. Normal, gamma, beta, categorical, and Dirichlet laws are also exponential families; uniform laws with an unknown endpoint are not, because their support depends on the parameter.
 
 When differentiation under the integral is valid,
 
-$$
+```math
 \nabla A(\eta)=\mathbb E_\eta[t(Z)],
 \qquad
 \nabla^2 A(\eta)=\operatorname{Cov}_\eta(t(Z)).
-$$
+```
 
 The Hessian is positive semidefinite, so $`A`$ is convex. The score for one observation is $`t(Z)-\nabla A(\eta)`$, and its Fisher information is exactly $`\nabla^2A(\eta)`$. For an iid sample,
 
-$$
+```math
 \log L_n(\eta)
 =\eta^\top\sum_i t(z_i)-nA(\eta)+\sum_i\log h(z_i).
-$$
+```
 
 Factorization proves that $`\sum_i t(Z_i)`$ is sufficient. The log-likelihood is concave, and any interior MLE obeys
 
-$$
+```math
 \mathbb E_{\widehat\eta}[t(Z)]
 =\frac1n\sum_i t(z_i).
-$$
+```
 
 Thus maximum likelihood is moment matching for the natural statistic. This does not guarantee an interior solution; boundary datasets can put the desired mean statistic beyond what finite natural parameters achieve.
 
@@ -2300,10 +2300,10 @@ Exponential families also have conjugate priors, which make Bayesian updating ex
 
 The scalar **Cramér–Rao bound** makes the information–variance connection precise. If an estimator $`\widehat\tau`$ is unbiased for a differentiable target $`\tau(\theta)`$ in a regular scalar model, then
 
-$$
+```math
 \operatorname{Var}_\theta(\widehat\tau)
 \ge\frac{[\tau'(\theta)]^2}{I_n(\theta)}.
-$$
+```
 
 Indeed, differentiating unbiasedness gives $`\operatorname{Cov}_\theta(\widehat\tau,U_n)=\tau'(\theta)`$, and Cauchy–Schwarz gives the inequality. For Bernoulli data, $`I_1(p)=1/[p(1-p)]`$, and $`\widehat p`$ attains the bound $`p(1-p)/n`$ for $`0<p<1`$. Biased estimators are not subject to this particular bound. The maximum likelihood estimator's limiting covariance $`I_1(\theta_\ast)^{-1}/n`$ from the main text attains the bound only asymptotically.
 
@@ -2321,11 +2321,11 @@ For iid observations from $`P_\ast`$, maximum likelihood in a possibly misspecif
 
 At an interior optimum, define the population curvature and score variability
 
-$$
+```math
 A=-\mathbb E_{P_*}[\nabla_\theta^2\log p_{\theta^\dagger}(Z)],
 \qquad
 B=\mathbb E_{P_*}[s_{\theta^\dagger}(Z)s_{\theta^\dagger}(Z)^\top].
-$$
+```
 
 Under iid sampling and the appropriate differentiability, moment, consistency, and nonsingularity conditions, the same score expansion gives asymptotic covariance $`A^{-1}BA^{-1}/n`$ for the estimator. This is the **sandwich covariance**. Under correct specification, the information identity gives $`A=B=I_1`$, recovering inverse Fisher information. Under misspecification, equating curvature with score variance can produce incorrect standard errors.
 
@@ -2335,31 +2335,31 @@ The empirical sandwich estimates $`A`$ by average negative Hessians and $`B`$ by
 
 A statistical functional $`T(P)`$ can be perturbed by mixing a small amount of mass at a point $`z`$ into the population. Its **influence function**, when this derivative exists, is
 
-$$
+```math
 \operatorname{IF}(z;T,P)
 =\left.\frac{d}{d\varepsilon}
 T\big((1-\varepsilon)P+\varepsilon\delta_z\big)
 \right|_{\varepsilon=0^+}.
-$$
+```
 
 This is a derivative with respect to the distribution. It measures the first-order effect of an infinitesimal contamination at $`z`$, rather than the effect of changing a parameter coordinate.
 
 For the mean, the contaminated mean is $`(1-\varepsilon)\mu+\varepsilon z`$, so $`\operatorname{IF}(z;\mu,P)=z-\mu`$. Its unbounded magnitude expresses the mean's sensitivity to extreme observations. For a quantile $`q_u=F^{-1}(u)`$, assume a continuous positive density at $`q_u`$. At points away from $`q_u`$, differentiating the defining equation for the contaminated quantile gives
 
-$$
+```math
 \operatorname{IF}(z;q_u,P)
 =\frac{u-\mathbf1\{z\le q_u\}}{p(q_u)}.
-$$
+```
 
 The numerator is bounded, but a small density at the target quantile makes the sensitivity large. The graph of the CDF is then nearly flat near its crossing of level $`u`$.
 
 Many regular estimators admit an **asymptotically linear expansion**
 
-$$
+```math
 \widehat\tau-\tau
 =\frac1n\sum_{i=1}^n\operatorname{IF}(Z_i;T,P_*)
 +o_p(n^{-1/2}).
-$$
+```
 
 Here $`R_n=o_p(a_n)`$ means $`R_n/a_n\xrightarrow{p}0`$. If the influence values have mean zero and finite variance, the CLT gives asymptotic variance $`\mathbb E[\operatorname{IF}(Z;T,P_\ast)^2]`$. For a median with positive density at its unique population value $`m`$, this yields $`1/[4p(m)^2]`$, and hence an approximate estimator variance $`1/[4np(m)^2]`$.
 
@@ -2369,24 +2369,24 @@ This representation explains why otherwise complicated statistics can have simpl
 
 Let $`Z_i\overset{\mathrm{iid}}{\sim}\operatorname{Unif}(0,\theta)`$ with $`\theta>0`$, and write $`M_n=\max_i Z_i`$. The likelihood is
 
-$$
+```math
 L_n(\theta)=\theta^{-n}\mathbf1\{\theta\ge M_n\},
-$$
+```
 
 so $`\widehat\theta=M_n`$. The maximum comes from the support constraint, rather than a vanishing score. For $`0\le x\le\theta`$,
 
-$$
+```math
 P_\theta(M_n\le x)=\left(\frac{x}{\theta}\right)^n,
 \qquad
 \mathbb E_\theta[M_n]=\frac{n}{n+1}\theta.
-$$
+```
 
 The MLE is biased downward. Multiplying by $`(n+1)/n`$ removes its bias, but both versions have a faster rate than the usual $`n^{-1/2}`$ parameter error. For fixed $`t\ge0`$ and sufficiently large $`n`$,
 
-$$
+```math
 P_\theta\!\left(\frac{n(\theta-M_n)}{\theta}>t\right)
 =\left(1-\frac tn\right)^n\longrightarrow e^{-t}.
-$$
+```
 
 The scaled error converges to $`\operatorname{Exp}(1)`$. Parameter-dependent support invalidates the regular score and information argument.
 
@@ -2396,11 +2396,11 @@ This example also exposes ordinary-bootstrap failure. Almost surely the observed
 
 For an estimator $`\widehat\tau=t(D)`$, let $`\widehat\tau_{(-i)}`$ be the same estimator computed after deleting observation $`i`$, and set $`\overline\tau_{(-)}=n^{-1}\sum_i\widehat\tau_{(-i)}`$. The **jackknife** variance estimate is
 
-$$
+```math
 \widehat{\operatorname{Var}}_{\mathrm{jack}}(\widehat\tau)
 =\frac{n-1}{n}\sum_{i=1}^n
 (\widehat\tau_{(-i)}-\overline\tau_{(-)})^2.
-$$
+```
 
 For the sample mean, $`\widehat\tau_{(-i)}=(n\overline Z-Z_i)/(n-1)`$ and $`\overline\tau_{(-)}=\overline Z`$. Substituting gives exactly $`S^2/n`$, the usual estimated variance of the mean. More generally, deletion effects approximate influence values for smooth statistics. The jackknife can be convenient when recomputing an estimator is inexpensive and a closed-form standard error is unavailable. Nonsmooth statistics such as sample maxima and some quantile estimators do not satisfy the smoothness reasoning behind the ordinary jackknife.
 
@@ -2418,9 +2418,9 @@ The jackknife also estimates bias. With $`\widehat{\operatorname{bias}}_{\mathrm
 
 The chi-square pivot $`(n-1)S^2/\sigma^2`$ gives an exact interval for a Normal variance,
 
-$$
+```math
 \left[\frac{(n-1)S^2}{\chi^2_{n-1,1-\alpha/2}},\ \frac{(n-1)S^2}{\chi^2_{n-1,\alpha/2}}\right].
-$$
+```
 
 Unlike the $`t`$ interval for a mean, this interval depends strongly on the Normal shape of the tails, and it does not become approximately valid for other distributions as $`n`$ grows.
 
@@ -2432,16 +2432,16 @@ The likelihood ratio ranks datasets by how much more strongly they support the s
 
 The proof is a short comparison. Let $`\varphi_\ast`$ reject where $`f_1>cf_0`$, with threshold $`c\ge0`$ and boundary randomization chosen for size $`\alpha`$. This also specifies rejection when $`f_0=0<f_1`$. Let $`\varphi`$ be any test of size at most $`\alpha`$. By construction,
 
-$$
+```math
 (\varphi_* - \varphi)(f_1-cf_0)\ge0
-$$
+```
 
 at every dataset: above the threshold $`\varphi_\ast=1`$, and below it $`\varphi_\ast=0`$. Integrating gives
 
-$$
+```math
 \mathbb E_1[\varphi_*]-\mathbb E_1[\varphi]
 \ge c\{\mathbb E_0[\varphi_*]-\mathbb E_0[\varphi]\}\ge0.
-$$
+```
 
 Thus its power is at least that of every competitor with the same error constraint.
 
@@ -2469,9 +2469,9 @@ The chi-square limit of the likelihood-ratio statistic is **Wilks' theorem**, an
 
 Near its maximum, a regular log-likelihood is approximately quadratic,
 
-$$
+```math
 \log L_n(\theta)\approx\log L_n(\widehat\theta)-\tfrac12(\theta-\widehat\theta)^\top J_n(\widehat\theta)(\theta-\widehat\theta),
-$$
+```
 
 and $`\widehat\theta`$ is approximately $`\mathcal N(\theta_\ast,J_n(\widehat\theta)^{-1})`$. In coordinates where $`J_n`$ becomes the identity, the estimate is approximately a standard Normal vector centered at the truth, and log-likelihood differences are half squared Euclidean distances. A null hypothesis that imposes $`r`$ smooth restrictions confines the parameter to a surface through the truth, approximately an affine subspace of codimension $`r`$, and the restricted maximum is approximately the projection of the estimate onto it. Twice the drop in log-likelihood is then the squared length of the component of a standard Normal vector along $`r`$ orthogonal directions, which has the $`\chi^2_r`$ distribution.
 
@@ -2479,9 +2479,9 @@ and $`\widehat\theta`$ is approximately $`\mathcal N(\theta_\ast,J_n(\widehat\th
 
 Counts in $`k`$ categories are often tested against specified category probabilities $`q_1,\ldots,q_k`$. With observed counts $`O_j`$ and expected counts $`E_j=nq_j`$, **Pearson's chi-square statistic** is
 
-$$
+```math
 X^2=\sum_{j=1}^k\frac{(O_j-E_j)^2}{E_j}.
-$$
+```
 
 Under the null and for large expected counts, it is approximately $`\chi^2_{k-1}`$; one degree of freedom is lost because the counts must sum to $`n`$. Each estimated parameter used to compute the $`E_j`$ removes one more.
 
@@ -2528,19 +2528,19 @@ The fitted vector is $`\widehat{\mathbf Y}=\mathbf X\widehat\beta=\mathbf H\math
 
 With one covariate and an intercept, the normal equations give
 
-$$
+```math
 \widehat\beta_1=\frac{\sum_i(x_i-\bar x)(Y_i-\bar Y)}{\sum_i(x_i-\bar x)^2},
 \qquad
 \widehat\beta_0=\bar Y-\widehat\beta_1\bar x.
-$$
+```
 
 The slope is the sample covariance of covariate and response divided by the sample variance of the covariate, and the fitted line passes through $`(\bar x,\bar Y)`$. When the model contains an intercept, the column of ones is one of the columns orthogonal to $`\mathbf e`$, so the residuals sum to zero. Since $`\widehat{\mathbf Y}-\bar Y\mathbf 1`$ then lies in the column space and $`\mathbf e`$ is orthogonal to it, Pythagoras splits the total variation:
 
-$$
+```math
 \mathrm{TSS}=\sum_i(Y_i-\bar Y)^2
 =\sum_i(\widehat Y_i-\bar Y)^2+\sum_i(Y_i-\widehat Y_i)^2
 =\mathrm{ESS}+\mathrm{RSS}.
-$$
+```
 
 Hence $`R^2=1-\mathrm{RSS}/\mathrm{TSS}=\mathrm{ESS}/\mathrm{TSS}`$ lies in $`[0,1]`$. Chapter 2 develops this projection geometry.
 
@@ -2548,10 +2548,10 @@ Hence $`R^2=1-\mathrm{RSS}/\mathrm{TSS}=\mathrm{ESS}/\mathrm{TSS}`$ lies in $`[0
 
 Assume $`\mathbb E[\varepsilon\mid\mathbf X]=0`$ and $`\operatorname{Cov}(\varepsilon\mid\mathbf X)=\sigma^2I_n`$. Any estimator that is linear in $`\mathbf Y`$ can be written $`\widetilde\beta=[(\mathbf X^\top\mathbf X)^{-1}\mathbf X^\top+\mathbf D]\mathbf Y`$ for a $`d\times n`$ matrix $`\mathbf D`$ that may depend on $`\mathbf X`$. Its conditional mean is $`\beta+\mathbf D\mathbf X\beta`$, so unbiasedness for every $`\beta`$ forces $`\mathbf D\mathbf X=0`$. The cross terms then vanish, and
 
-$$
+```math
 \operatorname{Cov}(\widetilde\beta\mid\mathbf X)
 =\sigma^2(\mathbf X^\top\mathbf X)^{-1}+\sigma^2\mathbf D\mathbf D^\top.
-$$
+```
 
 Since $`\mathbf D\mathbf D^\top`$ is positive semidefinite, every linear combination $`a^\top\widetilde\beta`$ has conditional variance at least that of $`a^\top\widehat\beta`$, with equality for every $`a`$ only when $`\mathbf D=0`$.
 
@@ -2559,9 +2559,9 @@ Since $`\mathbf D\mathbf D^\top`$ is positive semidefinite, every linear combina
 
 To test whether $`q`$ added columns improve a nested linear model, compare the residual sum of squares $`\mathrm{RSS}_0`$ of the smaller model with the residual sum of squares $`\mathrm{RSS}`$ of the full model with $`d`$ columns:
 
-$$
+```math
 F=\frac{(\mathrm{RSS}_0-\mathrm{RSS})/q}{\mathrm{RSS}/(n-d)}.
-$$
+```
 
 Under the Gaussian model and the null hypothesis that the added coefficients are zero, $`F\sim F_{q,n-d}`$ exactly: by the projection argument of the main text, the numerator and denominator are independent scaled chi-square variables with $`q`$ and $`n-d`$ degrees of freedom. For a single added coefficient, $`F`$ is the square of its $`t`$ statistic. More generally, $`r`$ linearly independent restrictions $`\mathbf A\beta=\mathbf b`$ are tested in the same way, with $`\mathrm{RSS}_0`$ from the fit under the restrictions and $`q`$ replaced by $`r`$.
 
@@ -2569,9 +2569,9 @@ Under the Gaussian model and the null hypothesis that the added coefficients are
 
 Partition the columns as $`\mathbf X=[\mathbf X_1\ \mathbf X_2]`$, with coefficient blocks $`\beta_1`$ and $`\beta_2`$, and let $`\mathbf M_1=\mathbf I-\mathbf X_1(\mathbf X_1^\top\mathbf X_1)^{-1}\mathbf X_1^\top`$ be the residual maker of $`\mathbf X_1`$. The **Frisch–Waugh–Lovell theorem** states that the block $`\widehat\beta_2`$ of the full least-squares fit equals the coefficient from regressing $`\mathbf M_1\mathbf Y`$ on $`\mathbf M_1\mathbf X_2`$:
 
-$$
+```math
 \widehat\beta_2=\big[(\mathbf M_1\mathbf X_2)^\top\mathbf M_1\mathbf X_2\big]^{-1}(\mathbf M_1\mathbf X_2)^\top\mathbf M_1\mathbf Y.
-$$
+```
 
 The first block of the normal equations gives $`\widehat\beta_1=(\mathbf X_1^\top\mathbf X_1)^{-1}\mathbf X_1^\top(\mathbf Y-\mathbf X_2\widehat\beta_2)`$. Substituting this into the second block, $`\mathbf X_2^\top\mathbf X_1\widehat\beta_1+\mathbf X_2^\top\mathbf X_2\widehat\beta_2=\mathbf X_2^\top\mathbf Y`$, gives $`\mathbf X_2^\top\mathbf M_1\mathbf X_2\widehat\beta_2=\mathbf X_2^\top\mathbf M_1\mathbf Y`$. Because $`\mathbf M_1`$ is symmetric and idempotent, these are the normal equations of the residualized regression.
 
@@ -2579,9 +2579,9 @@ The matrix $`\mathbf M_1\mathbf X_2`$ is the part of $`\mathbf X_2`$ that $`\mat
 
 The theorem also explains collinearity. Under spherical errors, $`\operatorname{Cov}(\widehat\beta_2\mid\mathbf X)=\sigma^2(\mathbf X_2^\top\mathbf M_1\mathbf X_2)^{-1}`$. For a single column $`x_j`$ with the others, including the intercept, in $`\mathbf X_1`$, the quantity $`x_j^\top\mathbf M_1x_j`$ is the residual sum of squares from regressing $`x_j`$ on the other columns, which equals $`(1-R_j^2)\sum_i(x_{ij}-\bar x_j)^2`$. Hence
 
-$$
+```math
 \operatorname{Var}(\widehat\beta_j\mid\mathbf X)=\frac{\sigma^2}{(1-R_j^2)\sum_i(x_{ij}-\bar x_j)^2},
-$$
+```
 
 and the **variance inflation factor** $`\mathrm{VIF}_j=1/(1-R_j^2)`$ is the factor by which correlation with the other columns inflates this variance.
 
@@ -2589,34 +2589,34 @@ and the **variance inflation factor** $`\mathrm{VIF}_j=1/(1-R_j^2)`$ is the fact
 
 The **leverage** of observation $`i`$ is the diagonal entry $`h_{ii}=x_i^\top(\mathbf X^\top\mathbf X)^{-1}x_i`$ of $`\mathbf H`$. It depends only on the covariates, and it is also the self-sensitivity $`\partial\widehat Y_i/\partial Y_i`$ of the fit. Cauchy–Schwarz in the inner product defined by $`\mathbf X^\top\mathbf X`$ gives the variational form
 
-$$
+```math
 h_{ii}=\max_{a\ne0}\frac{(x_i^\top a)^2}{\sum_{j=1}^n(x_j^\top a)^2},
-$$
+```
 
 the largest share of a direction's total squared response that observation $`i`$ supplies on its own. Consequently $`0\le h_{ii}\le1`$, and $`\sum_ih_{ii}=\operatorname{tr}\mathbf H=d`$, so the average leverage is $`d/n`$. The matrix determinant lemma gives $`\det(\mathbf X^\top\mathbf X-x_ix_i^\top)=(1-h_{ii})\det(\mathbf X^\top\mathbf X)`$: a row with leverage near one carries a direction that the other rows barely cover, and $`h_{ii}=1`$ means the design loses full rank without it.
 
 Leverage also governs the residuals. Since $`\mathbf M\mathbf X=0`$, $`\mathbf e=\mathbf M\varepsilon`$, and under spherical errors
 
-$$
+```math
 \operatorname{Cov}(\mathbf e\mid\mathbf X)=\sigma^2\mathbf M,
 \qquad
 \operatorname{Var}(e_i\mid\mathbf X)=\sigma^2(1-h_{ii}).
-$$
+```
 
 Even with homoskedastic errors the residuals are heteroskedastic: the fit is pulled toward high-leverage responses, so their residuals are the least variable. Dividing each residual by its own estimated standard deviation gives the **internally studentized residual** $`r_i=e_i/(\widehat\sigma\sqrt{1-h_{ii}})`$. Its scale estimate includes observation $`i`$, so an outlier partly masks itself. The **externally studentized residual** uses instead the estimate $`\widehat\sigma_{(i)}`$ computed without observation $`i`$, and under Gaussian errors it has an exact $`t_{n-d-1}`$ distribution.
 
 Deleting observation $`i`$ is a rank-one downdate of $`\mathbf X^\top\mathbf X`$, and the Sherman–Morrison formula gives the change in coefficients without refitting:
 
-$$
+```math
 \widehat\beta-\widehat\beta_{(i)}=\frac{(\mathbf X^\top\mathbf X)^{-1}x_i\,e_i}{1-h_{ii}}.
-$$
+```
 
 The fitted vector moves by $`\mathbf X(\widehat\beta-\widehat\beta_{(i)})`$, whose squared length is $`h_{ii}e_i^2/(1-h_{ii})^2`$. Scaling by $`d\widehat\sigma^2`$ gives **Cook's distance**,
 
-$$
+```math
 D_i=\frac{\|\widehat{\mathbf Y}-\widehat{\mathbf Y}_{(i)}\|^2}{d\,\widehat\sigma^2}
 =\frac{r_i^2}{d}\cdot\frac{h_{ii}}{1-h_{ii}}.
-$$
+```
 
 Influence is thus a squared studentized residual times a leverage ratio. It is typically large when an observation is both poorly fit and unusual in its covariates, although extreme leverage alone can also make it large, since $`h_{ii}/(1-h_{ii})`$ is unbounded. A high-leverage point that lies on the fitted surface is not currently pulling the fit, although small changes in its response would move it; a large residual near the center of the design barely moves the coefficients. For example, with $`n=50`$, $`d=2`$, $`h_{ii}=0.30`$, and $`e_i=2\widehat\sigma`$, one finds $`r_i=2/\sqrt{0.7}\approx2.39`$ and $`D_i=2\times0.30/0.49\approx1.22`$. Rules such as $`h_{ii}>2d/n`$ or $`D_i>4/n`$ are screening heuristics. A flagged observation deserves investigation, not automatic deletion.
 
@@ -2628,20 +2628,20 @@ Influence is thus a squared studentized residual times a leverage ratio. It is t
 
 If $`\operatorname{Cov}(\varepsilon\mid\mathbf X)=\Omega`$ is not a multiple of the identity, OLS remains unbiased under $`\mathbb E[\varepsilon\mid\mathbf X]=0`$, but $`\sigma^2(\mathbf X^\top\mathbf X)^{-1}`$ is the wrong covariance. The main text's sandwich $`(\mathbf X^\top\mathbf X)^{-1}\mathbf X^\top\Omega\mathbf X(\mathbf X^\top\mathbf X)^{-1}`$ is correct, and replacing $`\Omega`$ by $`\operatorname{diag}(e_i^2)`$ gives the **heteroskedasticity-robust** estimate
 
-$$
+```math
 \widehat{\operatorname{Cov}}_{\mathrm{HC}}(\widehat\beta)
 =(\mathbf X^\top\mathbf X)^{-1}\mathbf X^\top\operatorname{diag}(e_1^2,\ldots,e_n^2)\mathbf X(\mathbf X^\top\mathbf X)^{-1}.
-$$
+```
 
 Its variants rescale the squared residuals. Dividing by $`1-h_{ii}`$ removes the leverage bias $`\mathbb E e_i^2=\sigma^2(1-h_{ii})`$ under homoskedasticity, and dividing by $`(1-h_{ii})^2`$ over-corrects on purpose to give conservative standard errors in small samples. Heteroskedasticity-and-autocorrelation-consistent (Newey–West) estimates extend the same form to serially correlated errors. The structure matches the misspecification sandwich of [Appendix E](#block-probability-appendix-e).
 
 When the error variances are known up to a common scale, $`\operatorname{Var}(\varepsilon_i\mid x_i)=\sigma^2/w_i`$, **weighted least squares** gives more weight to the more precise observations:
 
-$$
+```math
 \widehat\beta_{\mathrm{WLS}}=(\mathbf X^\top\mathbf W\mathbf X)^{-1}\mathbf X^\top\mathbf W\mathbf Y,
 \qquad
 \mathbf W=\operatorname{diag}(w_1,\ldots,w_n).
-$$
+```
 
 **Generalized least squares** handles a full covariance $`\Omega`$ known up to scale, $`\widehat\beta_{\mathrm{GLS}}=(\mathbf X^\top\Omega^{-1}\mathbf X)^{-1}\mathbf X^\top\Omega^{-1}\mathbf Y`$. It is OLS after multiplying the model by $`\Omega^{-1/2}`$, which whitens the errors, so the Gauss–Markov theorem applied to the whitened model shows that GLS is the best linear unbiased estimator. With an estimated $`\Omega`$ these optimality properties hold only approximately.
 
@@ -2649,15 +2649,15 @@ $$
 
 The main text's omitted-variable formula has a general population form. Suppose $`Y=X^\top\beta+W^\top\gamma+u`$, where $`X`$ includes an intercept, $`\mathbb E[XX^\top]`$ is invertible, and $`\mathbb E[Xu]=0`$. If $`W`$ is omitted, the population least-squares coefficient from regressing $`Y`$ on $`X`$ is
 
-$$
+```math
 \beta+\big(\mathbb E[XX^\top]\big)^{-1}\mathbb E[XW^\top]\gamma.
-$$
+```
 
 The bias is the coefficient of the omitted variables regressed on the included ones, multiplied by their effect. Classical measurement error in a single covariate biases its slope toward zero. If $`Y=\alpha+\beta X+\varepsilon`$ with $`\operatorname{Cov}(X,\varepsilon)=0`$, but the observed covariate is $`\widetilde X=X+U`$ with noise $`U`$ independent of $`X`$ and $`\varepsilon`$, then $`\operatorname{Cov}(\widetilde X,Y)=\beta\operatorname{Var}(X)`$ while $`\operatorname{Var}(\widetilde X)=\operatorname{Var}(X)+\operatorname{Var}(U)`$. The least-squares slope therefore converges to
 
-$$
+```math
 \beta\,\frac{\operatorname{Var}(X)}{\operatorname{Var}(X)+\operatorname{Var}(U)},
-$$
+```
 
 a shrinkage called **attenuation**. With several covariates, the mismeasured one's coefficient is attenuated and the others can be biased in either direction.
 
@@ -2665,17 +2665,17 @@ Both are cases of **endogeneity**: a covariate correlated with the error term, t
 
 An **instrumental variable** $`Z`$ supplies variation in the covariate that is unrelated to the error. It must be *relevant*, $`\operatorname{Cov}(Z,X)\ne0`$, and *exogenous*, $`\operatorname{Cov}(Z,\varepsilon)=0`$. Exogeneity requires both exclusion, meaning that $`Z`$ affects $`Y`$ only through $`X`$, and the absence of common causes of $`Z`$ and $`Y`$. Taking the covariance of $`Y=\alpha+\beta X+\varepsilon`$ with $`Z`$ gives $`\operatorname{Cov}(Z,Y)=\beta\operatorname{Cov}(Z,X)`$, and the sample analogue is
 
-$$
+```math
 \widehat\beta_{\mathrm{IV}}=\frac{\widehat{\operatorname{Cov}}(Z,Y)}{\widehat{\operatorname{Cov}}(Z,X)}.
-$$
+```
 
 With several instruments and controls, **two-stage least squares** first regresses $`X`$ on the instruments and controls, then regresses $`Y`$ on the fitted values and the controls, using only the instrument-driven variation in $`X`$. A weak instrument makes the denominator nearly zero, so any small violation of exclusion is magnified into a large bias and the variance grows. Instrument relevance must be checked, while exogeneity generally cannot be verified from the data and rests on an argument about how they were generated.
 
 A second design compares changes over time. If a treatment reaches one group at a known date, the **difference-in-differences** estimate is the treated group's change in mean outcome minus the control group's change,
 
-$$
+```math
 \big(\bar Y^{\mathrm{treat}}_{\mathrm{post}}-\bar Y^{\mathrm{treat}}_{\mathrm{pre}}\big)-\big(\bar Y^{\mathrm{ctrl}}_{\mathrm{post}}-\bar Y^{\mathrm{ctrl}}_{\mathrm{pre}}\big).
-$$
+```
 
 It identifies the average effect on the treated under **parallel trends**: without treatment, the two groups' means would have changed by the same amount. It equals the coefficient of a treatment-by-period interaction in a regression with group and period indicators.
 
@@ -2697,11 +2697,11 @@ Forming $`(\mathbf X^\top\mathbf X)^{-1}`$ explicitly squares the condition numb
 
 The Beta–Bernoulli calculation of the main text works for counts as well. If $`Z_i\mid\lambda\sim\operatorname{Poisson}(\lambda)`$ independently and $`\lambda\sim\operatorname{Gamma}(a_0,b_0)`$ with shape $`a_0`$ and rate $`b_0`$, then
 
-$$
+```math
 \pi(\lambda\mid D)\propto\lambda^{\sum_iz_i}e^{-n\lambda}\,\lambda^{a_0-1}e^{-b_0\lambda},
 \qquad
 \lambda\mid D\sim\operatorname{Gamma}\Big(a_0+\sum_iz_i,\ b_0+n\Big).
-$$
+```
 
 The prior acts like $`a_0`$ events observed over $`b_0`$ units of exposure. The posterior mean $`(a_0+\sum_iz_i)/(b_0+n)`$ is again a weighted average, of the prior mean $`a_0/b_0`$ and the sample mean, with weights $`b_0`$ and $`n`$. Beta–Bernoulli and Gamma–Poisson updating are instances of one rule: every exponential family has a conjugate prior whose parameters behave like pseudo-observations.
 
@@ -2709,12 +2709,12 @@ The prior acts like $`a_0`$ events observed over $`b_0`$ units of exposure. The 
 
 The Beta–Bernoulli update extends to $`K`$ categories. Let $`\theta=(\theta_1,\ldots,\theta_K)`$ be category probabilities, with $`\theta_k\ge0`$ and $`\sum_k\theta_k=1`$. A Dirichlet prior with parameters $`\alpha_k>0`$ has density proportional to $`\prod_k\theta_k^{\alpha_k-1}`$ on this simplex. If $`N_k`$ counts observations in category $`k`$, then
 
-$$
+```math
 \theta\mid D\sim\operatorname{Dirichlet}(\alpha_1+N_1,\ldots,\alpha_K+N_K),
 \qquad
 P(Z_{\mathrm{new}}=k\mid D)
 =\frac{\alpha_k+N_k}{\sum_j\alpha_j+n}.
-$$
+```
 
 Every category receives positive predictive probability even if its count is zero. With $`\alpha_k=1`$, this is additive-one smoothing. The probability mass assigned to unseen categories comes from a stated prior, and the total amount depends on the number of categories. In language models with a very large vocabulary, this dependence makes naive additive-one smoothing a consequential choice.
 
@@ -2722,13 +2722,13 @@ Every category receives positive predictive probability even if its count is zer
 
 Suppose group $`j`$ has observations governed by a parameter $`\theta_j`$. A hierarchical model couples these parameters through a shared distribution:
 
-$$
+```math
 Z_{ij}\mid\theta_j\sim p(\cdot\mid\theta_j),
 \qquad
 \theta_j\mid\eta\sim\pi(\cdot\mid\eta),
 \qquad
 \eta\sim\pi_0.
-$$
+```
 
 The hyperparameter $`\eta`$ controls similarities between groups. Groups with little data borrow information through the shared distribution; groups with extensive data can remain more distinct. This is **partial pooling**, intermediate between fitting every group independently and forcing every group to share one parameter. **Empirical Bayes** instead estimates hyperparameters from the data and then conditions on their estimates. A plug-in analysis generally omits hyperparameter uncertainty unless it is accounted for separately.
 
@@ -2746,11 +2746,11 @@ Prior sensitivity addresses a different issue. If several substantively plausibl
 
 A posterior density, and therefore its mode, depends on the parameterization. Under a smooth invertible change of coordinates $`\phi=h(\theta)`$ with a smooth inverse, the change-of-variables formula gives
 
-$$
+```math
 \pi_\phi(\phi\mid D)
 =\pi_\theta(h^{-1}(\phi)\mid D)
 \left|\det J_{h^{-1}}(\phi)\right|.
-$$
+```
 
 The Jacobian factor means that transforming a MAP estimate need not give the MAP estimate in the new coordinates. Posterior probabilities remain consistent when transformed correctly. Likewise, a posterior mean is optimal for squared error in the coordinates in which that loss is defined.
 
@@ -2773,9 +2773,9 @@ Computational convergence does not establish statistical adequacy. A well-comput
 
 Bayes risk averages over a prior. A **minimax** rule instead minimizes worst-case risk:
 
-$$
+```math
 d_{\mathrm{mm}}\in\operatorname*{arg\,min}_d\sup_\theta R(\theta,d).
-$$
+```
 
 A rule $`d_1`$ **dominates** $`d_0`$ if $`R(\theta,d_1)\le R(\theta,d_0)`$ for every $`\theta`$, with a strict inequality somewhere. A rule is **admissible** if no other allowed rule dominates it. These are properties of a decision problem, including its parameter space, permitted actions, and loss. Changing the loss can change which procedure is optimal.
 
@@ -2783,9 +2783,9 @@ These notions explain why variance and bias must be considered together. A shrin
 
 The best-known example is **Stein's paradox**. For $`X\sim\mathcal N(\theta,I_k)`$ and loss $`\|a-\theta\|^2`$, the natural estimator $`X`$ has risk $`k`$ at every $`\theta`$. When $`k\ge3`$, the **James–Stein estimator**
 
-$$
+```math
 \widehat\theta_{\mathrm{JS}}=\Big(1-\frac{k-2}{\|X\|^2}\Big)X
-$$
+```
 
 has smaller risk at every $`\theta`$, so $`X`$ is inadmissible. The improvement is largest near the point toward which it shrinks, here the origin, and vanishes as $`\|\theta\|\to\infty`$. Shrinkage borrows strength across coordinates even when they describe unrelated quantities, the frequentist counterpart of partial pooling; the gain concerns the total loss over all coordinates, not each coordinate separately.
 

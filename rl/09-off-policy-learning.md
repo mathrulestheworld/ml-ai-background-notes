@@ -21,15 +21,15 @@ Every method needs **coverage**: $`\pi(a\mid s)>0`$ must imply $`b(a\mid s)>0`$,
 
 The basic correction is importance sampling. The probability of a trajectory after time $`t`$ under $`\pi`$, relative to $`b`$, is the **importance-sampling ratio**
 
-$$
+```math
 \rho_{t:h}=\prod_{k=t}^{h}\frac{\pi(A_k\mid S_k)}{b(A_k\mid S_k)},
-$$
+```
 
 in which the unknown transition probabilities cancel. Weighting the return by the ratio corrects its expectation, $`\mathbb E_b[\rho_{t:T-1}G_t\mid S_t=s]=v_\pi(s)`$. Chapter 5 introduced **ordinary importance sampling**, which averages the weighted returns and is unbiased, and **weighted importance sampling**, which divides by the sum of the weights instead of their number and is biased but consistent, with much lower variance. It also noted that each reward needs only the ratios of the actions before it, which gives **per-decision importance sampling** ([Precup, Sutton, and Singh, 2000](https://scholarworks.umass.edu/cs_faculty_pubs/80/)):
 
-$$
+```math
 \hat v_\pi(s)=\frac1N\sum_{i=1}^N\sum_{k=0}^{T_i-1}\gamma^k\rho^{(i)}_{0:k}R^{(i)}_{k+1}.
-$$
+```
 
 All three are simple and assume nothing about the environment. Their weakness is variance.
 
@@ -39,9 +39,9 @@ All three are simple and assume nothing about the environment. Their weakness is
 
 Each ratio has expectation one under the behavior, $`\mathbb E_b[\pi(A\mid s)/b(A\mid s)]=\sum_a\pi(a\mid s)=1`$, but its second moment exceeds one:
 
-$$
+```math
 \mathbb E_b\Bigl[\Bigl(\frac{\pi(A\mid s)}{b(A\mid s)}\Bigr)^2\Bigr]=\sum_a\frac{\pi(a\mid s)^2}{b(a\mid s)}=1+\chi^2\bigl(\pi(\cdot\mid s)\,\big\|\,b(\cdot\mid s)\bigr),
-$$
+```
 
 where $`\chi^2`$ is the chi-squared divergence between the two action distributions. In a product of $`H`$ ratios, the second moments multiply (exactly so when the factors are independent), and the variance of the product grows like $`(1+\chi^2)^H-1`$, exponentially in the horizon. A target and a behavior that differ by a few percent at each step become exponentially different over long trajectories: the product is almost always small and occasionally enormous.
 
@@ -51,17 +51,17 @@ The extreme case is common in control. If $`\pi`$ is greedy and $`b`$ is ε-gree
 
 Variance can be reduced with a **control variate**: a quantity with known expectation, subtracted from the estimate to cancel part of its noise. In off-policy learning the natural control variates are the current value estimates. The n-step off-policy return with control variates, defined recursively,
 
-$$
+```math
 G_{t:h}=\rho_t\bigl(R_{t+1}+\gamma G_{t+1:h}\bigr)+(1-\rho_t)V(S_t),
-$$
+```
 
 replaces the return by the estimate $`V(S_t)`$ where the behavior's action is unlikely under the target, instead of by 0 as ordinary importance sampling effectively does. The added term has expectation zero, since $`\mathbb E_b[1-\rho_t\mid S_t]=0`$, so the return stays unbiased in expectation, and when $`V`$ is accurate it removes the variance caused by the ratio's fluctuations around one, though not the variance caused by which action was sampled (exercise 9.2).
 
 The **doubly robust** estimator of [Jiang and Li (2016)](https://arxiv.org/abs/1511.03722) applies the same idea to off-policy evaluation with an approximate model of the action values $`\hat Q`$, from which $`\hat V(s)=\sum_a\pi(a\mid s)\hat Q(s,a)`$. Defined backward from the end of the trajectory, with $`\hat v_{\text{DR}}^{(T)}=0`$,
 
-$$
+```math
 \hat v_{\text{DR}}^{(t)}=\hat V(S_t)+\rho_t\bigl(R_{t+1}+\gamma\,\hat v_{\text{DR}}^{(t+1)}-\hat Q(S_t,A_t)\bigr).
-$$
+```
 
 It extends the bandit estimator of chapter 4 to sequences. It is unbiased whatever the model, if the ratios are correct, and its variance is low when the model is accurate: with $`\hat Q=q_\pi`$, the only remaining variance comes from the randomness of rewards and transitions, weighted by the ratios, which Jiang and Li show matches the Cramér–Rao lower bound for unbiased estimators on tree-structured problems (exercise 9.5). Weighted versions and blends of the doubly robust and model-based estimates, such as MAGIC ([Thomas and Brunskill, 2016](https://arxiv.org/abs/1604.00923)), trade a little bias for further variance reduction. The **direct method**, which simply reports $`\hat V(S_0)`$, reweights nothing and so has low variance, which comes only from the data used to fit the model, but it inherits every error of the model, and model errors compound with the horizon.
 
@@ -155,9 +155,9 @@ The last estimator avoids the problem. **Marginalized importance sampling** weig
 
 The n-step methods of chapter 8 extend to off-policy learning by weighting each n-step update with the ratios of the actions it depends on. For state values, the n-step TD update is weighted by $`\rho_{t:t+n-1}`$; for action values, the first action $`A_t`$ is given, and only the later actions need correction, so n-step SARSA uses
 
-$$
+```math
 Q(S_t,A_t)\leftarrow Q(S_t,A_t)+\alpha\,\rho_{t+1:t+n}\bigl[G_{t:t+n}-Q(S_t,A_t)\bigr].
-$$
+```
 
 The off-policy version of n-step Expected SARSA, whose target ends with $`\sum_a\pi(a\mid S_{t+n})Q(S_{t+n},a)`$ instead of the sampled $`Q(S_{t+n},A_{t+n})`$, needs one ratio fewer, $`\rho_{t+1:t+n-1}`$; with $`n=1`$ it needs no ratio at all, and with a greedy target it is one-step Q-learning. For larger $`n`$ these methods inherit the variance of the products, which limits $`n`$, and the control-variate form above reduces it.
 
@@ -165,9 +165,9 @@ The off-policy version of n-step Expected SARSA, whose target ends with $`\sum_a
 
 Importance sampling corrects the sampled actions after the fact. The **tree-backup algorithm** of Precup, Sutton, and Singh avoids them altogether. Its target combines, at each step, the sampled reward with the estimated values of all the actions that were not taken, each weighted by its target probability, and follows the actual trajectory only with the weight of the action that was taken:
 
-$$
+```math
 G_{t:t+n}=R_{t+1}+\gamma\sum_{a\ne A_{t+1}}\pi(a\mid S_{t+1})Q(S_{t+1},a)+\gamma\,\pi(A_{t+1}\mid S_{t+1})\,G_{t+1:t+n},
-$$
+```
 
 with $`G_{t:t+1}`$ the one-step Expected SARSA target. The name describes the backup diagram, a tree in which the leaves are the untaken actions at every level. The target contains no ratios and so has low variance, and it is a valid estimate of $`q_\pi`$ whatever the behavior (exercise 9.3). Its cost is that the continuation of the trajectory is weighted by $`\pi(A_{t+1}\mid S_{t+1})`$, which is less than one whenever the target is stochastic, even when the behavior is the target policy, so tree backup cuts its multi-step credit even on-policy, where there is nothing to correct.
 
@@ -179,15 +179,15 @@ with $`G_{t:t+1}`$ the one-step Expected SARSA target. The name describes the ba
 
 The λ-return versions of these methods fit a common template. Every method evaluates $`q_\pi`$ with the Expected SARSA TD error,
 
-$$
+```math
 \delta_t=R_{t+1}+\gamma\sum_a\pi(a\mid S_{t+1})Q(S_{t+1},a)-Q(S_t,A_t),
-$$
+```
 
 and credits it back along the trajectory through traces that decay by $`\gamma c_t`$ at each step, where the **trace coefficient** $`c_t`$ is chosen by the method. In the forward view of [Munos, Stepleton, Harutyunyan, and Bellemare (2016)](https://arxiv.org/abs/1606.02647), the update to the value of the pair that starts a trajectory is
 
-$$
+```math
 \Delta Q(S_0,A_0)=\sum_{t\ge0}\gamma^t\Bigl(\prod_{k=1}^tc_k\Bigr)\delta_t.
-$$
+```
 
 Four choices of $`c_k`$, each a function of the action $`A_k`$ taken at step $`k`$, give four known algorithms:
 
@@ -338,9 +338,9 @@ Let the target $`\pi`$ be greedy and the behavior $`b`$ be ε-greedy with respec
 
 (b) By induction on $`n`$. For $`n=1`$ the target does not involve the behavior, and at $`Q=q_\pi`$ its expectation is $`\mathbb E[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t,A_t]=q_\pi(S_t,A_t)`$. For $`n>1`$, adding and subtracting $`\gamma\pi(A_{t+1}\mid S_{t+1})Q(S_{t+1},A_{t+1})`$ gives
 
-$$
+```math
 G_{t:t+n}=R_{t+1}+\gamma\sum_a\pi(a\mid S_{t+1})Q(S_{t+1},a)+\gamma\,\pi(A_{t+1}\mid S_{t+1})\bigl[G_{t+1:t+n}-Q(S_{t+1},A_{t+1})\bigr].
-$$
+```
 
 At $`Q=q_\pi`$, the induction hypothesis says that the bracket has conditional expectation zero given $`(S_{t+1},A_{t+1})`$, whichever action the behavior chose, so the expected target is $`\mathbb E[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t,A_t]=q_\pi(S_t,A_t)`$ for any behavior. For an arbitrary $`Q`$ the bracket does not vanish, and its average over $`A_{t+1}\sim b`$ depends on the behavior: away from the fixed point, the expected tree-backup target differs from one behavior to another, but the fixed point, $`q_\pi`$, is the same for all of them.
 
@@ -526,9 +526,9 @@ At $`Q=q_\pi`$, the expected TD error given the pair $`(S_t,A_t)`$ is $`\mathbb 
 
 **The doubly robust estimator.** [Jiang and Li (2016)](https://arxiv.org/abs/1511.03722) derive its variance recursively. Write $`\operatorname{Var}_t`$ for the variance given the history before $`S_t`$ is drawn, $`\Delta=\hat Q-q_\pi`$ for the model error, and $`\hat v^{(t)}_{\text{DR}}`$ as in the chapter. Then
 
-$$
+```math
 \operatorname{Var}_t\bigl(\hat v^{(t)}_{\text{DR}}\bigr)=\operatorname{Var}_t\bigl(v_\pi(S_t)\bigr)+\mathbb E_t\Bigl[\operatorname{Var}\bigl(\rho_t\Delta(S_t,A_t)\bigm|S_t\bigr)\Bigr]+\mathbb E_t\Bigl[\rho_t^2\operatorname{Var}\bigl(R_{t+1}\bigm|S_t,A_t\bigr)\Bigr]+\gamma^2\,\mathbb E_t\Bigl[\rho_t^2\operatorname{Var}_{t+1}\bigl(\hat v^{(t+1)}_{\text{DR}}\bigr)\Bigr]:
-$$
+```
 
 one term for the randomness of the state, one for the random action weighted by the model's error, one for the reward, and one for the future, discounted and multiplied by the squared ratio. With an exact model the second term vanishes, and the remaining terms match the Cramér–Rao lower bound that Jiang and Li derive for tree-structured problems. The last term is where the exponential growth comes from: every level of the recursion multiplies the future's variance by $`\gamma^2\rho_t^2`$, whose expectation, $`\gamma^2(1+\chi^2(S_t))`$, exceeds one whenever the policies differ and $`\gamma=1`$, as in the chapter's experiments, and more generally whenever $`1+\chi^2(S_t)>1/\gamma^2`$.
 
@@ -542,15 +542,15 @@ one term for the randomness of the state, one for the random action weighted by 
 
 For a target $`\pi`$, a behavior $`b`$, and trace coefficients $`c_k=c(S_k,A_k)`$, define the operator
 
-$$
+```math
 (\mathcal RQ)(s,a)=Q(s,a)+\mathbb E_b\Bigl[\sum_{t\ge0}\gamma^t\Bigl(\prod_{k=1}^tc_k\Bigr)\bigl(R_{t+1}+\gamma\,\mathbb E_\pi Q(S_{t+1},\cdot)-Q(S_t,A_t)\bigr)\Bigm|S_0=s,A_0=a\Bigr],
-$$
+```
 
 the expected forward-view update of the chapter. Exercise 9.7 shows that $`q_\pi`$ is a fixed point for any $`c`$. [Munos et al. (2016)](https://arxiv.org/abs/1606.02647) prove that if $`0\le c(s,a)\le\pi(a\mid s)/b(a\mid s)`$ for all pairs, then $`\mathcal R`$ is a contraction around $`q_\pi`$ in the maximum norm:
 
-$$
+```math
 \|\mathcal RQ-q_\pi\|_\infty\le\eta\,\|Q-q_\pi\|_\infty,\qquad\eta=\max_{s,a}\Bigl(1-(1-\gamma)\,\mathbb E_b\Bigl[\sum_{t\ge0}\gamma^t\prod_{k=1}^tc_k\Bigr]\Bigr)\le\gamma.
-$$
+```
 
 The proof rewrites $`\mathcal RQ-q_\pi`$ as a sum over time of terms $`\gamma^t(\prod c_k)\bigl(\mathbb E_\pi\Delta(S_t,\cdot)-c_t\Delta(S_t,A_t)\bigr)`$, with $`\Delta=Q-q_\pi`$, and observes that under the condition on $`c`$ each term is a nonnegative combination of values of $`\Delta`$ with total weight that telescopes to $`\eta`$. The modulus shows the trade-off: $`c=0`$ gives one-step Expected SARSA with $`\eta=\gamma`$, and larger traces give smaller $`\eta`$, faster contraction, as long as they stay below the ratio, which controls the variance only if they are also bounded, as Retrace's are.
 

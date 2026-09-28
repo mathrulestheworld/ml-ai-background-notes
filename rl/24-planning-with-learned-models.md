@@ -133,15 +133,15 @@ With moderately noisy networks, the prior's most likely move is optimal in 79% o
 
 **AlphaGo Zero** ([Silver et al., 2017](https://doi.org/10.1038/nature24270)) removed the human data and the rollouts. One residual network with a policy head and a value head, $`(\mathbf p,v)=f_{\boldsymbol\theta}(s)`$, is trained entirely by self-play: every move of every game is chosen by an MCTS of 1,600 simulations guided by the current best network, and the network is trained to predict the search's **visit distribution** $`\boldsymbol\pi`$ and the game's final **outcome** $`z\in\{-1,1\}`$ ($`\{-1,0,1\}`$ in AlphaZero, where draws occur) with the loss
 
-$$
+```math
 \ell(\boldsymbol\theta)=(z-v)^2-\boldsymbol\pi^\top\ln\mathbf p+c\|\boldsymbol\theta\|^2.
-$$
+```
 
 Starting from random play, it surpassed the version that beat Lee Sedol after three days of self-play, winning 100–0, and a larger network trained for 40 days surpassed every previous version, beating AlphaGo Master 89–11. **AlphaZero** ([Silver et al., 2018](https://doi.org/10.1126/science.aar6404)) applied the same algorithm, with the same settings, to chess, shogi, and Go, and within hours of self-play for chess and shogi defeated the strongest programs of the time, Stockfish and Elmo, which embodied decades of human engineering. Its search is the one of the tic-tac-toe code. Each simulation descends the tree by the **PUCT** rule,
 
-$$
+```math
 a=\arg\max_a\Bigl(Q(s,a)+c_{\text{puct}}\,P(s,a)\,\frac{\sqrt{\sum_bN(s,b)}}{1+N(s,a)}\Bigr),
-$$
+```
 
 a variant of the UCB rule of chapter 3 in which the network's prior $`P(s,a)`$ decides which moves deserve exploration (AlphaZero let $`c_{\text{puct}}`$ grow slowly with the number of visits, as MuZero does in [appendix B](#block-rl24-appendix-b)). When it reaches a new position, it evaluates it with the network rather than with a rollout, and backs up the value along the path, with alternating signs for the two players. After 800 simulations, the move is chosen in proportion to the visit counts, with a temperature that makes play varied in the opening moves and nearly greedy afterward. Exploration at the root comes from **Dirichlet noise** added to the prior, $`P=(1-\epsilon)\mathbf p+\epsilon\boldsymbol\eta`$ with $`\boldsymbol\eta\sim\operatorname{Dir}(\alpha)`$, $`\epsilon=0.25`$, and $`\alpha`$ smaller for games with more legal moves (0.3 for chess, 0.03 for Go), so that the search sometimes examines moves the network considers unlikely (exercise 24.2).
 
@@ -153,9 +153,9 @@ Why train the policy on visit counts rather than on the search's best move? The 
 
 AlphaZero needs the rules of the game to simulate moves inside its search. **MuZero** ([Schrittwieser et al., 2020](https://www.nature.com/articles/s41586-020-03051-4)) learns a model instead, and it learns only what the search needs: the value-equivalent model of chapter 23. It has three functions. A **representation** $`h`$ encodes the past observations into a hidden state $`s^0`$; a **dynamics** function $`g`$ maps a hidden state and an action to the next hidden state and a predicted reward, $`(r^k,s^k)=g(s^{k-1},a^k)`$; and a **prediction** function $`f`$ outputs a policy and a value for each hidden state, $`(\mathbf p^k,v^k)=f(s^k)`$. The search runs entirely on hidden states, as AlphaZero's does on game positions. Training unrolls the model for $`K=5`$ steps along the actions actually taken, and at every step $`k`$ matches the predicted policy to the search's visit distribution, the predicted value to a target $`z`$ (the game outcome in board games, an $`n`$-step bootstrapped return in Atari), and the predicted reward to the observed one:
 
-$$
+```math
 \ell=\sum_{k=0}^{K}\Bigl(\ell^p(\boldsymbol\pi_{t+k},\mathbf p^k)+\ell^v(z_{t+k},v^k)+\ell^r(u_{t+k},r^k)\Bigr)+c\|\boldsymbol\theta\|^2.
-$$
+```
 
 Nothing requires the hidden states to reconstruct the observations or to resemble the game's states; they only need to support accurate predictions of the quantities the search uses. MuZero matched AlphaZero in chess and shogi and exceeded it slightly in Go, without being told the rules, and set a new state of the art on the 57 Atari games. A variant, **MuZero Reanalyze**, periodically reruns the search on old trajectories with the latest network to produce fresher targets, which makes it far more data-efficient.
 
@@ -169,9 +169,9 @@ Several extensions carry MuZero to settings it could not handle. **MuZero Unplug
 
 Why does training on visit counts improve the policy, and what happens with few simulations? [Grill et al. (2020)](https://arxiv.org/abs/2007.12509) showed that the visit distribution of PUCT approximately solves a regularized policy optimization problem at the root,
 
-$$
+```math
 \bar{\boldsymbol\pi}=\arg\max_{\mathbf y}\Bigl\{\mathbf q^\top\mathbf y-\lambda_N\,D_{\mathrm{KL}}(\mathbf p\,\|\,\mathbf y)\Bigr\},\qquad\lambda_N=c_{\text{puct}}\frac{\sqrt{\sum_bN_b}}{|\mathcal A|+\sum_bN_b},
-$$
+```
 
 where $`\mathbf q`$ are the search's action values: the improvement of the prior toward higher values with a KL regularizer whose weight decreases as the search progresses. This is the regularized, mirror-descent form of policy improvement of chapter 20, with the KL divergence in the other direction (exercise 24.5). The approximation is poor when the number of simulations is small compared with the number of actions, since visit counts are integers and most actions receive none; Grill et al. showed that computing $`\bar{\boldsymbol\pi}`$ exactly and using it for acting and training improves MuZero with few simulations.
 

@@ -10,9 +10,9 @@
 
 The families of the previous chapters all need a density to maximize, exactly or through a bound. A **generative adversarial network** (GAN; [Goodfellow et al., 2014](https://arxiv.org/abs/1406.2661)) does without one. A **generator** network $`G`$ maps noise $`z\sim p(z)`$ to samples $`G(z)`$, defining a distribution $`p_g`$ only implicitly, through its samples. A **discriminator** network $`D`$ outputs the probability that its input came from the data rather than from the generator. The two are trained against each other:
 
-$$
+```math
 \min_G\max_D\ V(D,G)=\mathbb E_{x\sim p_{\mathrm{data}}}\bigl[\log D(x)\bigr]+\mathbb E_{z\sim p(z)}\bigl[\log\bigl(1-D(G(z))\bigr)\bigr].
-$$
+```
 
 The discriminator is a classifier with the logistic loss, trained to tell data from samples; the generator is trained to make its samples indistinguishable from data, using the discriminator's gradient as its training signal. This is the classifier-based comparison of distributions of chapter 1 turned into a training procedure: the discriminator estimates where the model's samples differ from the data, and the generator moves to remove the difference.
 
@@ -178,9 +178,9 @@ Diffusion models displaced GANs as the leading image generators around 2021 (cha
 
 For a fixed generator, $`V(D,G)=\int\bigl[p_{\mathrm{data}}(x)\log D(x)+p_g(x)\log(1-D(x))\bigr]dx`$. For each $`x`$, the function $`a\log y+b\log(1-y)`$ of $`y\in(0,1)`$ is maximized at $`y=a/(a+b)`$, so $`D^*(x)=p_{\mathrm{data}}(x)/(p_{\mathrm{data}}(x)+p_g(x))`$. Substituting, with $`m=\frac12(p_{\mathrm{data}}+p_g)`$,
 
-$$
+```math
 V(D^*,G)=\mathbb E_{p_{\mathrm{data}}}\Bigl[\log\frac{p_{\mathrm{data}}}{2m}\Bigr]+\mathbb E_{p_g}\Bigl[\log\frac{p_g}{2m}\Bigr]=\mathrm{KL}(p_{\mathrm{data}}\,\|\,m)+\mathrm{KL}(p_g\,\|\,m)-\log4=2\,\mathrm{JS}-\log4.
-$$
+```
 
 **Saturation.** Write $`D(x)=\sigma(\ell(x))`$ with logit $`\ell`$. The generator's minimax loss $`\log(1-\sigma(\ell))`$ has derivative $`-\sigma(\ell)`$ with respect to $`\ell`$, which vanishes when $`\ell\to-\infty`$, that is, when the discriminator confidently rejects the sample. The non-saturating loss $`-\log\sigma(\ell)`$ has derivative $`-(1-\sigma(\ell))\to-1`$ in the same regime, so the gradient is largest when the samples are worst. At the optimal discriminator, the non-saturating generator's expected gradient is that of $`\mathrm{KL}(p_g\,\|\,p_{\mathrm{data}})-2\,\mathrm{JS}(p_g,p_{\mathrm{data}})`$, a combination dominated by the reverse KL divergence, which is one explanation for GANs' tendency to seek modes.
 
@@ -194,9 +194,9 @@ $$
 
 With $`D(x)=\sigma(\psi x)`$, data at 0, and generator at $`\theta`$, the value is $`V(\theta,\psi)=\log\sigma(0)+\log\sigma(-\psi\theta)`$, and the gradient vector field of the game, descending in $`\theta`$ and ascending in $`\psi`$, is
 
-$$
+```math
 \dot\theta=-\partial_\theta V=\psi\,\sigma(\psi\theta),\qquad\dot\psi=\partial_\psi V=-\theta\,\sigma(\psi\theta).
-$$
+```
 
 At the equilibrium $`(0,0)`$ the Jacobian of this field is $`\begin{pmatrix}0&1/2\\-1/2&0\end{pmatrix}`$, with eigenvalues $`\pm i/2`$: the continuous-time dynamics rotate around the equilibrium without approaching it, and in fact conserve $`\theta^2+\psi^2`$ exactly, since $`\theta\dot\theta+\psi\dot\psi=0`$. A simultaneous gradient step multiplies the linearized state by $`I+hJ`$, whose eigenvalues $`1\pm ih/2`$ have modulus $`\sqrt{1+h^2/4}>1`$, so the iterates spiral outward for every step size. Alternating updates correspond to a symplectic integrator of the rotation and stay on a bounded orbit. The R1 penalty adds $`-\gamma\psi`$ to $`\dot\psi`$, making the Jacobian $`\begin{pmatrix}0&1/2\\-1/2&-\gamma\end{pmatrix}`$, whose eigenvalues have real part $`-\gamma/2`$ when $`\gamma<1`$; for small enough $`h`$, the discrete iterates then contract to the equilibrium.
 

@@ -10,9 +10,9 @@
 
 Every distribution over a vector $`x=(x_1,\dots,x_D)`$ factorizes by the chain rule of probability,
 
-$$
+```math
 p(x)=\prod_{i=1}^Dp(x_i\mid x_1,\dots,x_{i-1}),
-$$
+```
 
 for any ordering of the dimensions. An **autoregressive model** represents each conditional with a network that reads the preceding dimensions, $`p_\theta(x_i\mid x_{<i})`$. Because each conditional is an ordinary distribution over one variable, a categorical over 256 intensities or a small mixture over a real number, the model's density is exact and cheap to evaluate: one pass computes all $`D`$ conditionals, whose log-probabilities add up to $`\log p_\theta(x)`$. Maximum likelihood training is then as simple as classification. Sampling, by contrast, is sequential: $`x_1`$ is drawn, then $`x_2`$ given $`x_1`$, and so on, so a $`D`$-dimensional sample needs $`D`$ steps.
 
@@ -22,9 +22,9 @@ The language models of NLP chapter 4 are autoregressive models of text, where th
 
 The simplest autoregressive model of binary data gives each conditional its own logistic regression, $`p(x_i=1\mid x_{<i})=\sigma\bigl(b_i+\sum_{j<i}W_{ij}x_j\bigr)`$, a model called the **fully visible sigmoid belief network** ([Neal, 1992](https://www.sciencedirect.com/science/article/pii/0004370292900656); [Frey, Hinton, and Dayan, 1996](https://papers.nips.cc/paper_files/paper/1995/hash/55b1927fdafef39c48e5b73b5d61ea60-Abstract.html)). It has $`O(D^2)`$ parameters and linear conditionals. [Bengio and Bengio (2000)](https://papers.nips.cc/paper_files/paper/1999/hash/e6384711491713d29bc63fc5eeb5ba4f-Abstract.html) replaced each logistic regression with a small network, and the **neural autoregressive distribution estimator** (NADE; [Larochelle and Murray, 2011](https://proceedings.mlr.press/v15/larochelle11a.html)) made this efficient by sharing one hidden layer across all conditionals:
 
-$$
+```math
 h_i=\sigma\bigl(c+W_{:,<i}\,x_{<i}\bigr),\qquad p(x_i=1\mid x_{<i})=\sigma\bigl(b_i+V_i^\top h_i\bigr).
-$$
+```
 
 Since $`h_{i+1}`$ differs from $`h_i`$ only by the contribution of $`x_i`$, all $`D`$ hidden vectors cost $`O(DH)`$ to compute, the same as one hidden layer of an ordinary network. NADE outperformed mixture models and restricted Boltzmann machines on most of the benchmark likelihoods of its time, and a variant trained on random orderings, so that one network can condition on any subset of dimensions, anticipated the any-order models of chapter 12 ([Uria et al., 2016](https://jmlr.org/papers/v17/16-272.html)).
 
@@ -198,9 +198,9 @@ For text, autoregressive models are the dominant approach, and for images they r
 
 Give input $`j`$ the degree $`m^{(0)}(j)`$, its position in the ordering, and each hidden unit $`k`$ of layer $`\ell`$ a degree $`m^{(\ell)}(k)\in\{1,\dots,D-1\}`$. The masks are
 
-$$
+```math
 M^{(\ell)}_{kk'}=\mathbb 1\bigl[m^{(\ell)}(k)\ge m^{(\ell-1)}(k')\bigr]\ \text{for hidden layers},\qquad M^{\mathrm{out}}_{ik}=\mathbb 1\bigl[m^{(0)}(i)>m^{(L)}(k)\bigr],
-$$
+```
 
 and each weight matrix is multiplied elementwise by its mask. Along any path from input $`j`$ to output $`i`$ with nonzero weights, the degrees satisfy $`m^{(0)}(j)\le m^{(1)}(k_1)\le\dots\le m^{(L)}(k_L)<m^{(0)}(i)`$, so the output for dimension $`i`$ can depend on $`x_j`$ only if $`j`$ comes strictly earlier in the ordering. Degrees below the minimum or above $`D-1`$ would create units connected to nothing, which is why they are drawn from $`\{1,\dots,D-1\}`$. A hidden unit of degree $`k`$ sees exactly the first $`k`$ inputs in the ordering, so the number of connections depends on the distribution of degrees; drawing them uniformly gives about half the weights of the unmasked network. Resampling the ordering and the degrees during training yields an ensemble of autoregressive models in one set of weights.
 
@@ -216,9 +216,9 @@ and each weight matrix is multiplied elementwise by its mask. Along any path fro
 
 **Discretized logistic mixture.** PixelCNN++ models an intensity $`x\in\{0,\dots,255\}`$, scaled to $`[-1,1]`$ with bin half-width $`\delta=1/255`$, by a mixture of $`K`$ logistic distributions with means $`\mu_k`$, scales $`s_k`$, and weights $`\pi_k`$, integrated over the bin:
 
-$$
+```math
 P(x)=\sum_{k=1}^K\pi_k\Bigl[\sigma\Bigl(\frac{x+\delta-\mu_k}{s_k}\Bigr)-\sigma\Bigl(\frac{x-\delta-\mu_k}{s_k}\Bigr)\Bigr],
-$$
+```
 
 with the edge bins extended to $`\pm\infty`$ so that the probabilities sum to one and the extreme values 0 and 255, common in images, get their own mass. A handful of components, a few numbers each, replace 256 logits per intensity, and nearby intensities share probability automatically.
 

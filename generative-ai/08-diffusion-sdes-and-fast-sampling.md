@@ -10,15 +10,15 @@
 
 The chain of chapter 7 adds noise in a thousand small steps, and the noise-conditional score network of chapter 6 uses a sequence of noise levels. Both are discretizations of a process in continuous time, and treating it as one exposes structure that the discrete versions hide: a deterministic sampler, exact likelihoods, and the use of numerical methods for differential equations to sample in far fewer steps. A **stochastic differential equation** (SDE)
 
-$$
+```math
 dx=f(x,t)\,dt+g(t)\,dW
-$$
+```
 
 describes a path that moves with a deterministic **drift** $`f`$ and is shaken by a **Brownian motion** $`W`$, whose increments over a time $`h`$ are independent Gaussians of variance $`h`$, scaled by the **diffusion coefficient** $`g`$. Its simplest numerical solution, the **Euler–Maruyama** method, repeats
 
-$$
+```math
 x_{k+1}=x_k+f(x_k,t_k)\,h+g(t_k)\sqrt h\;z_k,\qquad z_k\sim\mathcal N(0,I),
-$$
+```
 
 with an error that shrinks as the step $`h`$ does: for the distribution of the result, in proportion to $`h`$ ([Kloeden and Platen, 1992](https://link.springer.com/book/10.1007/978-3-662-12616-5)). The noise term scales with $`\sqrt h`$ rather than $`h`$, which is what makes the paths continuous but nowhere smooth. Langevin dynamics is an SDE of this kind, with the score as its drift (chapter 6, Appendix A).
 
@@ -26,15 +26,15 @@ with an error that shrinks as the step $`h`$ does: for the distribution of the r
 
 [Song et al. (2021)](https://arxiv.org/abs/2011.13456), in a paper that received an outstanding paper award at ICLR 2021, observed that both noising schemes are SDEs. With $`\beta_t=\beta(t)\,h`$, the DDPM step $`x_t=\sqrt{1-\beta_t}\,x_{t-1}+\sqrt{\beta_t}\,z`$ is an Euler–Maruyama step of the **variance-preserving** (VP) SDE
 
-$$
+```math
 dx=-\tfrac12\beta(t)\,x\,dt+\sqrt{\beta(t)}\,dW,
-$$
+```
 
 whose marginals are $`\mathcal N(\sqrt{\bar\alpha(t)}\,x_0,(1-\bar\alpha(t))I)`$ with $`\bar\alpha(t)=\exp(-\int_0^t\beta)`$; they used $`\beta(t)`$ rising linearly from 0.1 to 20 over $`t\in[0,1]`$. Adding noise of growing variance $`\sigma(t)^2`$ without shrinking the data, as the noise-conditional score network does, is the **variance-exploding** (VE) SDE
 
-$$
+```math
 dx=\sqrt{\frac{d\,[\sigma(t)^2]}{dt}}\;dW,
-$$
+```
 
 whose marginals are $`\mathcal N(x_0,\sigma(t)^2I)`$, with $`\sigma`$ growing to a maximum large enough to swamp the data. The two differ only by a change of coordinates: dividing the VP state by $`\sqrt{\bar\alpha(t)}`$ gives the VE state with $`\sigma(t)^2=(1-\bar\alpha(t))/\bar\alpha(t)=1/\operatorname{SNR}(t)`$. What distinguishes one noising process from another is the signal-to-noise ratio as a function of time, as in chapter 7, and how the state is scaled, which matters for the network, not for the mathematics. [Karras et al. (2022)](https://arxiv.org/abs/2206.00364) wrote every such process as $`x_t=s(t)\bigl(x_0+\sigma(t)\,\epsilon\bigr)`$ and argued for the simplest choice, $`s(t)=1`$ and $`\sigma(t)=t`$, which this chapter uses for sampling.
 
@@ -42,9 +42,9 @@ whose marginals are $`\mathcal N(x_0,\sigma(t)^2I)`$, with $`\sigma`$ growing to
 
 The density $`p_t`$ of $`x_t`$ obeys the **Fokker–Planck equation**
 
-$$
+```math
 \frac{\partial p_t}{\partial t}=-\nabla\cdot\bigl(f\,p_t\bigr)+\tfrac12g(t)^2\,\Delta p_t,
-$$
+```
 
 a conservation law in which the drift transports probability and the diffusion term spreads it. Chapter 6 used it to show that Langevin dynamics leaves its target distribution unchanged. Here it describes the data distribution being smoothed into a Gaussian, and it is the key to running the process backward, because two processes with the same Fokker–Planck equation have the same marginals at every time, whatever their individual paths look like.
 
@@ -54,9 +54,9 @@ a conservation law in which the drift transports probability and the diffusion t
 
 A diffusion run backward in time is again a diffusion. [Anderson (1982)](https://www.sciencedirect.com/science/article/pii/0304414982900515) showed that the paths of the forward SDE, traversed from $`t=T`$ down to $`t=0`$, follow
 
-$$
+```math
 dx=\bigl[f(x,t)-g(t)^2\,\nabla_x\log p_t(x)\bigr]\,dt+g(t)\,d\bar W,
-$$
+```
 
 where time runs backward and $`\bar W`$ is a Brownian motion in reversed time ([Appendix A](#block-gen08-appendix-a)). The only unknown is the score of the noisy marginals at every time, which is what a time-conditional network trained by denoising score matching estimates (chapter 6). Generation draws $`x_T`$ from the Gaussian prior and integrates this SDE numerically with the learned score. DDPM's ancestral sampling is one discretization of the reverse VP SDE, and the extra drift, $`g^2`$ times the score, is the move along the score that chapter 7 found in each reverse step.
 
@@ -66,9 +66,9 @@ The continuous view also separates two ways of sampling that NCSN had mixed. A *
 
 The Fokker–Planck equation has a second reading. Since $`\Delta p=\nabla\cdot(p\,\nabla\log p)`$, the diffusion term can be written as a transport term, and the forward SDE has the same marginals as the deterministic **probability-flow ODE**
 
-$$
+```math
 \frac{dx}{dt}=f(x,t)-\tfrac12g(t)^2\,\nabla_x\log p_t(x)
-$$
+```
 
 ([Appendix A](#block-gen08-appendix-a); [Song et al., 2021](https://arxiv.org/abs/2011.13456); [Maoutsa, Reich, and Opper, 2020](https://www.mdpi.com/1099-4300/22/8/802)). Each point moves along a smooth path, and the paths move the whole distribution as the SDE's random paths do. Run backward from Gaussian samples with a learned score, the ODE generates data, and three things follow. It is a continuous normalizing flow (chapter 4) whose velocity field comes from a score model, trained by denoising rather than by backpropagating through an ODE solver, so it gives **exact log-likelihoods** by the instantaneous change of variables, with the divergence estimated by the Skilling–Hutchinson trace estimator in high dimensions; Song et al. obtained 2.99 bits per dimension on CIFAR-10 this way. It is deterministic, so every image has a latent code, obtained by running the ODE forward, and with an exact score that code depends only on the data distribution and the noising process, not on the network. And it can be solved with any method for ordinary differential equations, which is the subject of the next section. The deterministic DDIM sampler of chapter 7 is the Euler method for this ODE (chapter 7, Appendix C).
 
@@ -162,21 +162,21 @@ The two samplers are related by more than their marginals. The reverse SDE is th
 
 Karras et al. separated the choices that had been bundled together in each paper, and their choices form the standard today. With $`s(t)=1`$ and $`\sigma(t)=t`$, the probability-flow ODE becomes
 
-$$
+```math
 \frac{dx}{d\sigma}=\frac{x-D(x;\sigma)}{\sigma},\qquad D(x;\sigma)=x+\sigma^2\,\nabla_x\log p_\sigma(x),
-$$
+```
 
 where $`D`$ is the **denoiser**, the minimum-mean-squared-error estimate of the clean data by Tweedie's formula. The velocity points from the current point toward its denoised version, and the ODE is solved from $`\sigma_{\max}=80`$, where $`x\sim\mathcal N(0,\sigma_{\max}^2I)`$, down to $`\sigma=0`$. The paths are nearly straight at large $`\sigma`$, where the denoiser returns roughly the mean of the data, and curve sharply at small $`\sigma`$, where they turn toward a particular mode, so the steps should be concentrated at low noise. Karras et al. used
 
-$$
+```math
 \sigma_i=\Bigl(\sigma_{\max}^{1/\rho}+\tfrac i{N-1}\bigl(\sigma_{\min}^{1/\rho}-\sigma_{\max}^{1/\rho}\bigr)\Bigr)^{\rho},\qquad\rho=7,\quad\sigma_{\min}=0.002,
-$$
+```
 
 followed by a final step to $`\sigma=0`$, and **Heun's method**, which follows an Euler step with a correction that averages the slopes at both ends of the step. Its error falls with the square of the step size instead of in proportion to it, for one extra network evaluation per step. With 35 network evaluations, their deterministic sampler reached an FID of 1.97 on unconditional CIFAR-10 and 1.79 on class-conditional CIFAR-10. For training, they rescaled the network's input and output so that both have unit variance at every noise level, the **preconditioning**
 
-$$
+```math
 D_\theta(x;\sigma)=c_{\text{skip}}(\sigma)\,x+c_{\text{out}}(\sigma)\,F_\theta\bigl(c_{\text{in}}(\sigma)\,x;\ c_{\text{noise}}(\sigma)\bigr),\qquad c_{\text{skip}}=\frac{\sigma_{\text{data}}^2}{\sigma^2+\sigma_{\text{data}}^2},\quad c_{\text{out}}=\frac{\sigma\,\sigma_{\text{data}}}{\sqrt{\sigma^2+\sigma_{\text{data}}^2}},\quad c_{\text{in}}=\frac1{\sqrt{\sigma^2+\sigma_{\text{data}}^2}},
-$$
+```
 
 with $`c_{\text{noise}}=\frac14\ln\sigma`$ and $`\sigma_{\text{data}}=0.5`$ for images in $`[-1,1]`$ ([Appendix B](#block-gen08-appendix-b)). The raw network $`F_\theta`$ then predicts the noise at low noise levels and the data at high ones, the same interpolation as velocity prediction (chapter 7). They sampled training noise levels with $`\ln\sigma`$ normal with mean −1.2 and standard deviation 1.2, concentrating training on the intermediate levels where the loss can be reduced, and weighted the loss so that every level contributes equally. With a stochastic sampler that injects and removes a controlled amount of noise at each step, the same study improved a pretrained ImageNet $`64\times64`$ model from an FID of 2.07 to 1.55 by changing only the sampler, and retrained it to 1.36. The paper received an outstanding paper award at NeurIPS 2022.
 
@@ -184,9 +184,9 @@ with $`c_{\text{noise}}=\frac14\ln\sigma`$ and $`\sigma_{\text{data}}=0.5`$ for 
 
 The ODE has a linear part, $`x/\sigma`$ in the form above and $`-\tfrac12\beta(t)\,x`$ in the VP form, which can be integrated exactly; only the term with the network needs approximating. Solving the linear part exactly and holding the denoiser fixed over a step gives
 
-$$
+```math
 x_{\sigma'}=\frac{\sigma'}{\sigma}\,x_\sigma+\Bigl(1-\frac{\sigma'}{\sigma}\Bigr)D(x_\sigma;\sigma),
-$$
+```
 
 which is DDIM, now seen as the first-order **exponential integrator** ([Appendix C](#block-gen08-appendix-c)). Higher orders approximate the denoiser along the step by a polynomial in the log signal-to-noise ratio instead of a constant. **DEIS** ([Zhang and Chen, 2023](https://arxiv.org/abs/2204.13902)) and **DPM-Solver** ([Lu et al., 2022](https://arxiv.org/abs/2206.00927)) developed such solvers; DPM-Solver reached an FID of 4.70 on CIFAR-10 with 10 network evaluations and 2.87 with 20, 4 to 16 times fewer than earlier training-free samplers. **DPM-Solver++** ([Lu et al., 2022](https://arxiv.org/abs/2211.01095)) applies the expansion to the predicted data rather than the predicted noise, which is more stable under the strong guidance of chapter 10, and reuses the previous step's evaluation, a **multistep** method with one evaluation per step; it needs 15 to 20 steps for guided sampling, where DDIM needs 100 to 250. The code compares Euler's method, Heun's method, and DPM-Solver++(2M) on the eight Gaussians of chapter 6 with the exact denoiser, measuring each solver against a reference solution from the same starting noise.
 
@@ -306,9 +306,9 @@ The choices of this chapter reduce to a few rules of thumb. For the best quality
 
 **Same marginals.** The forward SDE's density satisfies $`\partial_tp=-\nabla\cdot(fp)+\tfrac12g^2\Delta p`$. Since $`\nabla\cdot(p\nabla\log p)=\nabla\cdot\nabla p=\Delta p`$, this is
 
-$$
+```math
 \partial_tp=-\nabla\cdot\Bigl(\bigl(f-\tfrac12g^2\nabla\log p\bigr)\,p\Bigr),
-$$
+```
 
 the continuity equation of the deterministic flow $`\dot x=f-\tfrac12g^2\nabla\log p_t(x)`$ (chapter 4, Appendix B). Both processes start from the same $`p_0`$ and their densities obey the same equation, so they agree at every $`t`$.
 
@@ -326,9 +326,9 @@ the continuity equation of the deterministic flow $`\dot x=f-\tfrac12g^2\nabla\l
 
 Write the noisy input as $`x=y+n`$ with data $`y`$ of variance $`\sigma_{\text{data}}^2`$ per coordinate and noise $`n`$ of variance $`\sigma^2`$. The input to the network has unit variance if $`c_{\text{in}}=1/\sqrt{\sigma^2+\sigma_{\text{data}}^2}`$. The loss $`\lambda(\sigma)\,\|c_{\text{skip}}x+c_{\text{out}}F-y\|^2`$ equals $`\lambda\,c_{\text{out}}^2\,\|F-T\|^2`$ with the effective target $`T=(y-c_{\text{skip}}x)/c_{\text{out}}`$, whose variance is $`\bigl((1-c_{\text{skip}})^2\sigma_{\text{data}}^2+c_{\text{skip}}^2\sigma^2\bigr)/c_{\text{out}}^2`$. Requiring unit variance, and choosing $`c_{\text{skip}}`$ to make $`c_{\text{out}}`$ as small as possible, so that errors of $`F`$ are amplified as little as possible, minimizes $`(1-c)^2\sigma_{\text{data}}^2+c^2\sigma^2`$ over $`c`$:
 
-$$
+```math
 c_{\text{skip}}=\frac{\sigma_{\text{data}}^2}{\sigma^2+\sigma_{\text{data}}^2},\qquad c_{\text{out}}^2=\frac{\sigma^2\sigma_{\text{data}}^2}{\sigma^2+\sigma_{\text{data}}^2}.
-$$
+```
 
 Setting $`\lambda=1/c_{\text{out}}^2`$ makes the effective weight of every noise level one. At small $`\sigma`$, $`c_{\text{skip}}\approx1`$ and $`T\approx-n/\sigma`$, the negative of the standardized noise; at large $`\sigma`$, $`c_{\text{skip}}\approx0`$ and $`T\approx y/\sigma_{\text{data}}`$, the standardized data.
 
@@ -342,9 +342,9 @@ Setting $`\lambda=1/c_{\text{out}}^2`$ makes the effective weight of every noise
 
 For $`dx/d\sigma=(x-D(x;\sigma))/\sigma`$, the product rule gives $`\frac d{d\sigma}\bigl(x/\sigma\bigr)=-D/\sigma^2`$, so exactly
 
-$$
+```math
 \frac{x_{\sigma'}}{\sigma'}=\frac{x_\sigma}{\sigma}-\int_\sigma^{\sigma'}\frac{D(x_u;u)}{u^2}\,du.
-$$
+```
 
 Treating $`D`$ as constant over the step, the integral is $`D\,(1/\sigma-1/\sigma')`$, which gives the DDIM update of the text. In the variable $`\lambda=-\log\sigma`$, the log signal-to-noise ratio up to a factor of 2 for this process, the weight $`du/u^2`$ becomes $`-e^{\lambda}d\lambda`$, and higher-order methods replace the constant $`D`$ by a polynomial in $`\lambda`$ fitted to recent evaluations, integrating the product with the exponential exactly. DPM-Solver++(2M), used in the code, extrapolates $`D`$ linearly in $`\lambda`$ from the current and previous evaluations, $`D_i+\frac1{2r}(D_i-D_{i-1})`$ with $`r`$ the ratio of the previous step length in $`\lambda`$ to the current one, which is the extrapolated value at the middle of the step, and uses it in place of $`D`$ in the first-order update.
 
@@ -358,9 +358,9 @@ Treating $`D`$ as constant over the step, the integral is $`D\,(1/\sigma-1/\sigm
 
 In the form $`x_\sigma=x_0+\sigma\epsilon`$, one DDIM step from $`z`$ at level $`\sigma`$ with predicted clean image $`\hat x`$ lands at $`\hat x+(\sigma''/\sigma)(z-\hat x)`$ at level $`\sigma''`$. The teacher's two steps, through an intermediate level $`\sigma'`$, land at $`z''`$. Solving $`\hat x+(\sigma''/\sigma)(z-\hat x)=z''`$ for $`\hat x`$ gives the student's target
 
-$$
+```math
 \tilde x=\frac{z''-(\sigma''/\sigma)\,z}{1-\sigma''/\sigma}.
-$$
+```
 
 In the variance-preserving form $`z_t=\alpha_tx+\sigma_t\epsilon`$ of Salimans and Ho, the same argument gives $`\tilde x=\bigl(z_{t''}-(\sigma_{t''}/\sigma_t)z_t\bigr)/\bigl(\alpha_{t''}-(\sigma_{t''}/\sigma_t)\alpha_t\bigr)`$. At the last step, $`\sigma''=0`$ and the target is the teacher's output itself.
 

@@ -167,15 +167,15 @@ In-context learning needs no training and no infrastructure beyond the model, ad
 
 Consider linear regression on the context $`\{(x_i,y_i)\}_{i=1}^n`$ with loss $`\frac1{2n}\sum_i(y_i-w^\top x_i)^2`$. Gradient descent from $`w_0=0`$ with step size $`\eta`$ updates
 
-$$
+```math
 w_{t+1}=w_t+\frac\eta n\sum_{i=1}^n r_i^{(t)}x_i,\qquad r_i^{(t)}=y_i-w_t^\top x_i,
-$$
+```
 
 so the prediction at any input $`x_j`$ changes by $`f_{t+1}(x_j)-f_t(x_j)=\frac\eta n\sum_ir_i^{(t)}x_i^\top x_j`$, and the residuals obey $`r_j^{(t+1)}=r_j^{(t)}-\frac\eta n\sum_ir_i^{(t)}x_i^\top x_j`$ for every context point. Represent token $`j`$ as $`z_j=(x_j,r_j)\in\mathbb R^{d+1}`$, with the query token $`z_q=(x_q,-f_t(x_q))`$, which starts as $`(x_q,0)`$. A linear self-attention layer with a residual connection maps
 
-$$
+```math
 z_j\mapsto z_j+\frac1n\sum_{i=1}^n(W_Vz_i)(W_Kz_i)^\top(W_Qz_j),
-$$
+```
 
 where only the context tokens act as keys. Choosing $`W_Q=W_K=\begin{pmatrix}I_d&0\\0&0\end{pmatrix}`$ and $`W_V=\begin{pmatrix}0&0\\0&-\eta\end{pmatrix}`$ gives $`(W_Kz_i)^\top(W_Qz_j)=x_i^\top x_j`$ and $`W_Vz_i=(0,-\eta r_i)`$, so the layer leaves the inputs unchanged and replaces each last coordinate $`r_j`$ by $`r_j-\frac\eta n\sum_ir_ix_i^\top x_j`$, one gradient step for every token at once; the query's last coordinate becomes $`-f_{t+1}(x_q)`$. Stacking $`L`$ identical layers performs $`L`$ steps. Softmax attention can approximate the construction when the scores are small, and trained models find other solutions, but the construction shows that a transformer's forward pass has enough structure to run an optimizer on its own context.
 
@@ -189,9 +189,9 @@ where only the context tokens act as keys. Choosing $`W_Q=W_K=\begin{pmatrix}I_d
 
 Let $`\hat p(y\mid x)`$ be the model's probabilities for the $`m`$ labels after a prompt, renormalized over the labels. Suppose the prompt adds a label-dependent bias that multiplies each label's probability by an unknown factor $`b_y`$, independent of the input: $`\hat p(y\mid x)\propto b_y\,p^*(y\mid x)`$. A content-free input $`x_{\mathrm{cf}}`$ such as *N/A* should have a uniform $`p^*`$, so its predicted distribution estimates the biases, $`\hat p(y\mid x_{\mathrm{cf}})\propto b_y`$. Dividing by them gives the calibrated prediction
 
-$$
+```math
 p_{\mathrm{cal}}(y\mid x)\propto\frac{\hat p(y\mid x)}{\hat p(y\mid x_{\mathrm{cf}})},
-$$
+```
 
 an affine correction $`W\hat p`$ with $`W=\operatorname{diag}(\hat p(\cdot\mid x_{\mathrm{cf}}))^{-1}`$. Zhao et al. average the estimate over a few content-free strings. The correction is exact only if the bias is multiplicative and input-independent, which is roughly true of majority-label and recency biases, and it assumes that a uniform prior over labels is right for the task; when the true label distribution is skewed, the correction should target that distribution instead of the uniform one.
 
@@ -205,9 +205,9 @@ an affine correction $`W\hat p`$ with $`W=\operatorname{diag}(\hat p(\cdot\mid x
 
 Let concepts $`c`$ have prior $`\pi(c)`$, and let demonstrations $`(x_i,y_i)`$ be drawn from the true concept $`c^*`$. The posterior odds of another concept are
 
-$$
+```math
 \log\frac{p(c\mid D_k)}{p(c^*\mid D_k)}=\log\frac{\pi(c)}{\pi(c^*)}+\sum_{i=1}^k\log\frac{p(y_i\mid x_i,c)}{p(y_i\mid x_i,c^*)}.
-$$
+```
 
 The summands are independent with mean $`-\mathbb E_x\,D_{\mathrm{KL}}\bigl(p(\cdot\mid x,c^*)\,\Vert\,p(\cdot\mid x,c)\bigr)=-\delta_c\le0`$, so by the law of large numbers the log odds fall like $`-k\delta_c`$, and the posterior weight of each concept that disagrees with $`c^*`$ on some inputs decays exponentially in the number of demonstrations. In the toy of the code, two concepts disagree on about $`1-1/5`$ of the inputs, and on an input where they disagree the log-likelihood ratio has expectation $`-\bigl((1-\epsilon)-\frac\epsilon{4}\bigr)\log\frac{1-\epsilon}{\epsilon/4}\approx-3.1`$ nats for $`\epsilon=0.1`$, so each demonstration multiplies the odds of a typical wrong concept by about $`e^{-2.5}`$, and with 200 concepts about $`\log200/2.5\approx2`$ demonstrations are needed before the right concept is likely to lead, and several more before it dominates, consistent with the printed maximum posterior. Concepts that agree with $`c^*`$ on all inputs likely to appear ($`\delta_c=0`$) are never eliminated, and the predictive distribution averages over them, which is harmless for prediction.
 

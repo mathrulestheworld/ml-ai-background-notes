@@ -16,9 +16,9 @@ Every method so far has stored a separate value for each state or state–action
 
 With a table, each state's value can be made exact, so no trade-off between states arises. With fewer weights than states, making one state's value more accurate generally makes others less accurate, and the objective must say which states matter. The standard choice is the **mean squared value error**,
 
-$$
+```math
 \overline{\mathrm{VE}}(\mathbf w)=\sum_s\mu(s)\bigl[v_\pi(s)-\hat v(s,\mathbf w)\bigr]^2,
-$$
+```
 
 weighted by a distribution $`\mu`$ over states. Usually $`\mu`$ is the **on-policy distribution**, the fraction of time spent in each state while following $`\pi`$: in a continuing task, the stationary distribution of the Markov chain under $`\pi`$; in an episodic task, the expected number of visits per episode, $`\eta(s)=h(s)+\sum_{\bar s}\eta(\bar s)\sum_a\pi(a\mid\bar s)p(s\mid\bar s,a)`$ with start distribution $`h`$, normalized to sum to one. The states the agent actually visits are the ones whose values matter to its decisions. The objective is not necessarily the right one, since what we care about is the policy the values lead to, but it is the one the prediction methods of this chapter optimize or approximate.
 
@@ -28,15 +28,15 @@ weighted by a distribution $`\mu`$ over states. Usually $`\mu`$ is the **on-poli
 
 If the true values were available as targets, stochastic gradient descent on $`\overline{\mathrm{VE}}`$ would update the weights after each visit in the direction that reduces the error on that example:
 
-$$
+```math
 \mathbf w\leftarrow\mathbf w+\alpha\bigl[v_\pi(S_t)-\hat v(S_t,\mathbf w)\bigr]\nabla\hat v(S_t,\mathbf w),
-$$
+```
 
 where $`\nabla\hat v`$ is the gradient with respect to $`\mathbf w`$ and the states are sampled from $`\mu`$ by following the policy. The true value is unknown, but any unbiased estimate of it can take its place without changing the expected update. The Monte Carlo return $`G_t`$ is one, and **gradient Monte Carlo** uses it:
 
-$$
+```math
 \mathbf w\leftarrow\mathbf w+\alpha\bigl[G_t-\hat v(S_t,\mathbf w)\bigr]\nabla\hat v(S_t,\mathbf w).
-$$
+```
 
 It is a true stochastic gradient method, and with decreasing step sizes that satisfy the Robbins–Monro conditions it converges to a local minimum of $`\overline{\mathrm{VE}}`$, a global one for linear functions.
 
@@ -44,9 +44,9 @@ It is a true stochastic gradient method, and with decreasing step sizes that sat
 
 A bootstrapped target such as $`R_{t+1}+\gamma\hat v(S_{t+1},\mathbf w)`$ is not an unbiased estimate of $`v_\pi(S_t)`$, and it depends on $`\mathbf w`$. Using it in the same update gives **semi-gradient TD(0)**:
 
-$$
+```math
 \mathbf w\leftarrow\mathbf w+\alpha\bigl[R_{t+1}+\gamma\hat v(S_{t+1},\mathbf w)-\hat v(S_t,\mathbf w)\bigr]\nabla\hat v(S_t,\mathbf w).
-$$
+```
 
 It is called semi-gradient because it takes into account the effect of $`\mathbf w`$ on the estimate but ignores its effect on the target. It is not the gradient of any objective (chapter 12 explains why no such objective can be found), and it does not share the robustness of true gradient methods. In return it inherits the advantages of TD from chapter 6: it learns online, during episodes and in continuing tasks, and usually much faster. In the linear, on-policy case it converges, as the next section shows; off-policy or with nonlinear functions it can diverge.
 
@@ -127,24 +127,24 @@ The most important special case is the **linear** approximator, $`\hat v(s,\math
 
 With linear features, the expected semi-gradient TD(0) update, in steady state under the on-policy distribution, is
 
-$$
+```math
 \mathbb E\bigl[\mathbf w_{t+1}\mid\mathbf w_t\bigr]=\mathbf w_t+\alpha\bigl(\mathbf b-\mathbf A\mathbf w_t\bigr),\qquad
 \mathbf A=\mathbb E\bigl[\mathbf x_t(\mathbf x_t-\gamma\mathbf x_{t+1})^\top\bigr],\quad\mathbf b=\mathbb E\bigl[R_{t+1}\mathbf x_t\bigr],
-$$
+```
 
 where $`\mathbf x_t=\mathbf x(S_t)`$. If the algorithm converges, it must converge to the point where the expected update is zero, the **TD fixed point**
 
-$$
+```math
 \mathbf w_{\text{TD}}=\mathbf A^{-1}\mathbf b.
-$$
+```
 
 In matrix form, with $`\mathbf X`$ the matrix of features of all states, $`\mathbf D=\operatorname{diag}(\mu)`$, and $`\mathbf P_\pi`$ the transition matrix, $`\mathbf A=\mathbf X^\top\mathbf D(\mathbf I-\gamma\mathbf P_\pi)\mathbf X`$. The iteration converges when $`\mathbf A`$ is positive definite, and [Tsitsiklis and Van Roy (1997)](https://doi.org/10.1109/9.580874) showed that it is when $`\mu`$ is the on-policy distribution: the matrix $`\mathbf D(\mathbf I-\gamma\mathbf P_\pi)`$ is then positive definite, because under the stationary distribution $`\mathbf P_\pi`$ cannot increase the $`\mu`$-weighted norm ([Appendix A](#block-rl11-appendix-a)). With decreasing step sizes, linear semi-gradient TD(0) converges with probability one to $`\mathbf w_{\text{TD}}`$.
 
 The TD fixed point is not the minimum of $`\overline{\mathrm{VE}}`$, but it is not far from it. In a continuing task,
 
-$$
+```math
 \overline{\mathrm{VE}}(\mathbf w_{\text{TD}})\le\frac1{1-\gamma}\min_{\mathbf w}\overline{\mathrm{VE}}(\mathbf w),
-$$
+```
 
 and for TD(λ) the factor is $`(1-\gamma\lambda)/(1-\gamma)`$, which reaches 1 at $`\lambda=1`$ (chapter 8). Tsitsiklis and Van Roy proved these factors for the RMS error, the square root of $`\overline{\mathrm{VE}}`$; the statements for $`\overline{\mathrm{VE}}`$ itself, in the form Sutton and Barto give, follow from the sharper argument of [Appendix A](#block-rl11-appendix-a). With $`\gamma`$ close to 1 the bound is loose, and the error of the TD solution can be much larger than the best achievable, as in the random walk. What TD buys with this asymptotic error is faster learning, since its updates have lower variance, and the ability to learn online. Geometrically, the TD fixed point is where the projection of the Bellman operator onto the span of the features has a fixed point, $`\hat v=\Pi\mathcal T^\pi\hat v`$, rather than the projection of the true value function, $`\Pi v_\pi`$; chapter 12 develops this view.
 
@@ -224,9 +224,9 @@ Tile coding also does well on this task (exercise 11.3): with 50 tilings of tile
 
 With a table, a step size of $`\alpha=1/\tau`$ moves an estimate a fraction $`1/\tau`$ of the way to its target, so it learns in about $`\tau`$ experiences. With features, the change in $`\hat v(s)`$ from one update at $`s`$ is $`\alpha\,\mathbf x(s)^\top\mathbf x(s)`$ times the error, so the corresponding rule of thumb is
 
-$$
+```math
 \alpha=\bigl(\tau\,\mathbb E[\mathbf x^\top\mathbf x]\bigr)^{-1},
-$$
+```
 
 for learning in about $`\tau`$ experiences of similar feature vectors. With tile coding and $`n`$ tilings, $`\mathbf x^\top\mathbf x=n`$ always, so a step size of $`\alpha=1/(10n)`$ moves the value of a visited state a tenth of the way to its target, and the mountain car example below uses $`\alpha=0.5/8`$ with eight tilings. With features of very different scales, as in the polynomial basis, or of very different frequencies, as in the Fourier basis, normalizing the features, or scaling the step size per feature, matters more than the choice of $`\alpha`$.
 
@@ -236,9 +236,9 @@ for learning in about $`\tau`$ experiences of similar feature vectors. With tile
 
 Semi-gradient TD approaches the fixed point $`\mathbf A^{-1}\mathbf b`$ by small stochastic steps. **Least-squares TD** (LSTD; [Bradtke and Barto, 1996](https://doi.org/10.1007/BF00114723); [Boyan, 2002](https://doi.org/10.1023/A:1017936530646)) computes it directly, by estimating $`\mathbf A`$ and $`\mathbf b`$ from all the data seen so far,
 
-$$
+```math
 \hat{\mathbf A}_t=\sum_{k<t}\mathbf x_k(\mathbf x_k-\gamma\mathbf x_{k+1})^\top+\varepsilon\mathbf I,\qquad\hat{\mathbf b}_t=\sum_{k<t}R_{k+1}\mathbf x_k,\qquad\mathbf w_t=\hat{\mathbf A}_t^{-1}\hat{\mathbf b}_t,
-$$
+```
 
 with a small $`\varepsilon`$ for invertibility. It has no step size and uses every sample fully, so it is the most data-efficient form of linear TD. Its cost is $`O(d^2)`$ memory and $`O(d^2)`$ computation per step, with the inverse maintained incrementally by the Sherman–Morrison formula (exercise 11.5), against $`O(d)`$ for semi-gradient TD. With thousands of features, as tile coding easily produces, that difference matters; with dozens, LSTD is usually the better choice. Its other weakness is that it weights all past data equally, which is a problem when the policy changes, as in control.
 
@@ -310,9 +310,9 @@ After ten episodes LSTD's error is already half that of semi-gradient TD with a 
 
 Control uses the same ideas with action values, $`\hat q(s,a,\mathbf w)\approx q_*(s,a)`$, updated by semi-gradient SARSA:
 
-$$
+```math
 \mathbf w\leftarrow\mathbf w+\alpha\bigl[R_{t+1}+\gamma\hat q(S_{t+1},A_{t+1},\mathbf w)-\hat q(S_t,A_t,\mathbf w)\bigr]\nabla\hat q(S_t,A_t,\mathbf w),
-$$
+```
 
 with ε-greedy or other soft policies derived from $`\hat q`$, exactly as in chapter 7. With a small discrete set of actions, the usual construction keeps one weight vector per action, or equivalently one set of features per action. Continuous actions require either discretization or the policy-gradient methods of chapter 13.
 
@@ -390,9 +390,9 @@ The multi-step methods of chapter 8 extend to function approximation directly. n
 
 Continuing tasks, which never end, were handled in the tabular case with discounting. With function approximation, discounting runs into a conceptual problem. Once values are approximated, the policy improvement theorem no longer holds: improving the approximate value of one state can worsen the policy elsewhere, so there is no longer a clean ordering of policies by their values in every state. What remains is an ordering by a single number that measures the policy's performance, and for continuing tasks the natural one is the **average reward** of chapter 2,
 
-$$
+```math
 r(\pi)=\lim_{h\to\infty}\frac1h\sum_{t=1}^h\mathbb E\bigl[R_t\mid A_{0:t-1}\sim\pi\bigr]=\sum_s\mu_\pi(s)\sum_a\pi(a\mid s)\sum_{s',r}p(s',r\mid s,a)\,r,
-$$
+```
 
 with $`\mu_\pi`$ the stationary distribution. Sutton and Barto show that discounting adds nothing here: the discounted value averaged over the on-policy distribution is exactly $`r(\pi)/(1-\gamma)`$, so it orders policies exactly as the average reward does, whatever $`\gamma`$ (exercise 11.8). The discount factor becomes a parameter of the solution method, controlling the effective horizon of the bootstrapped targets, rather than part of the problem.
 
@@ -544,9 +544,9 @@ Show how to maintain $`\hat{\mathbf A}_t^{-1}`$ in $`O(d^2)`$ per step, and veri
 
 Each step adds a rank-one term, $`\hat{\mathbf A}_{t+1}=\hat{\mathbf A}_t+\mathbf x_t\mathbf y_t^\top`$ with $`\mathbf y_t=\mathbf x_t-\gamma\mathbf x_{t+1}`$. The Sherman–Morrison formula gives the inverse of a rank-one update from the old inverse:
 
-$$
+```math
 \hat{\mathbf A}_{t+1}^{-1}=\hat{\mathbf A}_t^{-1}-\frac{\hat{\mathbf A}_t^{-1}\mathbf x_t\,\mathbf y_t^\top\hat{\mathbf A}_t^{-1}}{1+\mathbf y_t^\top\hat{\mathbf A}_t^{-1}\mathbf x_t},
-$$
+```
 
 which needs two matrix–vector products and an outer product, $`O(d^2)`$ in all, starting from $`\hat{\mathbf A}_0^{-1}=\varepsilon^{-1}\mathbf I`$. The weights are $`\mathbf w_{t+1}=\hat{\mathbf A}_{t+1}^{-1}\hat{\mathbf b}_{t+1}`$, another $`O(d^2)`$ product.
 
@@ -707,9 +707,9 @@ Write the linear TD(0) update as $`\mathbf w_{t+1}=\mathbf w_t+\alpha_t\bigl(\ma
 
 **The error bound.** Let $`\Pi`$ be the projection onto the span of the features in the $`\mathbf D`$-norm. The TD fixed point satisfies $`\hat{\mathbf v}=\Pi\mathcal T^\pi\hat{\mathbf v}`$, and $`\Pi\mathcal T^\pi`$ is a $`\gamma`$-contraction in that norm, since $`\Pi`$ is a non-expansion and $`\mathcal T^\pi`$ is a $`\gamma`$-contraction by exercise 11.2. Then
 
-$$
+```math
 \|\hat{\mathbf v}-v_\pi\|_{\mathbf D}\le\|\hat{\mathbf v}-\Pi v_\pi\|_{\mathbf D}+\|\Pi v_\pi-v_\pi\|_{\mathbf D}=\|\Pi\mathcal T^\pi\hat{\mathbf v}-\Pi\mathcal T^\pi v_\pi\|_{\mathbf D}+\|\Pi v_\pi-v_\pi\|_{\mathbf D}\le\gamma\|\hat{\mathbf v}-v_\pi\|_{\mathbf D}+\|\Pi v_\pi-v_\pi\|_{\mathbf D},
-$$
+```
 
 so $`\|\hat{\mathbf v}-v_\pi\|_{\mathbf D}\le\frac1{1-\gamma}\|\Pi v_\pi-v_\pi\|_{\mathbf D}`$, the bound of Tsitsiklis and Van Roy for $`\lambda=0`$. It bounds the RMS error, so squaring it gives only $`\overline{\mathrm{VE}}(\mathbf w_{\text{TD}})\le\frac1{(1-\gamma)^2}\min_{\mathbf w}\overline{\mathrm{VE}}(\mathbf w)`$, and the bound of the chapter needs a sharper argument. Since $`\hat{\mathbf v}-\Pi v_\pi`$ lies in the span of the features and $`\Pi v_\pi-v_\pi`$ is $`\mathbf D`$-orthogonal to it, the Pythagorean theorem gives $`\|\hat{\mathbf v}-v_\pi\|_{\mathbf D}^2=\|\hat{\mathbf v}-\Pi v_\pi\|_{\mathbf D}^2+\|\Pi v_\pi-v_\pi\|_{\mathbf D}^2\le\gamma^2\|\hat{\mathbf v}-v_\pi\|_{\mathbf D}^2+\|\Pi v_\pi-v_\pi\|_{\mathbf D}^2`$, so $`\overline{\mathrm{VE}}(\mathbf w_{\text{TD}})\le\frac1{1-\gamma^2}\min_{\mathbf w}\overline{\mathrm{VE}}(\mathbf w)`$, a factor $`1/\sqrt{1-\gamma^2}`$ on the RMS error. Since $`1-\gamma^2=(1-\gamma)(1+\gamma)\ge1-\gamma`$, this implies the chapter's $`\overline{\mathrm{VE}}(\mathbf w_{\text{TD}})\le\frac1{1-\gamma}\min_{\mathbf w}\overline{\mathrm{VE}}(\mathbf w)`$. For TD(λ), the same argument with the contraction factor $`\kappa=\gamma(1-\lambda)/(1-\gamma\lambda)`$ in place of $`\gamma`$ gives $`1/(1-\kappa^2)\le1/(1-\kappa)=(1-\gamma\lambda)/(1-\gamma)`$.
 

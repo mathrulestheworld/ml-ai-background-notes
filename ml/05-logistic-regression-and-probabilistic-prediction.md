@@ -10,15 +10,15 @@
 
 Generative classifiers with Gaussian classes of equal covariance, or with discrete naive Bayes features, produce posterior log-odds that are affine in the input (chapter 4). **Logistic regression** takes this functional form as its model and estimates it directly. For binary labels $`y\in\{0,1\}`$, a weight vector $`w\in\mathbb R^d`$, and an intercept $`b\in\mathbb R`$,
 
-$$
+```math
 P(Y=1\mid X=x)=\sigma\bigl(w^\top x+b\bigr),\qquad \sigma(s)=\frac1{1+e^{-s}}.
-$$
+```
 
 In the notation of chapter 1, the model asserts that the class probability $`\eta(x)=P(Y=1\mid X=x)`$ has this form. Equivalently, the **log-odds** are linear:
 
-$$
+```math
 \log\frac{P(Y=1\mid x)}{P(Y=0\mid x)}=w^\top x+b.
-$$
+```
 
 The sigmoid maps the real-valued score $`s=w^\top x+b`$, called the **logit**, to a probability; its inverse maps a probability $`p`$ back to the log-odds $`\log\frac p{1-p}`$. It satisfies $`\sigma(-s)=1-\sigma(s)`$ and $`\sigma'(s)=\sigma(s)(1-\sigma(s))`$, so its slope is largest, $`1/4`$, at $`s=0`$, where the probability is $`1/2`$ (Calculus and Optimization lists these derivatives). The decision boundary of the rule "predict 1 when the probability is at least $`1/2`$" is the hyperplane $`w^\top x+b=0`$, so logistic regression is a linear classifier. Unlike the perceptron, it also supplies a probability.
 
@@ -28,18 +28,18 @@ The coefficients have a multiplicative interpretation on the odds scale: increas
 
 Each label is modeled as a Bernoulli variable with success probability $`p_i=\sigma(s_i)`$, $`s_i=w^\top x_i+b`$. The negative log-likelihood of the training labels, given the inputs, is
 
-$$
+```math
 \mathcal L(w,b)=-\sum_{i=1}^n\bigl[y_i\log p_i+(1-y_i)\log(1-p_i)\bigr]
 =\sum_{i=1}^n\bigl[\log\bigl(1+e^{s_i}\bigr)-y_is_i\bigr].
-$$
+```
 
 Each term is the **log loss**, or binary cross-entropy, between the observed label and the predicted probability; its information-theoretic meaning is in Cross-entropy, divergence, and log loss. Logarithms in this chapter are natural, so losses are measured in nats, whereas that chapter measures information in bits. The second form follows from $`\log\sigma(s)=s-\log(1+e^{s})`$ and $`\log(1-\sigma(s))=-\log(1+e^{s})`$. It is the numerically stable expression in terms of the logit: $`\log(1+e^{s})`$ can be evaluated as `np.logaddexp(0, s)` without overflow, and a probability that has rounded to $`0`$ or $`1`$ is never passed to a logarithm (Stable probability calculations).
 
 With signed labels $`\tilde y=2y-1\in\{-1,+1\}`$, the probability of the observed label is $`\sigma(\tilde y s)`$, by the symmetry $`\sigma(-s)=1-\sigma(s)`$, and the loss per example becomes
 
-$$
+```math
 \ell(\tilde y,s)=\log\bigl(1+e^{-\tilde y s}\bigr),
-$$
+```
 
 a function of the **margin** $`m=\tilde ys`$ alone, which is positive exactly when the logit has the sign of the label. The loss is large for confident mistakes, where it grows like $`-m`$; it equals $`\log2`$ at the boundary; and it decays like $`e^{-m}`$ for confidently correct predictions. Compared with the hinge loss of the support vector machine, which is exactly zero beyond a margin of one, the logistic loss never stops rewarding larger margins. Both are convex upper bounds on the zero–one loss, the logistic loss after rescaling by $`1/\log2`$ so that it equals one at $`m=0`$; chapter 6 compares them.
 
@@ -55,11 +55,11 @@ The model does not assume anything about the distribution of the inputs. It is *
 
 Absorb the intercept into $`w`$ by adding a column of ones to the design matrix $`X\in\mathbb R^{n\times(d+1)}`$, whose rows are the augmented inputs $`x_i^\top`$. Using $`\frac{d}{ds}\log(1+e^s)=\sigma(s)`$ and $`\sigma'=\sigma(1-\sigma)`$,
 
-$$
+```math
 \nabla\mathcal L(w)=\sum_{i=1}^n(p_i-y_i)\,x_i=X^\top(p-y),
 \qquad
 \nabla^2\mathcal L(w)=\sum_{i=1}^np_i(1-p_i)\,x_ix_i^\top=X^\top WX,
-$$
+```
 
 where $`p`$ and $`y`$ are the vectors of probabilities and labels and $`W=\operatorname{diag}\bigl(p_i(1-p_i)\bigr)`$. The gradient is a sum of residuals $`p_i-y_i`$ weighted by the inputs, exactly the form of the least-squares gradient $`X^\top(Xw-y)`$ with the prediction replaced by a probability. The Hessian is positive semidefinite, since $`v^\top X^\top WXv=\sum_ip_i(1-p_i)(x_i^\top v)^2\ge0`$, so $`\mathcal L`$ is **convex**. It is strictly convex when $`X`$ has full column rank, because every $`p_i(1-p_i)`$ is positive and $`Xv\ne0`$ for every $`v\ne0`$. By convexity, any stationary point is a global minimizer, and strict convexity makes it unique when it exists. Whether it exists depends on the data, as [a later section](#when-the-maximum-likelihood-estimate-does-not-exist) shows.
 
@@ -69,9 +69,9 @@ Since $`p(1-p)\le1/4`$, the Hessian is bounded by $`\frac14X^\top X`$, so the av
 
 At the minimizer the gradient vanishes:
 
-$$
+```math
 X^\top(y-\hat p)=0.
-$$
+```
 
 The column of ones gives $`\sum_i\hat p_i=\sum_iy_i`$: **the average predicted probability equals the observed frequency of class 1** on the training data. For a binary feature, the same equation says that the predicted and observed counts agree within each of its two levels. Logistic regression with an intercept is therefore calibrated "in the large" on its own training sample, a first hint of why its probabilities are usually reasonable; [Calibration](#calibration) makes the notion precise.
 
@@ -81,9 +81,9 @@ These score equations are an instance of a general property of maximum likelihoo
 
 Newton's method updates $`w\leftarrow w-(X^\top WX)^{-1}X^\top(p-y)`$, with $`W`$ and $`p`$ evaluated at the current $`w`$. Writing $`w=(X^\top WX)^{-1}X^\top WXw`$ and $`X^\top(y-p)=X^\top W\,W^{-1}(y-p)`$ and combining the two terms,
 
-$$
+```math
 w_{\text{new}}=(X^\top WX)^{-1}X^\top Wz,\qquad z=Xw+W^{-1}(y-p).
-$$
+```
 
 Each Newton step is a **weighted least-squares** regression of the "working response" $`z`$ on $`X`$, with weights $`p_i(1-p_i)`$ recomputed at every iteration; hence the name **iteratively reweighted least squares** (IRLS). The weights are inverse variances: if $`p_i`$ were the true probability, then $`\operatorname{Var}(y_i)=p_i(1-p_i)`$ and $`\operatorname{Var}(z_i)=1/(p_i(1-p_i))`$, so each step is the weighted least-squares estimate that trusts the more precise working responses more.
 
@@ -169,10 +169,10 @@ An unregularized algorithm can therefore have an implicit preference among the m
 
 Adding a penalty restores a unique finite solution and controls variance:
 
-$$
+```math
 \min_{w,b}\ \frac1n\sum_{i=1}^n\ell\bigl(\tilde y_i,w^\top x_i+b\bigr)+\frac\lambda2\|w\|_2^2,
 \qquad\lambda>0.
-$$
+```
 
 The objective is $`\lambda`$-strongly convex in $`w`$, so the minimizer exists and is unique even for separable data, provided both classes occur in the sample: the intercept is not penalized, and with a single class it alone would diverge ([Appendix B](#block-logreg-appendix-b)). Because one $`\lambda`$ multiplies every coefficient, the features should be standardized so that they are treated comparably. The estimate is the MAP estimate under the Gaussian prior $`w\sim\mathcal N\bigl(0,(n\lambda)^{-1}I\bigr)`$, as for ridge regression: multiplying the objective by $`n`$ makes the penalty $`\frac{n\lambda}2\|w\|_2^2`$, the negative log prior up to a constant (Posterior means and MAP estimates). scikit-learn parameterizes the same problem as $`C\sum_i\ell_i+\frac12\|w\|^2`$, so $`C=1/(n\lambda)`$: a small $`C`$ means strong regularization.
 
@@ -188,17 +188,17 @@ An $`\ell_1`$ penalty $`\lambda\|w\|_1`$ produces sparse coefficients, as in the
 
 For $`K`$ classes, give each class a weight vector $`w_k`$ and intercept $`b_k`$, and set
 
-$$
+```math
 P(Y=k\mid x)=\frac{\exp(s_k)}{\sum_{j=1}^K\exp(s_j)},\qquad s_k=w_k^\top x+b_k.
-$$
+```
 
 This is **multinomial logistic regression**, or **softmax regression**. Adding the same vector to every $`w_k`$, and the same number to every $`b_k`$, adds the same amount to every logit $`s_k`$ and leaves all probabilities unchanged; the same invariance is what makes the softmax stable to compute. The parameters are therefore identifiable only up to such shifts. Fixing one class's parameters at zero resolves this and shows that the log-odds of any class against the reference class are linear. With an $`\ell_2`$ penalty on the weights, their ambiguity is resolved automatically: among all shifted versions, the penalty is smallest when the weight vectors sum to zero. Unpenalized intercepts still need a convention, such as summing to zero. For $`K=2`$ the model reduces to binary logistic regression, with weight vector $`w_1-w_2`$ and intercept $`b_1-b_2`$ for class 1 against class 2.
 
 With one-hot targets $`Y\in\{0,1\}^{n\times K}`$, whose row $`i`$ has its single one in the column of the observed class $`y_i`$, and predicted probabilities $`P\in[0,1]^{n\times K}`$, whose row $`p_i^\top`$ holds the $`K`$ probabilities for $`x_i`$, the negative log-likelihood is the cross-entropy $`-\sum_i\sum_kY_{ik}\log P_{ik}`$. Its gradient with respect to the weight matrix $`W\in\mathbb R^{K\times(d+1)}`$, whose rows are the $`w_k^\top`$ with the intercepts absorbed as before (this $`W`$ is not the IRLS weight matrix), is
 
-$$
+```math
 \nabla_W\mathcal L=(P-Y)^\top X.
-$$
+```
 
 The per-example gradient with respect to the logits is $`p_i-e_{y_i}`$, where $`e_{y_i}`$ is the one-hot vector of the observed class, as derived in Numerical Computing. The logits of example $`i`$ are $`Wx_i`$, so the chain rule gives the contribution $`(p_i-e_{y_i})x_i^\top`$, and summing over the examples gives $`(P-Y)^\top X`$. The loss is convex because the log-sum-exp function is convex; its Hessian with respect to the logits is $`\operatorname{diag}(p)-pp^\top`$ per example, from Calculus and Optimization, Appendix B. The softmax output layer of a neural network classifier is this model applied to learned features.
 
@@ -236,9 +236,9 @@ The comparison illustrates a general principle rather than a fixed ranking. Stro
 
 A predicted probability is not yet a decision. With false-positive cost $`c_{\mathrm{FP}}`$ and false-negative cost $`c_{\mathrm{FN}}`$, the expected cost is minimized by predicting class 1 when
 
-$$
+```math
 \hat P(Y=1\mid x)\ge\frac{c_{\mathrm{FP}}}{c_{\mathrm{FP}}+c_{\mathrm{FN}}},
-$$
+```
 
 a result derived in Decisions, loss, and risk. The threshold $`1/2`$ is appropriate only for equal costs. Separating estimation from decision has a practical advantage: one fitted model serves any cost structure, and the threshold can be chosen after fitting. This requires the probabilities to be accurate, which is the subject of the next section.
 
@@ -250,17 +250,17 @@ Class imbalance is often handled by weighting the rare class more heavily during
 
 A probabilistic classifier $`\hat p(x)`$ is **calibrated** if
 
-$$
+```math
 P\bigl(Y=1\mid\hat p(X)=q\bigr)=q\qquad\text{for every }q.
-$$
+```
 
 Among all inputs assigned probability $`0.8`$, eighty percent should belong to class 1. Calibration is a property of the predictions, not of the classifier's ranking. A classifier can rank examples perfectly and be badly calibrated, as naive Bayes often is; conversely, the constant prediction $`\hat p(x)=P(Y=1)`$ is perfectly calibrated and useless for ranking. Good probabilistic prediction needs both calibration and **discrimination**, the ability to separate the classes.
 
 A **reliability diagram** bins the predictions and plots the observed frequency of class 1 against the average prediction in each bin, as in the [figure below](#recalibration). Points on the diagonal indicate calibration. The **expected calibration error** summarizes the diagram as
 
-$$
+```math
 \operatorname{ECE}=\sum_{b=1}^B\frac{n_b}{n}\bigl\lvert\bar y_b-\bar p_b\bigr\rvert,
-$$
+```
 
 where bin $`b`$ contains $`n_b`$ predictions with average $`\bar p_b`$ and observed frequency $`\bar y_b`$. The ECE depends on the binning and can be zero for a useless classifier, so it is a diagnostic rather than an objective.
 
@@ -268,9 +268,9 @@ where bin $`b`$ contains $`n_b`$ predictions with average $`\bar p_b`$ and obser
 
 The log loss and the **Brier score** $`(\hat p-y)^2`$ evaluate probabilities directly. Both are **strictly proper**: if the label is $`\operatorname{Bernoulli}(q)`$, the expected score is uniquely minimized by predicting $`\hat p=q`$. For the Brier score this follows from
 
-$$
+```math
 \mathbb E(\hat p-Y)^2=(\hat p-q)^2+q(1-q),
-$$
+```
 
 and for log loss from Gibbs' inequality; [Appendix A](#block-logreg-appendix-a) gives both arguments. A proper score rewards honest probabilities: no distortion of one's beliefs can improve the expected score. Classification accuracy is not strictly proper, since any prediction on the correct side of $`1/2`$ scores equally well.
 
@@ -354,9 +354,9 @@ Let $`Y\sim\operatorname{Bernoulli}(q)`$ and consider a prediction $`p\in(0,1)`$
 
 **Log score.** The expected log loss is
 
-$$
+```math
 -q\log p-(1-q)\log(1-p)=H(q)+D_{\mathrm{KL}}\bigl(\operatorname{Bernoulli}(q)\,\Vert\,\operatorname{Bernoulli}(p)\bigr),
-$$
+```
 
 the binary case of the cross-entropy decomposition, with $`H(q)=-q\log q-(1-q)\log(1-q)`$ the entropy of the label. By Gibbs' inequality, the divergence is zero only at $`p=q`$.
 
@@ -366,12 +366,12 @@ For a classifier and an input distribution, the population score is the expectat
 
 **Murphy's decomposition of the Brier score.** Suppose the predictions take finitely many values, or have been grouped into bins as in a reliability diagram, and each prediction is replaced by its bin average. Bin $`b`$ holds $`n_b`$ of the $`n`$ predictions, with common value $`\bar p_b`$ and observed frequency $`\bar y_b`$, and $`\bar y`$ is the overall frequency of class 1. Within bin $`b`$, the identity above with $`q=\bar y_b`$ gives $`\sum_{i\in b}(\bar p_b-y_i)^2=n_b\bigl[(\bar p_b-\bar y_b)^2+\bar y_b(1-\bar y_b)\bigr]`$. The variance of the labels splits into within-bin and between-bin parts, $`\bar y(1-\bar y)=\sum_b\frac{n_b}n\bar y_b(1-\bar y_b)+\sum_b\frac{n_b}n(\bar y_b-\bar y)^2`$. Combining the two,
 
-$$
+```math
 \frac1n\sum_{i=1}^n(\hat p_i-y_i)^2
 =\underbrace{\sum_b\frac{n_b}n(\bar p_b-\bar y_b)^2}_{\text{reliability}}
 -\underbrace{\sum_b\frac{n_b}n(\bar y_b-\bar y)^2}_{\text{resolution}}
 +\underbrace{\bar y(1-\bar y)}_{\text{uncertainty}}.
-$$
+```
 
 The reliability term is a squared version of the expected calibration error and vanishes for calibrated predictions. The resolution term rewards predictions that sort the examples into groups whose frequencies differ from the base rate, which is discrimination. The uncertainty term depends only on the labels.
 
@@ -384,9 +384,9 @@ The reliability term is a squared version of the expected calibration error and 
 
 Let $`\tilde y_iw^\top x_i\ge\gamma>0`$ for all $`i`$, with the intercept included in $`w`$ and $`x_i`$. For $`c>0`$,
 
-$$
+```math
 \mathcal L(cw)=\sum_{i=1}^n\log\bigl(1+e^{-c\,\tilde y_iw^\top x_i}\bigr)\le n\log\bigl(1+e^{-c\gamma}\bigr)\le ne^{-c\gamma},
-$$
+```
 
 which tends to zero. Every term is strictly positive for every finite parameter, so $`\mathcal L>0`$ everywhere, and the infimum $`0`$ is not attained. Adding $`\frac\lambda2\|w\|^2`$ with $`\lambda>0`$ makes the objective coercive, since it tends to infinity as $`\|w\|\to\infty`$, so a minimizer exists by the existence theorem for continuous coercive functions; strong convexity makes it unique.
 

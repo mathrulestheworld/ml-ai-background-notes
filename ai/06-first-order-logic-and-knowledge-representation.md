@@ -37,13 +37,13 @@ The richness has a price. A propositional language has finitely many models; a f
 
 Writing a knowledge base for a domain is **knowledge engineering**: identify the questions it must answer, assemble the relevant knowledge, choose a vocabulary of predicates, functions, and constants (an **ontology** of the domain), encode general rules, encode the specific problem instance, and debug. Take kinship. Given facts about the predicate $`\mathit{Parent}`$, definitions introduce the other relations:
 
-$$
+```math
 \begin{aligned}
 &\forall x,z\;\;\mathit{Grandparent}(x,z)\Leftrightarrow\exists y\;\mathit{Parent}(x,y)\wedge\mathit{Parent}(y,z),\\
 &\forall x,y\;\;\mathit{Sibling}(x,y)\Leftrightarrow x\neq y\wedge\exists p\;\mathit{Parent}(p,x)\wedge\mathit{Parent}(p,y),\\
 &\forall x,y\;\;\mathit{Ancestor}(x,y)\Leftrightarrow\mathit{Parent}(x,y)\vee\exists z\;\mathit{Parent}(x,z)\wedge\mathit{Ancestor}(z,y).
 \end{aligned}
-$$
+```
 
 The choice of basic predicates is a design decision: $`\mathit{Parent}`$ plus $`\mathit{Female}`$ define $`\mathit{Mother}`$, but one could equally start from $`\mathit{Mother}`$ and $`\mathit{Father}`$. Some sentences are **axioms**, basic facts from which others follow; others are **theorems**, entailed by the axioms and useful to state only to save inference. Debugging a knowledge base is different from debugging a program: a missing axiom does not produce a crash, only a query that fails or, worse, a wrong answer that follows correctly from an incorrect axiom. The last definition above also shows a limit of first-order logic: the biconditional does not pin down $`\mathit{Ancestor}`$ as the transitive closure of $`\mathit{Parent}`$ in every model, since unintended models, for example ones with infinite chains of descendants, can satisfy it with extra ancestor pairs; transitive closure is not definable in first-order logic. The least-model semantics of Datalog, below, gives the intended meaning.
 
@@ -59,9 +59,9 @@ When function symbols are present, there are infinitely many ground terms: $`\ma
 
 Propositionalization generates many useless instances. Given $`\forall x\;\mathit{King}(x)\wedge\mathit{Greedy}(x)\Rightarrow\mathit{Evil}(x)`$, $`\mathit{King}(\mathit{John})`$, and $`\mathit{Greedy}(\mathit{John})`$, it instantiates the rule for every object, when the only useful substitution, $`x/\mathit{John}`$, is obvious from the facts. **Lifted** inference works with variables directly, finding substitutions that make different sentences look identical. A **substitution** $`\theta`$ maps variables to terms, and $`\mathrm{Subst}(\theta,\alpha)`$ applies it. Two sentences **unify** if some substitution makes them identical, and **unification** computes one:
 
-$$
+```math
 \mathrm{Unify}\bigl(\mathit{Knows}(\mathit{John},x),\,\mathit{Knows}(y,\mathit{Mother}(y))\bigr)=\{y/\mathit{John},\;x/\mathit{Mother}(\mathit{John})\}.
-$$
+```
 
 Among all unifiers there is a **most general unifier** (MGU), unique up to renaming of variables, that places the fewest restrictions on the variables; every other unifier is an instance of it ([Appendix A](#block-ai06-appendix-a)). The algorithm walks both expressions in parallel, binding a variable to the corresponding subterm of the other expression. It must refuse to bind a variable to a term containing it, the **occurs check**: $`x`$ and $`f(x)`$ have no finite unifier. Variables in different sentences must also be **standardized apart**, renamed so they do not clash: $`\mathit{Knows}(\mathit{John},x)`$ and $`\mathit{Knows}(x,\mathit{Elizabeth})`$ unify once the second $`x`$ is renamed.
 
@@ -307,9 +307,9 @@ Other standard pieces of an upper ontology are **physical composition** ($`\math
 
 **Description logics** are designed to describe categories and reason about them. A description such as
 
-$$
+```math
 \mathit{Parent}\sqcap\forall\,\mathit{hasChild}.\mathit{Doctor}\sqcap\exists\,\mathit{hasChild}.\mathit{Female}
-$$
+```
 
 denotes the parents all of whose children are doctors and who have at least one daughter. The principal inference tasks are **subsumption**, whether one category is necessarily a subcategory of another, **classification**, which places a new description in the taxonomy by subsumption, and **consistency**, whether a category can have members at all. Description logics are fragments of first-order logic chosen for decidability, and their complexity is well mapped: the basic logic $`\mathcal{ALC}`$ has an EXPTIME-complete subsumption problem with general axioms, while the $`\mathcal{EL}`$ family, which drops universal restrictions and negation, allows polynomial-time classification and is used for SNOMED CT. OWL 2, the ontology language of the semantic web, is based on the more expressive $`\mathcal{SROIQ}`$.
 

@@ -28,9 +28,9 @@ A **probabilistic context-free grammar** (PCFG) attaches a probability to each r
 
 There are exponentially many parses, but they share subtrees, and the **CKY algorithm** (for Cocke, Kasami, and Younger) finds the best by dynamic programming. It requires the grammar in **Chomsky normal form**, with every rule of the form $`A\to B\,C`$ or $`A\to w`$, into which any context-free grammar can be converted. For each span of words $`i..k`$ and each nonterminal $`A`$, CKY computes the probability of the best subtree rooted in $`A`$ covering exactly that span, from shorter spans:
 
-$$
+```math
 \delta(i,k,A)=\max_{A\to B\,C}\ \max_{i<j<k}\ P(A\to B\,C)\,\delta(i,j,B)\,\delta(j,k,C),
-$$
+```
 
 starting from $`\delta(i,i+1,A)=P(A\to w_{i+1})`$. The best parse of the whole sentence has probability $`\delta(0,n,\mathrm S)`$, and backpointers recover it. The time is $`O(n^3|R|)`$ for $`n`$ words and $`|R|`$ rules. Replacing the maximum by a sum gives the **inside probability**, the total probability of all subtrees of $`A`$ over the span, and at the top, the probability of the sentence under the grammar; combined with the corresponding outside probabilities, it gives the expected number of times each rule is used, which is what EM needs to learn a grammar from unannotated sentences ([Appendix A](#block-nlp16-appendix-a)). The code parses with a small PCFG in which a prepositional phrase can attach to a verb phrase or to a noun phrase.
 
@@ -302,21 +302,21 @@ Behavioral tests measure whether models use this structure. Number agreement bet
 
 For a PCFG in Chomsky normal form and a sentence $`w_1\dots w_n`$, the **inside probability** $`\beta(i,k,A)=P(A\Rightarrow^*w_{i+1}\dots w_k)`$ is the total probability of the subtrees rooted in $`A`$ that cover the span, computed bottom-up like CKY with sums:
 
-$$
+```math
 \beta(i,i+1,A)=P(A\to w_{i+1}),\qquad\beta(i,k,A)=\sum_{A\to B\,C}\sum_{j=i+1}^{k-1}P(A\to B\,C)\,\beta(i,j,B)\,\beta(j,k,C),
-$$
+```
 
 and $`P(w_1\dots w_n)=\beta(0,n,\mathrm S)`$. The **outside probability** $`\alpha(i,k,A)`$ is the probability of generating the words outside the span together with an $`A`$ over the span, computed top-down from $`\alpha(0,n,\mathrm S)=1`$ by summing over the ways $`A`$ can be the left or the right child of a larger constituent:
 
-$$
+```math
 \alpha(i,k,A)=\sum_{B\to A\,C}\sum_{l>k}P(B\to A\,C)\,\alpha(i,l,B)\,\beta(k,l,C)+\sum_{B\to C\,A}\sum_{l<i}P(B\to C\,A)\,\alpha(l,k,B)\,\beta(l,i,C).
-$$
+```
 
 The product $`\alpha(i,k,A)\beta(i,k,A)`$ is the joint probability of the sentence and of a constituent $`A`$ over the span, so dividing by $`P(w_1\dots w_n)`$ gives its posterior probability. The expected number of uses of the rule $`A\to B\,C`$ in the sentence is
 
-$$
+```math
 \frac1{P(w_1\dots w_n)}\sum_{i<j<k}\alpha(i,k,A)\,P(A\to B\,C)\,\beta(i,j,B)\,\beta(j,k,C),
-$$
+```
 
 and similarly for lexical rules. EM alternates between computing these expected counts over a corpus and renormalizing them into rule probabilities, the **inside–outside algorithm** ([Baker, 1979](https://doi.org/10.1121/1.2017061); [Lari and Young, 1990](https://www.sciencedirect.com/science/article/pii/088523089090022X)). It generalizes the forward–backward algorithm for hidden Markov models, which are the special case of grammars that branch only to the right. The likelihood has many local maxima, and grammars learned this way from raw text rarely resemble linguists' grammars; neural parameterizations of the rule probabilities improved unsupervised grammar induction substantially ([Kim, Dyer, and Rush, 2019](https://arxiv.org/abs/1906.10225)).
 
@@ -330,13 +330,13 @@ and similarly for lexical rules. EM alternates between computing these expected 
 
 A projective dependency tree over a span decomposes at its head: the head's left and right dependents form separate projective subtrees, each attached independently. Eisner's algorithm exploits this with spans that have their head at one end. A **complete** span $`C[s,t,\rightarrow]`$ is a subtree over words $`s..t`$ headed by $`s`$, in which every word has received all its dependents inside the span; an **incomplete** span $`I[s,t,\rightarrow]`$ contains the arc $`s\to t`$ with everything between $`s`$ and $`t`$ attached, while $`t`$ may still receive dependents to its right. The mirror-image spans have their heads at $`t`$. The recurrences, for best scores, are
 
-$$
+```math
 I[s,t,\rightarrow]=\max_{s\le r<t}\bigl(C[s,r,\rightarrow]+C[r+1,t,\leftarrow]\bigr)+s(s,t),\qquad I[s,t,\leftarrow]=\max_{s\le r<t}\bigl(C[s,r,\rightarrow]+C[r+1,t,\leftarrow]\bigr)+s(t,s),
-$$
+```
 
-$$
+```math
 C[s,t,\rightarrow]=\max_{s<r\le t}\bigl(I[s,r,\rightarrow]+C[r,t,\rightarrow]\bigr),\qquad C[s,t,\leftarrow]=\max_{s\le r<t}\bigl(C[s,r,\leftarrow]+I[r,t,\leftarrow]\bigr),
-$$
+```
 
 with $`C[s,s,\cdot]=0`$. The best tree has score $`C[0,n,\rightarrow]`$, where position 0 is ROOT. Each of the $`O(n^2)`$ spans takes a maximum over $`O(n)`$ split points, so the time is $`O(n^3)`$. A naive adaptation of CKY with head words as nonterminals would index each span by its head as well and take $`O(n^5)`$ time; keeping the head at the end of the span is what saves the two factors of $`n`$. Replacing max and $`+`$ by sum and $`\times`$ over $`e^{s(h,d)}`$, or by log-sum-exp and $`+`$, gives the partition function. With all scores zero it counts projective trees, which for $`n`$ words with any number of dependents of ROOT number $`\binom{3n}{n}/(2n+1)`$: 1, 3, 12, 55, 273, 1,428, growing like $`(27/4)^n`$, while all trees number $`(n+1)^{n-1}`$.
 

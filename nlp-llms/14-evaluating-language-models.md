@@ -26,9 +26,9 @@ For free-form answers, the model generates a response and a program extracts and
 
 When the model samples its answers, performance with several attempts matters too, since a user or a system with a verifier can try more than once (chapter 12). **pass@$`k`$** is the probability that at least one of $`k`$ samples solves a problem, averaged over problems. The obvious estimate, drawing $`k`$ samples per problem and recording whether any succeeded, has high variance. Chen et al. instead draw $`n\ge k`$ samples, count the $`c`$ correct ones, and estimate pass@$`k`$ by the probability that a random subset of $`k`$ of the $`n`$ samples contains at least one correct sample,
 
-$$
+```math
 \widehat{\text{pass@}k}=1-\binom{n-c}{k}\Big/\binom{n}{k},
-$$
+```
 
 which is unbiased ([Appendix A](#block-nlp14-appendix-a)). Plugging the observed success rate $`c/n`$ into $`1-(1-p)^k`$ is biased downward. The code simulates 164 problems with success rates of widely varying difficulty and 20 samples per problem.
 
@@ -223,9 +223,9 @@ The naive standard error of model A's accuracy, 0.0156, understates the actual s
 
 Two models evaluated on the same questions are not independent samples. Questions that are hard for one model tend to be hard for the other, so their per-question scores are positively correlated, and the variance of the difference in their mean scores is
 
-$$
+```math
 \operatorname{Var}(\bar x_B-\bar x_A)=\frac{\sigma_A^2+\sigma_B^2-2\rho\,\sigma_A\sigma_B}{n},
-$$
+```
 
 where $`\rho`$ is the correlation of their per-question scores. Computing the standard error from the per-question differences $`x_{B,i}-x_{A,i}`$ uses this correlation automatically. In the simulation, the unpaired standard error of the difference is 0.0219 and the paired one 0.0186, which matches the actual spread of 0.0187. The shared passage difficulty that inflated each model's own standard error cancels in the difference, so clustering no longer matters. The observed difference of 2.4 points is 1.3 paired standard errors, not significant at the 5% level even though the models do differ in ability.
 
@@ -248,9 +248,9 @@ Good practice follows from the rest of the chapter. Report the protocol: the pro
 
 Fix a problem on which each sample succeeds independently with probability $`p`$, so pass@$`k`$ for this problem is $`1-(1-p)^k`$. Draw $`n\ge k`$ samples, of which $`c`$ are correct, and consider a subset $`S`$ of $`k`$ of them chosen uniformly at random. Given the samples, the probability that $`S`$ contains no correct sample is $`\binom{n-c}{k}/\binom{n}{k}`$, the number of all-wrong subsets over the number of subsets. Unconditionally, $`S`$ is a set of $`k`$ independent samples, so the probability that all are wrong is $`(1-p)^k`$. By the law of total expectation,
 
-$$
+```math
 \mathbb E\Bigl[\binom{n-c}{k}\Big/\binom{n}{k}\Bigr]=(1-p)^k,
-$$
+```
 
 so $`1-\binom{n-c}{k}/\binom{n}{k}`$ is an unbiased estimate of pass@$`k`$, and averaging over problems keeps it unbiased. It uses all $`n`$ samples, which gives it a smaller variance than the indicator of whether $`k`$ fresh samples contain a success, whose expectation is the same. The plug-in estimate $`1-(1-c/n)^k`$ is biased downward: $`u\mapsto(1-u)^k`$ is convex, so by Jensen's inequality $`\mathbb E[(1-c/n)^k]\ge(1-p)^k`$, with equality only for $`k=1`$. For numerical stability with large $`n`$, the ratio of binomial coefficients is computed as a product, $`\binom{n-c}{k}/\binom{n}{k}=\prod_{i=n-c+1}^{n}(1-k/i)`$ when $`n-c\ge k`$, and it is zero otherwise.
 
@@ -264,9 +264,9 @@ so $`1-\binom{n-c}{k}/\binom{n}{k}`$ is an unbiased estimate of pass@$`k`$, and 
 
 **Clustered.** Let the $`n`$ questions fall into groups $`g=1,\dots,G`$, write $`x_i`$ for the score on question $`i`$ and $`\bar x`$ for the mean, and assume that groups are independent while questions within a group may be correlated. The variance of $`\bar x=\frac1n\sum_g\sum_{i\in g}x_i`$ is $`\frac1{n^2}\sum_g\operatorname{Var}\bigl(\sum_{i\in g}x_i\bigr)`$, and the clustered, or sandwich, estimate replaces each group's variance by its squared summed residual:
 
-$$
+```math
 \widehat{\operatorname{SE}}_{\text{cluster}}=\frac1n\sqrt{\sum_{g=1}^G\Bigl(\sum_{i\in g}(x_i-\bar x)\Bigr)^2}.
-$$
+```
 
 When all groups have size $`m`$ and questions in a group have correlation $`\rho_{\mathrm{c}}`$, the variance is larger than under independence by the **design effect** $`1+(m-1)\rho_{\mathrm{c}}`$. In the chapter's simulation the clustered standard error is 1.24 times the naive one, a design effect of about 1.55, which with $`m=5`$ corresponds to $`\rho_{\mathrm c}\approx0.14`$. The estimate needs enough groups to be reliable, a few dozen at least.
 

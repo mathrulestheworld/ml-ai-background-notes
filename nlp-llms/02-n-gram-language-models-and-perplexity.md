@@ -12,9 +12,9 @@ A **language model** assigns a probability to every sequence of tokens $`w_1,\do
 
 The chain rule of probability writes any sequence probability as a product of next-token predictions,
 
-$$
+```math
 P(w_{1:T})=\prod_{t=1}^TP(w_t\mid w_{1:t-1}),
-$$
+```
 
 so a model of the conditionals is a model of text, and its log-likelihood is a sum of next-token log losses (Foundations chapter 5). The factorization is exact but offers no help by itself: a history of 20 words from a 10,000-word vocabulary has $`10^{80}`$ possible values, and almost every history in a new text has never occurred before.
 
@@ -22,17 +22,17 @@ so a model of the conditionals is a model of text, and its log-likelihood is a s
 
 An **n-gram model** assumes that only the last $`n-1`$ tokens matter,
 
-$$
+```math
 P(w_t\mid w_{1:t-1})\approx P(w_t\mid w_{t-n+1:t-1}),
-$$
+```
 
 a Markov chain of order $`n-1`$ (AI chapter 11). A unigram model ($`n=1`$) ignores context entirely, a bigram model conditions on the previous token, and a trigram model on the previous two. Sequences are padded with start symbols `<s>` so that the first tokens have a full context, and an end symbol `</s>` is often added so that the model also assigns probabilities to lengths.
 
 The maximum-likelihood estimate of each conditional is a relative frequency: with $`c(\cdot)`$ counting occurrences in the training text,
 
-$$
+```math
 P_{\mathrm{ML}}(w\mid h)=\frac{c(h\,w)}{c(h)},
-$$
+```
 
 the fraction of the times the context $`h`$ was followed by $`w`$. The code counts the word bigrams of Tiny Shakespeare, the corpus of chapter 1, lists the most likely words after two contexts, and generates text by sampling each next word from the counts of a unigram, bigram, trigram, and 4-gram model. It splits text into lowercase words and punctuation marks, the unit used throughout this chapter.
 
@@ -113,9 +113,9 @@ The left panel shows why maximum-likelihood estimates are unusable. Two thirds o
 
 The simplest method adds a pseudo-count $`k`$ to every possible continuation,
 
-$$
+```math
 P_{\text{add-}k}(w\mid h)=\frac{c(h\,w)+k}{c(h)+kV}.
-$$
+```
 
 With $`k=1`$ this is **Laplace smoothing**. It is the posterior mean of the next-word distribution under a symmetric Dirichlet prior ([Appendix C](#block-nlp02-appendix-c); AI chapter 14), which suits small vocabularies. For words it fails badly. A context seen 100 times, followed by 40 distinct words in a vocabulary of 12,000, gives the 11,960 unseen continuations a total probability of $`11{,}960/12{,}100\approx0.99`$, leaving 1% for the words actually observed. Smaller values of $`k`$ help, but a single constant cannot suit both frequent contexts, which need little smoothing, and rare ones, which need much. In the figure, add-$`k`$ with $`k`$ tuned on the development set is competitive for unigrams and low-order character models and deteriorates quickly beyond them.
 
@@ -123,9 +123,9 @@ With $`k=1`$ this is **Laplace smoothing**. It is the posterior mean of the next
 
 A better idea asks how often events seen $`c`$ times in one sample occur in another. Let $`N_c`$ be the number of distinct n-grams that occur exactly $`c`$ times in the training data, the **count of counts**, and $`N`$ the number of tokens. The **Good–Turing** estimate, devised by Turing during his wartime codebreaking and published by [Good (1953)](https://doi.org/10.1093/biomet/40.3-4.237), replaces each count $`c`$ by
 
-$$
+```math
 c^*=(c+1)\frac{N_{c+1}}{N_c},
-$$
+```
 
 and assigns the unseen n-grams a total probability of $`N_1/N`$, the fraction of the sample made up of **singletons** ([Appendix A](#block-nlp02-appendix-a)). The idea is that the next new event behaves like the events seen once so far. The code tests these predictions on bigrams. It shuffles the speeches of the corpus, splits them into two halves of about 125,000 words, and, for the bigrams occurring $`c`$ times in the first half, compares their average count in the second half with the Good–Turing value $`c^*`$.
 
@@ -173,9 +173,9 @@ Good–Turing predicts that 34.0% of second-half bigrams are new, and 35.0% are.
 
 Lower-order models are less specific but better estimated, so they are natural fallbacks for sparse contexts. **Linear interpolation** mixes the orders,
 
-$$
+```math
 P_{\mathrm{interp}}(w\mid h_{n-1})=\lambda\,P_{\mathrm{ML}}(w\mid h_{n-1})+(1-\lambda)\,P_{\mathrm{interp}}(w\mid h_{n-2}),
-$$
+```
 
 recursively down to a unigram or uniform distribution, where $`h_k`$ denotes the last $`k`$ tokens of the context. The weights are chosen to maximize the likelihood of held-out data, by grid search or by EM, the method Jelinek and Mercer (1980) called deleted interpolation, and can depend on how often the context was seen. **Backoff** models use the higher-order estimate when the n-gram was seen and fall back to the lower order only when it was not. [Katz (1987)](https://doi.org/10.1109/TASSP.1987.1165125) discounted the observed counts with Good–Turing and distributed the freed mass over the unseen continuations in proportion to the lower-order model, so that the result remains a probability distribution.
 
@@ -185,19 +185,19 @@ At web scale, simplicity wins. **Stupid backoff** ([Brants et al., 2007](https:/
 
 The held-out experiment suggests subtracting a fixed discount $`D`$ between 0 and 1 from every nonzero count and giving the collected mass to the lower-order model:
 
-$$
+```math
 P_{\mathrm{abs}}(w\mid h)=\frac{\max(c(h\,w)-D,0)}{c(h)}+\gamma(h)\,P_{\mathrm{lower}}(w),
 \qquad
 \gamma(h)=\frac{D\,N_{1+}(h\,\bullet)}{c(h)},
-$$
+```
 
 where $`N_{1+}(h\,\bullet)`$ is the number of distinct words seen after $`h`$. The weight $`\gamma(h)`$ equals exactly the mass removed, so the distribution sums to one; contexts followed by many different words reserve more mass for unseen ones, which is right, since such contexts are the most likely to produce new continuations.
 
 **Kneser–Ney smoothing** ([Kneser and Ney, 1995](https://doi.org/10.1109/ICASSP.1995.479394)) changes what the lower-order model estimates. The lower-order distribution is consulted only when the higher-order context has little evidence, so it should answer a different question from "how frequent is $`w`$?": namely, "how likely is $`w`$ to appear after a context in which it has not been seen?" A word that is frequent but occurs after only one or two contexts is a poor guess for a new context. Kneser–Ney therefore replaces raw counts in the lower-order model by **continuation counts**, the number of distinct words that precede $`w`$:
 
-$$
+```math
 P_{\mathrm{cont}}(w)=\frac{N_{1+}(\bullet\,w)}{N_{1+}(\bullet\,\bullet)}.
-$$
+```
 
 This choice is not a heuristic: it is the lower-order distribution for which the smoothed bigram model reproduces the observed unigram frequencies ([Appendix B](#block-nlp02-appendix-b)). In **interpolated Kneser–Ney**, the recursion applies the discount at every order and uses continuation counts at every order below the highest. The code implements it, with a discount per order estimated from the count of counts as $`D=N_1/(N_1+2N_2)`$ ([Ney, Essen, and Kneser, 1994](https://doi.org/10.1006/csla.1994.1001)).
 
@@ -281,9 +281,9 @@ Count-based models treat every token as an unrelated symbol. Having seen *the ca
 
 Before language models generated text, their main use was as a **prior** in the **noisy-channel** model. An observation $`o`$, such as an acoustic signal, a scanned page, or a misspelled word, is treated as the output of a channel applied to an intended text $`w`$, and decoding picks
 
-$$
+```math
 \hat w=\arg\max_wP(w\mid o)=\arg\max_wP(o\mid w)\,P(w),
-$$
+```
 
 combining a channel model $`P(o\mid w)`$ that describes the corruption with a language model $`P(w)`$ that describes what people write. The decomposition lets each part be trained on different data, and it dominated speech recognition, spelling correction, and statistical machine translation (chapter 15) for three decades. Neural systems now usually model $`P(w\mid o)`$ directly, but the idea survives wherever a separately trained language model rescores the outputs of another system.
 
@@ -296,21 +296,21 @@ combining a channel model $`P(o\mid w)`$ that describes the corruption with a la
 
 Suppose $`N`$ tokens are drawn independently from a distribution with probabilities $`p_i`$ over types $`i`$. The number of types seen exactly $`r`$ times, $`N_r`$, has expectation
 
-$$
+```math
 \mathbb E_N[N_r]=\sum_i\binom Nr p_i^r(1-p_i)^{N-r}.
-$$
+```
 
 The total probability of the types seen exactly $`r`$ times is $`M_r=\sum_ip_i\,\mathbf 1[\text{type }i\text{ seen }r\text{ times}]`$, with expectation
 
-$$
+```math
 \mathbb E_N[M_r]=\sum_i\binom Nr p_i^{r+1}(1-p_i)^{N-r}.
-$$
+```
 
 Since $`\binom{N+1}{r+1}=\frac{N+1}{r+1}\binom Nr`$, the same sum appears in the expected count of counts for a sample one token larger:
 
-$$
+```math
 \mathbb E_N[M_r]=\frac{r+1}{N+1}\,\mathbb E_{N+1}[N_{r+1}]\approx\frac{(r+1)\,\mathbb E[N_{r+1}]}{N}.
-$$
+```
 
 For $`r=0`$ the total probability of all unseen types is about $`N_1/N`$. For $`r\ge1`$, dividing the mass of the $`N_r`$ types seen $`r`$ times equally among them gives each a probability of about $`(r+1)N_{r+1}/(N\,N_r)=r^*/N`$, which is the adjusted count $`r^*=(r+1)N_{r+1}/N_r`$. The derivation uses expectations, so replacing $`\mathbb E[N_{r+1}]`$ by the observed $`N_{r+1}`$ is accurate only where the count of counts is large; for large $`r`$ the observed $`N_{r+1}`$ is noisy or zero, and practical versions smooth the sequence $`N_r`$ or use the raw counts there.
 
@@ -324,21 +324,21 @@ For $`r=0`$ the total probability of all unseen types is about $`N_1/N`$. For $`
 
 Consider an interpolated bigram model with discount $`0<D\le1`$,
 
-$$
+```math
 P(w\mid v)=\frac{\max(c(v\,w)-D,0)}{c(v)}+\frac{D\,N_{1+}(v\,\bullet)}{c(v)}\,P_{\mathrm{lower}}(w),
-$$
+```
 
 and require that it reproduce the observed frequency of every word: averaged over contexts in proportion to their counts, the predicted probability of $`w`$ should equal its relative frequency, $`\sum_vc(v)\,P(w\mid v)=c(w)`$. Every nonzero bigram count is at least $`1\ge D`$, so $`\sum_v\max(c(v\,w)-D,0)=c(w)-D\,N_{1+}(\bullet\,w)`$, where $`N_{1+}(\bullet\,w)`$ counts the distinct words preceding $`w`$ (and $`c(w)`$ counts the occurrences of $`w`$ that have a predecessor). The constraint becomes
 
-$$
+```math
 c(w)-D\,N_{1+}(\bullet\,w)+D\,P_{\mathrm{lower}}(w)\sum_vN_{1+}(v\,\bullet)=c(w),
-$$
+```
 
 and since $`\sum_vN_{1+}(v\,\bullet)=N_{1+}(\bullet\,\bullet)`$, the number of distinct bigram types,
 
-$$
+```math
 P_{\mathrm{lower}}(w)=\frac{N_{1+}(\bullet\,w)}{N_{1+}(\bullet\,\bullet)}.
-$$
+```
 
 The lower-order distribution that makes the smoothed model consistent with the unigram statistics is the continuation distribution, independent of $`D`$. Kneser and Ney derived their method from this constraint; applying the same argument at each order of a longer model gives continuation counts at every order below the highest.
 
@@ -352,9 +352,9 @@ The lower-order distribution that makes the smoothed model consistent with the u
 
 Let $`\theta=(\theta_1,\dots,\theta_V)`$ be the unknown next-word distribution after a context $`h`$, with a symmetric Dirichlet prior $`\mathrm{Dir}(k,\dots,k)`$, density proportional to $`\prod_w\theta_w^{k-1}`$. Observing the counts $`c(h\,w)`$ multiplies it by the likelihood $`\prod_w\theta_w^{c(h\,w)}`$, so the posterior is $`\mathrm{Dir}(c(h\,w)+k)`$. A Dirichlet with parameters $`\alpha_w`$ has mean $`\alpha_w/\sum_{w'}\alpha_{w'}`$, so the posterior mean, which is also the posterior predictive probability of the next word, is
 
-$$
+```math
 \mathbb E[\theta_w\mid\text{counts}]=\frac{c(h\,w)+k}{c(h)+kV}.
-$$
+```
 
 The prior acts as $`kV`$ imaginary observations spread evenly over the vocabulary. With $`k=1`$ and $`V=12{,}000`$ this is 12,000 imaginary observations, which swamp the evidence of any context seen fewer than thousands of times. The uniform prior is also the wrong shape: word distributions are heavy-tailed, and a prior that encodes this, such as the Pitman–Yor process behind Kneser–Ney, discounts rare counts proportionally more than frequent ones.
 

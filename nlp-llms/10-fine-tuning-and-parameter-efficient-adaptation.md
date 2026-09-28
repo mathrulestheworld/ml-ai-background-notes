@@ -50,9 +50,9 @@ Updating all weights needs memory for the weights, their gradients, and the opti
 
 **LoRA** ([Hu et al., 2022](https://arxiv.org/abs/2106.09685)) adapts a weight matrix $`W\in\mathbb R^{m\times n}`$ by adding a trainable low-rank update,
 
-$$
+```math
 W'=W+\frac\alpha r\,BA,\qquad B\in\mathbb R^{m\times r},\ A\in\mathbb R^{r\times n},\ r\ll\min(m,n),
-$$
+```
 
 with $`A`$ initialized randomly and $`B`$ at zero, so training starts exactly at the pretrained model, and a scale $`\alpha/r`$ that makes the learning dynamics roughly independent of the rank ([Appendix A](#block-nlp10-appendix-a)). Each adapted matrix costs $`r(m+n)`$ trained parameters instead of $`mn`$. After training, $`BA`$ can be added into $`W`$, so the adapted model has exactly the original architecture and no extra inference cost; alternatively, many LoRA updates can share one base model in memory and be applied per request. On GPT-3 175B, LoRA cut the number of trained parameters by a factor of 10,000 and the GPU memory for training by a factor of three while matching full fine-tuning on the tasks tested, and ranks as small as 1 or 2 were often enough.
 
@@ -322,9 +322,9 @@ A small model can also be trained to imitate a large one (DL chapter 11). For la
 
 Consider one adapted matrix with update $`\Delta W=sBA`$, $`s=\alpha/r`$, $`A`$ initialized with entries of variance $`1/n`$ and $`B=0`$. The gradient of the loss $`\ell`$ with respect to $`B`$ is $`s\,G A^\top`$, where $`G=\partial\ell/\partial W`$ is the gradient with respect to the full weight. After one step of gradient descent with learning rate $`\eta`$ on $`B`$, the update is
 
-$$
+```math
 \Delta W=sB_1A=-\eta s^2\,GA^\top A.
-$$
+```
 
 For random $`A`$ with $`r`$ rows, $`\mathbb E[A^\top A]=\frac rnI`$, so $`\mathbb E[\Delta W]=-\eta s^2\frac rnG`$. With $`s=\alpha/r`$ this is $`-\eta\alpha^2G/(rn)`$, which shrinks as $`1/r`$; with $`s=\alpha/\sqrt r`$ it is $`-\eta\alpha^2G/n`$, independent of $`r`$. Adam normalizes gradients elementwise, which changes the constants but not the conclusion that the effective step depends on the rank through $`s`$. The original $`\alpha/r`$ scaling lets one tune the learning rate at one rank and reuse it at nearby ranks, but at large ranks it makes the update too small to learn, which is why higher ranks often failed to help in early experiments and why rank-stabilized scaling uses $`\alpha/\sqrt r`$.
 
@@ -350,9 +350,9 @@ For a model with $`P`$ parameters trained with AdamW in mixed precision, full fi
 
 Let $`f(x;\theta)`$ be the network's output. If fine-tuning moves the weights only slightly from $`\theta_0`$, the output is close to its first-order expansion, $`f(x;\theta_0+\tau)\approx f(x;\theta_0)+\nabla_\theta f(x;\theta_0)^\top\tau`$, the linearized network of DL chapter 15. In that regime, adding two task vectors adds their effects on the output:
 
-$$
+```math
 f(x;\theta_0+\tau_1+\tau_2)-f(x;\theta_0)\approx\nabla f^\top\tau_1+\nabla f^\top\tau_2.
-$$
+```
 
 The combination works for both tasks if each task vector changes the outputs on its own task's inputs and leaves the other task's inputs nearly unchanged, that is, if $`\nabla f(x;\theta_0)^\top\tau_2\approx0`$ for inputs $`x`$ of task 1 and vice versa. [Ortiz-Jimenez, Favero, and Frossard (2023)](https://arxiv.org/abs/2305.12827) call this **weight disentanglement**, show that it holds to a large extent in pretrained models, and find that fine-tuning the linearized model directly makes task arithmetic more reliable. When the tasks overlap, the effects interfere, and the sum can be worse than either vector alone; scaling each vector down, as with the coefficient of one half in the code, trades each task's gain for less interference.
 

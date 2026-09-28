@@ -22,15 +22,15 @@ Raw counts make poor vectors. They are dominated by frequent context words such 
 
 **Pointwise mutual information** ([Church and Hanks, 1990](https://aclanthology.org/J90-1003/)) measures how much more often $`w`$ and $`c`$ co-occur than they would if they were independent,
 
-$$
+```math
 \operatorname{PMI}(w,c)=\log\frac{P(w,c)}{P(w)\,P(c)}=\log\frac{\#(w,c)\,|D|}{\#(w)\,\#(c)},
-$$
+```
 
 where $`\#(w,c)`$ counts the co-occurrences, $`\#(w)=\sum_c\#(w,c)`$ and $`\#(c)=\sum_w\#(w,c)`$ are the marginal counts, and $`|D|`$ is the total number of pairs. It is the log of the ratio in the mutual information of Foundations chapter 5, evaluated at a single pair of values rather than averaged. Positive values mark associations, zero independence, and negative values pairs that avoid each other; pairs never observed have $`\operatorname{PMI}=-\infty`$. Negative values are unreliable, because showing that two words co-occur less than chance requires far more data than showing that they co-occur more, so the standard representation is **positive PMI**,
 
-$$
+```math
 \operatorname{PPMI}(w,c)=\max\bigl(\operatorname{PMI}(w,c),0\bigr).
-$$
+```
 
 PMI overrates rare context words: a context seen once, next to $`w`$, gets a large PMI from a single observation. A simple correction raises the context counts to a power $`\alpha<1`$ before normalizing, $`P_\alpha(c)\propto\#(c)^\alpha`$ with $`\alpha=0.75`$, which raises the probability of rare contexts and lowers their PMI. The value comes from word2vec, and it helps count-based vectors as much as predictive ones ([Levy, Goldberg, and Dagan, 2015](https://aclanthology.org/Q15-1016/)).
 
@@ -91,9 +91,9 @@ Even from 200,000 words the neighbors are sensible. *Romeo* is surrounded by the
 
 **Word2vec** ([Mikolov et al., 2013a](https://arxiv.org/abs/1301.3781); [2013b](https://arxiv.org/abs/1310.4546)) learns vectors by prediction rather than counting. The **skip-gram** model gives every word two vectors, a **word vector** $`w`$ used when it is the center and a **context vector** $`c`$ used when it is in the window, and models the probability of seeing context $`c`$ near word $`w`$ as a softmax over the vocabulary,
 
-$$
+```math
 P(c\mid w)=\frac{\exp(c^\top w)}{\sum_{c'}\exp(c'^\top w)}.
-$$
+```
 
 Training maximizes the log-likelihood of all (word, context) pairs within the window. The model is a log-bilinear language model with no hidden layer, and its only parameters are the two embedding tables. The companion **continuous bag-of-words** (CBOW) model predicts the center word from the average of its context vectors. The obstacle is the normalizer: each gradient step for one pair touches all $`V`$ context vectors. The original papers avoided it with a **hierarchical softmax** over a binary tree of words, which costs $`O(\log V)`$ per pair, and with the simpler method that became standard.
 
@@ -101,9 +101,9 @@ Training maximizes the log-likelihood of all (word, context) pairs within the wi
 
 **Skip-gram with negative sampling** (SGNS) replaces the softmax by binary classification. For each observed pair $`(w,c)`$ it draws $`k`$ **negative** contexts $`c_1,\dots,c_k`$ from a noise distribution $`P_n`$ and maximizes
 
-$$
+```math
 \log\sigma(c^\top w)+\sum_{i=1}^k\log\sigma(-c_i^\top w),
-$$
+```
 
 so the model learns to tell real pairs from random ones with a logistic regression whose features are the two vectors (ML chapter 5). The objective is a simplified form of **noise-contrastive estimation** ([Gutmann and Hyvärinen, 2010](https://proceedings.mlr.press/v9/gutmann10a.html)) and a relative of the contrastive losses of DL chapter 10. Each step touches only $`k+1`$ context vectors, with $`k`$ between 2 and 20. The noise distribution is the unigram distribution raised to the power 0.75, the same smoothing as in PPMI. Word2vec also **subsamples** frequent words, discarding each occurrence of word $`w`$ with probability $`1-\sqrt{t/f(w)}`$ for its relative frequency $`f(w)`$ and a threshold $`t`$ around $`10^{-5}`$, which speeds training and effectively widens the window around rare words.
 
@@ -111,9 +111,9 @@ so the model learns to tell real pairs from random ones with a logistic regressi
 
 Although SGNS is trained by stochastic gradient descent on sampled pairs, its objective can be written as a sum over all word–context pairs with weights given by their counts, and each pair's term depends only on the single number $`x=c^\top w`$. If the dimension is large enough for every $`x`$ to be set independently, the optimum is
 
-$$
+```math
 c^\top w=\log\frac{\#(w,c)}{\#(w)\,P_n(c)}-\log k=\operatorname{PMI}(w,c)-\log k
-$$
+```
 
 ([Levy and Goldberg, 2014](https://papers.nips.cc/paper/5477-neural-word-embedding-as-implicit-matrix-factorization); [Appendix A](#block-nlp03-appendix-a)), with PMI computed against the noise distribution. SGNS therefore factorizes the matrix of PMI values shifted by $`\log k`$, like the SVD of the previous section but with a different loss: it weights each cell by how often the pair and its negatives were sampled, so frequent pairs are fit tightly and rare ones loosely, and it never sees the $`-\infty`$ entries of unobserved pairs directly. The code trains SGNS in PyTorch on the same pairs as the PPMI code, with 100 dimensions and $`k=5`$, then checks the prediction on the pairs seen at least 30 times.
 
@@ -202,10 +202,10 @@ The equivalence explains a long debate. When word2vec appeared, its vectors beat
 
 **GloVe** ([Pennington, Socher, and Manning, 2014](https://aclanthology.org/D14-1162/)) makes the factorization explicit. It starts from the observation that ratios of co-occurrence probabilities carry meaning: $`P(\textit{solid}\mid\textit{ice})/P(\textit{solid}\mid\textit{steam})`$ is large, $`P(\textit{gas}\mid\textit{ice})/P(\textit{gas}\mid\textit{steam})`$ is small, and $`P(\textit{water}\mid\cdot)`$ is about the same for both, so the relation between *ice* and *steam* shows in the ratios. Asking differences of vectors to encode log ratios leads to a weighted least-squares fit of the log counts,
 
-$$
+```math
 J=\sum_{i,j:\,X_{ij}>0}f(X_{ij})\bigl(w_i^\top\tilde w_j+b_i+\tilde b_j-\log X_{ij}\bigr)^2,
 \qquad f(x)=\min\bigl(1,(x/x_{\max})^{3/4}\bigr),
-$$
+```
 
 where $`X_{ij}`$ counts co-occurrences, $`b_i`$ and $`\tilde b_j`$ are biases that absorb the word frequencies, and the weight $`f`$ discounts rare pairs and caps frequent ones at $`x_{\max}=100`$. Only the nonzero cells enter the sum, so training costs time proportional to the number of distinct co-occurring pairs. GloVe and SGNS perform similarly in practice; both are factorizations of a transformed co-occurrence matrix with a weighting that favors frequent pairs.
 
@@ -262,17 +262,17 @@ Averaging the word vectors of a sentence gives a surprisingly strong sentence re
 
 Let $`\#(w,c)`$ be the number of times the pair $`(w,c)`$ is observed and $`\#(w)=\sum_c\#(w,c)`$. Each observed pair contributes $`\log\sigma(c^\top w)`$ and brings $`k`$ negatives drawn from $`P_n`$, so in expectation word $`w`$ is paired with context $`c`$ as a negative $`k\,\#(w)\,P_n(c)`$ times. The expected objective is
 
-$$
+```math
 \ell=\sum_{w,c}\Bigl[\#(w,c)\log\sigma(x_{wc})+k\,\#(w)\,P_n(c)\log\sigma(-x_{wc})\Bigr],\qquad x_{wc}=c^\top w.
-$$
+```
 
 If the dimension is large enough that each $`x_{wc}`$ can be chosen freely, $`\ell`$ separates into one concave term per pair. Using $`\frac{d}{dx}\log\sigma(x)=\sigma(-x)`$ and $`\frac{d}{dx}\log\sigma(-x)=-\sigma(x)`$, the derivative is
 
-$$
+```math
 \#(w,c)\,\sigma(-x)-k\,\#(w)\,P_n(c)\,\sigma(x)=0
 \quad\Longleftrightarrow\quad
 e^{x}=\frac{\sigma(x)}{\sigma(-x)}=\frac{\#(w,c)}{k\,\#(w)\,P_n(c)}.
-$$
+```
 
 Hence $`x_{wc}=\log\frac{\#(w,c)}{\#(w)P_n(c)}-\log k`$. With $`P_n(c)=\#(c)/|D|`$ this is $`\operatorname{PMI}(w,c)-\log k`$; with the smoothed noise distribution it is PMI computed against the smoothed context probabilities. Pairs never observed have $`\#(w,c)=0`$ and an optimum of $`-\infty`$, which a finite-dimensional factorization cannot reach, so the low-rank solution trades off the cells with weights $`\#(w,c)+k\#(w)P_n(c)`$ that emphasize frequent pairs. The number of negatives $`k`$ therefore plays two roles: it shifts every cell by $`-\log k`$, and it increases the weight on unobserved pairs.
 
@@ -286,15 +286,15 @@ Hence $`x_{wc}=\log\frac{\#(w,c)}{\#(w)P_n(c)}-\log k`$. With $`P_n(c)=\#(c)/|D|
 
 Represent each word $`w`$ by its full PMI vector $`p_w\in\mathbb R^V`$ with entries $`\operatorname{PMI}(w,c)=\log P(c\mid w)-\log P(c)`$. Suppose a relation, such as male to female, changes the contexts of two word pairs in the same way:
 
-$$
+```math
 \frac{P(c\mid\textit{queen})}{P(c\mid\textit{king})}=\frac{P(c\mid\textit{woman})}{P(c\mid\textit{man})}\quad\text{for every context }c.
-$$
+```
 
 Taking logarithms, the $`\log P(c)`$ terms cancel in each difference, and
 
-$$
+```math
 p_{\textit{queen}}-p_{\textit{king}}=p_{\textit{woman}}-p_{\textit{man}},\qquad\text{so}\qquad p_{\textit{queen}}=p_{\textit{king}}-p_{\textit{man}}+p_{\textit{woman}}
-$$
+```
 
 exactly. Word embeddings that factorize PMI, $`p_w\approx C^\top w`$ for a context matrix $`C`$, inherit the relation approximately, as $`C^\top(e_{\textit{queen}}-e_{\textit{king}}-e_{\textit{woman}}+e_{\textit{man}})\approx0`$, and so the offset holds in the embedding up to directions that $`C`$ ignores. Real relations satisfy the ratio condition only approximately and only for some contexts, which is why analogies hold for some word pairs and fail for others; [Allen and Hospedales (2019)](https://arxiv.org/abs/1901.09813) develop this argument in terms of paraphrases, showing how the error terms depend on how far the condition fails.
 

@@ -103,9 +103,9 @@ The tabular theory of optimism is well developed (chapter 30). **R-max** ([Brafm
 
 A count must generalize: two Atari frames that differ in a few pixels should count as the same state, and two that differ in the agent's room should not. [Bellemare et al. (2016)](https://arxiv.org/abs/1606.01868) derived **pseudo-counts** from a density model. If $`\rho_n(x)`$ is the model's probability of observation $`x`$ after training on $`n`$ observations and $`\rho'_n(x)`$ its probability after one more update on $`x`$ itself, then the pseudo-count
 
-$$
+```math
 \hat N_n(x)=\frac{\rho_n(x)\bigl(1-\rho'_n(x)\bigr)}{\rho'_n(x)-\rho_n(x)}
-$$
+```
 
 is the count that would make the model's change consistent with an empirical distribution (exercise 22.3): a state whose probability barely moves when the model sees it again has been seen many times. With a bonus $`\beta/\sqrt{\hat N_n(x)+0.01}`$ from a simple pixel density model, a DQN agent explored 15 of the 24 rooms of the first level of Montezuma's Revenge within 50 million frames, where the agent without the bonus explored 2. Later work used a PixelCNN as the density model ([Ostrovski, Bellemare, van den Oord, and Munos, 2017](https://arxiv.org/abs/1703.01310)) or simply counted hashes of learned or random projections of the observations ([Tang et al., 2017](https://arxiv.org/abs/1611.04717)).
 

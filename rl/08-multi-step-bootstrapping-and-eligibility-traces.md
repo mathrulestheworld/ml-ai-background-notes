@@ -12,23 +12,23 @@ The TD methods of chapter 6 and chapter 7 bootstrap after one step; Monte Carlo 
 
 The **n-step return** uses $`n`$ rewards and then bootstraps from the value estimate of the state reached:
 
-$$
+```math
 G_{t:t+n}=R_{t+1}+\gamma R_{t+2}+\cdots+\gamma^{n-1}R_{t+n}+\gamma^nV(S_{t+n}),
-$$
+```
 
 with $`G_{t:t+n}=G_t`$, the full return, if the episode ends before $`t+n`$. The one-step TD target is $`G_{t:t+1}`$, and the Monte Carlo target is $`G_{t:\infty}=G_t`$. The **n-step TD** update uses it as the target for the state visited $`n`$ steps earlier,
 
-$$
+```math
 V(S_t)\leftarrow V(S_t)+\alpha\bigl[G_{t:t+n}-V(S_t)\bigr],
-$$
+```
 
 made at time $`t+n`$, when $`R_{t+n}`$ and $`S_{t+n}`$ become known. The first $`n-1`$ steps of an episode make no updates, and $`n-1`$ updates are made after the episode ends, for the states whose $`n`$-step window reached past it.
 
 The n-step return inherits the contraction property of the Bellman operator, with a stronger factor. Its expected value, given $`S_t=s`$, is $`((\mathcal T^\pi)^nV)(s)`$, the result of $`n`$ backups of the current estimates, so
 
-$$
+```math
 \max_s\Bigl|\mathbb E_\pi\bigl[G_{t:t+n}\mid S_t=s\bigr]-v_\pi(s)\Bigr|\le\gamma^n\max_s\bigl|V(s)-v_\pi(s)\bigr|.
-$$
+```
 
 This is the **error reduction property** of n-step returns (exercise 8.2): the worst error of the expected target is at most $`\gamma^n`$ times the worst error of the estimates it bootstraps from. For $`n=1`$ it is the $`\gamma`$-contraction of chapter 2; as $`n`$ grows, the bias from bootstrapping shrinks geometrically, and the target depends more on sampled rewards, which adds variance.
 
@@ -100,11 +100,11 @@ An intermediate $`n`$ is best: $`n=4`$ reaches an error of 0.27, against 0.35 fo
 
 The same idea applies to control. **n-step SARSA** replaces state values with action values and bootstraps from the action actually taken $`n`$ steps later:
 
-$$
+```math
 G_{t:t+n}=R_{t+1}+\gamma R_{t+2}+\cdots+\gamma^{n-1}R_{t+n}+\gamma^nQ(S_{t+n},A_{t+n}),
 \qquad
 Q(S_t,A_t)\leftarrow Q(S_t,A_t)+\alpha\bigl[G_{t:t+n}-Q(S_t,A_t)\bigr].
-$$
+```
 
 **n-step Expected SARSA** replaces the last term by $`\gamma^n\bar V(S_{t+n})`$, where $`\bar V(s)=\sum_a\pi(a\mid s)Q(s,a)`$ is the expected value under the target policy. The benefit in control is faster credit assignment. When an agent in a maze first reaches the goal after a long random search, one-step SARSA strengthens only the last action of the episode; n-step SARSA strengthens the last $`n`$, and the next episode can follow the trail from further away (exercise 8.3).
 
@@ -120,21 +120,21 @@ The choice of $`n`$ trades bias against variance, and delay against both. Small 
 
 Any average of n-step returns with nonnegative weights summing to one is also a valid target: its expectation still has the error reduction property. The **λ-return** averages all of them with geometrically decaying weights,
 
-$$
+```math
 G^\lambda_t=(1-\lambda)\sum_{n=1}^\infty\lambda^{n-1}G_{t:t+n},\qquad0\le\lambda\le1.
-$$
+```
 
 In the infinite sum, the one-step return gets the largest weight, $`1-\lambda`$, and each additional step reduces the weight by a factor $`\lambda`$. In an episode that ends at time $`T`$, all n-step returns with $`t+n\ge T`$ equal the full return $`G_t`$, and their weights add up to $`\lambda^{T-t-1}`$:
 
-$$
+```math
 G^\lambda_t=(1-\lambda)\sum_{n=1}^{T-t-1}\lambda^{n-1}G_{t:t+n}+\lambda^{T-t-1}G_t.
-$$
+```
 
 With $`\lambda=0`$ the λ-return is the one-step TD target; with $`\lambda=1`$ it is the Monte Carlo return. The parameter $`\lambda`$ plays the role of $`n`$, but continuously: the weights fall by half every $`\ln2/\ln(1/\lambda)`$ steps, 6.6 steps for $`\lambda=0.9`$, and $`1/(1-\lambda)`$, 10 steps for $`\lambda=0.9`$, acts as an effective horizon (exercise 8.4). The λ-return also satisfies a one-step recursion, which makes it cheap to compute backward through a stored episode,
 
-$$
+```math
 G^\lambda_t=R_{t+1}+\gamma\bigl[(1-\lambda)V(S_{t+1})+\lambda G^\lambda_{t+1}\bigr]:
-$$
+```
 
 the target bootstraps from the next state's estimate with weight $`1-\lambda`$ and continues with the next λ-return with weight $`\lambda`$. Applied to value functions, the corresponding operator $`\mathcal T^\lambda V=(1-\lambda)\sum_n\lambda^{n-1}(\mathcal T^\pi)^nV`$ is a contraction with modulus $`\gamma(1-\lambda)/(1-\gamma\lambda)`$, which falls from $`\gamma`$ at $`\lambda=0`$ to 0 at $`\lambda=1`$ ([Appendix B](#block-rl08-appendix-b)).
 
@@ -152,23 +152,23 @@ An algorithm that updates each state toward its λ-return, $`V(S_t)\leftarrow V(
 
 **TD(λ)** ([Sutton, 1988](https://doi.org/10.1007/BF00115009)) implements the λ-return incrementally. It keeps an **eligibility trace** $`z(s)`$ for every state, a short-term memory of how recently and how often the state has been visited. At every step, all traces decay by $`\gamma\lambda`$ and the trace of the current state is incremented:
 
-$$
+```math
 z_t(s)=\gamma\lambda\,z_{t-1}(s)+\mathbb 1[S_t=s],\qquad z_{-1}=0.
-$$
+```
 
 The one-step TD error $`\delta_t=R_{t+1}+\gamma V(S_{t+1})-V(S_t)`$ is then broadcast to every state in proportion to its trace:
 
-$$
+```math
 V(s)\leftarrow V(s)+\alpha\,\delta_t\,z_t(s)\quad\text{for all }s.
-$$
+```
 
 This is the **backward view**: instead of looking forward to future rewards, each TD error, when it occurs, is credited backward to the states that led to it, the more strongly the more recently and frequently they were visited. With $`\lambda=0`$, only the current state has a nonzero trace, and TD(λ) is TD(0). With $`\lambda=1`$, the credit decays only through discounting, and TD(1) implements a Monte Carlo update incrementally, one TD error at a time, and applies to continuing tasks where Monte Carlo cannot.
 
 The two views are connected by an identity from chapter 6. If the values do not change during the episode, the λ-return error is a discounted sum of TD errors,
 
-$$
+```math
 G^\lambda_t-V(S_t)=\sum_{k=t}^{T-1}(\gamma\lambda)^{k-t}\delta_k,
-$$
+```
 
 and exchanging the order of summation shows that the total TD(λ) increment to each state over an episode equals the total forward-view increment ([Appendix A](#block-rl08-appendix-a)). **Offline**, with the changes accumulated and applied at the end of the episode, TD(λ) and the λ-return algorithm are therefore identical. The code checks both identities on one episode.
 
@@ -230,21 +230,21 @@ In practice TD(λ) updates the values online, at every step, and then the equiva
 
 The **online λ-return algorithm** defines the ideal online forward view. At every time $`h`$, it redoes all the updates of the episode so far, using for each earlier time $`t`$ the **truncated λ-return** $`G^\lambda_{t:h}`$, which bootstraps with the values at time $`h`$ wherever the data run out:
 
-$$
+```math
 G^\lambda_{t:h}=(1-\lambda)\sum_{n=1}^{h-t-1}\lambda^{n-1}G_{t:t+n}+\lambda^{h-t-1}G_{t:h}.
-$$
+```
 
 This is the best online use of the data, but its cost grows with the length of the episode. [van Seijen and Sutton (2014)](https://proceedings.mlr.press/v32/seijen14.html) found a backward-view algorithm, **true online TD(λ)**, that produces exactly the same values as the online λ-return algorithm for linear function approximation, with $`O(d)`$ computation per step. It uses a **dutch trace**,
 
-$$
+```math
 z_t=\gamma\lambda z_{t-1}+\bigl(1-\alpha\gamma\lambda\,z_{t-1}^\top x_t\bigr)x_t,
-$$
+```
 
 and an update with a correction term,
 
-$$
+```math
 w_{t+1}=w_t+\alpha\delta_tz_t+\alpha\bigl(w_t^\top x_t-w_{t-1}^\top x_t\bigr)(z_t-x_t),
-$$
+```
 
 where $`x_t`$ is the feature vector of $`S_t`$; for a table, $`x_t`$ is the indicator vector of the current state. In the tabular case the dutch trace sits between the accumulating and the replacing trace, as in the figure above. The equivalence and its generalizations are developed by [van Seijen et al. (2016)](https://jmlr.org/papers/v17/15-599.html), and Sutton and Barto call the online λ-return algorithm, which true online TD(λ) implements exactly for linear function approximation, the best-performing temporal-difference algorithm at the time they wrote.
 
@@ -333,9 +333,9 @@ The offline λ-return algorithm cannot use what it learns within an episode. TD(
 
 Nothing requires $`\lambda`$ and $`\gamma`$ to be constants. With a state-dependent $`\lambda_t=\lambda(S_t)`$ and discount $`\gamma_t=\gamma(S_t)`$, the recursive definition of the λ-return generalizes directly,
 
-$$
+```math
 G^\lambda_t=R_{t+1}+\gamma_{t+1}\bigl[(1-\lambda_{t+1})V(S_{t+1})+\lambda_{t+1}G^\lambda_{t+1}\bigr],
-$$
+```
 
 and the traces decay by $`\gamma_t\lambda_t`$ at each step. A small $`\lambda(s)`$ expresses trust in the estimate at $`s`$: the return bootstraps there. A state-dependent discount unifies episodic and continuing tasks, since termination is a transition with $`\gamma=0`$, and it describes predictions of events other than the main return, such as the time until something happens ([White, 2017](https://arxiv.org/abs/1609.01995)). These generalizations underlie the general value functions and options of later chapters, and the off-policy methods of chapter 9 choose $`\lambda`$ at each step to control the variance of importance sampling.
 
@@ -345,9 +345,9 @@ and the traces decay by $`\gamma_t\lambda_t`$ at each step. A small $`\lambda(s)
 
 **SARSA(λ)** applies the backward view to action values. Each state–action pair has a trace, the pair just taken is marked, and every pair is updated with the one-step SARSA error:
 
-$$
+```math
 \delta_t=R_{t+1}+\gamma Q(S_{t+1},A_{t+1})-Q(S_t,A_t),\qquad z_t(s,a)=\gamma\lambda z_{t-1}(s,a)+\mathbb 1[S_t=s,A_t=a],\qquad Q\leftarrow Q+\alpha\delta_tz_t.
-$$
+```
 
 Its forward view is the λ-return built from n-step SARSA returns, and a true online version exists as for TD(λ). The code runs SARSA(λ) with replacing traces in the $`6\times9`$ maze that Sutton and Barto use for their planning examples, where the only reward is 1 on reaching the goal.
 
@@ -435,9 +435,9 @@ Show that if the value estimates do not change, the n-step error can be written 
 
 Write $`\delta_k=R_{k+1}+\gamma V(S_{k+1})-V(S_k)`$, with $`V(S_T)=0`$ at termination. The sum telescopes:
 
-$$
+```math
 \sum_{k=t}^{h-1}\gamma^{k-t}\delta_k=\sum_{k=t}^{h-1}\gamma^{k-t}R_{k+1}+\sum_{k=t}^{h-1}\bigl(\gamma^{k-t+1}V(S_{k+1})-\gamma^{k-t}V(S_k)\bigr)=\sum_{k=t}^{h-1}\gamma^{k-t}R_{k+1}+\gamma^{h-t}V(S_h)-V(S_t),
-$$
+```
 
 with $`h=\min(t+n,T)`$. The first two terms are $`G_{t:t+n}`$. For $`n\ge T-t`$ this is the Monte Carlo identity of exercise 6.1. If the values change during the episode, as in n-step TD, the identity holds only approximately, with correction terms proportional to $`\alpha`$.
 
@@ -455,9 +455,9 @@ Prove that $`\max_s|\mathbb E_\pi[G_{t:t+n}\mid S_t=s]-v_\pi(s)|\le\gamma^n\max_
 
 Treat termination as a transition into an absorbing state with value 0. Then $`\mathbb E_\pi[G_{t:t+n}\mid S_t=s]=((\mathcal T^\pi)^nV)(s)`$: the expected rewards of the first $`n`$ steps plus the discounted expected estimate at the state reached, and the same expression with $`v_\pi`$ in place of $`V`$ is $`((\mathcal T^\pi)^nv_\pi)(s)=v_\pi(s)`$, since $`v_\pi`$ is the fixed point. The difference is
 
-$$
+```math
 ((\mathcal T^\pi)^nV)(s)-((\mathcal T^\pi)^nv_\pi)(s)=\gamma^n\sum_{s'}\Pr\nolimits_\pi(S_{t+n}=s'\mid S_t=s)\bigl(V(s')-v_\pi(s')\bigr),
-$$
+```
 
 where the rewards have canceled and the sum runs over the nonterminal states, whose probabilities sum to at most 1. Its absolute value is at most $`\gamma^n\max_{s'}|V(s')-v_\pi(s')|`$. In an episodic task with $`\gamma=1`$, the bound as stated gives no reduction, but the same argument gives the sharper factor $`\max_s\Pr_\pi(S_{t+n}\text{ is nonterminal}\mid S_t=s)`$, which is close to 1 for small $`n`$ and falls as episodes end.
 
@@ -554,9 +554,9 @@ Larger $`n`$ shortens the second episode, since the final reward of the first ep
 
 (c) Each n-step return satisfies $`G_{t:t+n}=R_{t+1}+\gamma G_{t+1:t+n}`$ for $`n\ge2`$, and $`G_{t:t+1}=R_{t+1}+\gamma V(S_{t+1})`$. Substituting into the definition,
 
-$$
+```math
 G^\lambda_t=(1-\lambda)\bigl[R_{t+1}+\gamma V(S_{t+1})\bigr]+(1-\lambda)\sum_{n\ge2}\lambda^{n-1}\bigl[R_{t+1}+\gamma G_{t+1:t+n}\bigr]=R_{t+1}+\gamma(1-\lambda)V(S_{t+1})+\gamma\lambda\,(1-\lambda)\sum_{m\ge1}\lambda^{m-1}G_{t+1:t+1+m},
-$$
+```
 
 using $`(1-\lambda)\sum_{n\ge1}\lambda^{n-1}=1`$ for the reward terms. The last sum is $`G^\lambda_{t+1}`$. In an episode, the same computation with the full-return term included gives the same recursion, with $`G^\lambda_{T}=0`$ and $`V`$ of the terminal state 0.
 
@@ -574,9 +574,9 @@ Show that with the values held fixed during an episode, the total TD(λ) increme
 
 The TD(λ) increment to $`V(s)`$ over the episode is $`\alpha\sum_{k=0}^{T-1}\delta_kz_k(s)`$, where $`z_k(s)=\sum_{t=0}^k(\gamma\lambda)^{k-t}\mathbb 1[S_t=s]`$ unrolls the trace recursion. Substituting and exchanging the order of summation,
 
-$$
+```math
 \alpha\sum_{k=0}^{T-1}\delta_k\sum_{t=0}^k(\gamma\lambda)^{k-t}\mathbb 1[S_t=s]=\alpha\sum_{t=0}^{T-1}\mathbb 1[S_t=s]\sum_{k=t}^{T-1}(\gamma\lambda)^{k-t}\delta_k=\alpha\sum_{t=0}^{T-1}\mathbb 1[S_t=s]\bigl(G^\lambda_t-V(S_t)\bigr),
-$$
+```
 
 using the identity $`G^\lambda_t-V(S_t)=\sum_{k\ge t}(\gamma\lambda)^{k-t}\delta_k`$, which follows from the recursion of exercise 8.4 in the same way as exercise 8.1: $`G^\lambda_t-V(S_t)=\delta_t+\gamma\lambda(G^\lambda_{t+1}-V(S_{t+1}))`$. The right-hand side is the total forward-view increment. The code of the chapter checks the equality numerically.
 

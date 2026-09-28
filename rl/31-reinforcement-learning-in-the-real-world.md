@@ -18,7 +18,9 @@ Practice has converged on a few habits. Reward the outcome rather than the metho
 
 One family of dense rewards is safe by construction. **Potential-based shaping** adds to the reward of each transition
 
-$$F(s,a,s')=\gamma\Phi(s')-\Phi(s)$$
+```math
+F(s,a,s')=\gamma\Phi(s')-\Phi(s)
+```
 
 for a **potential** $`\Phi`$ defined on states, with $`\Phi=0`$ at terminal states. Along any trajectory the added terms telescope: the shaped return from $`s_0`$ differs from the original by $`-\Phi(s_0)`$, whatever the agent does afterward, so every action value shifts by the same amount, $`Q'^{\pi}(s,a)=Q^\pi(s,a)-\Phi(s)`$, and the optimal policies of the two problems coincide. [Ng, Harada, and Russell (1999)](https://people.eecs.berkeley.edu/~russell/papers/icml99-shaping.pdf) proved the converse as well: if $`F`$ is not of this form, there are dynamics and rewards for which it changes the optimal policy ([appendix A](#block-rl31-appendix-a)). The potential can be any function of the state, and a good one approximates the optimal value: with $`\Phi=V^*`$, the expected shaped reward of an action is its advantage $`A^*(s,a)`$, zero for optimal actions and negative for the others, and the problem becomes one a greedy, myopic agent can solve (exercise 31.2). The same idea extends to potentials that depend on the action ([Wiewiora, Cottrell, and Elkan, 2003](https://aaai.org/Papers/ICML/2003/ICML03-103.pdf)) and to potentials that change over time ([Devlin and Kudenko, 2012](https://www.ifaamas.org/Proceedings/aamas2012/papers/2C_3.pdf)).
 
@@ -185,7 +187,9 @@ The same idea supports methods without value functions. **Goal-conditioned super
 
 People plan in steps of very different lengths: drive to the airport, then take the flight, and only at the lowest level move a foot or a wheel. An agent that chooses a primitive action every few milliseconds faces long horizons, slow credit assignment, and exploration that rarely strays far from where it started. **Options** ([Sutton, Precup, and Singh, 1999](https://doi.org/10.1016/S0004-3702(99)00052-1)) give it temporally extended actions. An option $`o=(\mathcal I_o,\pi_o,\beta_o)`$ has an initiation set of states where it may start, a policy it follows while running, and a termination condition $`\beta_o(s)`$, the probability of stopping in each state. Primitive actions are options that last one step. Choosing among options from the states where one ends is a **semi-MDP**, a decision process whose actions take variable amounts of time, and its values satisfy a Bellman equation in which an option that runs for $`k`$ steps is followed by a discount of $`\gamma^k`$:
 
-$$Q(s,o)=\mathbb E\bigl[r_{t+1}+\gamma r_{t+2}+\dots+\gamma^{k-1}r_{t+k}+\gamma^k\max_{o'}Q(s_{t+k},o')\;\big|\;s_t=s,\ o\bigr],$$
+```math
+Q(s,o)=\mathbb E\bigl[r_{t+1}+\gamma r_{t+2}+\dots+\gamma^{k-1}r_{t+k}+\gamma^k\max_{o'}Q(s_{t+k},o')\;\big|\;s_t=s,\ o\bigr],
+```
 
 where the expectation is over the random duration $`k`$ as well as the rewards and the state where the option ends. Q-learning carries over directly, with the discounted reward accumulated during the option as the reward and $`\gamma^k`$ as the discount ([Bradtke and Duff, 1994](https://papers.nips.cc/paper_files/paper/1994/hash/07871915a8107172b3b5dc15a6574ad3-Abstract.html)). Because the options' policies are known, experience can do more work: **intra-option learning** updates the value of every option consistent with each primitive step, and an option can be interrupted whenever switching to another looks better.
 
@@ -205,13 +209,17 @@ Why hierarchy helps has been examined as carefully as whether it does. Comparing
 
 Many requirements are naturally bounds. A robot should reach its goal quickly *and* spend little time near people; a building controller should save energy *and* keep temperatures within limits; a trading agent should earn *and* keep its risk below a threshold. A **constrained MDP** ([Altman, 1999](https://doi.org/10.1201/9781315140223)) adds cost functions $`c_1,\dots,c_k`$ and budgets $`d_1,\dots,d_k`$ to an MDP and asks for
 
-$$\max_\pi J_r(\pi)\quad\text{subject to}\quad J_{c_i}(\pi)\le d_i,\ i=1,\dots,k,$$
+```math
+\max_\pi J_r(\pi)\quad\text{subject to}\quad J_{c_i}(\pi)\le d_i,\ i=1,\dots,k,
+```
 
 where $`J_r`$ and $`J_{c_i}`$ are the expected discounted totals of the reward and of each cost from the start. Budgets have units an operator can state and check, and they do not need retuning when the reward changes scale, which fixed penalty weights do.
 
 The theory is that of linear programming. Expected discounted totals are linear in the discounted **occupancy measure** $`x(s,a)`$ of the policy (chapter 1), and the occupancy measures of all policies are exactly the nonnegative solutions of a set of linear flow equations, so a constrained MDP is the linear program of chapter 2 with $`k`$ more inequality constraints. Two consequences follow ([appendix B](#block-rl31-appendix-b)). First, an optimal policy may have to randomize, but there is always one that randomizes in at most $`k`$ states; with one constraint, in at most one. A fixed penalty turns the problem back into an ordinary MDP, whose optimal policies can be taken deterministic, so it cannot in general produce the constrained optimum. Second, strong duality holds: with the **Lagrangian**
 
-$$L(\pi,\lambda)=J_r(\pi)-\sum_i\lambda_i\bigl(J_{c_i}(\pi)-d_i\bigr),\qquad \lambda_i\ge0,$$
+```math
+L(\pi,\lambda)=J_r(\pi)-\sum_i\lambda_i\bigl(J_{c_i}(\pi)-d_i\bigr),\qquad \lambda_i\ge0,
+```
 
 the constrained optimum equals $`\min_{\lambda\ge0}\max_\pi L(\pi,\lambda)`$, and the inner maximization is an ordinary MDP with the penalized reward $`r-\sum_i\lambda_ic_i`$. [Paternain, Chamon, Calvo-Fullana, and Ribeiro (2019)](https://arxiv.org/abs/1910.13393) showed that the duality gap is zero despite the nonconvexity of the problem in the policy, and that for parameterized policies it is bounded by a multiple of the parameterization's approximation error, so nearly zero for rich ones, the justification of the **Lagrangian methods** that dominate practice: an RL algorithm improves the policy on the penalized reward while the multipliers rise when a constraint is violated and fall when it is slack. This is RCPO ([Tessler, Mankowitz, and Mannor, 2019](https://arxiv.org/abs/1805.11074)) and the PPO-Lagrangian baselines of the Safety Gym benchmark ([Ray, Achiam, and Amodei, 2019](https://cdn.openai.com/safexp-short.pdf)). **Constrained policy optimization** (CPO; [Achiam, Held, Tamar, and Abbeel, 2017](https://arxiv.org/abs/1705.10528)) instead adds a linearized cost constraint to each trust-region step of chapter 20, aiming to satisfy the constraint approximately at every update rather than on average.
 
@@ -612,13 +620,19 @@ A system $`x_{t+1}=x_t+bu_t`$ has an unknown gain $`b\in[0.5,2]`$, and a linear 
 
 
 **Sufficiency.** Let $`\Phi`$ be bounded, with $`\Phi=0`$ at terminal states, and let the shaped MDP have rewards $`r+F`$ with $`F(s,a,s')=\gamma\Phi(s')-\Phi(s)`$. Along any trajectory, the discounted shaping terms telescope:
-$$\sum_{t=0}^{T-1}\gamma^t\bigl(\gamma\Phi(s_{t+1})-\Phi(s_t)\bigr)=\gamma^T\Phi(s_T)-\Phi(s_0),$$
+```math
+\sum_{t=0}^{T-1}\gamma^t\bigl(\gamma\Phi(s_{t+1})-\Phi(s_t)\bigr)=\gamma^T\Phi(s_T)-\Phi(s_0),
+```
 and $`\gamma^T\Phi(s_T)`$ vanishes as $`T\to\infty`$ when $`\gamma<1`$, or at termination. Taking expectations under any policy $`\pi`$ from $`(s,a)`$ gives $`Q'^\pi(s,a)=Q^\pi(s,a)-\Phi(s)`$. In particular $`Q^*-\Phi`$ satisfies the shaped Bellman optimality equation, since
-$$\mathbb E\Bigl[r+\gamma\Phi(s')-\Phi(s)+\gamma\max_{a'}\bigl(Q^*(s',a')-\Phi(s')\bigr)\Bigr]=\mathbb E\Bigl[r+\gamma\max_{a'}Q^*(s',a')\Bigr]-\Phi(s)=Q^*(s,a)-\Phi(s),$$
+```math
+\mathbb E\Bigl[r+\gamma\Phi(s')-\Phi(s)+\gamma\max_{a'}\bigl(Q^*(s',a')-\Phi(s')\bigr)\Bigr]=\mathbb E\Bigl[r+\gamma\max_{a'}Q^*(s',a')\Bigr]-\Phi(s)=Q^*(s,a)-\Phi(s),
+```
 so $`Q'^*=Q^*-\Phi`$. The two differ by a function of the state alone, so $`\arg\max_aQ'^*(s,a)=\arg\max_aQ^*(s,a)`$ in every state: the optimal policies coincide, and near-optimal policies of one problem are near-optimal in the other, with the same gaps.
 
 **Necessity, sketched.** Suppose a shaping function $`F(s,a,s')`$, fixed in advance, preserves the optimal policies of *every* MDP with the given states, actions, and discount, whatever its transitions and rewards. Fix a terminal state $`z`$ and an action $`a_0`$, and define $`\Phi(s)=-F(s,a_0,z)`$. For any state $`s`$, action $`a\ne a_0`$, and state $`s'`$, build deterministic dynamics in which $`a`$ takes $`s`$ to $`s'`$, and $`a_0`$ takes every state to $`z`$; from $`s`$, the agent can then exit at once, or move to $`s'`$ and exit from there. Give these two plans original returns that differ by a small $`\varepsilon`$, in either direction. Their shaped returns differ by an additional
-$$F(s,a,s')+\gamma F(s',a_0,z)-F(s,a_0,z)=F(s,a,s')-\gamma\Phi(s')+\Phi(s),$$
+```math
+F(s,a,s')+\gamma F(s',a_0,z)-F(s,a_0,z)=F(s,a,s')-\gamma\Phi(s')+\Phi(s),
+```
 and if this were nonzero, a small enough $`\varepsilon`$ of the opposite sign would make the shaped problem prefer the plan that is worse in the original. Preservation for all $`\varepsilon`$ forces $`F(s,a,s')=\gamma\Phi(s')-\Phi(s)`$. [Ng, Harada, and Russell (1999)](https://people.eecs.berkeley.edu/~russell/papers/icml99-shaping.pdf) give the full argument, including the case $`a=a_0`$ and the conditions on $`z`$.
 
 The theorem is about *which* rewards are safe to add, not about how much they help. Potential-based shaping helps exactly as much as initializing the value estimates to $`\Phi`$ would (exercise 31.2), and a potential close to $`V^*`$ helps most, since it leaves almost nothing to learn.
@@ -632,14 +646,20 @@ The theorem is about *which* rewards are safe to add, not about how much they he
 
 
 **The program.** For a policy $`\pi`$ and start distribution $`\mu_0`$, the discounted occupancy measure $`x(s,a)=\sum_t\gamma^t\Pr(s_t=s,a_t=a)`$ satisfies, for every state $`s'`$, the flow equation
-$$\sum_ax(s',a)=\mu_0(s')+\gamma\sum_{s,a}P(s'\mid s,a)\,x(s,a),$$
+```math
+\sum_ax(s',a)=\mu_0(s')+\gamma\sum_{s,a}P(s'\mid s,a)\,x(s,a),
+```
 and conversely every nonnegative solution is the occupancy measure of the stationary policy $`\pi(a\mid s)=x(s,a)/\sum_bx(s,b)`$ (chapter 1). Expected discounted totals are linear in $`x`$, $`J_r=\sum_{s,a}x(s,a)r(s,a)`$ and $`J_{c_i}=\sum_{s,a}x(s,a)c_i(s,a)`$, so the constrained MDP is the linear program
-$$\max_{x\ge0}\ r^\top x\quad\text{subject to the } S \text{ flow equations and } c_i^\top x\le d_i,\ i=1,\dots,k.$$
+```math
+\max_{x\ge0}\ r^\top x\quad\text{subject to the } S \text{ flow equations and } c_i^\top x\le d_i,\ i=1,\dots,k.
+```
 
 **Randomization.** If the program is feasible, it has an optimal *basic* solution, in which, after adding a slack variable to each inequality, at most $`S+k`$ variables are nonzero, one for each constraint. Suppose every state has positive occupancy, as when $`\mu_0(s)>0`$ for all $`s`$. Then each state needs at least one positive $`x(s,a)`$, which uses $`S`$ of the nonzero variables, and at most $`k`$ remain for second or further actions: the corresponding optimal policy randomizes in at most $`k`$ states. [Altman (1999)](https://doi.org/10.1201/9781315140223) proves the general statement: some optimal stationary policy uses at most $`k`$ randomizations in total. With $`k=0`$ this recovers the existence of deterministic optimal policies.
 
 **Duality.** For $`\lambda\ge0`$, the dual function
-$$g(\lambda)=\max_\pi\Bigl(J_r(\pi)-\sum_i\lambda_i\bigl(J_{c_i}(\pi)-d_i\bigr)\Bigr)=V^*_{r-\lambda^\top c}(\mu_0)+\lambda^\top d$$
+```math
+g(\lambda)=\max_\pi\Bigl(J_r(\pi)-\sum_i\lambda_i\bigl(J_{c_i}(\pi)-d_i\bigr)\Bigr)=V^*_{r-\lambda^\top c}(\mu_0)+\lambda^\top d
+```
 is the optimal value of an unconstrained MDP with the penalized reward, plus a constant. It is a maximum of functions linear in $`\lambda`$, one for each deterministic policy, hence convex and piecewise linear, and linear programming duality gives $`\min_{\lambda\ge0}g(\lambda)=`$ the constrained optimum. At any $`\lambda`$, a vector with components $`d_i-J_{c_i}(\pi_\lambda)`$, for an optimal policy $`\pi_\lambda`$ of the penalized MDP, is a subgradient of $`g`$, so the multiplier update $`\lambda_i\leftarrow\max\bigl(0,\lambda_i+\eta(J_{c_i}(\pi_\lambda)-d_i)\bigr)`$ is projected subgradient descent on $`g`$.
 
 This explains the behavior of the third code. At the minimizer $`\lambda^*`$, $`g`$ has a kink: several deterministic policies are optimal for the penalized reward, with costs on both sides of the budget, and the constrained optimum is the mixture of their occupancy measures that meets the budget, a policy that randomizes where they differ. Subgradient methods on a kinked function do not settle at the kink with a fixed step size; their iterates hover around it, and only averages converge. The policy that best responds to the current multiplier is at every moment one of the deterministic extremes, never the mixture. Algorithms that converge in the last iterate either smooth the problem, for instance with an entropy term that makes the best response unique and continuous in $`\lambda`$, or use optimistic or damped updates, of which the PI controller is an example.

@@ -18,11 +18,11 @@ In ML code, "tensor" simply means an array of any order. An array can hold the c
 
 Mathematical expressions in these notes keep vectors as columns, while datasets are stored with one observation per row: for $`N`$ observations with $`d`$ features, the design matrix $`X\in\mathbb R^{N\times d}`$ holds $`x_i^\top`$ in row $`i`$. A shared affine map with $`W\in\mathbb R^{m\times d}`$ and $`b\in\mathbb R^m`$ therefore has two equivalent forms, one for a single observation and one for the whole dataset:
 
-$$
+```math
 z_i=Wx_i+b,
 \qquad
 Z=XW^\top+\mathbf 1_Nb^\top.
-$$
+```
 
 The output $`Z`$ has shape $`N\times m`$, with $`z_i^\top`$ in row $`i`$. The transpose in the dataset form comes only from storing observations as rows; $`x_i`$ and $`z_i`$ are still column vectors. The table lists the shapes used for common objects.
 
@@ -105,9 +105,9 @@ Elementwise operations such as `+` and `*` combine entries with equal indices, s
 
 Because shapes are aligned from the right, `(N, d)` can be combined with `(d,)` and also with `(N, 1)`, but the two combinations mean different things. With feature offsets $`\mu\in\mathbb R^d`$, the expression `X - mu` computes
 
-$$
+```math
 C_{ij}=X_{ij}-\mu_j,
-$$
+```
 
 reusing the same offsets for every observation. With one multiplier per observation, $`a\in\mathbb R^N`$, the vector must first be made a column, and `X * a[:, None]` computes $`C_{ij}=a_iX_{ij}`$. Writing the indexed formula first shows which index each operand carries, and therefore where an axis of length one is needed. NumPy's [broadcasting rules](https://numpy.org/doc/stable/user/basics.broadcasting.html) never consult the meaning of the axes, so this check is the programmer's job. Broadcasting does not physically repeat the smaller operand, although the output has the full broadcast shape.
 
@@ -117,17 +117,17 @@ The opposite operation removes an axis by aggregating along it.
 
 The feature means are a reduction over the observation axis,
 
-$$
+```math
 \mu_j=\frac1N\sum_{i=1}^N X_{ij},
-$$
+```
 
 so `X.mean(axis=0)` has shape `(d,)`. With `keepdims=True` the [mean reduction](https://numpy.org/doc/stable/reference/generated/numpy.mean.html) returns shape `(1, d)` instead, keeping the reduced axis with length one so that the result broadcasts back against `X`. Similarly, `X.mean(axis=1, keepdims=True)` has shape `(N, 1)` and holds one mean per observation.
 
 Broadcasting is also behind one of the most common silent errors. Suppose predictions have shape `(N, 1)` and targets have shape `(N,)`. Aligned from the right, the two shapes broadcast to `(N, N)`, so their difference is the matrix of all pairwise differences,
 
-$$
+```math
 E_{ij}=\widehat y_i-y_j,
-$$
+```
 
 rather than the vector of residuals $`e_i=\widehat y_i-y_i`$. Averaging the squared entries still returns a scalar, so nothing fails; the program simply minimizes a different objective.
 
@@ -164,11 +164,11 @@ In the last example every prediction equals its target, so the mean squared erro
 
 Reductions over padded data need one more ingredient. When sequences of different lengths share a batch of shape `(B, T)`, the shorter sequences are padded to length $`T`$, and a Boolean **mask** records which positions are real: $`M_{bt}=1`$ for a real token and $`M_{bt}=0`$ for padding. If $`\ell_{bt}`$ is a finite loss at each position, the average over real tokens is
 
-$$
+```math
 \overline\ell
 =\frac{\sum_{b,t}M_{bt}\ell_{bt}}{\sum_{b,t}M_{bt}},
 \qquad \sum_{b,t}M_{bt}>0.
-$$
+```
 
 Dividing by $`BT`$ instead would count every padding position as a token with zero loss, so the average would shrink as padding increases. There is also a second legitimate choice. Averaging within each sequence first and then across sequences gives every sequence equal weight, whereas the token average gives longer sequences more weight. The two are different objectives, and the denominator is where the choice between them is made.
 
@@ -182,9 +182,9 @@ Multiplying by a mask does not remove invalid values. In floating-point arithmet
 
 Array code uses two kinds of multiplication that are easy to confuse. For NumPy arrays, `*` is elementwise, so `X * X` squares every entry, while `@` is matrix multiplication, summing over a shared inner index, so `X.T @ X` forms all inner products between features. For two-dimensional inputs, the [matrix multiplication operation](https://numpy.org/doc/stable/reference/generated/numpy.matmul.html) has the contract
 
-$$
+```math
 (m,d)\ @\ (d,k)\longrightarrow(m,k).
-$$
+```
 
 For inputs with more axes, `@` treats the last two axes as matrices and the leading axes as a batch. Thus `(B, m, d) @ (B, d, k)` computes $`B`$ separate matrix products, and a single `(d, k)` matrix on the right is broadcast to every member of the batch. A batch of vectors of shape `(B, d)`, however, is just a matrix to `@`. To apply a different matrix $`A_b\in\mathbb R^{m\times d}`$ to each vector $`x_b`$, with `A` of shape `(B, m, d)`, each vector must first become a column: `(A @ x[..., None])[..., 0]`.
 
@@ -196,16 +196,16 @@ All of these products follow one pattern.
 
 For a batch of sequences $`\mathcal X\in\mathbb R^{B\times T\times d}`$ and $`W\in\mathbb R^{m\times d}`$, a shared affine map applied at every example and position is
 
-$$
+```math
 \mathcal Z_{rto}=\sum_{j=1}^d\mathcal X_{rtj}W_{oj}+b_o,
 \qquad 1\le r\le B.
-$$
+```
 
 The formula writes $`r`$ for the example index because $`b`$ already denotes the bias; the code below uses the label `b` for the batch axis in its einsum strings and calls the bias `bias`. In einsum form the map is `"bti,oi->bto"`: the feature label is summed, while the example and position labels remain. Position-wise squared lengths contract the feature index of $`\mathcal X`$ with itself:
 
-$$
+```math
 S_{rt}=\sum_{j=1}^d\mathcal X_{rtj}^2.
-$$
+```
 
 ```python
 import numpy as np
@@ -271,10 +271,10 @@ Once a solution has been computed, its quality can be judged in two ways: by how
 
 The computed vector solves the perturbed system $`A\widehat x=b-r`$ exactly, so its error is $`\widehat x-x=-A^{-1}r`$ and $`\|\widehat x-x\|_2\le\|A^{-1}\|_2\|r\|_2`$. Dividing by $`\|x\|_2`$ and using $`\|b\|_2\le\|A\|_2\|x\|_2`$ gives the perturbation bound of Linear Algebra:
 
-$$
+```math
 \frac{\|\widehat x-x\|_2}{\|x\|_2}
 \le\kappa_2(A)\frac{\|r\|_2}{\|b\|_2}.
-$$
+```
 
 A small residual therefore guarantees a small error only when $`A`$ is well conditioned. For an ill-conditioned system, such as the nearly parallel lines drawn in that chapter, a vector can almost satisfy the equation and still lie far from the solution. The two factors of the bound have different sources. The condition number belongs to the problem, and no algorithm can change it. The residual depends on the algorithm: a numerically stable method, such as the LU factorization with partial pivoting behind `solve`, delivers a residual close to the rounding level in practice, and the condition number then bounds how much that residual can be amplified.
 
@@ -282,28 +282,28 @@ A small residual therefore guarantees a small error only when $`A`$ is well cond
 
 Floating-point numbers have a limited range, and exponentials leave it quickly: in `float64`, $`e^z`$ overflows for $`z`$ above about $`710`$. This causes failures even when the final answer is an ordinary number. If class logits are $`z\in\mathbb R^K`$, the softmax probabilities are
 
-$$
+```math
 p_k=\frac{e^{z_k}}{\sum_{j=1}^K e^{z_j}},
-$$
+```
 
 and a logit of $`1000`$ makes both the numerator and the denominator overflow to infinity, giving the undefined ratio $`\infty/\infty`$, although the probabilities themselves are unremarkable.
 
 The remedy is to shift the logits. Adding the same constant $`c`$ to every logit leaves the probabilities unchanged, because the factor $`e^c`$ cancels between numerator and denominator. Subtracting the largest logit, $`m=\max_jz_j`$, gives the shifted logits $`u_j=z_j-m`$ and
 
-$$
+```math
 p_k=\frac{e^{u_k}}{\sum_je^{u_j}}.
-$$
+```
 
 For finite logits, every shifted logit is at most zero, so each $`e^{u_j}`$ lies in $`[0,1]`$ and cannot overflow. The largest equals one, so the denominator is at least one and cannot underflow to zero either.
 
 Log losses need one more step, because a very small probability can still round to zero after the shift, and its logarithm is then $`-\infty`$. The loss should therefore be computed from **log probabilities**, obtained directly without forming the probabilities first. Taking logarithms in the shifted formula gives
 
-$$
+```math
 \log p_k=u_k-\operatorname{LSE}(u),
 \qquad
 \operatorname{LSE}(z)=\log\sum_je^{z_j}
 =m+\operatorname{LSE}(u),
-$$
+```
 
 where the **log-sum-exp** of the shifted logits is safe to compute because its sum lies between $`1`$ and $`K`$. As in NumPy and PyTorch, $`\log`$ in this chapter is the natural logarithm, so log losses are in nats; dividing by $`\ln2`$ converts them to the bits used in Information and Learning Theory.
 
@@ -369,9 +369,9 @@ The operands of an operation must live on the same device, and matrix multiplica
 
 Training needs the gradient of a scalar loss $`L(\theta)`$ with respect to parameters that are themselves arrays. The convention is that a gradient has the same shape as its parameter. A matrix parameter $`W`$ receives a matrix gradient $`\nabla_W L`$, defined by
 
-$$
+```math
 dL=\langle\nabla_W L,dW\rangle_F,
-$$
+```
 
 which is the gradient convention of Calculus and Optimization. Code therefore never needs to flatten the parameters into a single vector.
 
@@ -414,29 +414,29 @@ The graph contains only operations that PyTorch executed on tensors. Moving part
 
 A gradient is the derivative of a scalar output. For a map $`F:\mathbb R^d\to\mathbb R^m`$ with several outputs, Calculus and Optimization introduced two derivative products, the Jacobian–vector product (JVP) and the vector–Jacobian product (VJP). In numerator layout their shapes are
 
-$$
+```math
 J_F(x)\in\mathbb R^{m\times d},
 \qquad J_F(x)v\in\mathbb R^m,
 \qquad J_F(x)^\top u\in\mathbb R^d.
-$$
+```
 
 An input direction $`v\in\mathbb R^d`$ asks how all the outputs respond to one particular perturbation of the inputs. An output seed $`u\in\mathbb R^m`$ asks instead how each input affects the single scalar $`u^\top F(x)`$. With column vectors, the VJP is represented by $`J_F(x)^\top u`$.
 
 Consider the example from the calculus chapter,
 
-$$
+```math
 F(x)=\begin{bmatrix}x_1x_2\\\sin(x_1x_2)\end{bmatrix},
 \qquad x=\begin{bmatrix}2\\3\end{bmatrix},
 \qquad v=\begin{bmatrix}1\\-1\end{bmatrix}.
-$$
+```
 
 Its Jacobian and the product with $`v`$ are
 
-$$
+```math
 J_F(x)=
 \begin{bmatrix}3&2\\3\cos6&2\cos6\end{bmatrix},
 \qquad J_F(x)v=\begin{bmatrix}1\\\cos6\end{bmatrix}.
-$$
+```
 
 Moving the inputs to $`(2+\tau,3-\tau)`$ therefore changes the two outputs by approximately $`\tau(1,\cos6)^\top`$: the JVP is a first-order prediction of how the outputs move along the chosen direction.
 
@@ -502,9 +502,9 @@ A tensor stored as an ordinary attribute is neither, even if it requires gradien
 
 The basic example is the affine layer. For one example $`x\in\mathbb R^d`$ it computes $`z=Wx+b`$, with $`W\in\mathbb R^{m\times d}`$ and $`b\in\mathbb R^m`$, and for a row batch $`X\in\mathbb R^{B\times d}`$ it computes, as in the first section,
 
-$$
+```math
 Z=XW^\top+\mathbf 1_B b^\top\in\mathbb R^{B\times m}.
-$$
+```
 
 The layer [`nn.Linear(d, m)`](https://docs.pytorch.org/docs/stable/generated/torch.nn.Linear.html) stores exactly this $`m\times d`$ matrix $`W`$, which is why its batch computation multiplies by the transpose.
 
@@ -542,13 +542,13 @@ The module defines only a computation. The same affine map could produce regress
 
 Because a single weight matrix serves the whole batch, its gradient collects contributions from every observation. If the scalar loss has output gradient $`\Delta=\nabla_Z L\in\mathbb R^{B\times m}`$, the affine layer without the offset gives
 
-$$
+```math
 \nabla_W L=\Delta^\top X,
 \qquad
 \nabla_b L=\Delta^\top\mathbf 1_B,
 \qquad
 \nabla_X L=\Delta W.
-$$
+```
 
 For the module above, $`X`$ is replaced by its offset version $`X-\mathbf 1_B\,\mathrm{offset}^\top`$ in the weight gradient. In coordinates, $`\partial L/\partial W_{kj}=\sum_{i=1}^B\Delta_{ik}X_{ij}`$, with one term from each observation that uses the weight $`W_{kj}`$. The bias is broadcast to every observation in the forward computation, so its gradient sums over observations. This is a general rule: the reverse derivative of broadcasting along an axis is a sum along that axis.
 
@@ -558,26 +558,26 @@ The third formula, the gradient with respect to the input, answers a different q
 
 A training objective has to specify two things: the loss of each observation and how those losses are combined into one number. The usual combination is the mean over a batch of size $`B`$,
 
-$$
+```math
 L_B(\theta)=\frac1B\sum_{i=1}^B\ell_i(\theta),
 \qquad
 \nabla L_B(\theta)=\frac1B\sum_{i=1}^B\nabla\ell_i(\theta).
-$$
+```
 
 Replacing the mean by a sum multiplies the gradient by $`B`$. For plain SGD this has the same effect as multiplying the learning rate by $`B`$ (adaptive methods such as Adam largely undo such a rescaling), and for any optimizer it changes the relative weight of a regularization term added to the loss. The reduction is thus part of the objective. (The mathematical notation $`\ell(y,\hat y)`$ puts the target first, while PyTorch loss functions receive the model output first and the target second.)
 
 For classification with $`C`$ mutually exclusive classes, the model produces **logits** $`s_i\in\mathbb R^C`$, unconstrained real scores that define probabilities through the softmax,
 
-$$
+```math
 p_{ic}=\frac{\exp(s_{ic})}{\sum_{k=1}^{C}\exp(s_{ik})}.
-$$
+```
 
 For an observed class $`y_i`$, the negative log-likelihood is
 
-$$
+```math
 \ell_i=-\log p_{i,y_i}
 =\log\sum_{c=1}^{C}\exp(s_{ic})-s_{i,y_i},
-$$
+```
 
 the log-sum-exp form of the first part. It is the cross-entropy between the one-hot target and the predicted distribution, the log loss of Information and Learning Theory measured in nats. Its derivative with respect to one logit is $`\partial\ell_i/\partial s_{ic}=p_{ic}-\mathbf 1\{c=y_i\}`$, the probability error, and the mean over a batch adds a factor $`1/B`$.
 
@@ -631,24 +631,24 @@ A training program assembles the pieces of the previous parts, and each mathemat
 
 For binary observations $`(x_i,y_i)`$ with $`y_i\in\{0,1\}`$, consider the linear logit
 
-$$
+```math
 s_i=w^\top x_i+b,
 \qquad p_i=\sigma(s_i)=\frac1{1+e^{-s_i}}.
-$$
+```
 
 The Bernoulli negative log-likelihood can be written as
 
-$$
+```math
 \ell_i(w,b)=\log(1+e^{s_i})-y_i s_i.
-$$
+```
 
 Substituting $`p_i=\sigma(s_i)`$ and $`1-p_i=\sigma(-s_i)`$ shows that this equals the familiar $`-y_i\log p_i-(1-y_i)\log(1-p_i)`$; the form in terms of the logit is the one that can be computed stably. Differentiating gives $`\partial\ell_i/\partial s_i=\sigma(s_i)-y_i=p_i-y_i`$, and the chain rule through $`s_i=w^\top x_i+b`$ gives the gradients of the mean loss over a batch of size $`B`$:
 
-$$
+```math
 \nabla_w L_B=\frac1B X_B^\top(p-y),
 \qquad
 \frac{\partial L_B}{\partial b}=\frac1B\sum_{i=1}^B(p_i-y_i).
-$$
+```
 
 Here $`X_B`$ has shape $`B\times d`$ and the residual $`p-y`$ has $`B`$ entries, so the weight gradient has the same $`d`$ coordinates as $`w`$. An `nn.Linear(d, 1)` layer stores these coefficients as a $`1\times d`$ weight tensor, and its stored gradient has the same $`1\times d`$ shape.
 
@@ -660,12 +660,12 @@ The batches can be drawn in two ways. If each batch is sampled uniformly from a 
 
 Let $`z\sim\mathcal N(0,I_3)`$ and define observed features by
 
-$$
+```math
 x=\begin{pmatrix}10\\-3\\0.5\end{pmatrix}
 +\operatorname{diag}(2,0.5,4)z,
 \qquad
 P(Y=1\mid z)=\sigma(1.2z_1-0.8z_2+0.5z_3-0.3).
-$$
+```
 
 The features have deliberately different offsets and scales, which the fitted model will have to standardize. The labels remain random even given the features, so no classifier can reach zero population error. The model is nevertheless correctly specified: $`z`$ is an affine function of $`x`$, so the true logit is also affine in $`x`$, and logistic regression can represent the true conditional probability exactly. The best achievable log loss and accuracy are therefore known, and the fit can be compared with them.
 
@@ -762,9 +762,9 @@ In the CPU environment of the computing setup, the training loss falls from $`0.
 
 Two details of the evaluation function deserve comment. First, it computes accuracy from logits without applying the sigmoid: $`\sigma(s)\ge1/2`$ exactly when $`s\ge0`$, so thresholding the logit at zero is thresholding the probability at $`1/2`$. The loss uses the whole predicted probability, while accuracy uses only the side of this threshold, so the two scores assess different properties of the same predictions. Second, the evaluation also works in batches of $`128`$, and since $`769=6\cdot128+1`$ and $`257=2\cdot128+1`$, each dataset again ends with a batch of one. The mean loss over a dataset must weight each batch by its size: if batches have sizes $`B_1,\ldots,B_K`$ and mean losses $`L_1,\ldots,L_K`$, the dataset mean is
 
-$$
+```math
 L_{\mathrm{data}}=\frac{\sum_{k=1}^K B_kL_k}{\sum_{k=1}^K B_k}.
-$$
+```
 
 An unweighted average of the batch means would give the single final observation as much influence as a full batch. The function therefore accumulates sums of losses and counts of observations, and divides only at the end. Weighted losses and ignored labels call for the same care with their denominators.
 
@@ -814,22 +814,22 @@ The range, in turn, limits the values a calculation can produce. In `float64`, f
 
 For a normalized result in the ordinary range, correctly rounded elementary arithmetic is often modeled as
 
-$$
+```math
 \operatorname{fl}(a\circ b)=(a\circ b)(1+\delta),
 \qquad |\delta|\le u,
-$$
+```
 
 where $`\circ`$ is an elementary arithmetic operation and $`u`$ is the unit roundoff. This relative-error model needs modification near underflow and does not cover overflow or invalid operations. NumPy's [`finfo`](https://numpy.org/doc/stable/reference/generated/numpy.finfo.html) reports $`\varepsilon`$ as `eps`, together with the representable range. The model bounds the error of a single operation; the error of a whole calculation depends on how these single errors accumulate.
 
 For a sequential sum of $`n`$ terms, the accumulation gives a standard absolute-error bound of the form
 
-$$
+```math
 \left|\operatorname{fl}\!\left(\sum_{i=1}^n a_i\right)
 -\sum_{i=1}^n a_i\right|
 \le\gamma_{n-1}\sum_{i=1}^n|a_i|,
 \qquad
 \gamma_k=\frac{ku}{1-ku},
-$$
+```
 
 under the elementary model, with $`ku<1`$ and no overflow or harmful underflow. The bound is absolute. If large positive and negative terms nearly cancel, the true sum can be much smaller than $`\sum_i|a_i|`$, and the relative error can then be large. Pairwise and compensated summation reduce the error, and NumPy reductions often sum pairwise rather than sequentially. Because floating-point addition is not associative, any change in the order of summation, including NumPy's, can change the last few digits of a result. Higham's [*Accuracy and Stability of Numerical Algorithms*](https://epubs.siam.org/doi/book/10.1137/1.9780898718027), Chapters 2–4, develops this arithmetic model and its error bounds.
 
@@ -855,11 +855,11 @@ The shifted softmax and log-sum-exp calculations have a more detailed rounding-e
 
 The [Jacobian transforms](https://docs.pytorch.org/docs/stable/generated/torch.func.jacrev.html) extend the same conventions to array-valued inputs and outputs. If $`F:\mathbb R^{a\times b}\to\mathbb R^{c\times d}`$, its derivative array has shape $`(c,d,a,b)`$:
 
-$$
+```math
 \mathcal J_{ijpq}=\frac{\partial F_{ij}}{\partial X_{pq}},
 \qquad
 (DF(X)[V])_{ij}=\sum_{p,q}\mathcal J_{ijpq}V_{pq}.
-$$
+```
 
 The output axes come first and the input axes follow. A scalar output has no axes, so its derivative array has the shape of the input and stores the same partial derivatives as the gradient. (After the input is flattened into $`q`$ coordinates, the numerator-layout Jacobian is a $`1\times q`$ row and the gradient is its $`q\times1`$ transpose, a distinction that a one-dimensional array does not record.) For general outputs, flattening the output axes and the input axes recovers a matrix Jacobian, but a derivative product avoids allocating that full matrix.
 
@@ -869,9 +869,9 @@ The output axes come first and the input axes follow. A scalar output has no axe
 
 For a twice differentiable scalar function, the Hessian is the Jacobian of its gradient. A [gradient transform](https://docs.pytorch.org/docs/stable/generated/torch.func.grad.html) composed with a JVP computes
 
-$$
+```math
 \nabla^2 f(x)v=D(\nabla f)(x)[v]
-$$
+```
 
 without forming the dense Hessian. On a quadratic $`f(x)=\tfrac12x^\top Ax`$ with symmetric $`A`$, the result is exactly $`Av`$:
 
@@ -901,9 +901,9 @@ The two full-Hessian computations confirm the convention in two dimensions. For 
 
 At a smooth point, compare an AD gradient $`g`$ with the centered directional difference
 
-$$
+```math
 \frac{f(x+hv)-f(x-hv)}{2h}\approx g^\top v.
-$$
+```
 
 The comparison uses two independent calculations of the same local quantity, so a disagreement larger than the error of the finite difference points to an incorrect custom derivative or a missing dependency. Agreement in one direction at one point, however, does not establish agreement in other directions or at other inputs, and several random directions and points give much stronger evidence. PyTorch's [`gradcheck`](https://docs.pytorch.org/docs/stable/generated/torch.autograd.gradcheck.gradcheck.html) automates numerical comparisons and is designed around double-precision inputs by default. At nondifferentiable points, the numerical comparison may fail even when the framework follows its specified derivative convention.
 

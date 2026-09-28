@@ -22,9 +22,9 @@ All the algorithms of this chapter are **best-first searches**: the generic loop
 
 **A\*** ([Hart, Nilsson, and Raphael, 1968](https://doi.org/10.1109/TSSC.1968.300136)) orders the frontier by
 
-$$
+```math
 f(n)=g(n)+h(n),
-$$
+```
 
 the cost of the path to $`n`$ plus the estimated cost from $`n`$ to a goal: an estimate of the cost of the cheapest solution *through* $`n`$. It balances the two failures above. Uniform-cost search, $`h=0`$, takes no account of where the goal lies; greedy search, $`g`$ ignored, takes no account of what the path costs. As in uniform-cost search, the goal test is applied when a node is removed from the frontier.
 
@@ -38,16 +38,16 @@ Two properties of $`h`$ make A\* optimal.
 
 - $`h`$ is **admissible** if it never overestimates: $`h(n)\le h^*(n)`$ for every node. Then $`f(n)`$ never overestimates the cost of the best solution through $`n`$. The straight-line distance is admissible because a straight line is the shortest path between two points; misplaced tiles and Manhattan distance are admissible because every misplaced tile must move at least once, and at least its Manhattan distance, in any solution.
 - $`h`$ is **consistent** (or **monotone**) if, for every node $`n`$ and every successor $`n'`$ reached by action $`a`$,
-$$
+```math
 h(n)\le c(n,a,n')+h(n'),
-$$
+```
 and $`h=0`$ at goals. This is a triangle inequality: the estimate from $`n`$ is no larger than the cost of a step plus the estimate from where the step leads.
 
 Consistency implies admissibility, by induction along an optimal path to a goal. The converse fails, but the admissible heuristics that arise in practice are usually consistent. Consistency has a direct consequence for A\*: along any path, $`f`$ never decreases, since
 
-$$
+```math
 f(n')=g(n)+c(n,a,n')+h(n')\ge g(n)+h(n)=f(n).
-$$
+```
 
 ### <a id="optimality-of-a"></a>Optimality of A\*
 
@@ -374,9 +374,9 @@ Let $`h`$ be consistent. Then $`f=g+h`$ is nondecreasing along every path, as sh
 
 **Claim:** when A\* expands a state $`s`$, the path it has found to $`s`$ is optimal, $`g(s)=g^*(s)`$. Suppose not, and take an optimal path from $`s_0`$ to $`s`$. Its first state not yet expanded, $`u`$, has a predecessor that was expanded; by induction on the order of expansion that predecessor was expanded with its optimal cost, so $`u`$ is on the frontier with $`g(u)=g^*(u)`$. Since $`f`$ is nondecreasing along the optimal path from $`u`$ to $`s`$,
 
-$$
+```math
 f(u)=g^*(u)+h(u)\le g^*(s)+h(s)<g(s)+h(s)=f(s),
-$$
+```
 
 so A\* would have expanded $`u`$ before $`s`$, a contradiction. Hence every state is expanded with its optimal cost, and the sequence of expanded $`f`$ values is nondecreasing: when $`n'`$ is generated from $`n`$, $`f(n')\ge f(n)`$, and every node on the frontier has $`f`$ at least that of the last expanded node.
 
@@ -398,9 +398,9 @@ so A\* would have expanded $`u`$ before $`s`$, a contradiction. Hence every stat
 
 Let $`h`$ be admissible, $`w\ge1`$, and $`f_w(n)=g(n)+w\,h(n)`$. Suppose weighted A\* (as a tree search, or as a graph search that reopens states) removes a goal $`G`$ with cost $`g(G)`$. At that moment, some node $`u`$ on an optimal solution path is on the frontier with $`g(u)=g^*(u)`$, for the same reason as in Appendix A of chapter 1. Because $`G`$ was removed first,
 
-$$
+```math
 g(G)=f_w(G)\le f_w(u)=g^*(u)+w\,h(u)\le g^*(u)+w\,h^*(u)\le w\bigl(g^*(u)+h^*(u)\bigr)=w\,C^*,
-$$
+```
 
 using admissibility and $`w\ge1`$. So the solution costs at most $`wC^*`$.
 

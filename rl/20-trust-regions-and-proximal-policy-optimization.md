@@ -14,15 +14,15 @@ In supervised learning, a gradient step that is too large costs a few iterations
 
 How much better is a policy $`\pi'`$ than $`\pi`$? With $`\rho_\pi(s)=\sum_t\gamma^t\Pr(S_t=s\mid\pi)`$ the unnormalized discounted state visitation and $`A_\pi`$ the advantage function of $`\pi`$, the **performance difference lemma** ([Kakade and Langford, 2002](https://dl.acm.org/doi/10.5555/645531.656005)) states that
 
-$$
+```math
 J(\pi')-J(\pi)=\sum_s\rho_{\pi'}(s)\sum_a\pi'(a\mid s)A_\pi(s,a)
-$$
+```
 
 (exercise 20.1). The improvement is the advantage of the new policy's actions, measured by the old policy's advantage function but averaged over the *new* policy's states. That makes it useless as it stands for choosing $`\pi'`$, since the new states are unknown until $`\pi'`$ has been run. Replacing $`\rho_{\pi'}`$ by $`\rho_\pi`$ gives the **surrogate objective**
 
-$$
+```math
 L_\pi(\pi')=J(\pi)+\sum_s\rho_\pi(s)\sum_a\pi'(a\mid s)A_\pi(s,a)=J(\pi)+\mathbb E_{s,a\sim\pi}\Bigl[\frac{\pi'(a\mid s)}{\pi(a\mid s)}A_\pi(s,a)\Bigr],
-$$
+```
 
 with the expectation over the unnormalized discounted visitation (total mass $`1/(1-\gamma)`$), which can be estimated from the data of $`\pi`$ with importance weights on the actions only. The surrogate matches $`J`$ to first order at $`\pi'=\pi`$, so its gradient there is the policy gradient (exercise 20.2), but it ignores the change of the state distribution, and it becomes unreliable as $`\pi'`$ moves away. Policy iteration maximizes it completely at every step, $`\pi'(s)=\arg\max_aA_\pi(s,a)`$, which is safe with exact advantages, since the greedy policy is at least as good in every state, but not with estimated ones.
 
@@ -30,9 +30,9 @@ with the expectation over the unnormalized discounted visitation (total mass $`1
 
 **Conservative policy iteration** ([Kakade and Langford, 2002](https://dl.acm.org/doi/10.5555/645531.656005)) moves only part of the way to the greedy policy, with the mixture $`\pi_{\text{new}}=(1-\alpha)\pi+\alpha\pi'`$, and proves a lower bound on the improvement: the surrogate's gain minus a penalty of order $`\alpha^2\varepsilon\gamma/(1-\gamma)^2`$, where $`\varepsilon=\max_s|\mathbb E_{a\sim\pi'}A_\pi(s,a)|`$ bounds the new policy's expected advantage. For small enough $`\alpha`$ the gain dominates and the policy improves monotonically. [Schulman et al. (2015)](https://arxiv.org/abs/1502.05477) extended the bound to arbitrary pairs of stochastic policies:
 
-$$
+```math
 J(\pi')\ge L_\pi(\pi')-\frac{4\varepsilon\gamma}{(1-\gamma)^2}\max_sD_{\mathrm{KL}}\bigl(\pi(\cdot\mid s)\,\|\,\pi'(\cdot\mid s)\bigr),\qquad\varepsilon=\max_{s,a}|A_\pi(s,a)|.
-$$
+```
 
 The right side equals $`J(\pi)`$ at $`\pi'=\pi`$ and is a lower bound everywhere, so maximizing it can only improve $`J`$: a **minorize–maximize** algorithm, like EM. In practice the penalty coefficient is far too large, since it is a worst case over all states and multiplied by $`(1-\gamma)^{-2}`$, and the steps it allows are tiny. TRPO keeps the structure and replaces the penalty by a constraint.
 
@@ -42,9 +42,9 @@ The right side equals $`J(\pi)`$ at $`\pi'=\pi`$ and is a lower bound everywhere
 
 **Trust region policy optimization** (TRPO) ([Schulman, Levine, Moritz, Jordan, and Abbeel, 2015](https://arxiv.org/abs/1502.05477)) solves, at each iteration,
 
-$$
+```math
 \max_{\boldsymbol\theta}\ \hat{\mathbb E}_t\Bigl[\frac{\pi_{\boldsymbol\theta}(A_t\mid S_t)}{\pi_{\boldsymbol\theta_{\text{old}}}(A_t\mid S_t)}\hat A_t\Bigr]\quad\text{subject to}\quad\hat{\mathbb E}_t\Bigl[D_{\mathrm{KL}}\bigl(\pi_{\boldsymbol\theta_{\text{old}}}(\cdot\mid S_t)\,\|\,\pi_{\boldsymbol\theta}(\cdot\mid S_t)\bigr)\Bigr]\le\delta,
-$$
+```
 
 with the expectations estimated from a batch collected by $`\pi_{\boldsymbol\theta_{\text{old}}}`$, the maximum KL of the theory replaced by the average over visited states, and the advantages estimated by Monte Carlo returns in the original paper and by GAE in later implementations (chapter 19). A typical $`\delta`$ is 0.01. The constraint makes the step size a statement about behavior: whatever the parameterization, the new policy's action distributions differ from the old ones by about $`\delta`$ nats on average.
 
@@ -52,15 +52,15 @@ with the expectations estimated from a batch collected by $`\pi_{\boldsymbol\the
 
 Near $`\boldsymbol\theta_{\text{old}}`$, the surrogate is linear to first order, with gradient $`\mathbf g`$, the policy gradient, and the average KL is quadratic to second order, with the **Fisher information matrix** $`F`$ as its Hessian (exercise 20.3):
 
-$$
+```math
 \hat{\mathbb E}[D_{\mathrm{KL}}]\approx\tfrac12\,\Delta\boldsymbol\theta^\top F\,\Delta\boldsymbol\theta,\qquad F=\hat{\mathbb E}_t\bigl[\nabla\ln\pi_{\boldsymbol\theta}(A_t\mid S_t)\,\nabla\ln\pi_{\boldsymbol\theta}(A_t\mid S_t)^\top\bigr].
-$$
+```
 
 Maximizing $`\mathbf g^\top\Delta\boldsymbol\theta`$ subject to $`\frac12\Delta\boldsymbol\theta^\top F\Delta\boldsymbol\theta\le\delta`$ gives the **natural gradient** direction of chapter 13, scaled to the boundary of the trust region:
 
-$$
+```math
 \Delta\boldsymbol\theta=\sqrt{\frac{2\delta}{\mathbf g^\top F^{-1}\mathbf g}}\;F^{-1}\mathbf g.
-$$
+```
 
 TRPO is thus a natural policy gradient method whose step size is set by the KL rather than chosen by hand, with a safeguard for the error of the quadratic model.
 
@@ -74,9 +74,9 @@ A network with a million parameters has a Fisher matrix with $`10^{12}`$ entries
 
 **Proximal policy optimization** (PPO) ([Schulman, Wolski, Dhariwal, Radford, and Klimov, 2017](https://arxiv.org/abs/1707.06347)) keeps TRPO's goal and drops its machinery. With the probability ratio $`r_t(\boldsymbol\theta)=\pi_{\boldsymbol\theta}(A_t\mid S_t)/\pi_{\boldsymbol\theta_{\text{old}}}(A_t\mid S_t)`$, it maximizes the **clipped objective**
 
-$$
+```math
 L^{\mathrm{CLIP}}(\boldsymbol\theta)=\hat{\mathbb E}_t\Bigl[\min\Bigl(r_t(\boldsymbol\theta)\hat A_t,\ \operatorname{clip}\bigl(r_t(\boldsymbol\theta),1-\epsilon,1+\epsilon\bigr)\hat A_t\Bigr)\Bigr],\qquad\epsilon\approx0.2,
-$$
+```
 
 with ordinary first-order optimizers. For a sample with a positive advantage, the objective rewards raising its probability only until the ratio reaches $`1+\epsilon`$; with a negative advantage, lowering it only until $`1-\epsilon`$. Beyond those points the sample contributes no gradient. The minimum with the unclipped term makes the objective a pessimistic bound: a change that makes a sample's contribution worse is never clipped away, so mistakes are always corrected (left and center panels of the figure; exercise 20.5). The paper's alternative, a penalty $`-\beta\,\hat{\mathbb E}[D_{\mathrm{KL}}]`$ whose coefficient doubles when the measured KL exceeds 1.5 times a target and halves when it falls below two thirds of it (exercise 20.6), performed somewhat worse and is less used.
 
@@ -88,9 +88,9 @@ with ordinary first-order optimizers. For a sample with a positive advantage, th
 
 PPO is the synchronous actor–critic of chapter 19 with one change: it takes several **epochs** of minibatch updates on each batch instead of one step. Each iteration collects $`T`$ steps from each of $`N`$ environments, computes GAE advantages and TD(λ) value targets with the old networks, and then, for $`K`$ epochs, shuffles the $`NT`$ samples into minibatches and takes an optimizer step on each minibatch with the loss
 
-$$
+```math
 -L^{\mathrm{CLIP}}+c_v\,\hat{\mathbb E}\bigl[(\hat v_{\mathbf w}(S_t)-\hat G_t)^2\bigr]-\beta\,\hat{\mathbb E}\bigl[\mathcal H(\pi_{\boldsymbol\theta}(\cdot\mid S_t))\bigr].
-$$
+```
 
 Reusing each batch for several epochs is where PPO's sample efficiency over A2C comes from, and the clipping is what makes the reuse safe. The original settings are still the usual starting points: for continuous control, one environment, $`T=2048`$, 10 epochs, minibatches of 64, Adam with step size $`3\times10^{-4}`$, $`\gamma=0.99`$, $`\lambda=0.95`$; for Atari, 8 environments, $`T=128`$, 3 epochs, $`\epsilon=0.1`$, and step size and $`\epsilon`$ both annealed to zero ([appendix B](#block-rl20-appendix-b)). With one epoch on the whole batch, the ratio is 1 when the gradient is computed, the clipping never activates, and PPO, with A2C's other settings (its optimizer, no advantage normalization or value clipping), reduces to A2C ([Huang et al., 2022](https://arxiv.org/abs/2205.09123)).
 
@@ -197,9 +197,9 @@ Lab 10 implements PPO, measures the effect of several of these details, and trai
 
 TRPO and PPO approximate a cleaner idea that the tabular case exposes. Replace the greedy step of policy iteration by a regularized one, which improves on $`Q_{\pi_k}`$ while staying close to $`\pi_k`$:
 
-$$
+```math
 \pi_{k+1}(\cdot\mid s)=\arg\max_p\Bigl\{\eta\,\bigl\langle p,\,Q_{\pi_k}(s,\cdot)\bigr\rangle-D_{\mathrm{KL}}\bigl(p\,\|\,\pi_k(\cdot\mid s)\bigr)\Bigr\}\quad\Longrightarrow\quad\pi_{k+1}(a\mid s)\propto\pi_k(a\mid s)\,e^{\eta Q_{\pi_k}(s,a)}
-$$
+```
 
 (exercise 20.7). This is **policy mirror descent**, the mirror descent of convex optimization with the KL divergence as its geometry, applied state by state. For tabular softmax policies it is exactly the natural policy gradient with step size $`\eta(1-\gamma)`$, since adding $`\eta A`$ to the logits multiplies the probabilities by $`e^{\eta A}`$ ([Kakade, 2001](https://papers.nips.cc/paper_files/paper/2001/hash/4b86abe48d358ecf194c56c69108433e-Abstract.html); [Agarwal, Kakade, Lee, and Mahajan, 2021](https://arxiv.org/abs/1908.00261)). Its step size interpolates between doing nothing ($`\eta\to0`$) and policy iteration ($`\eta\to\infty`$). Its theory is the strongest in policy optimization: with exact values, it converges to an optimal policy at rate $`O(1/k)`$ for any constant step size, with constants that do not depend on the number of states and grow only logarithmically as the initial policy becomes more deterministic, and linearly with geometrically increasing step sizes ([Lan, 2023](https://arxiv.org/abs/2102.00135); [Xiao, 2022](https://arxiv.org/abs/2201.07443)). The plain policy gradient has no such guarantee: its rate depends on how small the probabilities of good actions are, and it can take exponentially long to leave a plateau ([Mei, Xiao, Szepesvári, and Schuurmans, 2020](https://arxiv.org/abs/2005.06392); [Li et al., 2021](https://arxiv.org/abs/2102.11270)). The next code compares the three methods with exact values.
 
@@ -314,9 +314,9 @@ Prove that $`J(\pi')-J(\pi)=\mathbb E_{\tau\sim\pi'}\bigl[\sum_t\gamma^tA_\pi(S_
 
 Add and subtract $`\gamma^{t+1}v_\pi(S_{t+1})`$ along a trajectory of $`\pi'`$. The sum telescopes:
 
-$$
+```math
 \sum_t\gamma^tR_{t+1}=v_\pi(S_0)+\sum_t\gamma^t\bigl(R_{t+1}+\gamma v_\pi(S_{t+1})-v_\pi(S_t)\bigr).
-$$
+```
 
 Take expectations under $`\pi'`$. The left side becomes $`J(\pi')`$ and $`\mathbb E[v_\pi(S_0)]=J(\pi)`$, since the start distribution is shared. Conditioning each term on $`(S_t,A_t)`$ turns $`R_{t+1}+\gamma v_\pi(S_{t+1})`$ into $`q_\pi(S_t,A_t)`$, because the environment's dynamics do not depend on the policy, so each term becomes $`A_\pi(S_t,A_t)`$. Collecting the terms by state gives the visitation form. The lemma holds for any pair of policies, with no approximation; all the difficulty lies in the fact that the expectation is over the new policy's trajectories.
 

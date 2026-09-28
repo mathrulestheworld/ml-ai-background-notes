@@ -18,9 +18,9 @@ Bandits are also useful in their own right. Clinical trials that allocate patien
 
 A good strategy is judged by its **regret**, the reward lost relative to always pulling the best arm:
 
-$$
+```math
 \mathcal R_T=T\mu^*-\mathbb E\Bigl[\sum_{t=1}^TR_t\Bigr]=\sum_a\Delta_a\,\mathbb E[N_a(T)],
-$$
+```
 
 where $`N_a(T)`$ is the number of pulls of arm $`a`$ in the first $`T`$ steps. The second form, the **regret decomposition**, follows from $`\mathbb E[\sum_tR_t]=\sum_a\mu_a\mathbb E[N_a(T)]`$ and says that minimizing regret means pulling each suboptimal arm as rarely as possible, especially the arms with large gaps, while still pulling it often enough to be sure it is suboptimal. A strategy that never explores can lock onto a bad arm forever and suffer regret linear in $`T`$; a strategy that explores forever at a fixed rate also has linear regret. The central results of this chapter are that the best achievable regret grows only **logarithmically** in $`T`$ for a fixed problem, and as $`\sqrt{kT}`$ in the worst case over problems, and that simple algorithms achieve both, UCB1 up to a factor $`\sqrt{\ln T}`$ in the worst case.
 
@@ -30,15 +30,15 @@ where $`N_a(T)`$ is the number of pulls of arm $`a`$ in the first $`T`$ steps. T
 
 The natural estimate of an arm's mean is the average of its observed rewards, $`Q_n=(R_1+\dots+R_{n-1})/(n-1)`$ after $`n-1`$ pulls. It can be updated in constant memory:
 
-$$
+```math
 Q_{n+1}=Q_n+\frac1n\bigl(R_n-Q_n\bigr).
-$$
+```
 
 This has the form that recurs throughout the module,
 
-$$
+```math
 \text{new estimate}\leftarrow\text{old estimate}+\text{step size}\times\bigl(\text{target}-\text{old estimate}\bigr),
-$$
+```
 
 where the bracket is an **error** that the update reduces. Temporal-difference learning (chapter 6) and Q-learning (chapter 7) are updates of exactly this form with other targets.
 
@@ -46,15 +46,15 @@ where the bracket is an **error** that the update reduces. Temporal-difference l
 
 With a constant step size $`\alpha\in(0,1]`$, the estimate becomes an exponentially weighted average,
 
-$$
+```math
 Q_{n+1}=(1-\alpha)^nQ_1+\sum_{i=1}^n\alpha(1-\alpha)^{n-i}R_i,
-$$
+```
 
 which weights recent rewards more and tracks a **nonstationary** mean, but never converges when the mean is fixed: its variance stays of order $`\alpha`$. The classical sufficient conditions for a sequence of step sizes $`\alpha_n`$ to give convergence with probability one to a fixed mean are the **Robbins–Monro conditions**,
 
-$$
+```math
 \sum_n\alpha_n=\infty,\qquad\sum_n\alpha_n^2<\infty:
-$$
+```
 
 the steps must be large enough in total to overcome the initial value and any early noise, and small enough eventually to average the noise away. The sample average, $`\alpha_n=1/n`$, satisfies both; a constant step size violates the second. In reinforcement learning the targets themselves usually change as the agent learns, so constant step sizes are the norm in practice (exercise 3.6).
 
@@ -72,9 +72,9 @@ Setting all initial estimates well above any plausible reward makes the greedy a
 
 A strategy that separates the two phases, pulling each arm $`m`$ times and then committing to the arm with the best average, has regret at most
 
-$$
+```math
 \mathcal R_T\le m\sum_a\Delta_a+(T-mk)\sum_a\Delta_a\exp\bigl(-m\Delta_a^2/4\bigr)
-$$
+```
 
 for rewards with unit sub-Gaussian noise ([Lattimore and Szepesvári, 2020](https://tor-lattimore.com/downloads/book/book.pdf), theorem 6.1): the first term pays for exploring, the second for committing to the wrong arm. With $`m`$ tuned to the gap, about $`(4/\Delta^2)\ln(T\Delta^2/4)`$ for two arms, the regret is logarithmic in $`T`$; without knowledge of the gaps, the best fixed choice is $`m\propto T^{2/3}`$, giving regret of order $`T^{2/3}`$ (exercise 3.3). Explore-then-commit is what a classical A/B test does: a fixed experiment followed by a decision.
 
@@ -161,9 +161,9 @@ The greedy agent finds the best arm in only 35% of the problems and stays with i
 
 Optimism needs a measure of how uncertain each estimate is. For rewards in $`[0,1]`$, Hoeffding's inequality (Foundations chapter 4) bounds the probability that an average of $`n`$ independent rewards overestimates or underestimates its mean by $`\varepsilon`$:
 
-$$
+```math
 \Pr\bigl(\hat\mu_n\ge\mu+\varepsilon\bigr)\le e^{-2n\varepsilon^2},\qquad\Pr\bigl(\hat\mu_n\le\mu-\varepsilon\bigr)\le e^{-2n\varepsilon^2}.
-$$
+```
 
 Setting the right-hand side to $`\delta`$ gives a confidence radius $`\sqrt{\ln(1/\delta)/(2n)}`$: with probability at least $`1-\delta`$, the mean is below $`\hat\mu_n+\sqrt{\ln(1/\delta)/(2n)}`$. The radius shrinks like $`1/\sqrt n`$, so arms pulled rarely have wide intervals.
 
@@ -171,15 +171,15 @@ Setting the right-hand side to $`\delta`$ gives a confidence radius $`\sqrt{\ln(
 
 The **upper confidence bound** principle says: pull the arm whose mean could plausibly be highest, that is, the arm with the largest upper confidence bound. Either the arm is truly good, and pulling it is right, or its bound is too optimistic, and pulling it narrows the bound. Choosing $`\delta`$ to shrink polynomially in $`t`$ gives the **UCB1** algorithm of [Auer, Cesa-Bianchi, and Fischer (2002)](https://doi.org/10.1023/A:1013689704352): after pulling each arm once, choose
 
-$$
+```math
 A_t=\arg\max_a\Bigl[\hat\mu_a+\sqrt{\frac{2\ln t}{N_a(t)}}\Bigr].
-$$
+```
 
 Its regret satisfies, for rewards in $`[0,1]`$ and every $`T`$,
 
-$$
+```math
 \mathcal R_T\le\sum_{a:\Delta_a>0}\frac{8\ln T}{\Delta_a}+\Bigl(1+\frac{\pi^2}3\Bigr)\sum_a\Delta_a.
-$$
+```
 
 The proof ([Appendix A](#block-rl03-appendix-a)) shows that a suboptimal arm is pulled only while its confidence radius exceeds about half its gap, which happens about $`8\ln T/\Delta_a^2`$ times, and that failures of the confidence bounds are rare enough to contribute a constant. This is the rule that the UCT algorithm applies at every node of a search tree (AI chapter 4, Appendix B). The bound is logarithmic in $`T`$ but depends on the gaps, and it blows up as a gap goes to zero. A problem with a tiny gap is not hard, though, since pulling the wrong arm costs little; splitting the arms at a threshold $`\varepsilon`$, the arms with $`\Delta_a<\varepsilon`$ cost at most $`\varepsilon T`$ in total and the others at most $`\sum_a8\ln T/\Delta_a\le8k\ln T/\varepsilon`$ (plus a constant), and choosing $`\varepsilon=\sqrt{8k\ln T/T}`$ gives a **gap-free** bound of order $`\sqrt{kT\ln T}`$.
 
@@ -189,9 +189,9 @@ The UCB rule in the testbed code, $`\hat\mu_a+c\sqrt{\ln t/N_a}`$ with $`c=2`$, 
 
 Hoeffding's inequality uses only the range of the rewards and is loose for Bernoulli rewards far from 1/2. **KL-UCB** ([Garivier and Cappé, 2011](https://arxiv.org/abs/1102.2490)) uses the exact large-deviation rate instead, the relative entropy of Bernoulli distributions $`\mathrm{KL}(p,q)=p\ln\frac pq+(1-p)\ln\frac{1-p}{1-q}`$. Its index is the largest mean $`q`$ that is still plausible given the data,
 
-$$
+```math
 U_a(t)=\max\bigl\{q\in[\hat\mu_a,1]:N_a(t)\,\mathrm{KL}(\hat\mu_a,q)\le\ln t+c\ln\ln t\bigr\},
-$$
+```
 
 computed by bisection. By Pinsker's inequality $`\mathrm{KL}(p,q)\ge2(p-q)^2`$, the KL confidence set is never wider than Hoeffding's for the same threshold, and it is much narrower near 0 or 1. For Bernoulli rewards, KL-UCB matches the lower bound of the next section asymptotically, with the exact constant (the analysis takes $`c=3`$; Garivier and Cappé recommend $`c=0`$ in practice, as in the code below).
 
@@ -201,9 +201,9 @@ computed by bisection. By Pinsker's inequality $`\mathrm{KL}(p,q)\ge2(p-q)^2`$, 
 
 How small can regret be? A strategy that always pulls arm 1 has zero regret on problems where arm 1 is best, so a lower bound must concern strategies that do reasonably well on every problem. Call a strategy **consistent** if, on every bandit in the class considered, its regret is $`o(T^\alpha)`$ for every $`\alpha>0`$. [Lai and Robbins (1985)](https://doi.org/10.1016/0196-8858(85)90002-8) proved that any consistent strategy pulls each suboptimal arm at least logarithmically often:
 
-$$
+```math
 \liminf_{T\to\infty}\frac{\mathbb E[N_a(T)]}{\ln T}\ge\frac1{\mathrm{KL}(\nu_a,\nu^*)},\qquad\text{hence}\qquad\liminf_{T\to\infty}\frac{\mathcal R_T}{\ln T}\ge\sum_{a:\Delta_a>0}\frac{\Delta_a}{\mathrm{KL}(\nu_a,\nu^*)}.
-$$
+```
 
 The argument ([Appendix B](#block-rl03-appendix-b)) is a change of measure: if arm $`a`$ were pulled much less than $`\ln T/\mathrm{KL}(\nu_a,\nu^*)`$ times, the strategy could not distinguish the true problem from one in which arm $`a`$'s distribution is changed slightly to become the best, and on that problem it would suffer polynomial regret, contradicting consistency. The relative entropy measures how many samples are needed to tell an arm's distribution from a slightly better one, so arms close to the best in distribution, not just in mean, must be explored more. By Pinsker's inequality, $`\Delta_a/\mathrm{KL}\le1/(2\Delta_a)`$, so the constant $`8/\Delta_a`$ in UCB1's bound is at least 16 times the optimal one (exercise 3.4).
 
@@ -219,9 +219,9 @@ The oldest bandit algorithm is Bayesian. Put a prior on each arm's mean, update 
 
 **Thompson sampling** chooses each arm with exactly the posterior probability that it is the best arm,
 
-$$
+```math
 \Pr(A_t=a\mid\text{history})=\Pr\bigl(a=\arg\max_b\mu_b\mid\text{history}\bigr),
-$$
+```
 
 a property called **probability matching** (exercise 3.8). An arm that is certainly worse is almost never pulled; an arm with few observations has a wide posterior and is sampled high often enough to be tried. Unlike UCB, Thompson sampling needs no confidence bounds, and it extends naturally to any model with a posterior that can be sampled: contextual and linear bandits, and even MDPs (chapter 4, chapter 22).
 
@@ -320,9 +320,9 @@ The regret after 10,000 pulls separates the algorithms by how their regret grows
 
 Instead of estimating values, a **gradient bandit** learns a numerical **preference** $`H(a)`$ for each arm and chooses arms with the softmax probabilities $`\pi(a)=e^{H(a)}/\sum_be^{H(b)}`$. After pulling $`A_t`$ and receiving $`R_t`$, it updates
 
-$$
+```math
 H(a)\leftarrow H(a)+\alpha\,(R_t-\bar R_t)\bigl(\mathbb 1[a=A_t]-\pi(a)\bigr)\quad\text{for all }a,
-$$
+```
 
 where $`\bar R_t`$ is the average of the rewards before step $`t`$. A reward above the baseline raises the preference of the chosen arm and lowers the others. The expected update is exactly the gradient of the expected reward $`\sum_a\pi(a)\mu_a`$ with respect to the preferences, so the algorithm is stochastic gradient ascent ([Appendix C](#block-rl03-appendix-c)). The baseline does not change the expected update but reduces its variance, and when the true values are near $`+4`$ an agent without it learns much more slowly (Sutton and Barto's Figure 2.5; exercise 3.5). This is the simplest instance of the **policy gradient** methods of chapter 13: the score-function estimator with a baseline, applied to a one-step problem.
 
@@ -537,15 +537,15 @@ The radius is valid simultaneously for all arms and rounds: by Hoeffding's inequ
 
 Let arm 1 be optimal and fix a suboptimal arm $`a`$. Write $`c_{t,n}=\sqrt{2\ln t/n}`$ and $`\hat\mu_{a,n}`$ for the average of the first $`n`$ rewards of arm $`a`$. Let $`\ell=\lceil8\ln T/\Delta_a^2\rceil`$. Arm $`a`$ is pulled at time $`t`$ only if its index is at least arm 1's, so
 
-$$
+```math
 N_a(T)\le\ell+\sum_{t=k+1}^T\mathbb 1\bigl[A_t=a,\ N_a(t-1)\ge\ell\bigr]\le\ell+\sum_{t}\ \sum_{s=1}^{t}\ \sum_{n=\ell}^{t}\mathbb 1\bigl[\hat\mu_{1,s}+c_{t,s}\le\hat\mu_{a,n}+c_{t,n}\bigr].
-$$
+```
 
 The event in the last indicator implies one of three events: (i) $`\hat\mu_{1,s}\le\mu_1-c_{t,s}`$, the optimal arm is underestimated; (ii) $`\hat\mu_{a,n}\ge\mu_a+c_{t,n}`$, arm $`a`$ is overestimated; or (iii) $`\mu_1<\mu_a+2c_{t,n}`$. For $`n\ge\ell\ge8\ln T/\Delta_a^2`$, $`2c_{t,n}\le2\sqrt{2\ln T/\ell}\le\Delta_a`$, so (iii) is impossible. By Hoeffding's inequality, (i) and (ii) each have probability at most $`e^{-2s\cdot2\ln t/s}=t^{-4}`$. Hence
 
-$$
+```math
 \mathbb E[N_a(T)]\le\frac{8\ln T}{\Delta_a^2}+1+\sum_{t\ge1}\sum_{s=1}^t\sum_{n=1}^t2t^{-4}\le\frac{8\ln T}{\Delta_a^2}+1+\frac{\pi^2}3,
-$$
+```
 
 and multiplying by $`\Delta_a`$ and summing over suboptimal arms gives the bound in the text ([Auer, Cesa-Bianchi, and Fischer, 2002](https://doi.org/10.1023/A:1013689704352)). The proof shows what the logarithm is for: the confidence level must tighten with $`t`$ so that the total probability of misleading bounds over the whole run is finite.
 
@@ -561,9 +561,9 @@ Consider a consistent strategy on a bandit $`\nu`$ where arm 1 is optimal, and a
 
 The **divergence decomposition** says that the relative entropy between the distributions of everything observed in $`T`$ steps under the two bandits is $`\mathbb E_\nu[N_a(T)]\,\mathrm{KL}(\nu_a,\nu_a')`$, since only arm $`a`$'s rewards differ. A standard inequality (Bretagnolle–Huber) bounds the probability of any event $`E`$ in terms of this divergence: $`\Pr_\nu(E)+\Pr_{\nu'}(E^c)\ge\frac12\exp\bigl(-\mathbb E_\nu[N_a(T)]\,\mathrm{KL}(\nu_a,\nu_a')\bigr)`$. Take $`E=\{N_a(T)>T/2\}`$. Under $`\nu`$, consistency means arm $`a`$ is rarely pulled more than half the time, so $`\Pr_\nu(E)`$ is small, of order $`\mathcal R_T(\nu)/(T\Delta_a)`$; under $`\nu'`$, consistency means arm $`a`$ is pulled most of the time, so $`\Pr_{\nu'}(E^c)`$ is of order $`\mathcal R_T(\nu')/T`$. Both regrets are $`o(T^\alpha)`$ for every $`\alpha>0`$, so the left side is at most $`T^{-1+o(1)}`$, and taking logarithms,
 
-$$
+```math
 \mathbb E_\nu[N_a(T)]\,\mathrm{KL}(\nu_a,\nu_a')\ge(1-o(1))\ln T .
-$$
+```
 
 Letting $`\epsilon\to0`$ gives the Lai–Robbins bound. The intuition is that of hypothesis testing: to rule out that arm $`a`$ is secretly the best with error probability about $`1/T`$, the strategy must collect about $`\ln T/\mathrm{KL}`$ samples from it ([Lattimore and Szepesvári](https://tor-lattimore.com/downloads/book/book.pdf), chapter 16).
 
@@ -577,15 +577,15 @@ Letting $`\epsilon\to0`$ gives the Lai–Robbins bound. The intuition is that of
 
 The expected reward is $`J(H)=\sum_b\pi(b)\mu_b`$ with $`\pi(b)=e^{H(b)}/\sum_ce^{H(c)}`$. The softmax derivative is $`\partial\pi(b)/\partial H(a)=\pi(b)(\mathbb 1[a=b]-\pi(a))`$, so
 
-$$
+```math
 \frac{\partial J}{\partial H(a)}=\sum_b\mu_b\,\pi(b)\bigl(\mathbb 1[a=b]-\pi(a)\bigr)=\sum_b\pi(b)\,(\mu_b-B)\bigl(\mathbb 1[a=b]-\pi(a)\bigr)
-$$
+```
 
 for any constant $`B`$, since $`\sum_b\pi(b)(\mathbb 1[a=b]-\pi(a))=0`$. The last sum is an expectation over $`A_t\sim\pi`$, and $`\mu_{A_t}=\mathbb E[R_t\mid A_t]`$, so
 
-$$
+```math
 \frac{\partial J}{\partial H(a)}=\mathbb E\Bigl[(R_t-B)\bigl(\mathbb 1[a=A_t]-\pi(a)\bigr)\Bigr].
-$$
+```
 
 The update of the text is a sample of this expectation times $`\alpha`$, with $`B`$ replaced by the running average $`\bar R_t`$ (which depends on past rewards but not on $`A_t`$). The factor $`\mathbb 1[a=A_t]-\pi(a)`$ is $`\partial\ln\pi(A_t)/\partial H(a)`$, the **score** of the chosen action, and the whole construction is the REINFORCE estimator of chapter 13 in its simplest setting.
 

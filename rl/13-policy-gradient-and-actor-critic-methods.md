@@ -10,17 +10,17 @@
 
 Every control method so far has learned action values and derived a policy from them, greedy or ε-greedy. **Policy gradient methods** instead learn a parameterized policy $`\pi(a\mid s,\boldsymbol\theta)`$ directly, adjusting the policy parameters $`\boldsymbol\theta\in\mathbb R^{d'}`$ in the direction that increases a measure of performance $`J(\boldsymbol\theta)`$:
 
-$$
+```math
 \boldsymbol\theta_{t+1}=\boldsymbol\theta_t+\alpha\,\widehat{\nabla J(\boldsymbol\theta_t)},
-$$
+```
 
 where $`\widehat{\nabla J}`$ is a stochastic estimate of the gradient. A value function may still be learned, to help estimate the gradient, but it is no longer needed to choose actions. Methods that learn both a policy, the **actor**, and a value function, the **critic**, are **actor–critic** methods, one of the oldest reinforcement learning architectures ([Barto, Sutton, and Anderson, 1983](https://doi.org/10.1109/TSMC.1983.6313077)) and the template of most modern deep RL agents.
 
 For discrete actions, the standard parameterization is a **softmax in action preferences**: each state–action pair has a numerical preference $`h(s,a,\boldsymbol\theta)`$, for example linear in features, $`h=\boldsymbol\theta^\top\mathbf x(s,a)`$, or computed by a neural network, and
 
-$$
+```math
 \pi(a\mid s,\boldsymbol\theta)=\frac{e^{h(s,a,\boldsymbol\theta)}}{\sum_be^{h(s,b,\boldsymbol\theta)}}.
-$$
+```
 
 For continuous actions, a common choice is a **Gaussian policy** whose mean $`\mu(s,\boldsymbol\theta)`$, and possibly standard deviation $`\sigma(s,\boldsymbol\theta)`$, are parameterized functions of the state.
 
@@ -46,9 +46,9 @@ In episodic tasks, performance is the value of the start state under the policy,
 
 For the episodic case, the **policy gradient theorem** ([Sutton, McAllester, Singh, and Mansour, 1999](https://papers.nips.cc/paper_files/paper/1999/hash/464d828b85b0bed98e80ade0a5c43b0f-Abstract.html)) states that
 
-$$
+```math
 \nabla J(\boldsymbol\theta)\propto\sum_s\mu(s)\sum_aq_\pi(s,a)\,\nabla\pi(a\mid s,\boldsymbol\theta),
-$$
+```
 
 where $`\mu`$ is the on-policy distribution of states under $`\pi`$, and the constant of proportionality is the average length of an episode (or 1 in the continuing case, with average-reward values). The gradient of performance involves no derivative of the state distribution: to first order, a small change in the policy changes performance through the action probabilities at each state, weighted by how often the state is visited and by how good each action is ([Appendix A](#block-rl13-appendix-a) proves it). The **performance difference lemma** of chapter 1 is the finite version of the same fact.
 
@@ -56,9 +56,9 @@ where $`\mu`$ is the on-policy distribution of states under $`\pi`$, and the con
 
 Multiplying and dividing by $`\pi(a\mid s,\boldsymbol\theta)`$ turns the sum over actions into an expectation over the action the policy takes:
 
-$$
+```math
 \nabla J(\boldsymbol\theta)\propto\mathbb E_\pi\Bigl[\sum_aq_\pi(S_t,a)\nabla\pi(a\mid S_t,\boldsymbol\theta)\Bigr]=\mathbb E_\pi\bigl[q_\pi(S_t,A_t)\,\nabla\ln\pi(A_t\mid S_t,\boldsymbol\theta)\bigr]=\mathbb E_\pi\bigl[G_t\,\nabla\ln\pi(A_t\mid S_t,\boldsymbol\theta)\bigr],
-$$
+```
 
 using $`\nabla\pi/\pi=\nabla\ln\pi`$ and $`\mathbb E_\pi[G_t\mid S_t,A_t]=q_\pi(S_t,A_t)`$. The vector $`\nabla\ln\pi(A_t\mid S_t,\boldsymbol\theta)`$ is the **score function**, or **eligibility vector**: the direction in parameter space that most increases the probability of the action actually taken, divided by that probability, so that frequently chosen actions do not win merely by being chosen often. The identity $`\nabla\mathbb E_{x\sim p_\theta}[f(x)]=\mathbb E_{x\sim p_\theta}[f(x)\nabla\ln p_\theta(x)]`$ is the **likelihood-ratio** or **score-function** gradient estimator, developed in simulation optimization independently of reinforcement learning ([Glynn, 1990](https://doi.org/10.1145/84537.84552)), and it applies whenever an expectation must be differentiated with respect to the parameters of the distribution, not only the function. For a linear softmax policy, the score is $`\nabla\ln\pi(a\mid s,\boldsymbol\theta)=\mathbf x(s,a)-\sum_b\pi(b\mid s,\boldsymbol\theta)\mathbf x(s,b)`$, the feature vector of the action taken minus its expectation under the policy.
 
@@ -66,9 +66,9 @@ using $`\nabla\pi/\pi=\nabla\ln\pi`$ and $`\mathbb E_\pi[G_t\mid S_t,A_t]=q_\pi(
 
 Sampling the expectation gives **REINFORCE** ([Williams, 1992](https://doi.org/10.1007/BF00992696)), the Monte Carlo policy gradient algorithm. After each episode, for each step $`t`$,
 
-$$
+```math
 \boldsymbol\theta\leftarrow\boldsymbol\theta+\alpha\gamma^tG_t\nabla\ln\pi(A_t\mid S_t,\boldsymbol\theta).
-$$
+```
 
 Each update increases the probability of the action taken in proportion to the return that followed it. It is an unbiased stochastic gradient method, so with decreasing step sizes it converges to a stationary point of $`J`$, but its updates have high variance, since each depends on a whole random return. The factor $`\gamma^t`$ makes the update an unbiased estimate of the gradient of the discounted value of the start state; practical implementations usually drop it, which makes the update the gradient of no fixed objective ([Nota and Thomas, 2020](https://arxiv.org/abs/1906.07073)), but works well (exercise 13.7).
 
@@ -131,15 +131,15 @@ Starting from a nearly deterministic policy that almost always goes left, REINFO
 
 Any function of the state that does not depend on the action can be subtracted from the return without changing the expected gradient:
 
-$$
+```math
 \nabla J(\boldsymbol\theta)\propto\sum_s\mu(s)\sum_a\bigl(q_\pi(s,a)-b(s)\bigr)\nabla\pi(a\mid s,\boldsymbol\theta),
-$$
+```
 
 because $`\sum_ab(s)\nabla\pi(a\mid s,\boldsymbol\theta)=b(s)\nabla\sum_a\pi(a\mid s,\boldsymbol\theta)=b(s)\nabla1=0`$. The **baseline** $`b(s)`$ leaves the gradient unbiased but can reduce its variance greatly. Without it, all returns in a task with negative rewards are negative, so every action taken has its probability decreased, and the gradient appears only as the small difference between large, noisy decreases. With a baseline close to $`v_\pi(s)`$, the update is proportional to how much better or worse than usual the action turned out, positive or negative. The natural baseline is a learned state-value function $`\hat v(s,\mathbf w)`$, trained by gradient Monte Carlo alongside the policy:
 
-$$
+```math
 \delta=G_t-\hat v(S_t,\mathbf w),\qquad\mathbf w\leftarrow\mathbf w+\alpha^{\mathbf w}\delta\nabla\hat v(S_t,\mathbf w),\qquad\boldsymbol\theta\leftarrow\boldsymbol\theta+\alpha^{\boldsymbol\theta}\gamma^t\delta\nabla\ln\pi(A_t\mid S_t,\boldsymbol\theta).
-$$
+```
 
 ```python
 import numpy as np
@@ -219,9 +219,9 @@ The baseline reduces the variance of the one-episode gradient estimate by a fact
 
 The state value is a good baseline but not the one that minimizes variance. For a single state and a one-dimensional parameter, the variance of $`(G-b)\nabla\ln\pi`$ is minimized by
 
-$$
+```math
 b^*=\frac{\mathbb E\bigl[G\,(\nabla\ln\pi)^2\bigr]}{\mathbb E\bigl[(\nabla\ln\pi)^2\bigr]},
-$$
+```
 
 a weighted average of the returns that gives more weight to actions with large scores ([Greensmith, Bartlett, and Baxter, 2004](https://jmlr.org/papers/v5/greensmith04a.html); exercise 13.3). In practice $`\hat v(s)`$ is close enough and much simpler. Other variance reductions follow the same principle, subtracting a quantity of known expectation: **reward-to-go**, which uses only the rewards after step $`t`$, as $`G_t`$ already does, instead of the whole episode's return, is the most basic; action-dependent baselines and the control variates of chapter 9 go further. In language-model training, where one prompt yields several sampled answers, the average reward of the answers to the same prompt is a simple and effective baseline (the other answers in RLOO; the whole group, with standardization, in GRPO) (chapter 28).
 
@@ -231,11 +231,11 @@ a weighted average of the returns that gives more weight to actions with large s
 
 REINFORCE with baseline learns a state-value function, but only as a baseline: its target is still the full Monte Carlo return, which is unbiased but noisy and available only at the end of the episode. **Actor–critic** methods use the value function as a **critic** that bootstraps, replacing the return by the one-step TD target:
 
-$$
+```math
 \delta_t=R_{t+1}+\gamma\hat v(S_{t+1},\mathbf w)-\hat v(S_t,\mathbf w),\qquad
 \mathbf w\leftarrow\mathbf w+\alpha^{\mathbf w}\delta_t\nabla\hat v(S_t,\mathbf w),\qquad
 \boldsymbol\theta\leftarrow\boldsymbol\theta+\alpha^{\boldsymbol\theta}I\delta_t\nabla\ln\pi(A_t\mid S_t,\boldsymbol\theta),
-$$
+```
 
 where $`I=\gamma^t`$ is accumulated during the episode. The TD error estimates the **advantage** $`a_\pi(S_t,A_t)=q_\pi(S_t,A_t)-v_\pi(S_t)`$, since $`\mathbb E[\delta_t\mid S_t,A_t]=a_\pi(S_t,A_t)`$ when the critic is exact. The one-step actor–critic is fully online and incremental, like TD(0), and it can be used in continuing tasks. Bootstrapping introduces bias, since the critic is not exact, but it reduces variance, usually by much more.
 
@@ -326,15 +326,15 @@ A critic introduces bias into the policy gradient unless it is exact. [Sutton et
 
 The ordinary gradient depends on how the policy is parameterized: rescaling one parameter changes the direction of steepest ascent, although it does not change the policy. The **natural gradient** ([Amari, 1998](https://doi.org/10.1162/089976698300017746)) measures steps not in parameter space but in the space of distributions, by the Kullback–Leibler divergence they cause. Locally, $`\mathrm{KL}(\pi_{\boldsymbol\theta}\,\|\,\pi_{\boldsymbol\theta+\Delta})\approx\tfrac12\Delta^\top\mathbf F(\boldsymbol\theta)\Delta`$, where
 
-$$
+```math
 \mathbf F(\boldsymbol\theta)=\mathbb E_{s\sim\mu,\,a\sim\pi}\bigl[\nabla\ln\pi(a\mid s,\boldsymbol\theta)\,\nabla\ln\pi(a\mid s,\boldsymbol\theta)^\top\bigr]
-$$
+```
 
 is the **Fisher information matrix** of the policy, averaged over states. The steepest ascent direction per unit of divergence is $`\mathbf F^{-1}\nabla J`$, and the **natural policy gradient** ([Kakade, 2001](https://papers.nips.cc/paper_files/paper/2001/hash/4b86abe48d358ecf194c56c69108433e-Abstract.html)) follows it:
 
-$$
+```math
 \boldsymbol\theta\leftarrow\boldsymbol\theta+\alpha\,\mathbf F(\boldsymbol\theta)^{-1}\nabla J(\boldsymbol\theta).
-$$
+```
 
 It is invariant to how the policy is parameterized, and it has a striking connection to compatible function approximation: the natural gradient equals the weight vector $`\mathbf w`$ of the best compatible critic, since $`\mathbf w=\mathbf F^{-1}\nabla J`$ solves the critic's least-squares problem. A **natural actor–critic** ([Peters and Schaal, 2008](https://doi.org/10.1016/j.neucom.2007.11.026)) learns the compatible critic and moves the policy parameters along its weights. For a tabular softmax policy, the natural gradient step, computed with the pseudoinverse of $`\mathbf F`$, which is singular because the scores at each state sum to zero, is especially simple, $`\boldsymbol\theta(s,a)\leftarrow\boldsymbol\theta(s,a)+\frac{\alpha}{1-\gamma}a_\pi(s,a)`$, which multiplies each action's probability by $`e^{\alpha a_\pi(s,a)/(1-\gamma)}`$ and renormalizes: a soft form of policy iteration.
 
@@ -352,10 +352,10 @@ Modern theory has made these observations precise. With exact gradients, softmax
 
 For a continuous action, a Gaussian policy with mean $`\mu(s,\boldsymbol\theta_\mu)`$ and standard deviation $`\sigma(s,\boldsymbol\theta_\sigma)=\exp(\boldsymbol\theta_\sigma^\top\mathbf x_\sigma(s))`$, parameterized through its logarithm to keep it positive, has score functions
 
-$$
+```math
 \nabla_{\boldsymbol\theta_\mu}\ln\pi(a\mid s)=\frac{a-\mu(s)}{\sigma(s)^2}\nabla\mu(s),\qquad
 \nabla_{\boldsymbol\theta_\sigma}\ln\pi(a\mid s)=\Bigl(\frac{(a-\mu(s))^2}{\sigma(s)^2}-1\Bigr)\mathbf x_\sigma(s).
-$$
+```
 
 An action that turns out better than expected moves the mean toward it; the standard deviation grows when actions far from the mean do well and shrinks when actions near it do. Every policy gradient method applies unchanged. Exercise 13.4 uses a Gaussian policy to learn the feedback gain of a linear–quadratic regulator, the problem of chapter 15, and recovers the gain that the Riccati equation gives. For bounded actions, a Gaussian squashed by a hyperbolic tangent, or a beta distribution, keeps the actions in range.
 
@@ -363,9 +363,9 @@ An action that turns out better than expected moves the mean toward it; the stan
 
 As the standard deviation of a Gaussian policy shrinks to zero, the score-function gradient becomes infinitely noisy, but a different estimator takes over. For a deterministic policy $`a=\mu(s,\boldsymbol\theta)`$, the **deterministic policy gradient theorem** ([Silver et al., 2014](https://proceedings.mlr.press/v32/silver14.html)) gives
 
-$$
+```math
 \nabla J(\boldsymbol\theta)\propto\mathbb E_{s\sim\rho^\mu}\Bigl[\nabla_{\boldsymbol\theta}\mu(s,\boldsymbol\theta)\,\nabla_aq_\mu(s,a)\big|_{a=\mu(s,\boldsymbol\theta)}\Bigr]:
-$$
+```
 
 where $`\rho^\mu`$ is the discounted state distribution under $`\mu`$: the policy moves its action in the direction in which the critic's action values increase. It needs a critic that is differentiable in the action and an exploration mechanism outside the policy, and since the gradient is taken at the policy's own action for states from any distribution, it can be used off-policy. It is the basis of DDPG and TD3 (chapter 21). The same idea, differentiating through a learned model of the value of actions rather than sampling scores, is the **reparameterization** or pathwise gradient, which trades the variance of the score function for bias from the critic.
 
@@ -392,7 +392,9 @@ Lab 6 compares REINFORCE's gradient estimators on the cart-pole, builds an onlin
 
 (a) With $`v_1,v_2,v_3`$ the values of the three states and the goal worth 0: $`v_1=-1+pv_2+(1-p)v_1`$, since left in the first state stays there; $`v_2=-1+pv_1+(1-p)v_3`$, since the actions are reversed; and $`v_3=-1+(1-p)v_2`$. The first equation gives $`v_1=v_2-1/p`$; substituting it and the third into the second gives $`p(1-p)\,v_2=p-3`$. So
 
-$$J(p)=v_1=\frac{p-3}{p(1-p)}-\frac1p=\frac{2p-4}{p(1-p)}=-\frac{2(2-p)}{p(1-p)}.$$
+```math
+J(p)=v_1=\frac{p-3}{p(1-p)}-\frac1p=\frac{2p-4}{p(1-p)}=-\frac{2(2-p)}{p(1-p)}.
+```
 
 It gives $`-82.1`$ at $`p=0.05`$ and $`-44.2`$ at $`p=0.95`$.
 
@@ -603,21 +605,21 @@ Adding an entropy bonus, $`J_\tau(\boldsymbol\theta)=J(\boldsymbol\theta)+\tau\,
 
 Consider the episodic case with $`\gamma=1`$; the discounted case is the same with $`\gamma^k`$ inserted. For any state $`s`$,
 
-$$
+```math
 \nabla v_\pi(s)=\nabla\sum_a\pi(a\mid s)q_\pi(s,a)=\sum_a\Bigl[\nabla\pi(a\mid s)q_\pi(s,a)+\pi(a\mid s)\nabla q_\pi(s,a)\Bigr],
-$$
+```
 
 and since $`q_\pi(s,a)=\sum_{s',r}p(s',r\mid s,a)(r+v_\pi(s'))`$ and the dynamics do not depend on $`\boldsymbol\theta`$, $`\nabla q_\pi(s,a)=\sum_{s'}p(s'\mid s,a)\nabla v_\pi(s')`$. Substituting repeatedly unrolls the recursion:
 
-$$
+```math
 \nabla v_\pi(s)=\sum_x\sum_{k=0}^\infty\Pr(s\to x,k,\pi)\sum_a\nabla\pi(a\mid x)q_\pi(x,a),
-$$
+```
 
 where $`\Pr(s\to x,k,\pi)`$ is the probability of being in state $`x`$ after $`k`$ steps from $`s`$ under $`\pi`$. For the start state, $`\sum_k\Pr(s_0\to x,k,\pi)=\eta(x)`$, the expected number of visits to $`x`$ per episode, so
 
-$$
+```math
 \nabla J(\boldsymbol\theta)=\sum_x\eta(x)\sum_a\nabla\pi(a\mid x)q_\pi(x,a)=\Bigl(\sum_{x'}\eta(x')\Bigr)\sum_x\mu(x)\sum_a\nabla\pi(a\mid x)q_\pi(x,a),
-$$
+```
 
 with $`\mu=\eta/\sum\eta`$. The constant $`\sum\eta`$ is the average episode length. The derivative of the state distribution never appears, because each term of the recursion differentiates only the policy at one state and passes the rest of the dependence on to the next state's value.
 

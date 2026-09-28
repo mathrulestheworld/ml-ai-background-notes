@@ -10,9 +10,9 @@
 
 Deep networks are hard to analyze because their outputs are nonlinear functions of millions of parameters. One tractable limit is infinite width. Consider a network whose weights are drawn independently with variance proportional to the inverse fan-in, as in chapter 2. Each unit of the first hidden layer is a fixed function of the input with random weights, and each unit of the next layer sums $`n`$ such terms with independent random weights. As $`n\to\infty`$, the central limit theorem makes every pre-activation, as a function of the input, a Gaussian process (ML chapter 15). [Neal (1996)](https://doi.org/10.1007/978-1-4612-0745-0) showed this for one hidden layer, and [Lee et al. (2018)](https://arxiv.org/abs/1711.00165) and [Matthews et al. (2018)](https://arxiv.org/abs/1804.11271) for deep networks, in which the kernel follows a recursion over layers:
 
-$$
+```math
 K^{(l+1)}(x,x')=\sigma_w^2\,\mathbb E_{(u,v)\sim\mathcal N(0,\Sigma^{(l)})}\bigl[\phi(u)\,\phi(v)\bigr]+\sigma_b^2,\qquad \Sigma^{(l)}=\begin{pmatrix}K^{(l)}(x,x)&K^{(l)}(x,x')\\K^{(l)}(x,x')&K^{(l)}(x',x')\end{pmatrix}.
-$$
+```
 
 This is the **neural network Gaussian process** (NNGP) kernel. For ReLU the expectation has a closed form, the arc-cosine kernel ([Cho and Saul, 2009](https://proceedings.neurips.cc/paper/2009/hash/5751ec3e9a4feab575962e78e006250d-Abstract.html); [Appendix A](#block-dl15-appendix-a)), and in terms of correlations it is the map $`\rho\mapsto\bigl(\sqrt{1-\rho^2}+(\pi-\arccos\rho)\rho\bigr)/\pi`$ that chapter 2 used to study how depth makes inputs look alike. The recursion describes a single wide network as well as an average over networks, because a sum of many independent terms concentrates:
 
@@ -59,15 +59,15 @@ The deviations shrink roughly like $`1/\sqrt n`$. The NNGP kernel gives an exact
 
 Write the network as $`f(x;\theta)`$ with parameters $`\theta\in\mathbb R^P`$, trained by gradient descent on a loss over training inputs $`x_1,\ldots,x_N`$. Near the initialization $`\theta_0`$, the first-order Taylor expansion
 
-$$
+```math
 f(x;\theta)\approx f(x;\theta_0)+\nabla_\theta f(x;\theta_0)^\top(\theta-\theta_0)
-$$
+```
 
 is a **linear model** in the parameters with fixed features $`\nabla_\theta f(x;\theta_0)`$, one per parameter. Gradient flow on the squared loss $`\frac1{2N}\sum_i\bigl(f(x_i)-y_i\bigr)^2`$ moves the parameters by $`\dot\theta=-\frac\eta N\sum_i\nabla_\theta f(x_i)\bigl(f(x_i)-y_i\bigr)`$, and by the chain rule the function at any input moves by
 
-$$
+```math
 \frac{d}{dt}f(x)=-\frac\eta N\sum_{i=1}^N\Theta(x,x_i)\bigl(f(x_i)-y_i\bigr),\qquad \Theta(x,x')=\nabla_\theta f(x)^\top\nabla_\theta f(x') .
-$$
+```
 
 $`\Theta`$ is the **neural tangent kernel** (NTK; [Jacot, Gabriel, and Hongler, 2018](https://arxiv.org/abs/1806.07572)): the inner product of the parameter gradients at two inputs. It says how much a gradient step that reduces the error at $`x_i`$ also changes the output at $`x`$. This equation is exact for any network, but $`\Theta`$ depends on $`\theta`$ and therefore changes during training, which makes the dynamics nonlinear.
 
@@ -136,15 +136,15 @@ print("and its parameter change is the minimum-norm interpolating one:",
 
 With a constant kernel, the dynamics on the training inputs are linear, $`\dot{\mathbf f}=-\frac\eta N\Theta(\mathbf f-\mathbf y)`$, where $`\mathbf f`$ and $`\mathbf y`$ stack the outputs and targets and $`\Theta`$ is the $`N\times N`$ kernel matrix. The solution is
 
-$$
+```math
 \mathbf f_t=\mathbf y+e^{-\eta\Theta t/N}(\mathbf f_0-\mathbf y),
-$$
+```
 
 and at a test input, as $`t\to\infty`$ and if $`\Theta`$ is invertible,
 
-$$
+```math
 f_\infty(x)=f_0(x)+\Theta(x,X)\,\Theta^{-1}(\mathbf y-\mathbf f_0),
-$$
+```
 
 kernel regression with the NTK, started from the network's initial function ([Appendix C](#block-dl15-appendix-c)). Among all parameter changes that fit the data, gradient descent on the linear model finds the one of minimum norm, as the code verifies. Two conclusions follow. First, if the smallest eigenvalue of $`\Theta`$ on the training inputs is positive, which holds for distinct inputs and many architectures, the training loss converges to zero exponentially fast: sufficiently wide networks provably reach zero training loss by gradient descent, despite the nonconvexity of the loss in their parameters ([Du et al., 2019](https://arxiv.org/abs/1810.02054); [Allen-Zhu, Li, and Song, 2019](https://arxiv.org/abs/1811.03962)). Second, the function a wide network learns is determined by its kernel, so its generalization can be studied with the tools of kernel methods (ML chapter 8).
 
@@ -193,17 +193,17 @@ The lesson is that "infinite width" does not define one theory: the limit depend
 
 **The recursion.** Let the pre-activations of layer $`l+1`$ be $`z^{(l+1)}_j(x)=\frac{\sigma_w}{\sqrt n}\sum_{k=1}^nW_{jk}\,\phi\bigl(z^{(l)}_k(x)\bigr)+\sigma_bb_j`$ with independent standard normal $`W_{jk}`$ and $`b_j`$. Conditional on layer $`l`$, each $`z^{(l+1)}_j`$ is a Gaussian process with covariance
 
-$$
+```math
 \mathbb E\bigl[z^{(l+1)}_j(x)z^{(l+1)}_j(x')\,\big|\,z^{(l)}\bigr]=\frac{\sigma_w^2}n\sum_{k=1}^n\phi\bigl(z^{(l)}_k(x)\bigr)\phi\bigl(z^{(l)}_k(x')\bigr)+\sigma_b^2 .
-$$
+```
 
 If, inductively, the units $`z^{(l)}_k`$ are independent and identically distributed Gaussian processes with kernel $`K^{(l)}`$, the average over $`k`$ converges by the law of large numbers to $`\sigma_w^2\,\mathbb E[\phi(u)\phi(v)]+\sigma_b^2`$ with $`(u,v)`$ Gaussian with covariance $`\Sigma^{(l)}`$, which is the recursion in the text. Different units $`j`$ of layer $`l+1`$ use independent weights, so they are independent. (Making the limit rigorous for all layers at once requires more care; taking the widths to infinity one layer at a time gives the result directly.)
 
 **ReLU.** Let $`u,v`$ have variances $`q_1,q_2`$ and correlation $`\rho=\cos\alpha`$. Writing them as $`u=\sqrt{q_1}\,g_1`$ and $`v=\sqrt{q_2}\,(\rho g_1+\sqrt{1-\rho^2}g_2)`$ with independent standard normals and integrating in polar coordinates gives
 
-$$
+```math
 \mathbb E\bigl[\max(u,0)\max(v,0)\bigr]=\frac{\sqrt{q_1q_2}}{2\pi}\bigl(\sin\alpha+(\pi-\alpha)\cos\alpha\bigr).
-$$
+```
 
 For $`\rho=1`$ this is $`q/2`$, so $`\sigma_w^2=2`$ preserves the variance, which is He initialization. Dividing by $`q/2`$ gives the correlation map $`\rho\mapsto\bigl(\sqrt{1-\rho^2}+(\pi-\arccos\rho)\rho\bigr)/\pi`$ used in the code. Its fixed point is $`\rho=1`$ with slope 1 there, which is why correlations of deep ReLU networks creep toward 1 slowly, polynomially in depth rather than exponentially.
 
@@ -217,9 +217,9 @@ For $`\rho=1`$ this is $`q/2`$, so $`\sigma_w^2=2`$ preserves the variance, whic
 
 Take the one-hidden-layer network $`f(x)=\frac1{\sqrt n}\sum_{j=1}^na_j\phi(w_j^\top x)`$ in the NTK parameterization, with all $`a_j,w_j`$ of order one at initialization. The gradient with respect to $`a_j`$ is $`\phi(w_j^\top x)/\sqrt n`$ and with respect to $`w_j`$ is $`a_j\phi'(w_j^\top x)x/\sqrt n`$, so every coordinate of $`\nabla_\theta f`$ is $`O(1/\sqrt n)`$ while the kernel
 
-$$
+```math
 \Theta(x,x')=\frac1n\sum_{j=1}^n\Bigl[\phi(w_j^\top x)\phi(w_j^\top x')+a_j^2\phi'(w_j^\top x)\phi'(w_j^\top x')\,x^\top x'\Bigr]
-$$
+```
 
 is an average of $`n`$ terms of order one, which converges to its expectation, a deterministic kernel.
 
@@ -237,15 +237,15 @@ The same argument fails in the mean-field parameterization, where the output is 
 
 With a constant kernel, the vector of training outputs obeys $`\dot{\mathbf f}=-\frac\eta N\Theta(\mathbf f-\mathbf y)`$, a linear system whose solution is $`\mathbf f_t-\mathbf y=e^{-\eta\Theta t/N}(\mathbf f_0-\mathbf y)`$. Diagonalizing $`\Theta=\sum_k\lambda_kv_kv_k^\top`$, the residual's component along $`v_k`$ decays like $`e^{-\eta\lambda_kt/N}`$, which gives the spectral bias. At a test input,
 
-$$
+```math
 \dot f_t(x)=-\frac\eta N\Theta(x,X)(\mathbf f_t-\mathbf y)=-\frac\eta N\Theta(x,X)e^{-\eta\Theta t/N}(\mathbf f_0-\mathbf y),
-$$
+```
 
 and integrating from 0 to $`t`$,
 
-$$
+```math
 f_t(x)=f_0(x)+\Theta(x,X)\,\Theta^{-1}\bigl(I-e^{-\eta\Theta t/N}\bigr)(\mathbf y-\mathbf f_0),
-$$
+```
 
 which tends to kernel regression without regularization as $`t\to\infty`$. At finite $`t`$, the factor $`I-e^{-\eta\Theta t/N}`$ acts like the spectral filter of ridge regression, $`\Theta(\Theta+\lambda I)^{-1}`$, suppressing the eigen-directions with $`\lambda_k\ll N/(\eta t)`$: early stopping is approximately a kernel ridge penalty that decreases as training continues. Because $`f_0`$ is a random function (the NNGP at initialization), the predictions of an ensemble of infinitely wide networks are Gaussian, with mean $`\Theta(x,X)\Theta^{-1}\mathbf y`$ and a variance determined by both the NNGP and the NTK ([Lee et al., 2019](https://arxiv.org/abs/1902.06720)).
 

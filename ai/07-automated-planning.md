@@ -17,9 +17,9 @@ The classical formalism is **STRIPS** ([Fikes and Nilsson, 1971](https://www.sci
 
 An action is applicable in $`s`$ when $`\mathrm{pre}(a)\subseteq s`$, and applying it produces
 
-$$
+```math
 \mathrm{Result}(s,a)=\bigl(s\setminus\mathrm{del}(a)\bigr)\cup\mathrm{add}(a).
-$$
+```
 
 Everything not mentioned stays as it was, which solves the frame problem of chapter 5 by convention. A **plan** is a sequence of actions, each applicable in the state produced by its predecessors, that ends in a state containing $`G`$. The **Planning Domain Definition Language** (PDDL) writes actions as schemas with variables, such as
 
@@ -48,9 +48,9 @@ Deciding whether a STRIPS task has a plan, PlanSAT, is PSPACE-complete ([Bylande
 
 **Backward search**, or **regression**, starts from the goal and works toward the initial state through sets of states described by partial conditions. An action $`a`$ is **relevant** to a goal description $`g`$ if it adds some atom of $`g`$ and deletes none, and the regressed goal is
 
-$$
+```math
 \mathrm{Regress}(g,a)=\bigl(g\setminus\mathrm{add}(a)\bigr)\cup\mathrm{pre}(a):
-$$
+```
 
 the conditions that must hold before $`a`$ so that $`g`$ holds after it. The search succeeds when the initial state satisfies the regressed description. Regression considers only relevant actions, which reduces the branching factor, and can be done with action schemas without grounding them all. Its drawback is that the regressed descriptions stand for sets of states, which makes good heuristics harder to design and duplicate detection harder, so most current planners search forward.
 
@@ -64,9 +64,9 @@ The central idea of domain-independent planning heuristics, developed in HSP ([B
 
 Both approximations estimate a cost for each atom by a fixed-point equation over the relaxed task. With unit action costs, $`\mathrm{cost}(p)=0`$ for atoms true in $`s`$, and otherwise
 
-$$
+```math
 \mathrm{cost}(p)=\min_{a:\;p\in\mathrm{add}(a)}\Bigl(1+\bigoplus_{q\in\mathrm{pre}(a)}\mathrm{cost}(q)\Bigr),
-$$
+```
 
 where $`\bigoplus`$ is either the maximum or the sum. The heuristic value of a state combines the goal atoms the same way.
 
@@ -353,9 +353,9 @@ Large language models add a new ingredient. Asked directly for plans in PDDL dom
 
 Let $`g`$ be a set of atoms describing the states that contain it. For an action $`a`$ with $`\mathrm{add}(a)\cap g\neq\emptyset`$ and $`\mathrm{del}(a)\cap g=\emptyset`$, the regression $`g'=(g\setminus\mathrm{add}(a))\cup\mathrm{pre}(a)`$ satisfies, for every state $`s`$:
 
-$$
+```math
 g'\subseteq s\quad\Longrightarrow\quad a\text{ is applicable in }s\text{ and }g\subseteq\mathrm{Result}(s,a).
-$$
+```
 
 Indeed $`\mathrm{pre}(a)\subseteq g'\subseteq s`$, and every atom of $`g`$ is either added by $`a`$ or in $`g\setminus\mathrm{add}(a)\subseteq s`$ and not deleted, since $`a`$ deletes nothing in $`g`$. Conversely, if $`a`$ is applicable in $`s`$ and $`g\subseteq\mathrm{Result}(s,a)`$, then $`g'\subseteq s`$ whenever $`a`$ deletes nothing in $`g`$: preconditions hold in $`s`$, and an atom of $`g`$ that $`a`$ does not add must already be in $`s`$. So $`g'`$ describes exactly the states from which $`a`$ leads into $`g`$ (up to actions that add and delete the same atom). By induction on plan length, backward search from $`G`$ finds a description satisfied by $`s_0`$ if and only if a plan exists, and the actions along the path, read in reverse order of discovery, form the plan. Relevance, requiring $`a`$ to add some atom of $`g`$, loses no plans that are minimal, since an action contributing nothing to $`g`$ can be removed from the end of a plan.
 

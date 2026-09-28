@@ -20,15 +20,15 @@ All three are hard in general. Computing marginals in Bayesian networks is #P-ha
 
 Inference by enumeration sums the full joint over the hidden variables. For the burglary network,
 
-$$
+```math
 P(B\mid j,m)=\alpha\sum_e\sum_aP(B)\,P(e)\,P(a\mid B,e)\,P(j\mid a)\,P(m\mid a),
-$$
+```
 
 a sum of $`2\times2`$ terms, each a product of five numbers, for each value of $`B`$. Enumeration recomputes the same subexpressions many times: $`P(j\mid a)P(m\mid a)`$ is the same for every value of $`e`$. Moving each sum as far right as it goes,
 
-$$
+```math
 P(B\mid j,m)=\alpha\,P(B)\sum_eP(e)\sum_aP(a\mid B,e)\,P(j\mid a)\,P(m\mid a),
-$$
+```
 
 and evaluating from the inside out, storing each intermediate result, removes the repetition. This is dynamic programming, and on a network with $`n`$ variables it can turn an $`O(2^n)`$ sum into one that is linear in $`n`$.
 
@@ -149,15 +149,15 @@ Random networks with long-range connections have large treewidth, and exact infe
 
 Variable elimination answers one query. On a tree, all marginals can be computed at twice the cost of one, by keeping the intermediate factors as **messages**. For a pairwise Markov network $`P(x)\propto\prod_i\phi_i(x_i)\prod_{(i,j)}\psi_{ij}(x_i,x_j)`$ on a tree, the message from node $`i`$ to its neighbor $`j`$ is
 
-$$
+```math
 m_{i\to j}(x_j)=\sum_{x_i}\phi_i(x_i)\,\psi_{ij}(x_i,x_j)\prod_{k\in N(i)\setminus j}m_{k\to i}(x_i),
-$$
+```
 
 the result of eliminating the whole subtree on $`i`$'s side of the edge, summarized as a function of $`x_j`$. The marginal of each node is proportional to its own potential times all incoming messages:
 
-$$
+```math
 P(x_i)\propto\phi_i(x_i)\prod_{k\in N(i)}m_{k\to i}(x_i).
-$$
+```
 
 A message can be sent once its sender has heard from all its other neighbors. Choosing a root, an upward pass from the leaves and a downward pass from the root compute all $`2(n-1)`$ messages, after which every marginal is available ([Appendix A](#block-ai09-appendix-a)). On a factor graph (chapter 8), the same algorithm alternates two kinds of messages, variable-to-factor (the product of the other incoming messages) and factor-to-variable (the factor times the incoming messages, summed over all its other variables), and it is known as the **sum-product** algorithm ([Kschischang, Frey, and Loeliger, 2001](https://doi.org/10.1109/18.910572)). The forward–backward algorithm for hidden Markov models (chapter 11) and the Kalman smoother are sum-product on a chain.
 
@@ -267,9 +267,9 @@ Two further ideas extend exact inference. **Knowledge compilation** turns a netw
 
 Root the tree at node $`r`$. For an edge from child $`i`$ to parent $`j`$, let $`T_i`$ be the subtree of $`i`$. **Claim:** the upward message satisfies
 
-$$
+```math
 m_{i\to j}(x_j)=\sum_{x_{T_i}}\psi_{ij}(x_i,x_j)\prod_{u\in T_i}\phi_u(x_u)\prod_{(u,v)\in T_i}\psi_{uv}(x_u,x_v),
-$$
+```
 
 the sum over all variables of the subtree of every factor that touches it. By induction on height: for a leaf, the message is $`\sum_{x_i}\phi_i(x_i)\psi_{ij}(x_i,x_j)`$, as claimed. For an internal node, the subtrees of its children are disjoint and share no factors, so the sum over $`x_{T_i}`$ factors into $`\sum_{x_i}\phi_i\psi_{ij}`$ times the product over children $`k`$ of the sums over their subtrees, which are the messages $`m_{k\to i}(x_i)`$ by the induction hypothesis. This is exactly the message formula.
 
@@ -287,9 +287,9 @@ Replacing sums by maxima throughout, the same induction shows that $`m_{i\to j}(
 
 Given a 3-CNF formula with variables $`U_1,\dots,U_n`$ and clauses $`C_1,\dots,C_m`$, build a Bayesian network with root nodes $`U_i`$, each with $`P(U_i=\text{true})=1/2`$; a node $`C_j`$ for each clause, a deterministic OR of the literals it contains, with the three variables as parents; and a chain of deterministic AND nodes $`A_1,\dots,A_m`$, with $`A_1=C_1`$ and $`A_j=A_{j-1}\wedge C_j`$, so that each node has at most three parents. Then
 
-$$
+```math
 P(A_m=\text{true})=\frac{\#\{\text{satisfying assignments}\}}{2^n}.
-$$
+```
 
 The network has size polynomial in the formula, so computing this marginal exactly counts satisfying assignments, a #P-complete problem, and deciding whether it is positive decides satisfiability, an NP-complete problem. The same network shows that no algorithm can approximate the marginal within any constant relative error in polynomial time unless P = NP, because a relative approximation distinguishes zero from nonzero. Absolute error approximations, by contrast, are easy by sampling (chapter 10), which is why relative error, and small probabilities of evidence, are the hard case.
 

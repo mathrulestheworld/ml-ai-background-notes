@@ -14,9 +14,9 @@ Boosting began as a question in learning theory, posed by Kearns and Valiant in 
 
 Throughout, labels are $`y\in\{-1,+1\}`$ for AdaBoost and $`y\in\{0,1\}`$ when boosting is framed as logistic regression. The combined score is an additive model
 
-$$
+```math
 F_T(x)=\sum_{t=1}^T\alpha_t\,h_t(x),
-$$
+```
 
 a weighted sum of $`T`$ **base learners** $`h_t`$ with **vote weights** $`\alpha_t`$. Each base learner is typically a small decision tree (chapter 9); a tree with a single split is a **stump**. Logarithms are natural throughout.
 
@@ -42,16 +42,16 @@ The weights evolve like the expert weights of the Hedge algorithm in chapter 7, 
 
 **Theorem.** The training error $`\widehat R_n(H)`$ of $`H`$ under the zero–one loss satisfies
 
-$$
+```math
 \frac1n\sum_{i=1}^n\mathbf 1\{H(x_i)\ne y_i\}\le\prod_{t=1}^TZ_t=\prod_{t=1}^T2\sqrt{\varepsilon_t(1-\varepsilon_t)}\le\exp\Bigl(-2\sum_{t=1}^T\gamma_t^2\Bigr),
 \qquad\gamma_t=\tfrac12-\varepsilon_t .
-$$
+```
 
 **Proof.** Unrolling the update from $`D_1(i)=1/n`$ gives $`D_{T+1}(i)=\frac1n\prod_t\bigl(e^{-\alpha_ty_ih_t(x_i)}/Z_t\bigr)`$, and the exponents add up to $`-y_iF_T(x_i)`$:
 
-$$
+```math
 D_{T+1}(i)=\frac{\exp\bigl(-y_iF_T(x_i)\bigr)}{n\prod_tZ_t}.
-$$
+```
 
 These weights sum to one, so $`\frac1n\sum_i\exp(-y_iF_T(x_i))=\prod_tZ_t`$. A mistake means $`y_iF_T(x_i)\le0`$, and $`\mathbf 1\{z\le0\}\le e^{-z}`$, which proves the first inequality. Splitting $`Z_t=\sum_iD_t(i)e^{-\alpha_ty_ih_t(x_i)}`$ into correct and incorrect examples gives $`Z_t=(1-\varepsilon_t)e^{-\alpha_t}+\varepsilon_te^{\alpha_t}`$. This is minimized by the chosen $`\alpha_t`$, as the left panel of the figure in [the next section](#adaboost-minimizes-the-exponential-loss) shows, with value $`2\sqrt{\varepsilon_t(1-\varepsilon_t)}=\sqrt{1-4\gamma_t^2}\le e^{-2\gamma_t^2}`$, where the last step is $`1-u\le e^{-u}`$. $`\square`$
 
@@ -105,10 +105,10 @@ The data are those of [ESL §10.1](https://hastie.su.domains/ElemStatLearn/): te
 
 The proof above shows that AdaBoost drives down $`\frac1n\sum_i\exp(-y_iF(x_i))`$, the average **exponential loss** of chapter 6. It does so greedily. Suppose $`F_{t-1}`$ is fixed and a new term $`\alpha h`$ is to be added. With $`w_i=\exp(-y_iF_{t-1}(x_i))`$, which is proportional to $`D_t(i)`$,
 
-$$
+```math
 \sum_iw_i\,e^{-\alpha y_ih(x_i)}
 =e^{-\alpha}\sum_iw_i+\bigl(e^\alpha-e^{-\alpha}\bigr)\sum_iw_i\,\mathbf 1\{h(x_i)\ne y_i\}.
-$$
+```
 
 For any $`\alpha>0`$, the best $`h`$ minimizes the weighted error $`\varepsilon=\sum_iw_i\mathbf 1\{h(x_i)\ne y_i\}/\sum_iw_i`$. Dividing by $`\sum_iw_i`$, the loss as a function of $`\alpha`$ is $`(1-\varepsilon)e^{-\alpha}+\varepsilon e^{\alpha}`$, the factor $`Z_t`$ of the training-error proof, and setting its derivative $`-(1-\varepsilon)e^{-\alpha}+\varepsilon e^{\alpha}`$ to zero gives $`\alpha=\frac12\ln\frac{1-\varepsilon}{\varepsilon}`$. AdaBoost is therefore **forward stagewise additive modeling** with exponential loss ([Friedman, Hastie, and Tibshirani, 2000](https://projecteuclid.org/journals/annals-of-statistics/volume-28/issue-2/Additive-logistic-regression--a-statistical-view-of-boosting-With/10.1214/aos/1016218223.full)): each round adds the one basis function, from a possibly infinite dictionary of weak classifiers, that most decreases the loss, and never revisits earlier terms. Equivalently, it is coordinate descent on the exponential loss over that dictionary, with one coordinate per weak classifier. The derivative of the loss along the coordinate $`h`$ at $`\alpha=0`$ is $`-(1-2\varepsilon)\sum_iw_i`$, so the classifier with the smallest weighted error is the steepest coordinate, and $`\alpha_t`$ is an exact line search along it.
 
@@ -122,9 +122,9 @@ This view connects boosting to the rest of the module. With $`\eta(x)=P(Y=1\mid 
 
 For a loss $`L(y,F)`$ and a family of base functions $`b(x;a)`$ with parameters $`a`$, such as the split variables, thresholds, and leaf values of a tree, forward stagewise fitting sets $`F_0`$ to the best constant and then, for $`t=1,2,\ldots`$,
 
-$$
+```math
 (\beta_t,a_t)=\arg\min_{\beta,a}\sum_{i=1}^nL\bigl(y_i,F_{t-1}(x_i)+\beta\,b(x_i;a)\bigr),\qquad F_t=F_{t-1}+\beta_tb(\cdot;a_t).
-$$
+```
 
 For squared loss, the inner problem fits the base learner to the current residuals $`y_i-F_{t-1}(x_i)`$ by least squares. For exponential loss with classifiers as base functions, it is AdaBoost. For most other losses, the inner problem has no closed form, and gradient boosting approximates it.
 
@@ -140,9 +140,9 @@ The margin bound of Information and Learning Theory applies directly. That bound
 
 Take $`\mathcal F`$ to be the convex hull of the base class. The Rademacher complexity of the convex hull of a class equals that of the class itself, because a linear function of the vector $`(f(x_1),\ldots,f(x_n))`$ attains its supremum over a convex hull at an extreme point. For base classifiers with values $`\pm1`$ and VC dimension $`v`$, the vectors $`(h(x_1),\ldots,h(x_n))`$ have norm $`\sqrt n`$, and by Sauer's lemma there are at most $`(en/v)^v`$ distinct ones when $`n\ge v`$, so the finite-class Rademacher bound of the Foundations appendix bounds that complexity by $`\sqrt{2v\ln(en/v)/n}`$. Hence, with probability at least $`1-\delta`$, for a fixed margin level $`\theta>0`$ and every convex combination $`f`$,
 
-$$
+```math
 P\bigl(Yf(X)\le0\bigr)\le\frac1n\sum_{i=1}^n\mathbf 1\{y_if(x_i)\le\theta\}+\frac2\theta\sqrt{\frac{2v\ln(en/v)}n}+\sqrt{\frac{\ln(1/\delta)}{2n}} .
-$$
+```
 
 The left side is the population error of the classifier $`\operatorname{sign}f`$, counting a zero score as an error. The number of rounds $`T`$ does not appear. What matters is the fraction of training points with small margin, and AdaBoost reduces it: [Appendix A](#block-boost-appendix-a) shows that the fraction with margin at most $`\theta`$ is at most $`\prod_t2\sqrt{\varepsilon_t^{1-\theta}(1-\varepsilon_t)^{1+\theta}}`$, which decays exponentially whenever every edge $`\gamma_t`$ is at least $`\theta`$.
 
@@ -154,9 +154,9 @@ The margin explanation is incomplete. [Breiman (1999)](https://direct.mit.edu/ne
 
 Gradient boosting ([Friedman, 2001](https://projecteuclid.org/journals/annals-of-statistics/volume-29/issue-5/Greedy-function-approximation-A-gradient-boosting-machine/10.1214/aos/1013203451.full); [Mason, Baxter, Bartlett, and Frean, 1999](https://proceedings.neurips.cc/paper_files/paper/1999/hash/96a93ba89a5b5c6c226e49b88973f46e-Abstract.html)) treats the vector of training predictions $`\bigl(F(x_1),\ldots,F(x_n)\bigr)`$ as the variable of an optimization problem, the training loss $`\sum_iL\bigl(y_i,F(x_i)\bigr)`$. The gradient of this loss with respect to that vector has components
 
-$$
+```math
 g_i=\frac{\partial L(y_i,F)}{\partial F}\bigg|_{F=F_{t-1}(x_i)} .
-$$
+```
 
 A step of gradient descent would move each training prediction by $`-g_i`$, but that defines the function only at the training inputs. Gradient boosting instead fits a regression tree to the **pseudo-residuals** $`r_i=-g_i`$ by least squares, choosing the base function most nearly parallel to the negative gradient, and steps along it. The tree's vector of training predictions is then a least-squares approximation to the gradient step $`(r_1,\ldots,r_n)`$, and, unlike that step, the tree also defines a step at every other input. The algorithm is:
 
@@ -226,16 +226,16 @@ On the one-dimensional example, the sum of the scaled trees approaches the regre
 
 Modern implementations use second-order information, as Newton's method does. Write $`g_i`$ and $`h_i`$ for the first and second derivatives of $`L(y_i,\cdot)`$ at $`F_{t-1}(x_i)`$; here $`h_i`$ is a curvature, not a base learner, following the notation of XGBoost. Penalize a tree with leaf values $`w_1,\ldots,w_J`$ by $`\Omega=\zeta J+\frac\lambda2\sum_jw_j^2`$, where $`\zeta`$ charges for each leaf and $`\lambda`$ shrinks the leaf values. A second-order Taylor expansion of the loss makes the objective for a fixed tree structure separate across leaves:
 
-$$
+```math
 \sum_{j=1}^J\Bigl[G_jw_j+\frac12(H_j+\lambda)w_j^2\Bigr]+\zeta J,
 \qquad G_j=\sum_{i\in R_j}g_i,\quad H_j=\sum_{i\in R_j}h_i .
-$$
+```
 
 Each leaf's optimal value is $`w_j^\ast=-G_j/(H_j+\lambda)`$, and splitting a leaf into a left child $`L`$ and a right child $`R`$ improves the objective by
 
-$$
+```math
 \frac12\Bigl[\frac{G_L^2}{H_L+\lambda}+\frac{G_R^2}{H_R+\lambda}-\frac{(G_L+G_R)^2}{H_L+H_R+\lambda}\Bigr]-\zeta .
-$$
+```
 
 This split criterion and leaf formula are the core of XGBoost ([Chen and Guestrin, 2016](https://dl.acm.org/doi/abs/10.1145/2939672.2939785)); the derivation is in [Appendix B](#block-boost-appendix-b). For squared error, $`h_i=1`$ and the leaf value is a shrunken mean residual $`\sum r_i/(n_j+\lambda)`$, where $`n_j`$ is the number of examples in the leaf. For log loss with $`\lambda=0`$, it is exactly the Newton leaf value in the table above. The split criterion reduces to the regression-tree criterion of chapter 9, weighted by curvature: with $`h_i=1`$ and $`\lambda=\zeta=0`$, each term $`G^2/H`$ is the $`S^2/n`$ of that criterion applied to the residuals, and the gain is half the decrease in squared error.
 
@@ -308,15 +308,15 @@ Boosted ensembles are as opaque as forests. The permutation importance of chapte
 
 Let $`A=\sum_t\alpha_t`$ and $`f=F_T/A`$. For $`\theta\in[0,1)`$, the event $`y_if(x_i)\le\theta`$ is the event $`y_iF_T(x_i)\le\theta A`$, and $`\mathbf 1\{z\le0\}\le e^{-z}`$ applied to $`z=y_iF_T(x_i)-\theta A`$ gives
 
-$$
+```math
 \frac1n\sum_i\mathbf 1\{y_if(x_i)\le\theta\}\le\frac{e^{\theta A}}n\sum_ie^{-y_iF_T(x_i)}=e^{\theta A}\prod_tZ_t=\prod_te^{\theta\alpha_t}Z_t,
-$$
+```
 
 using the identity $`\frac1n\sum_ie^{-y_iF_T(x_i)}=\prod_tZ_t`$ from the training-error proof. Substituting $`e^{\alpha_t}=\sqrt{(1-\varepsilon_t)/\varepsilon_t}`$ and $`Z_t=2\sqrt{\varepsilon_t(1-\varepsilon_t)}`$,
 
-$$
+```math
 e^{\theta\alpha_t}Z_t=\Bigl(\frac{1-\varepsilon_t}{\varepsilon_t}\Bigr)^{\theta/2}2\sqrt{\varepsilon_t(1-\varepsilon_t)}=2\sqrt{\varepsilon_t^{1-\theta}(1-\varepsilon_t)^{1+\theta}} .
-$$
+```
 
 Suppose every $`\varepsilon_t\le\frac12-\gamma`$ and $`\theta\le\gamma`$. The factor is increasing in $`\varepsilon_t`$ on $`[0,(1-\theta)/2]`$, because the derivative of its logarithm, $`\frac{1-\theta}{2\varepsilon_t}-\frac{1+\theta}{2(1-\varepsilon_t)}`$, is nonnegative there, and this interval contains $`[0,\frac12-\gamma]`$. Each factor is therefore at most its value at $`\varepsilon_t=\frac12-\gamma`$, which is $`\sqrt{(1-2\gamma)^{1-\theta}(1+2\gamma)^{1+\theta}}`$. Taking logarithms with $`u=2\gamma`$, this is below one exactly when $`\theta\ln\frac{1+u}{1-u}<-\ln(1-u^2)`$. The power series $`\frac u2\ln\frac{1+u}{1-u}=u^2+\frac{u^4}3+\frac{u^6}5+\cdots`$ and $`-\ln(1-u^2)=u^2+\frac{u^4}2+\frac{u^6}3+\cdots`$ compare term by term, the coefficients $`\frac1{2k-1}`$ against $`\frac1k`$, and show that the condition holds at $`\theta=\gamma`$ and hence for all smaller $`\theta`$. The fraction of training points with margin at most $`\theta`$ therefore decays exponentially in $`T`$, which is how AdaBoost raises the margin distribution.
 
@@ -332,15 +332,15 @@ The margin bound in the main text holds for a fixed $`\theta`$. To choose $`\the
 
 At round $`t`$, a new tree $`f`$ with leaves $`R_1,\ldots,R_J`$ and values $`w_1,\ldots,w_J`$ is added to $`F_{t-1}`$. A second-order Taylor expansion of each loss term around $`F_{t-1}(x_i)`$ gives
 
-$$
+```math
 \sum_iL\bigl(y_i,F_{t-1}(x_i)+f(x_i)\bigr)\approx\sum_iL\bigl(y_i,F_{t-1}(x_i)\bigr)+\sum_i\Bigl[g_if(x_i)+\frac12h_if(x_i)^2\Bigr].
-$$
+```
 
 Every example in leaf $`j`$ has $`f(x_i)=w_j`$, so after dropping the constant and adding the penalty the objective is
 
-$$
+```math
 \sum_j\Bigl[G_jw_j+\frac12(H_j+\lambda)w_j^2\Bigr]+\zeta J .
-$$
+```
 
 For convex losses $`h_i\ge0`$, so each bracket is a convex quadratic in $`w_j`$ when $`H_j+\lambda>0`$. Setting its derivative to zero gives $`w_j^\ast=-G_j/(H_j+\lambda)`$ and minimum value $`-\frac12G_j^2/(H_j+\lambda)`$. The objective of a structure is therefore $`-\frac12\sum_jG_j^2/(H_j+\lambda)+\zeta J`$. Splitting one leaf into two replaces one term by two and adds one leaf, which gives the gain formula in the main text. A split is worthwhile only when the gain is positive, so $`\zeta`$ acts as a minimum gain, a form of pre-pruning.
 

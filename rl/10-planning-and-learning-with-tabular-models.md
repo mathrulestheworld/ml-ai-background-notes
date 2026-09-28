@@ -278,9 +278,9 @@ Planning updates can differ along three dimensions: whether they update state va
 
 An expected update is exact but costs about $`b`$ times as much as a sample update, where the **branching factor** $`b`$ is the number of possible next states. When the successors are equally likely and their values are correct, a sample update that averages its targets with step size $`1/t`$ reduces the error of the estimate as
 
-$$
+```math
 \text{error after }t\text{ sample updates}\approx\sigma\sqrt{\frac{b-1}{bt}},
-$$
+```
 
 where $`\sigma^2`$ measures the spread of the successors' values (exercise 10.4). The expected update achieves zero error, but only after $`b`$ computations; in that time, $`b`$ sample updates reduce the error to about $`\sigma/\sqrt b`$, which is already small when $`b`$ is large. For large $`b`$ most of the benefit of an expected update is available at a small fraction of its cost, and in problems where the successors' values are themselves being learned, the sample updates, which let those improvements propagate sooner, do even better. Expected updates are preferable when the branching factor is small or when the computation is cheap relative to the value of exactness.
 

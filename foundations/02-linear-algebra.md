@@ -23,23 +23,23 @@ Lowercase letters generally denote vectors and uppercase letters matrices; indiv
 
 The matrix $`A`$ represents a **linear map** $`x\mapsto Ax`$ from $`\mathbb R^n`$ to $`\mathbb R^m`$. Linearity means
 
-$$
+```math
 A(\alpha x+\beta z)=\alpha Ax+\beta Az.
-$$
+```
 
 If $`a_1,\ldots,a_n`$ are the columns of $`A`$, then
 
-$$
+```math
 Ax=\sum_{j=1}^n x_j a_j.
-$$
+```
 
 Thus a matrix-vector product is a linear combination of columns. Equivalently, each output coordinate is the inner product of one row with the input. The map $`x\mapsto Ax+b`$ is **affine**; it is linear only when $`b=0`$.
 
 For $`B\in\mathbb R^{n\times p}`$, the product $`AB\in\mathbb R^{m\times p}`$ represents composition: apply $`B`$ first, then $`A`$. Its entries are $`(AB)_{ij}=\sum_k A_{ik}B_{kj}`$. Matrix multiplication is associative and distributive but generally not commutative. Transposition reverses the order:
 
-$$
+```math
 (AB)^\top=B^\top A^\top.
-$$
+```
 
 For vectors, $`x^\top y`$ is a scalar **inner product**, whereas $`xy^\top`$ is an **outer product**, a matrix of rank one when both vectors are nonzero.
 
@@ -65,38 +65,37 @@ For a dataset, $`X\in\mathbb R^{N\times d}`$ will denote $`N`$ observations stor
 
 An **inner product** on a real vector space is bilinear, symmetric, and positive definite. In Euclidean space,
 
-$$
+```math
 \langle x,y\rangle=x^\top y,\qquad
 \|x\|_2=\sqrt{x^\top x}.
-$$
+```
 
 Vectors are **orthogonal** when their inner product is zero. For any subset $`\mathcal S`$ of a Euclidean space, its **orthogonal complement** is
 
-$$
+```math
 \mathcal S^\perp=\{y:\langle y,s\rangle=0\text{ for every }s\in\mathcal S\}.
-$$
+```
 
 This is a subspace even when $`\mathcal S`$ is not. An **orthonormal** family consists of mutually orthogonal unit vectors. For nonzero vectors, the angle satisfies
 
-$$
+```math
 \cos\theta=\frac{x^\top y}{\|x\|_2\|y\|_2}.
-$$
+```
 
 The **Cauchy-Schwarz inequality** is
 
-$$
-
+```math
 |x^\top y|\le\|x\|_2\|y\|_2,
-$$
+```
 
 with equality exactly when one vector is a scalar multiple of the other (including when either is zero). For orthogonal $`x,y`$, the Pythagorean identity gives $`\|x+y\|_2^2=\|x\|_2^2+\|y\|_2^2`$.
 
 The transpose represents the **adjoint** of a linear map for Euclidean inner products:
 
-$$
+```math
 \langle Ax,y\rangle=\langle x,A^\top y\rangle,
 \qquad x\in\mathbb R^n,\quad y\in\mathbb R^m.
-$$
+```
 
 Thus $`A`$ maps input vectors into the output space, while $`A^\top`$ maps output-space vectors into the input space in the way required by this pairing. The transpose need not invert $`A`$. This identity is also the linear-algebra basis of backward gradient propagation.
 
@@ -106,33 +105,33 @@ A square matrix $`Q`$ is **orthogonal** if $`Q^\top Q=I`$, equivalently $`Q^{-1}
 
 A **norm** measures size and satisfies positivity, absolute homogeneity, and the triangle inequality. Common vector norms are
 
-$$
+```math
 \|x\|_p=\left(\sum_i|x_i|^p\right)^{1/p}\quad(1\le p<\infty),
 \qquad
 \|x\|_\infty=\max_i|x_i|.
-$$
+```
 
 For example,
 
-$$
+```math
 \|x\|_\infty\le\|x\|_2\le\|x\|_1,
 \qquad
 \|x\|_1\le\sqrt n\,\|x\|_2.
-$$
+```
 
 The **induced matrix norm** is $`\|A\|_p=\max_{x\ne0}\|Ax\|_p/\|x\|_p`$. In particular, $`\|A\|_1`$ is the largest absolute column sum, $`\|A\|_\infty`$ the largest absolute row sum, and the **spectral norm** is
 
-$$
+```math
 \|A\|_2=\max_{\|x\|_2=1}\|Ax\|_2.
-$$
+```
 
 The **Frobenius inner product** and **Frobenius norm** are
 
-$$
+```math
 \langle A,B\rangle_F=\sum_{i,j}A_{ij}B_{ij},
 \qquad
 \|A\|_F=\sqrt{\sum_{i,j}A_{ij}^2}.
-$$
+```
 
 They treat a matrix as a vector of entries. The spectral norm measures the largest amplification of an input vector; the Frobenius norm is the square root of the sum of squared entries. Their expressions in singular values appear below.
 
@@ -142,10 +141,10 @@ They treat a matrix as a vector of entries. The spectral norm measures the large
 
 The **span** of vectors $`v_1,\ldots,v_k`$ is
 
-$$
+```math
 \operatorname{span}\{v_1,\ldots,v_k\}
 =\left\{\sum_{i=1}^k c_i v_i:c_i\in\mathbb R\right\}.
-$$
+```
 
 The vectors are **linearly independent** if $`\sum_i c_i v_i=0`$ implies every $`c_i=0`$. A **basis** is a linearly independent spanning set. Coordinates relative to a basis are unique; all bases of a finite-dimensional space have the same size, its **dimension**.
 
@@ -164,27 +163,27 @@ The **rank** of a linear map is the dimension of its image, the space of attaina
 
 The **rank-nullity theorem** states
 
-$$
+```math
 \operatorname{rank}(A)+\dim\ker A=n.
-$$
+```
 
 One proof starts with a basis of $`\ker A`$ and extends it to a basis of the domain. The images of the added basis vectors form a basis of the image: they span every output, and any dependence among them would yield an extra nullspace direction. Hence the dimensions add to $`n`$.
 
 The orthogonality relations are
 
-$$
+```math
 \operatorname{row}(A)=(\ker A)^\perp,
 \qquad
 \operatorname{col}(A)=(\ker A^\top)^\perp.
-$$
+```
 
 Indeed, $`Az=0`$ says precisely that $`z`$ is orthogonal to every row. Taking dimensions gives equality with the orthogonal complement. Therefore
 
-$$
+```math
 \mathbb R^n=\operatorname{row}(A)\oplus\ker A,
 \qquad
 \mathbb R^m=\operatorname{col}(A)\oplus\ker A^\top.
-$$
+```
 
 Here $`\oplus`$ denotes a **direct sum**: every vector has a unique decomposition as a sum of one vector from each subspace. These two decompositions are also orthogonal.
 
@@ -192,9 +191,9 @@ Here $`\oplus`$ denotes a **direct sum**: every vector has a unique decompositio
 
 The system $`Ax=b`$ is **consistent** exactly when $`b\in\operatorname{col}(A)`$. If $`x_0`$ is one solution, every solution is
 
-$$
+```math
 x=x_0+z,\qquad z\in\ker A.
-$$
+```
 
 The solution set is an affine subspace. A consistent system has a unique solution exactly when $`\ker A=\{0\}`$, or equivalently $`A`$ has full column rank. Full row rank means that every right-hand side has a solution. A square matrix is invertible exactly when it has full rank.
 
@@ -202,9 +201,9 @@ For a feature matrix $`X`$, a nonzero $`z\in\ker X`$ means $`X(w+z)=Xw`$: the ob
 
 **Example.** The columns of
 
-$$
+```math
 A=\begin{pmatrix}1&2&3\\0&1&1\end{pmatrix}
-$$
+```
 
 satisfy $`a_3=a_1+a_2`$, so $`(-1,-1,1)^\top\in\ker A`$. The first two columns are independent, giving rank two and nullity one. Every vector in $`\mathbb R^2`$ is an attainable output, but its preimage is a line.
 
@@ -221,11 +220,11 @@ print(A @ z)                      # [0. 0.]
 
 Two useful identities are
 
-$$
+```math
 \ker(A^\top A)=\ker A,
 \qquad
 \operatorname{col}(AA^\top)=\operatorname{col}(A).
-$$
+```
 
 For the first, $`x^\top A^\top Ax=\|Ax\|_2^2`$ shows that the two kernels coincide. Apply the same reasoning to $`A^\top`$ for the second: $`\ker(AA^\top)=\ker A^\top`$, and taking orthogonal complements gives the column-space equality.
 
@@ -233,33 +232,33 @@ For the first, $`x^\top A^\top Ax=\|Ax\|_2^2`$ shows that the two kernels coinci
 
 For a square matrix,
 
-$$
+```math
 \operatorname{tr}(A)=\sum_i A_{ii}.
-$$
+```
 
 The Frobenius pairing can therefore also be written as
 
-$$
+```math
 \langle A,B\rangle_F=\operatorname{tr}(A^\top B).
-$$
+```
 
 Trace is linear and **cyclic**:
 
-$$
+```math
 \operatorname{tr}(AB)=\operatorname{tr}(BA),
 \qquad
 \operatorname{tr}(ABC)=\operatorname{tr}(BCA)=\operatorname{tr}(CAB),
-$$
+```
 
 whenever the products are defined. Cyclicity does not permit arbitrary reordering. For example, $`\operatorname{tr}(ABC)`$ need not equal $`\operatorname{tr}(ACB)`$.
 
 The **determinant** $`\det A`$ is the signed volume scale of the linear map. It satisfies
 
-$$
+```math
 \det(AB)=\det A\det B,\qquad
 \det A^\top=\det A,\qquad
 \det A^{-1}=\frac1{\det A}
-$$
+```
 
 when the inverse exists. A square matrix is invertible exactly when its determinant is nonzero, but a floating-point determinant is not a reliable way to diagnose near singularity; singular values reveal the relevant scales.
 
@@ -273,9 +272,9 @@ An expression involving $`A^{-1}b`$ specifies a solution mathematically. Computi
 
 Gaussian elimination eliminates variables by row operations. With row pivoting, a nonsingular square matrix has a factorization
 
-$$
+```math
 PA=LU,
-$$
+```
 
 where $`P`$ is a permutation matrix, $`L`$ is unit lower triangular, and $`U`$ is upper triangular. To solve $`Ax=b`$, solve $`Ly=Pb`$ by forward substitution and $`Ux=y`$ by back substitution. Pivoting avoids zero pivots and reduces the risk of large intermediate errors.
 
@@ -285,17 +284,17 @@ Dense factorization costs $`O(n^3)`$, while a solve with already available trian
 
 A real symmetric **positive definite** matrix satisfies $`x^\top Ax>0`$ for every nonzero $`x`$. It has a unique Cholesky factorization
 
-$$
+```math
 A=LL^\top,
-$$
+```
 
 with $`L`$ lower triangular and positive diagonal. The entries follow the recursion
 
-$$
+```math
 L_{kk}=\sqrt{A_{kk}-\sum_{s<k}L_{ks}^2},
 \qquad
 L_{ik}=\frac{A_{ik}-\sum_{s<k}L_{is}L_{ks}}{L_{kk}}\quad(i>k).
-$$
+```
 
 Solving $`Ax=b`$ then consists of $`Ly=b`$ and $`L^\top x=y`$. A symmetric matrix is **positive semidefinite** when $`x^\top Ax\ge0`$ for every $`x`$. This weaker condition does not guarantee a Cholesky factor with strictly positive diagonal: singular matrices require a different treatment.
 
@@ -317,18 +316,18 @@ The two calls to `solve` make the factorization visible; a specialized triangula
 
 For independent columns $`a_1,\ldots,a_n`$, Gram-Schmidt repeatedly removes components already represented:
 
-$$
+```math
 \widetilde q_j=a_j-\sum_{i<j}(q_i^\top a_j)q_i,
 \qquad
 q_j=\frac{\widetilde q_j}{\|\widetilde q_j\|_2}.
-$$
+```
 
 Collecting the projection coefficients gives the **reduced QR factorization**
 
-$$
+```math
 A=QR,\qquad Q\in\mathbb R^{m\times n},\quad
 Q^\top Q=I_n,\quad R\in\mathbb R^{n\times n},
-$$
+```
 
 where $`m\ge n`$, $`A`$ has full column rank, and $`R`$ is invertible and upper triangular. Classical Gram-Schmidt explains the geometry; Householder QR is a standard stable numerical construction. Rank-deficient matrices also have QR factorizations, but the triangular factor is then singular and these full-rank formulas need adjustment.
 
@@ -346,15 +345,15 @@ where $`m\ge n`$, $`A`$ has full column rank, and $`R`$ is invertible and upper 
 
 For a subspace $`\mathcal S\subseteq\mathbb R^m`$, every $`b`$ has a unique decomposition
 
-$$
+```math
 b=p+r,\qquad p\in\mathcal S,\quad r\in\mathcal S^\perp.
-$$
+```
 
 The vector $`p`$ is the **orthogonal projection** of $`b`$ onto $`\mathcal S`$. For any $`z\in\mathcal S`$,
 
-$$
+```math
 \|b-z\|_2^2=\|r\|_2^2+\|p-z\|_2^2,
-$$
+```
 
 so $`p`$ is the unique closest vector in $`\mathcal S`$.
 
@@ -364,21 +363,21 @@ so $`p`$ is the unique closest vector in $`\mathcal S`$.
 
 For a nonzero vector $`a`$, projection onto its span is
 
-$$
+```math
 \operatorname{proj}_a(b)=\frac{a^\top b}{a^\top a}a.
-$$
+```
 
 If the columns of $`Q`$ form an orthonormal basis of $`\mathcal S`$, the projection matrix is $`P=QQ^\top`$. More generally, if $`A`$ has independent columns spanning $`\mathcal S`$,
 
-$$
+```math
 P=A(A^\top A)^{-1}A^\top.
-$$
+```
 
 A square matrix is an orthogonal projector exactly when
 
-$$
+```math
 P^2=P,\qquad P^\top=P.
-$$
+```
 
 Idempotence alone allows oblique projections, in which the residual need not be orthogonal to the target subspace. An orthogonal projector preserves vectors in $`\mathcal S`$ and sends vectors in $`\mathcal S^\perp`$ to zero.
 
@@ -386,29 +385,29 @@ Idempotence alone allows oblique projections, in which the residual need not be 
 
 The **least-squares problem** is
 
-$$
+```math
 \min_x\|Ax-b\|_2^2.
-$$
+```
 
 Its fitted vector $`A\hat x`$ is the projection of $`b`$ onto $`\operatorname{col}(A)`$. Orthogonality of the residual to every column yields the **normal equations**
 
-$$
+```math
 A^\top(b-A\hat x)=0,
 \qquad A^\top A\hat x=A^\top b.
-$$
+```
 
 These equations hold even when $`A`$ is rank deficient. If $`A`$ has full column rank, they have the unique solution
 
-$$
+```math
 \hat x=(A^\top A)^{-1}A^\top b.
-$$
+```
 
 For $`A=QR`$ with full column rank,
 
-$$
+```math
 \|Ax-b\|_2^2
 =\|Rx-Q^\top b\|_2^2+\|(I-QQ^\top)b\|_2^2.
-$$
+```
 
 The second term is independent of $`x`$, so the solution follows from $`R\hat x=Q^\top b`$. Using orthogonal transformations avoids explicitly forming $`A^\top A`$, which can magnify numerical errors.
 
@@ -440,9 +439,9 @@ An **eigenpair** of a square matrix is a scalar $`\lambda`$ and nonzero vector $
 
 A matrix is **diagonalizable** over a field if it has a basis of eigenvectors over that field. Writing those eigenvectors as columns of $`P`$ gives
 
-$$
+```math
 A=P\Lambda P^{-1},\qquad A^k=P\Lambda^kP^{-1}.
-$$
+```
 
 The algebraic multiplicity of an eigenvalue is its multiplicity as a characteristic-polynomial root; its geometric multiplicity is $`\dim\ker(A-\lambda I)`$. Diagonalizability requires a splitting characteristic polynomial and equality of these multiplicities for every eigenvalue. Distinct eigenvalues suffice. For example, $`\begin{pmatrix}1&1\\0&1\end{pmatrix}`$ has only a one-dimensional eigenspace and is not diagonalizable.
 
@@ -452,17 +451,17 @@ The algebraic multiplicity of an eigenvalue is its multiplicity as a characteris
 
 Similarity preserves the characteristic polynomial because
 
-$$
+```math
 \det(P^{-1}AP-\lambda I)=\det\big(P^{-1}(A-\lambda I)P\big)=\det(A-\lambda I).
-$$
+```
 
 If the eigenvalues are $`\lambda_1,\ldots,\lambda_n`$, counted with algebraic multiplicity over $`\mathbb C`$, then
 
-$$
+```math
 \operatorname{tr}(A)=\sum_i\lambda_i,
 \qquad
 \det A=\prod_i\lambda_i.
-$$
+```
 
 These identities do not require diagonalizability. For an orthogonal projector onto $`\mathcal S`$, vectors in $`\mathcal S`$ are eigenvectors with eigenvalue one, and vectors in $`\mathcal S^\perp`$ have eigenvalue zero. Consequently $`\operatorname{tr}(P)=\operatorname{rank}(P)=\dim\mathcal S`$.
 
@@ -472,32 +471,32 @@ If $`Av=\lambda v`$, then $`p(A)v=p(\lambda)v`$ for any polynomial $`p`$. In par
 
 Every real symmetric matrix has an orthonormal eigenbasis:
 
-$$
+```math
 A=Q\Lambda Q^\top=\sum_{i=1}^n\lambda_iq_iq_i^\top,
 \qquad Q^\top Q=I.
-$$
+```
 
 A short existence argument maximizes $`x^\top Ax`$ on the unit sphere. A maximizer exists by compactness; the stationary condition gives $`Ax=\lambda x`$. Symmetry makes the orthogonal complement of this eigenvector invariant, so induction supplies an orthonormal eigenbasis.
 
 For a unit vector $`x=\sum_i c_iq_i`$,
 
-$$
+```math
 x^\top Ax=\sum_i\lambda_i c_i^2,
 \qquad \sum_i c_i^2=1.
-$$
+```
 
 The quadratic form is a weighted average of eigenvalues. Consequently the **Rayleigh quotient** $`R_A(x)=x^\top Ax/(x^\top x)`$ satisfies
 
-$$
+```math
 \lambda_{\min}(A)\le R_A(x)\le\lambda_{\max}(A),
-$$
+```
 
 and both bounds are attained by eigenvectors. More generally, for $`\lambda_1\ge\cdots\ge\lambda_n`$, the Courant-Fischer characterization is
 
-$$
+```math
 \lambda_k=\max_{\dim\mathcal S=k}
 \ \min_{\substack{x\in\mathcal S\\\|x\|_2=1}}x^\top Ax.
-$$
+```
 
 It describes successive eigenvalues through the best available subspaces.
 
@@ -532,9 +531,9 @@ For a symmetric matrix, **Sylvester's criterion** says that positive definitenes
 
 If $`A\succeq0`$, its unique symmetric PSD square root is
 
-$$
+```math
 A^{1/2}=Q\Lambda^{1/2}Q^\top.
-$$
+```
 
 When $`A\succ0`$, the inverse square root is also defined. A Cholesky factor $`L`$ satisfies $`LL^\top=A`$, but it need not satisfy $`L^2=A`$ and need not equal this symmetric square root.
 
@@ -542,16 +541,16 @@ When $`A\succ0`$, the inverse square root is also defined. A Cholesky factor $`L
 
 For symmetric $`A`$, power iteration applies
 
-$$
+```math
 w_{t+1}=Av_t,\qquad
 v_{t+1}=w_{t+1}/\|w_{t+1}\|_2.
-$$
+```
 
 If $`|\lambda_1|>|\lambda_2|\ge\cdots`$ and $`v_0`$ has a nonzero component along the leading eigenvector, then
 
-$$
+```math
 A^t v_0=\lambda_1^t c_1q_1+\sum_{i>1}\lambda_i^t c_iq_i.
-$$
+```
 
 The direction approaches the leading eigendirection at a rate governed by $`|\lambda_2/\lambda_1|^t`$. The vector's sign can alternate when the leading eigenvalue is negative. The method finds the eigenvalue of largest magnitude, which need not be the largest algebraic eigenvalue. Ties in magnitude remove this simple convergence guarantee.
 
@@ -561,31 +560,31 @@ The direction approaches the leading eigendirection at a rate governed by $`|\la
 
 Every real $`m\times n`$ matrix has a **singular value decomposition**
 
-$$
+```math
 A=U\Sigma V^\top,
-$$
+```
 
 with $`U\in\mathbb R^{m\times m}`$ and $`V\in\mathbb R^{n\times n}`$ orthogonal and $`\Sigma\in\mathbb R^{m\times n}`$ rectangular diagonal. Let $`q=\min(m,n)`$ and order the singular values as
 
-$$
+```math
 \sigma_1\ge\cdots\ge\sigma_r>0,
 \qquad \sigma_{r+1}=\cdots=\sigma_q=0,
-$$
+```
 
 where $`r=\operatorname{rank}(A)`$. The compact rank-$`r`$ form is
 
-$$
+```math
 A=U_r\Sigma_rV_r^\top=\sum_{i=1}^r\sigma_i u_i v_i^\top.
-$$
+```
 
 The columns $`u_i`$ of $`U`$ are the **left singular vectors**, the columns $`v_i`$ of $`V`$ are the **right singular vectors**, and the $`\sigma_i`$ are the **singular values**. Left singular vectors lie in the output space $`\mathbb R^m`$; right singular vectors lie in the input space $`\mathbb R^n`$. The names record the side on which each vector meets $`A`$:
 
-$$
+```math
 Av_i=\sigma_iu_i,
 \qquad
 u_i^\top A=\sigma_iv_i^\top,
 \qquad i=1,\ldots,q.
-$$
+```
 
 Read from right to left, $`A=U\Sigma V^\top`$ describes the map in three steps. $`V^\top x`$ gives the coordinates of $`x`$ along the right singular vectors; $`\Sigma`$ multiplies the $`i`$th coordinate by $`\sigma_i`$; and $`U`$ places the result along the corresponding left singular vectors. For $`i\le q`$, the right singular vector $`v_i`$ is sent to $`\sigma_iu_i`$. Right singular vectors with $`\sigma_i=0`$, and the extra ones $`v_{m+1},\ldots,v_n`$ when $`n>m`$, are sent to zero. SVD exists for rectangular and singular matrices; it does not require an eigenbasis of $`A`$.
 
@@ -599,13 +598,13 @@ In the full SVD, $`v_1,\ldots,v_r`$ span the row space and the remaining right s
 
 The norm identities become
 
-$$
+```math
 \begin{aligned}
 \|A\|_2&=\sigma_1,\\
 \|A\|_F^2&=\sum_i\sigma_i^2,\\
 \|A\|_*&=\sum_i\sigma_i.
 \end{aligned}
-$$
+```
 
 The last quantity is the **nuclear norm**, often used in low-rank regularization. For a symmetric matrix, singular values are the absolute values of its eigenvalues; they coincide with the eigenvalues themselves only in the PSD case.
 
@@ -627,33 +626,33 @@ For leading right singular vectors, the operator $`v\mapsto A^\top(Av)`$ applies
 
 The **Moore-Penrose pseudoinverse** replaces nonzero singular values by their reciprocals:
 
-$$
+```math
 A^+=V_r\Sigma_r^{-1}U_r^\top.
-$$
+```
 
 It is the unique matrix satisfying
 
-$$
+```math
 AA^+A=A,\qquad A^+AA^+=A^+,
 \qquad (AA^+)^\top=AA^+,\qquad (A^+A)^\top=A^+A.
-$$
+```
 
 In particular,
 
-$$
+```math
 AA^+=U_rU_r^\top=P_{\operatorname{col}(A)},
 \qquad A^+A=V_rV_r^\top=P_{\operatorname{row}(A)}.
-$$
+```
 
 For every $`b`$, $`\hat x=A^+b`$ is a least-squares minimizer and has the smallest Euclidean norm among all minimizers. To see this, rotate into singular coordinates: $`z=V^\top x`$, $`c=U^\top b`$. The nonzero modes require $`z_i=c_i/\sigma_i`$. Nullspace coordinates cannot improve the residual, so setting them to zero uniquely minimizes the norm. All minimizers are $`A^+b+z`$ with $`z\in\ker A`$.
 
 Two special cases are
 
-$$
+```math
 A^+=(A^\top A)^{-1}A^\top\quad\text{(full column rank)},
 \qquad
 A^+=A^\top(AA^\top)^{-1}\quad\text{(full row rank)}.
-$$
+```
 
 ```python
 import numpy as np
@@ -674,25 +673,25 @@ An exact pseudoinverse discards zero singular values, but a tiny nonzero singula
 
 For $`k<r`$, the truncated SVD
 
-$$
+```math
 A_k=\sum_{i=1}^k\sigma_i u_i v_i^\top
-$$
+```
 
 is a best approximation among matrices of rank at most $`k`$, in both spectral and Frobenius norms. The **Eckart-Young theorem** gives
 
-$$
+```math
 \|A-A_k\|_2=\sigma_{k+1},
 \qquad
 \|A-A_k\|_F^2=\sum_{i>k}\sigma_i^2.
-$$
+```
 
 For the spectral lower bound, any rank-at-most-$`k`$ matrix $`B`$ has a null vector of unit length in $`\operatorname{span}(v_1,\ldots,v_{k+1})`$: the two subspaces must intersect by dimension counting. On that vector, $`\|(A-B)x\|_2=\|Ax\|_2\ge\sigma_{k+1}`$, and $`A_k`$ attains the bound.
 
 For the Frobenius bound, fix a $`k`$-dimensional candidate column space with projector $`P`$. Its best approximation to each column of $`A`$ is the projection, so the best matrix with that column-space constraint is $`PA`$. The captured squared norm is
 
-$$
+```math
 \|PA\|_F^2=\sum_i\sigma_i^2\|Pu_i\|_2^2.
-$$
+```
 
 Extend the list of squared singular values by zeros to a full left singular basis. Then the weights $`\|Pu_i\|_2^2`$ lie in $`[0,1]`$ and sum to $`\operatorname{tr}(P)=k`$. The sum is largest when all weight lies on the $`k`$ largest singular values, giving the stated error. Repeated singular values at the truncation boundary can make the best approximation nonunique.
 
@@ -702,19 +701,19 @@ Extend the list of squared singular values by zeros to a full left singular basi
 
 For invertible square $`A`$, the spectral **condition number** is
 
-$$
+```math
 \kappa_2(A)=\|A\|_2\|A^{-1}\|_2
 =\frac{\sigma_{\max}(A)}{\sigma_{\min}(A)}.
-$$
+```
 
 The singular values $`\sigma_i`$ are the stretching factors from the SVD. The ratio of largest to smallest of the $`\min(m,n)`$ singular values is also used for full-rank rectangular matrices; it is infinite when the matrix is rank deficient. A wide matrix can therefore have finite condition number despite having a nullspace: the ratio concerns the nonzero singular directions, and does not make an underdetermined system uniquely solvable. The perturbation bound below is for an invertible square system.
 
 For a fixed invertible $`A`$, perturbing a nonzero right-hand side in $`Ax=b`$ gives the bound
 
-$$
+```math
 \frac{\|\delta x\|_2}{\|x\|_2}
 \le\kappa_2(A)\frac{\|\delta b\|_2}{\|b\|_2}.
-$$
+```
 
 This is a worst-case bound: the direction of the perturbation matters. **Conditioning** is sensitivity of the mathematical problem. **Numerical stability** concerns whether an algorithm introduces errors comparable to small perturbations of its inputs. A stable algorithm can still have a large forward error on an ill-conditioned problem.
 
@@ -738,9 +737,9 @@ Here a perturbation of size $`10^{-8}`$ in the right-hand side produces a change
 
 For full-column-rank $`A`$, the squared singular values of $`A`$ are the eigenvalues of $`A^\top A`$, so
 
-$$
+```math
 \kappa_2(A^\top A)=\kappa_2(A)^2.
-$$
+```
 
 Thus forming the normal equations can square the condition number. QR and SVD avoid this explicit Gram-matrix construction. For example, a matrix with condition number $`10^6`$ gives a normal-equation matrix with condition number $`10^{12}`$ in exact arithmetic.
 
@@ -756,15 +755,15 @@ For very large problems, a linear map may be represented by a function that comp
 
 For a random column vector $`z\in\mathbb R^d`$ with finite second moments and mean $`\mu`$, its covariance matrix is
 
-$$
+```math
 \Sigma=\mathbb E[(z-\mu)(z-\mu)^\top].
-$$
+```
 
 For every deterministic $`v`$,
 
-$$
+```math
 v^\top\Sigma v=\operatorname{Var}(v^\top z)\ge0.
-$$
+```
 
 Thus covariance matrices are symmetric PSD. A covariance matrix is singular exactly when some nonzero linear combination $`v^\top z`$ has zero variance, meaning it is almost surely constant. This includes exact redundancy among variables.
 
@@ -774,9 +773,9 @@ If all marginal variances are positive, define $`D=\operatorname{diag}(\sqrt{\Si
 
 For $`N\ge2`$ observations stored in $`X\in\mathbb R^{N\times d}`$, let $`X_c`$ be the matrix after subtracting the mean of each column. The sample covariance is
 
-$$
+```math
 S=\frac1{N-1}X_c^\top X_c.
-$$
+```
 
 Its rank is at most $`\min(N-1,d)`$, since $`\mathbf1^\top X_c=0`$. In particular, $`d\ge N`$ forces singularity regardless of the numerical method used to invert it.
 
@@ -786,17 +785,17 @@ For $`\Sigma\succ0`$, a **whitening transformation** $`W`$ satisfies $`W\Sigma W
 
 The **Mahalanobis distance** is
 
-$$
+```math
 d_\Sigma(z,\mu)
 =\sqrt{(z-\mu)^\top\Sigma^{-1}(z-\mu)}
 =\|\Sigma^{-1/2}(z-\mu)\|_2.
-$$
+```
 
 It is Euclidean distance after accounting for covariance. An eigendirection with small variance receives a larger distance penalty for the same displacement. The ellipsoid
 
-$$
+```math
 \{z:(z-\mu)^\top\Sigma^{-1}(z-\mu)\le c^2\},\qquad c>0,
-$$
+```
 
 is the image of a radius-$`c`$ ball under $`u\mapsto\mu+\Sigma^{1/2}u`$. Its volume is therefore the ball's volume multiplied by $`\sqrt{\det\Sigma}`$. This connects the determinant's volume interpretation with covariance geometry.
 
@@ -820,25 +819,25 @@ For correlated Gaussian simulation, draw independent standard normal column vect
 
 The variance along a unit direction $`v`$ is
 
-$$
+```math
 \frac1{N-1}\|X_cv\|_2^2=v^\top Sv.
-$$
+```
 
 The Rayleigh quotient therefore identifies the leading principal direction as a top eigenvector of $`S`$. Subsequent directions maximize variance subject to being orthogonal to the earlier directions.
 
 If $`X_c=U\Sigma_XV^\top`$, the principal directions are the right singular vectors, and their variances are $`\sigma_i^2/(N-1)`$. For the first $`k`$ directions,
 
-$$
+```math
 Z_k=X_cV_k\quad\text{(scores)},
 \qquad
 \widehat X_c=Z_kV_k^\top\quad\text{(reconstruction)}.
-$$
+```
 
 Their combined explained-variance ratio is
 
-$$
+```math
 \frac{\sum_{i=1}^k\sigma_i^2}{\sum_i\sigma_i^2},
-$$
+```
 
 provided total variance is positive. Eckart-Young also shows that this reconstruction minimizes squared reconstruction error among rank-at-most-$`k`$ approximations to the centered data.
 
@@ -869,17 +868,17 @@ Random projection can reduce the number of coordinates needed to represent a fin
 
 **Johnson-Lindenstrauss lemma, Gaussian form.** Fix $`N\ge2`$ points $`x_1,\ldots,x_N\in\mathbb R^d`$, a tolerance $`0<\varepsilon<1`$, and a failure probability $`0<\delta<1`$. Independently of these points, draw $`R\in\mathbb R^{k\times d}`$ with independent entries $`R_{ab}\sim\mathcal N(0,1/k)`$. For a sufficiently large universal constant $`C`$, choosing
 
-$$
+```math
 k\ge C\varepsilon^{-2}\log(N/\delta)
-$$
+```
 
 ensures that, with probability at least $`1-\delta`$, every pair satisfies
 
-$$
+```math
 (1-\varepsilon)\|x_i-x_j\|_2^2
 \le\|Rx_i-Rx_j\|_2^2
 \le(1+\varepsilon)\|x_i-x_j\|_2^2.
-$$
+```
 
 Here $`\log`$ is the natural logarithm. The required dimension depends logarithmically on the number of points, independently of the original dimension $`d`$. This yields dimension reduction when the chosen $`k<d`$.
 
@@ -897,16 +896,16 @@ The main distinction for derivatives is between a linear response and a gradient
 
 For a scalar objective $`L(x)`$, the derivative is a row and the gradient is a column:
 
-$$
+```math
 D_xL=(\nabla_xL)^\top,
 \qquad dL=(\nabla_xL)^\top dx.
-$$
+```
 
 For a matrix parameter $`X`$, the same convention uses the Frobenius pairing,
 
-$$
+```math
 dL=\langle\nabla_XL,dX\rangle_F.
-$$
+```
 
 Thus the gradient of a scalar loss has the same shape as its parameter. For example, $`L(X)=\|X\|_F^2`$ has gradient $`2X`$. A derivative of an array-valued output generally needs both output and input indices; this is why its full Jacobian can be much larger than the parameter itself.
 
@@ -918,46 +917,46 @@ Tensor operations and rank are developed in [Appendix A](#block-la-appendix-a); 
 
 The column-gradient convention gives the identities
 
-$$
+```math
 \begin{aligned}
 \nabla_x(a^\top x)&=a,\\
 \nabla_x(x^\top Ax)&=(A+A^\top)x,\\
 \nabla_x\|Ax-b\|_2^2&=2A^\top(Ax-b).
 \end{aligned}
-$$
+```
 
 The least-squares Hessian (the matrix of second partial derivatives) is $`2A^\top A\succeq0`$, and it is positive definite exactly when the columns of $`A`$ are independent. This confirms convexity and the full-column-rank uniqueness criterion through curvature.
 
 **Ridge regularization** adds a quadratic penalty:
 
-$$
+```math
 L_\lambda(x)=\|Ax-b\|_2^2+\lambda\|x\|_2^2,
 \qquad\lambda>0.
-$$
+```
 
 The solution satisfies
 
-$$
+```math
 (A^\top A+\lambda I)\hat x_\lambda=A^\top b.
-$$
+```
 
 The matrix is positive definite even if $`A`$ is rank deficient. In singular coordinates,
 
-$$
+```math
 \hat x_\lambda
 =\sum_{i=1}^r\frac{\sigma_i}{\sigma_i^2+\lambda}(u_i^\top b)v_i.
-$$
+```
 
 Least squares multiplies a resolved singular direction by $`1/\sigma_i`$; ridge replaces this with $`\sigma_i/(\sigma_i^2+\lambda)`$, suppressing small singular directions. The parameter $`\lambda`$ here corresponds to the unnormalized sum-of-squares objective as written; adding a factor $`1/N`$ to the data term changes its relative scale.
 
 A stable way to express the same problem is the augmented least-squares system
 
-$$
+```math
 \min_x\left\|
 \begin{pmatrix}A\\\sqrt\lambda I\end{pmatrix}x-
 \begin{pmatrix}b\\0\end{pmatrix}
 \right\|_2^2.
-$$
+```
 
 ```python
 import numpy as np
@@ -983,11 +982,11 @@ Here [`np.vstack`](https://numpy.org/doc/stable/reference/generated/numpy.vstack
 
 In numerical computing, a **tensor** is an array with a specified number of axes. A scalar has order zero, a vector has order one, and a matrix has order two. An order-$`r`$ tensor has coordinates
 
-$$
+```math
 \mathcal X\in\mathbb R^{n_1\times\cdots\times n_r},
 \qquad
 \mathcal X_{i_1,\ldots,i_r},\quad 1\le i_j\le n_j.
-$$
+```
 
 Its **shape** is the tuple $`(n_1,\ldots,n_r)`$, its **order** is the number $`r`$ of axes, and its number of scalar entries is $`\prod_{j=1}^r n_j`$. These are distinct quantities. For example, a tensor of shape $`(2,3,4)`$ has order three and 24 entries.
 
@@ -1008,30 +1007,30 @@ The more abstract definition comes from tensor products of vector spaces. Once b
 
 The outer product of $`u\in\mathbb R^m`$, $`v\in\mathbb R^n`$, and $`w\in\mathbb R^p`$ has entries
 
-$$
+```math
 \mathcal T_{ijk}=u_i v_j w_k,
 \qquad \operatorname{shape}(\mathcal T)=(m,n,p).
-$$
+```
 
 An outer product concatenates the axes without summing. A **contraction** pairs compatible indices and sums over them. Matrix multiplication is a contraction:
 
-$$
+```math
 C_{ij}=\sum_{k=1}^n A_{ik}B_{kj}.
-$$
+```
 
 The index $`k`$ is summed out; $`i,j`$ remain as the output axes. Similarly, contracting $`\mathcal T\in\mathbb R^{m\times n\times p}`$ with $`w\in\mathbb R^p`$ gives
 
-$$
+```math
 Z_{ij}=\sum_{k=1}^p\mathcal T_{ijk}w_k,
 \qquad Z\in\mathbb R^{m\times n}.
-$$
+```
 
 For equal-shaped tensors, the Euclidean inner product contracts every axis:
 
-$$
+```math
 \langle\mathcal X,\mathcal H\rangle_F
 =\sum_{i_1,\ldots,i_r}\mathcal X_{i_1,\ldots,i_r}\mathcal H_{i_1,\ldots,i_r}.
-$$
+```
 
 NumPy's [`einsum`](https://numpy.org/doc/stable/reference/generated/numpy.einsum.html) makes the surviving and contracted indices explicit. Labels after `->` specify the output axes; labels omitted from the output are summed. [`tensordot`](https://numpy.org/doc/stable/reference/generated/numpy.tensordot.html) performs the same contraction by naming the axes to sum.
 
@@ -1050,19 +1049,19 @@ print(np.allclose(Z, np.tensordot(T, w, axes=([2], [0]))))  # True
 
 A nonzero outer product $`u^{(1)}\otimes\cdots\otimes u^{(r)}`$ is a **rank-one tensor**. The **CP rank** of $`\mathcal X`$, over the real field used here, is the smallest integer $`R`$ for which
 
-$$
+```math
 \mathcal X=\sum_{j=1}^R
 u_j^{(1)}\otimes\cdots\otimes u_j^{(r)},
 \qquad u_j^{(a)}\in\mathbb R^{n_a}.
-$$
+```
 
 The zero tensor has rank zero. For order two, this is ordinary matrix rank: the SVD supplies a decomposition with $`\operatorname{rank}(A)`$ outer products, and a sum of $`R`$ rank-one matrices has image dimension at most $`R`$. For higher orders, CP rank and tensor order remain distinct. This definition and its extensions are developed by Kolda and Bader in [*Tensor Decompositions and Applications*](https://www.kolda.net/publication/koba09/).
 
 For example, let $`e_1,e_2`$ be the coordinate vectors in $`\mathbb R^2`$. The tensor
 
-$$
+```math
 \mathcal T=e_1\otimes e_1\otimes e_1+e_2\otimes e_2\otimes e_2
-$$
+```
 
 has shape $`(2,2,2)`$, order three, and CP rank two. It has a two-term representation. It cannot have a one-term representation because the matrix slices obtained by fixing its third index are $`\operatorname{diag}(1,0)`$ and $`\operatorname{diag}(0,1)`$; for a single outer product, all such slices would be scalar multiples of the same matrix.
 
@@ -1078,17 +1077,17 @@ A **reshape** changes how a fixed list of entries is indexed. A permutation of a
 
 For $`A\in\mathbb R^{m\times n}`$ and $`B\in\mathbb R^{p\times q}`$, the **Kronecker product** $`A\otimes B`$ is the $`mp\times nq`$ block matrix whose $`(i,j)`$ block is $`A_{ij}B`$. It represents a tensor product of linear maps in product bases. For compatible dimensions,
 
-$$
+```math
 (A\otimes B)(C\otimes D)=(AC)\otimes(BD).
-$$
+```
 
 If $`A,B`$ are square and invertible, $`(A\otimes B)^{-1}=A^{-1}\otimes B^{-1}`$. For square factors, the eigenvalues of their Kronecker product are pairwise products of their eigenvalues.
 
 For $`A\in\mathbb R^{m\times n}`$, $`X\in\mathbb R^{n\times p}`$, and $`B\in\mathbb R^{p\times q}`$,
 
-$$
+```math
 \boxed{\operatorname{vec}(AXB)=(B^\top\otimes A)\operatorname{vec}(X).}
-$$
+```
 
 The left side has $`mq`$ entries, and the matrix $`B^\top\otimes A`$ has shape $`mq\times np`$. This identity expresses a linear map on matrices as an ordinary matrix-vector product.
 
@@ -1115,9 +1114,9 @@ print(np.allclose(left, right))    # True
 
 For a differentiable map $`f`$ between finite-dimensional Euclidean spaces, the derivative at $`X`$ is the linear map that gives the first-order response to a small change $`H`$:
 
-$$
+```math
 f(X+H)=f(X)+Df(X)[H]+o(\|H\|_F).
-$$
+```
 
 The input $`X`$ may be a scalar, vector, matrix, or higher-order tensor. The perturbation $`H`$ has the same shape as $`X`$, and $`Df(X)[H]`$ has the same shape as $`f(X)`$. The remainder notation means that its norm divided by $`\|H\|_F`$ tends to zero as $`H\to0`$. The derivative is linear in $`H`$, even when $`f`$ is nonlinear in $`X`$.
 
@@ -1129,30 +1128,30 @@ For example, $`f(x)=Ax`$ has derivative $`Df(x)[h]=Ah`$. For a matrix input, $`f
 
 Suppose the input and output have shapes
 
-$$
+```math
 \begin{aligned}
 \mathcal X&\in\mathbb R^{n_1\times\cdots\times n_r},\\
 \mathcal Y=f(\mathcal X)&\in\mathbb R^{m_1\times\cdots\times m_s}.
 \end{aligned}
-$$
+```
 
 In **numerator layout**, the Jacobian coefficient array lists output indices first and input indices second:
 
-$$
+```math
 \mathcal J_{a_1\ldots a_s,\,b_1\ldots b_r}
 =\frac{\partial\mathcal Y_{a_1\ldots a_s}}
 {\partial\mathcal X_{b_1\ldots b_r}}.
-$$
+```
 
 Consequently,
 
-$$
+```math
 \boxed{
 \operatorname{shape}(\mathcal J)
 =\big(\underbrace{m_1,\ldots,m_s}_{\text{output axes}},
 \underbrace{n_1,\ldots,n_r}_{\text{input axes}}\big).
 }
-$$
+```
 
 **The numbers of axes add; the numbers of entries multiply.** An order-$`r`$ input and order-$`s`$ output give an order-$`(r+s)`$ Jacobian array. It contains $`(\prod_a m_a)(\prod_b n_b)`$ scalar partial derivatives.
 
@@ -1170,17 +1169,17 @@ For example, an input of shape $`(2,3)`$ and output of shape $`(4,5)`$ give a fu
 
 Use $`\alpha`$ as a shorthand for the entire output-index tuple and $`\beta`$ for the entire input-index tuple. These are **multi-indices**, not additional axes. The first-order output change is
 
-$$
+```math
 (Df(\mathcal X)[\mathcal H])_\alpha
 =\sum_\beta\mathcal J_{\alpha\beta}\mathcal H_\beta.
-$$
+```
 
 All input axes are contracted; the output axes remain. In flattened coordinates this is the **Jacobian-vector product** $`Jh`$. If $`\mathcal H`$ is a direction and $`\varepsilon`$ is a small scalar step, then
 
-$$
+```math
 f(\mathcal X+\varepsilon\mathcal H)
 =f(\mathcal X)+\varepsilon Df(\mathcal X)[\mathcal H]+o(|\varepsilon|).
-$$
+```
 
 Thus $`Df(\mathcal X)[\mathcal H]`$ is the output's rate of change along the chosen input direction; multiplying it by $`\varepsilon`$ gives the predicted output change. This is the quantity propagated as a tangent in forward-mode automatic differentiation.
 
@@ -1188,19 +1187,19 @@ Thus $`Df(\mathcal X)[\mathcal H]`$ is the output's rate of change along the cho
 
 For $`L:\mathbb R^n\to\mathbb R`$, the numerator-layout derivative is a row, while its Euclidean gradient is a column:
 
-$$
+```math
 \underbrace{D_xL}_{1\times n}
 =\underbrace{(\nabla_xL)^\top}_{1\times n},
 \qquad
 dL=(D_xL)\,dx=\nabla_xL^\top dx.
-$$
+```
 
 For a tensor input, the analogous gradient satisfies
 
-$$
+```math
 dL=\langle\nabla_{\mathcal X}L,d\mathcal X\rangle_F
 =\sum_\beta(\nabla_{\mathcal X}L)_\beta\,d\mathcal X_\beta.
-$$
+```
 
 Thus **the gradient of a scalar loss has the same shape as its input**. If the input has $`P`$ entries, the flattened derivative is a $`1\times P`$ row and the flattened gradient is its $`P\times1`$ transpose. Reshaping the latter gives the input-shaped gradient tensor. A scalar has shape $`()`$ and contributes no output axes to the coefficient array; representing the same derivative as a matrix introduces a single row. Both representations follow the same numerator convention.
 
@@ -1210,16 +1209,16 @@ The distinction is between a derivative that acts on perturbations and the gradi
 
 Let
 
-$$
+```math
 A\in\mathbb R^{m\times n},\quad X\in\mathbb R^{n\times p},\quad
 B\in\mathbb R^{p\times q},\quad Y\in\mathbb R^{m\times q}.
-$$
+```
 
 Then $`Y_{ij}=\sum_{k,\ell}A_{ik}X_{k\ell}B_{\ell j}`$, so
 
-$$
+```math
 \boxed{\frac{\partial Y_{ij}}{\partial X_{k\ell}}=A_{ik}B_{\ell j}.}
-$$
+```
 
 The full Jacobian has shape $`(m,q,n,p)`$. Contracting its input indices against $`H`$ gives $`AHB`$. Column vectorization gives its matrix representation $`J=B^\top\otimes A`$.
 
@@ -1244,10 +1243,10 @@ This example deliberately materializes $`J`$ to make the axes visible. Computing
 
 For $`Y_{ij}=X_{ij}^2`$,
 
-$$
+```math
 \frac{\partial Y_{ij}}{\partial X_{k\ell}}
 =2X_{ij}\,\delta_{ik}\delta_{j\ell},
-$$
+```
 
 where $`\delta_{ab}`$ is one when $`a=b`$ and zero otherwise. The full Jacobian has four axes, but nearly all entries are zero. Its action is simply $`Df(X)[H]=2X\odot H`$, where $`\odot`$ denotes elementwise multiplication. The input-shaped array $`2X`$ stores the diagonal coefficients efficiently; it is not the full matrix-to-matrix Jacobian.
 
@@ -1259,27 +1258,27 @@ Batch axes follow the same rule. If $`X`$ has shape $`(N,d)`$ and $`Y`$ has shap
 
 For $`\mathcal Y=f(\mathcal X)`$ and $`\mathcal Z=g(\mathcal Y)`$, contraction over every intermediate index gives
 
-$$
+```math
 \frac{\partial\mathcal Z_\gamma}{\partial\mathcal X_\beta}
 =\sum_\alpha
 \frac{\partial\mathcal Z_\gamma}{\partial\mathcal Y_\alpha}
 \frac{\partial\mathcal Y_\alpha}{\partial\mathcal X_\beta}.
-$$
+```
 
 After flattening, this is $`J_{g\circ f}=J_gJ_f`$. If the final output is a scalar loss and $`G=\nabla_{\mathcal Y}L`$, then
 
-$$
+```math
 (\nabla_{\mathcal X}L)_\beta
 =\sum_\alpha\mathcal J_{\alpha\beta}G_\alpha.
-$$
+```
 
 Now the **output** axes are contracted and the **input** axes remain. This is the adjoint derivative applied to $`G`$, or the reshaped $`J^\top g`$ operation used in reverse-mode differentiation. Written with row derivatives, the same operation is the vector-Jacobian product $`g^\top J`$.
 
 For $`Y=AXB`$ and an output gradient $`G\in\mathbb R^{m\times q}`$,
 
-$$
+```math
 \nabla_X L=A^\top G B^\top\in\mathbb R^{n\times p}.
-$$
+```
 
 For the concrete loss $`L(X)=\tfrac12\|AXB-C\|_F^2`$, take $`G=AXB-C`$. A directional finite difference checks the derivative without constructing its full Jacobian:
 
@@ -1304,13 +1303,13 @@ print(np.isclose(finite_difference, np.sum(grad * H), rtol=1e-5))  # True
 
 For a scalar loss on an order-$`r`$ tensor, the Hessian coefficient array has **two copies of the input shape**:
 
-$$
+```math
 \mathcal H_{\beta\eta}
 =\frac{\partial^2L}{\partial\mathcal X_\beta\partial\mathcal X_\eta},
 \qquad
 \operatorname{shape}(\mathcal H)
 =(n_1,\ldots,n_r,n_1,\ldots,n_r).
-$$
+```
 
 It has order $`2r`$ and becomes a $`P\times P`$ matrix after flattening, where $`P=\prod_j n_j`$. For continuous second partial derivatives, it is symmetric under exchange of the two complete index groups, $`\mathcal H_{\beta\eta}=\mathcal H_{\eta\beta}`$. Contracting one input group with a perturbation produces an input-shaped Hessian-vector product.
 
@@ -1318,10 +1317,10 @@ It has order $`2r`$ and becomes a $`P\times P`$ matrix after flattening, where $
 
 Expanding the differential gives
 
-$$
+```math
 d(x^\top Ax)=(dx)^\top Ax+x^\top A\,dx
 =\big((A+A^\top)x\big)^\top dx.
-$$
+```
 
 This gives $`\nabla_x(x^\top Ax)=(A+A^\top)x`$, including the symmetric case $`2Ax`$.
 
@@ -1329,28 +1328,28 @@ This gives $`\nabla_x(x^\top Ax)=(A+A^\top)x`$, including the symmetric case $`2
 
 For a matrix parameter $`A`$, the gradient convention is
 
-$$
+```math
 dL=\langle\nabla_A L,dA\rangle_F
 =\operatorname{tr}((\nabla_A L)^\top dA).
-$$
+```
 
 The identities below follow by expressing each differential in this form:
 
-$$
+```math
 \begin{aligned}
 \nabla_A\operatorname{tr}(AB)&=B^\top,\\
 \nabla_A\operatorname{tr}(A^\top B)&=B,\\
 \nabla_A\|A\|_F^2&=2A.
 \end{aligned}
-$$
+```
 
 For invertible real square $`A`$,
 
-$$
+```math
 d\log|\det A|=\operatorname{tr}(A^{-1}dA),
 \qquad
 \nabla_A\log|\det A|=A^{-\top}.
-$$
+```
 
 On the positive definite cone the absolute value is unnecessary.
 
@@ -1365,13 +1364,13 @@ On the positive definite cone the absolute value is unnecessary.
 
 Let $`x,y\in\mathbb R^d`$ be independent random vectors whose coordinates are iid from a fixed distribution with mean zero, variance one, and finite fourth moment. Then
 
-$$
+```math
 \mathbb E\|x\|_2^2=d,
 \qquad
 \mathbb E[x^\top y]=0,
 \qquad
 \mathbb E[(x^\top y)^2]=d.
-$$
+```
 
 The squared norms concentrate near $`d`$ as $`d`$ grows, while the root-mean-square size of the inner product is $`\sqrt d`$. Their normalized inner product is therefore typically of order $`d^{-1/2}`$. Near orthogonality is a property of this random model, rather than of all high-dimensional vectors.
 
@@ -1381,29 +1380,29 @@ Random projections exploit a related concentration phenomenon: for a fixed vecto
 
 Let $`x_1,\ldots,x_N\in\mathbb R^d`$ be a **fixed** set of points, with $`N\ge2`$. Choose a distortion tolerance $`0<\varepsilon<1`$ and a failure probability $`0<\delta<1`$. Let $`M=\binom N2`$ be the number of pairs and choose an integer
 
-$$
+```math
 \boxed{k\ge\frac{8}{\varepsilon^2}\log\frac{2M}{\delta}.}
-$$
+```
 
 Here $`\log`$ denotes the natural logarithm. Draw $`R\in\mathbb R^{k\times d}`$ independently of the points, with independent entries
 
-$$
+```math
 R_{ab}\sim\mathcal N(0,1/k),\qquad f(x)=Rx.
-$$
+```
 
 With probability at least $`1-\delta`$, **every pair** satisfies
 
-$$
+```math
 (1-\varepsilon)\|x_i-x_j\|_2^2
 \le\|Rx_i-Rx_j\|_2^2
 \le(1+\varepsilon)\|x_i-x_j\|_2^2.
-$$
+```
 
 This is a Gaussian form of the **Johnson-Lindenstrauss lemma**. The required dimension is
 
-$$
+```math
 k=O\!\left(\varepsilon^{-2}\log(N/\delta)\right),
-$$
+```
 
 independent of the ambient dimension $`d`$. The displayed constant is a sufficient, conservative choice. It gives dimensionality reduction when the resulting $`k<d`$; the bound itself does not promise a reduction for every parameter choice.
 
@@ -1411,51 +1410,51 @@ independent of the ambient dimension $`d`$. The displayed constant is a sufficie
 
 Fix a nonzero vector $`v`$, independently of $`R`$. Each coordinate of $`Rv`$ is Gaussian with variance $`\|v\|_2^2/k`$, and the coordinates are independent. Therefore
 
-$$
+```math
 Q:=\frac{k\|Rv\|_2^2}{\|v\|_2^2}\sim\chi_k^2,
 \qquad
 \mathbb E\|Rv\|_2^2=\|v\|_2^2.
-$$
+```
 
 Here $`\chi_k^2`$ denotes the distribution of the sum of squares of $`k`$ independent standard normal variables. The $`1/\sqrt k`$ scaling preserves the expected squared norm. To control a particular draw, use concentration. For a chi-square random variable,
 
-$$
+```math
 \mathbb E[e^{tQ}]=(1-2t)^{-k/2},\qquad t<1/2.
-$$
+```
 
 For any nonnegative random variable $`Z`$ and $`a>0`$, Markov's inequality gives $`\Pr(Z\ge a)\le\mathbb E[Z]/a`$. Apply it to $`e^{tQ}`$, using $`t>0`$ for the upper tail and $`t<0`$ for the lower tail, and optimize $`t`$. This gives the Chernoff bounds
 
-$$
+```math
 \begin{aligned}
 \Pr\{Q\ge k(1+\varepsilon)\}
 &\le e^{-\frac{k}{2}(\varepsilon-\log(1+\varepsilon))},\\
 \Pr\{Q\le k(1-\varepsilon)\}
 &\le e^{-\frac{k}{2}(-\varepsilon-\log(1-\varepsilon))}.
 \end{aligned}
-$$
+```
 
 For $`0<\varepsilon<1`$,
 
-$$
+```math
 \begin{aligned}
 \varepsilon-\log(1+\varepsilon)&\ge\varepsilon^2/4,\\
 -\varepsilon-\log(1-\varepsilon)&\ge\varepsilon^2/2.
 \end{aligned}
-$$
+```
 
 Combining the tails yields
 
-$$
+```math
 \Pr\!\left\{\left|\frac{\|Rv\|_2^2}{\|v\|_2^2}-1\right|>\varepsilon\right\}
 \le2e^{-k\varepsilon^2/8}.
-$$
+```
 
 Now apply this statement to each difference $`v=x_i-x_j`$. There are at most $`M`$ nonzero differences; coincident points stay coincident automatically. By the union bound,
 
-$$
+```math
 \Pr\{\text{some pair violates the distance bound}\}
 \le2M e^{-k\varepsilon^2/8}\le\delta.
-$$
+```
 
 The union bound states that the probability of a union of events is at most the sum of their probabilities; the pairwise events need not be independent. The logarithm of the number of points appears because exponentially small failure probabilities must cover quadratically many pairs.
 
@@ -1508,56 +1507,56 @@ The first draw exceeds the chosen tolerance $`\varepsilon=0.5`$; the second stay
 
 Partition a matrix as
 
-$$
+```math
 M=\begin{pmatrix}A&B\\C&D\end{pmatrix},
 \qquad S=D-CA^{-1}B.
-$$
+```
 
 Here $`A\in\mathbb R^{n\times n}`$ is invertible, $`D\in\mathbb R^{m\times m}`$, $`B\in\mathbb R^{n\times m}`$, and $`C\in\mathbb R^{m\times n}`$. The matrix $`S\in\mathbb R^{m\times m}`$ is the **Schur complement** of $`A`$. Its meaning follows from eliminating $`x`$ in the block system
 
-$$
+```math
 Ax+By=a,\qquad Cx+Dy=d.
-$$
+```
 
 Substitution gives $`Sy=d-CA^{-1}a`$, followed by $`x=A^{-1}(a-By)`$. In computations these inverse actions can be evaluated through solves.
 
 Block elimination also gives
 
-$$
+```math
 \det M=\det A\det S.
-$$
+```
 
 If $`S`$ is invertible, then
 
-$$
+```math
 M^{-1}=\begin{pmatrix}
 A^{-1}+A^{-1}BS^{-1}CA^{-1}&-A^{-1}BS^{-1}\\
 -S^{-1}CA^{-1}&S^{-1}
 \end{pmatrix}.
-$$
+```
 
 For symmetric $`M`$ with $`C=B^\top`$ and $`A\succ0`$,
 
-$$
+```math
 M\succeq0\iff S\succeq0,
 \qquad
 M\succ0\iff S\succ0.
-$$
+```
 
 The reason is the completion of the square:
 
-$$
+```math
 \begin{pmatrix}x\\y\end{pmatrix}^\top M
 \begin{pmatrix}x\\y\end{pmatrix}
 =(x+A^{-1}By)^\top A(x+A^{-1}By)+y^\top Sy.
-$$
+```
 
 For jointly Gaussian random vectors $`(u,v)`$ with $`\Sigma_{vv}\succ0`$, the conditional covariance is
 
-$$
+```math
 \operatorname{Cov}(u\mid v)
 =\Sigma_{uu}-\Sigma_{uv}\Sigma_{vv}^{-1}\Sigma_{vu}.
-$$
+```
 
 The subtracted PSD term describes the variance explained by observing $`v`$. For a general non-Gaussian joint distribution, this expression need not be the conditional covariance; it is still the covariance of the residual from the best affine predictor under the usual finite-second-moment assumptions.
 
@@ -1565,19 +1564,19 @@ The subtracted PSD term describes the variance explained by observing $`v`$. For
 
 For $`A\in\mathbb R^{n\times n}`$, $`U\in\mathbb R^{n\times k}`$, $`C\in\mathbb R^{k\times k}`$ and $`V\in\mathbb R^{k\times n}`$, the **Woodbury identity** is
 
-$$
+```math
 (A+UCV)^{-1}
 =A^{-1}-A^{-1}U(C^{-1}+VA^{-1}U)^{-1}VA^{-1},
-$$
+```
 
 assuming the displayed inverses exist. When $`k\ll n`$ and solves with $`A`$ are already cheap, it converts an updated system into a smaller $`k\times k`$ solve.
 
 The rank-one case is **Sherman-Morrison**:
 
-$$
+```math
 (A+uv^\top)^{-1}
 =A^{-1}-\frac{A^{-1}uv^\top A^{-1}}{1+v^\top A^{-1}u},
-$$
+```
 
 provided $`A`$ is invertible and the denominator is nonzero. Applying the formula to a right-hand side avoids constructing the inverse:
 
@@ -1604,18 +1603,18 @@ Here the update is $`uu^\top`$ and $`A\succ0`$, so the denominator is positive. 
 
 For vectors $`a,b\in\mathbb R^n`$, write their coordinates in decreasing order. The relation **majorization**, $`a\prec b`$, means
 
-$$
+```math
 \sum_{i=1}^k a_{[i]}\le\sum_{i=1}^k b_{[i]}
 \quad(1\le k<n),
 \qquad
 \sum_i a_i=\sum_i b_i.
-$$
+```
 
 It says that $`a`$ is a more averaged distribution of the same total mass. For symmetric $`A=Q\Lambda Q^\top`$, its diagonal vector $`d`$ satisfies
 
-$$
+```math
 d_i=\sum_j q_{ij}^2\lambda_j.
-$$
+```
 
 The matrix $`D_{ij}=q_{ij}^2`$ is **doubly stochastic**: entries are nonnegative and every row and column sums to one. The **Birkhoff-von Neumann theorem** expresses every doubly stochastic matrix as a convex combination of permutation matrices, yielding $`d\prec\lambda`$.
 
@@ -1632,9 +1631,9 @@ For example, a symmetric matrix with eigenvalues $`(3,1)`$ may have diagonal $`(
 
 A **row-stochastic matrix** has nonnegative entries and satisfies $`P\mathbf1=\mathbf1`$. Thus $`1`$ is an eigenvalue with right eigenvector $`\mathbf1`$. If a probability distribution is represented by a column $`\pi_t`$, its evolution is $`\pi_{t+1}=P^\top\pi_t`$. A stationary distribution satisfies
 
-$$
+```math
 P^\top\pi=\pi,\qquad \pi_i\ge0,\qquad\mathbf1^\top\pi=1.
-$$
+```
 
 Here $`P_{ij}`$ is the probability of moving from state $`i`$ to state $`j`$ in one step. A finite chain is **irreducible** if every state can reach every other state in some number of steps. It is **aperiodic** if the greatest common divisor of possible positive return times is one for each state. A finite irreducible chain has a unique stationary distribution; aperiodicity additionally ensures convergence to it from every starting distribution. Other eigenvalues affect convergence, but the existence of eigenvalue one by itself is insufficient. A chain is **reversible** with respect to $`\pi`$ when detailed balance holds: $`\pi_iP_{ij}=\pi_jP_{ji}`$. For positive stationary probabilities, this identity makes $`\operatorname{diag}(\pi)^{1/2}P\operatorname{diag}(\pi)^{-1/2}`$ symmetric, connecting Markov dynamics to the symmetric spectral theorem.
 

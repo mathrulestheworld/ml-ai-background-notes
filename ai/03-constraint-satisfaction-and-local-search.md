@@ -327,9 +327,9 @@ Each of the $`n-1`$ arcs is revised once in $`O(d^2)`$ time, and the forward pas
 
 Let the state space be finite, the neighbor relation symmetric with every state having the same number $`N`$ of neighbors, and the chain able to reach any state from any other. At a fixed temperature $`T`$, simulated annealing proposes a neighbor $`s'`$ of $`s`$ with probability $`1/N`$ and accepts it with probability $`\min\bigl(1,e^{-(E(s')-E(s))/T}\bigr)`$. For the distribution $`\pi(s)\propto e^{-E(s)/T}`$ and neighbors with $`E(s')\ge E(s)`$,
 
-$$
+```math
 \pi(s)\,P(s\to s')=\frac{e^{-E(s)/T}}{Z}\cdot\frac1N\,e^{-(E(s')-E(s))/T}=\frac{e^{-E(s')/T}}{Z}\cdot\frac1N=\pi(s')\,P(s'\to s),
-$$
+```
 
 the **detailed balance** condition, which makes $`\pi`$ stationary. This is the Metropolis algorithm for sampling from $`\pi`$. As $`T\to0`$, $`\pi(s)/\pi(s^*)=e^{-(E(s)-E(s^*))/T}\to0`$ for every $`s`$ with a higher energy than a global minimum $`s^*`$, so $`\pi`$ concentrates on the global minima.
 

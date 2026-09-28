@@ -137,15 +137,15 @@ Suppose the reward is linear in known features, $`r(s)=\mathbf w^\top\boldsymbol
 
 Feature matching still leaves many policies, and many distributions over trajectories, that match the expert's features. **Maximum-entropy IRL** ([Ziebart, Maas, Bagnell, and Dey, 2008](https://cdn.aaai.org/AAAI/2008/AAAI08-227.pdf)) chooses the least committed one: the distribution of maximum entropy among those that match the expert's feature counts. It is an exponential family, in which trajectories are exponentially more likely the higher their reward,
 
-$$
+```math
 p_{\mathbf w}(\tau)\propto\exp\bigl(\mathbf w^\top\boldsymbol\phi(\tau)\bigr),\qquad\boldsymbol\phi(\tau)=\sum_t\boldsymbol\phi(s_t),
-$$
+```
 
 (with the dynamics' probabilities as a factor in stochastic environments; the causally consistent version of [Ziebart, Bagnell, and Dey (2010)](https://icml.cc/Conferences/2010/papers/28.pdf) is the soft-optimal policy of chapter 21). The reward weights are fitted by maximum likelihood on the demonstrations, and the gradient of the log-likelihood has a simple form: the demonstrations' feature counts minus the feature counts expected under the current model,
 
-$$
+```math
 \nabla_{\mathbf w}\frac1N\sum_i\ln p_{\mathbf w}(\tau_i)=\boldsymbol\mu_E-\mathbb E_{\tau\sim p_{\mathbf w}}\bigl[\boldsymbol\phi(\tau)\bigr],
-$$
+```
 
 computed by a backward pass of soft value iteration, which gives the model's policy, and a forward pass that propagates its state visitation (exercise 25.3). The model treats the expert as noisily rational, which also resolves the ambiguity: suboptimal actions are explained as less likely, not impossible. The next code recovers the rewards of five kinds of terrain from demonstrations of a soft-optimal expert, and plans with them on a map whose layout it has never seen.
 
