@@ -8,7 +8,7 @@
 
 Exact inference, chapter 9, costs time exponential in the treewidth, and many models of interest have large treewidth: grids of pixels, dense networks built from data, relational models with many interacting objects, and models with continuous variables whose conditionals have no closed form. For them, two families of approximation are used, and they fail in different ways.
 
-- **Sampling** (Monte Carlo) methods draw samples whose frequencies approximate the target distribution. They are **consistent**: with enough samples the answer converges to the truth, and the error of an average of $N$ independent samples shrinks as $1/\sqrt N$ regardless of the number of variables (Foundations chapter 4). The difficulty is obtaining samples from the right distribution, especially under unlikely evidence.
+- **Sampling** (Monte Carlo) methods draw samples whose frequencies approximate the target distribution. They are **consistent**: with enough samples the answer converges to the truth, and the error of an average of $`N`$ independent samples shrinks as $`1/\sqrt N`$ regardless of the number of variables (Foundations chapter 4). The difficulty is obtaining samples from the right distribution, especially under unlikely evidence.
 - **Variational** methods replace inference by optimization: they search a tractable family of distributions for the member closest to the target. They are fast and deterministic, but **biased**, since the answer is only as good as the family, and the error does not vanish with more computation.
 
 The running examples are the burglary network of chapter 8, small enough to check against exact answers, and the Ising model, the simplest model in which approximate inference is both necessary and hard.
@@ -17,7 +17,7 @@ The running examples are the burglary network of chapter 8, small enough to chec
 
 ### <a id="direct-and-rejection-sampling"></a>Direct and rejection sampling
 
-A Bayesian network is a generative process: sample each variable in topological order from its CPT, given the sampled values of its parents. This **ancestral** or **prior sampling** produces exact samples from the joint distribution, and the fraction of samples with a property estimates its probability. Conditional queries need more. **Rejection sampling** discards the samples that disagree with the evidence and uses the rest. It is consistent, but it keeps only a fraction $P(e)$ of the samples, which collapses as the evidence grows: in the burglary network, both neighbors call in only 0.2% of the samples, so a hundred thousand samples yield about two hundred useful ones, and with evidence on many variables $P(e)$ falls exponentially.
+A Bayesian network is a generative process: sample each variable in topological order from its CPT, given the sampled values of its parents. This **ancestral** or **prior sampling** produces exact samples from the joint distribution, and the fraction of samples with a property estimates its probability. Conditional queries need more. **Rejection sampling** discards the samples that disagree with the evidence and uses the rest. It is consistent, but it keeps only a fraction $`P(e)`$ of the samples, which collapses as the evidence grows: in the burglary network, both neighbors call in only 0.2% of the samples, so a hundred thousand samples yield about two hundred useful ones, and with evidence on many variables $`P(e)`$ falls exponentially.
 
 ### <a id="likelihood-weighting"></a>Likelihood weighting
 
@@ -67,31 +67,31 @@ Rejection sampling keeps 213 of 100,000 samples. Likelihood weighting uses all o
 
 ### <a id="importance-sampling"></a>Importance sampling
 
-Both methods are cases of **importance sampling**. To estimate $\mathbb E_p[f]=\sum_xp(x)f(x)$ when sampling from $p$ is hard, sample from a **proposal** $q$ instead, with $q(x)>0$ wherever $p(x)f(x)\neq0$, and reweight:
+Both methods are cases of **importance sampling**. To estimate $`\mathbb E_p[f]=\sum_xp(x)f(x)`$ when sampling from $`p`$ is hard, sample from a **proposal** $`q`$ instead, with $`q(x)>0`$ wherever $`p(x)f(x)\neq0`$, and reweight:
 
 $$
 \mathbb E_p[f]=\mathbb E_q\!\left[f(x)\frac{p(x)}{q(x)}\right]\approx\frac1N\sum_kf(x_k)\,w_k,\qquad w_k=\frac{p(x_k)}{q(x_k)}.
 $$
 
-When $p$ is known only up to a constant, such as a posterior $p(x\mid e)\propto p(x,e)$, the **self-normalized** estimate $\sum_kw_kf(x_k)/\sum_kw_k$ uses unnormalized weights and is consistent though slightly biased. The quality of a proposal is summarized by the **effective sample size**
+When $`p`$ is known only up to a constant, such as a posterior $`p(x\mid e)\propto p(x,e)`$, the **self-normalized** estimate $`\sum_kw_kf(x_k)/\sum_kw_k`$ uses unnormalized weights and is consistent though slightly biased. The quality of a proposal is summarized by the **effective sample size**
 
 $$
 N_{\mathrm{eff}}=\frac{\bigl(\sum_kw_k\bigr)^2}{\sum_kw_k^2},
 $$
 
-which equals $N$ when all weights are equal and 1 when one weight dominates. The variance of importance sampling is small when $q$ is close to $p$ and enormous, even infinite, when $q$ has lighter tails than $p$. In high dimensions a product of many per-variable weight ratios almost always degenerates, which is why **sequential** importance sampling with resampling, the particle filter of chapter 11, periodically discards low-weight samples and duplicates high-weight ones.
+which equals $`N`$ when all weights are equal and 1 when one weight dominates. The variance of importance sampling is small when $`q`$ is close to $`p`$ and enormous, even infinite, when $`q`$ has lighter tails than $`p`$. In high dimensions a product of many per-variable weight ratios almost always degenerates, which is why **sequential** importance sampling with resampling, the particle filter of chapter 11, periodically discards low-weight samples and duplicates high-weight ones.
 
 ## <a id="markov-chain-monte-carlo"></a>Markov chain Monte Carlo
 
 ### <a id="markov-chains-and-stationary-distributions"></a>Markov chains and stationary distributions
 
-**Markov chain Monte Carlo** (MCMC) gives up independent samples. It runs a Markov chain whose states are complete assignments and whose long-run distribution is the target $\pi$, and uses the sequence of states as correlated samples. A chain with transition probabilities $T(x\to x')$ has **stationary distribution** $\pi$ if $\sum_x\pi(x)T(x\to x')=\pi(x')$: a state distributed according to $\pi$ stays so distributed after a step. A convenient sufficient condition is **detailed balance**,
+**Markov chain Monte Carlo** (MCMC) gives up independent samples. It runs a Markov chain whose states are complete assignments and whose long-run distribution is the target $`\pi`$, and uses the sequence of states as correlated samples. A chain with transition probabilities $`T(x\to x')`$ has **stationary distribution** $`\pi`$ if $`\sum_x\pi(x)T(x\to x')=\pi(x')`$: a state distributed according to $`\pi`$ stays so distributed after a step. A convenient sufficient condition is **detailed balance**,
 
 $$
 \pi(x)\,T(x\to x')=\pi(x')\,T(x'\to x)\qquad\text{for all }x,x',
 $$
 
-which says that in equilibrium the flow from $x$ to $x'$ equals the flow back ([Appendix B](#block-ai10-appendix-b)). If the chain is also **ergodic**, able to reach every state from every other (irreducible) without being trapped in cycles (aperiodic), then from any starting state the distribution of the chain converges to $\pi$, and averages along the chain converge to expectations under $\pi$. The conditions are easy to verify and say nothing about how fast convergence happens, which is the whole practical question.
+which says that in equilibrium the flow from $`x`$ to $`x'`$ equals the flow back ([Appendix B](#block-ai10-appendix-b)). If the chain is also **ergodic**, able to reach every state from every other (irreducible) without being trapped in cycles (aperiodic), then from any starting state the distribution of the chain converges to $`\pi`$, and averages along the chain converge to expectations under $`\pi`$. The conditions are easy to verify and say nothing about how fast convergence happens, which is the whole practical question.
 
 ### <a id="gibbs-sampling"></a>Gibbs sampling
 
@@ -101,23 +101,23 @@ $$
 P(x_i\mid x_{-i})\propto P\bigl(x_i\mid\mathrm{parents}(X_i)\bigr)\prod_{Y_j\in\mathrm{children}(X_i)}P\bigl(y_j\mid\mathrm{parents}(Y_j)\bigr)
 $$
 
-in a Bayesian network, and $\propto\prod_{c\ni i}\psi_c(x_c)$ in a Markov network, so each update is cheap and local. Evidence variables are simply never resampled. Each update leaves the target invariant, and cycling through the variables gives an ergodic chain when all conditionals are positive. On the burglary network, Gibbs sampling over the three unobserved variables estimates $P(B\mid j,m)$ far more accurately than the sampling methods above for the same number of iterations, because it samples the alarm from its posterior instead of from its prior:
+in a Bayesian network, and $`\propto\prod_{c\ni i}\psi_c(x_c)`$ in a Markov network, so each update is cheap and local. Evidence variables are simply never resampled. Each update leaves the target invariant, and cycling through the variables gives an ergodic chain when all conditionals are positive. On the burglary network, Gibbs sampling over the three unobserved variables estimates $`P(B\mid j,m)`$ far more accurately than the sampling methods above for the same number of iterations, because it samples the alarm from its posterior instead of from its prior:
 
 <img src="sources/images/ai-approx-sampling.png" alt="ai-approx-sampling" width="700">
 
-*Mean absolute error of three estimates of $P(B\mid j,m)=0.284$, over 100 runs (20 for Gibbs sampling) for each number of samples; when rejection sampling keeps no sample, its error is counted as 0.284. Rejection sampling keeps on average 0.2 samples out of 100 and 207 out of 100,000, and its error is dominated by the lack of accepted samples until about $10^4$. Likelihood weighting is only slightly better: its weight concentrates on the rare samples with the alarm on. Gibbs sampling, with one sweep over burglary, earthquake, and alarm per sample and a burn-in of 100 sweeps, has errors ten times smaller, 0.0029 after 30,000 sweeps; all three errors fall roughly as $N^{-1/2}$ once enough samples are useful.*
+*Mean absolute error of three estimates of $`P(B\mid j,m)=0.284`$, over 100 runs (20 for Gibbs sampling) for each number of samples; when rejection sampling keeps no sample, its error is counted as 0.284. Rejection sampling keeps on average 0.2 samples out of 100 and 207 out of 100,000, and its error is dominated by the lack of accepted samples until about $`10^4`$. Likelihood weighting is only slightly better: its weight concentrates on the rare samples with the alarm on. Gibbs sampling, with one sweep over burglary, earthquake, and alarm per sample and a burn-in of 100 sweeps, has errors ten times smaller, 0.0029 after 30,000 sweeps; all three errors fall roughly as $`N^{-1/2}`$ once enough samples are useful.*
 
 Gibbs sampling fails when variables are strongly coupled. If two variables are almost always equal, changing one while holding the other fixed is almost always rejected by the conditional, and the chain moves between the two joint modes only rarely. **Blocked Gibbs** samples groups of correlated variables jointly, and **collapsed Gibbs** integrates some variables out analytically, which is how topic models are usually fitted.
 
 ### <a id="metropolishastings"></a>Metropolis–Hastings
 
-**Metropolis–Hastings** ([Metropolis et al., 1953](https://doi.org/10.1063/1.1699114); [Hastings, 1970](https://doi.org/10.1093/biomet/57.1.97)) builds a chain for any target known up to a constant. From the current state $x$, propose $x'\sim q(x'\mid x)$, and accept with probability
+**Metropolis–Hastings** ([Metropolis et al., 1953](https://doi.org/10.1063/1.1699114); [Hastings, 1970](https://doi.org/10.1093/biomet/57.1.97)) builds a chain for any target known up to a constant. From the current state $`x`$, propose $`x'\sim q(x'\mid x)`$, and accept with probability
 
 $$
 A(x\to x')=\min\left(1,\;\frac{\pi(x')\,q(x\mid x')}{\pi(x)\,q(x'\mid x)}\right),
 $$
 
-otherwise stay at $x$. The normalizing constant of $\pi$ cancels in the ratio, and the acceptance rule enforces detailed balance for any proposal (Appendix B). Gibbs sampling is the special case whose proposal is the exact conditional, for which the acceptance probability is always 1; the simulated annealing of chapter 3 is the case $\pi\propto e^{-E/T}$ with a symmetric proposal and a falling temperature.
+otherwise stay at $`x`$. The normalizing constant of $`\pi`$ cancels in the ratio, and the acceptance rule enforces detailed balance for any proposal (Appendix B). Gibbs sampling is the special case whose proposal is the exact conditional, for which the acceptance probability is always 1; the simulated annealing of chapter 3 is the case $`\pi\propto e^{-E/T}`$ with a symmetric proposal and a falling temperature.
 
 The proposal's scale governs efficiency. Small steps are almost always accepted but move slowly; large steps are almost always rejected; the best is in between, and for random-walk proposals in high dimensions theory suggests tuning the scale for an acceptance rate of about 0.23 ([Roberts, Gelman, and Gilks, 1997](https://doi.org/10.1214/aoap/1034625254)).
 
@@ -162,7 +162,7 @@ for step in [0.05, 0.5, 1.5, 5.0]:
 # step  5.0: acceptance 0.03, effective sample size    204 of 18000, estimate of E[x1^2] = 1: 1.025
 ```
 
-For a strongly correlated Gaussian, steps of 0.05 are accepted 95% of the time, but the chain diffuses so slowly that 18,000 draws are worth about six independent ones, and its estimate of $\mathbb E[x_1^2]=1$ is off by 30%. Steps of 1.5, accepted 20% of the time, give 732 effective samples; steps of 5, accepted 3% of the time, fall back to 204. The **effective sample size** of a chain, $N/(1+2\sum_k\rho_k)$ in terms of the autocorrelations $\rho_k$ of the sampled quantity, measures how many independent samples the correlated sequence is worth.
+For a strongly correlated Gaussian, steps of 0.05 are accepted 95% of the time, but the chain diffuses so slowly that 18,000 draws are worth about six independent ones, and its estimate of $`\mathbb E[x_1^2]=1`$ is off by 30%. Steps of 1.5, accepted 20% of the time, give 732 effective samples; steps of 5, accepted 3% of the time, fall back to 204. The **effective sample size** of a chain, $`N/(1+2\sum_k\rho_k)`$ in terms of the autocorrelations $`\rho_k`$ of the sampled quantity, measures how many independent samples the correlated sequence is worth.
 
 ### <a id="mixing-and-diagnostics"></a>Mixing and diagnostics
 
@@ -170,31 +170,31 @@ The time a chain needs to forget its starting point, its **mixing time**, can be
 
 <img src="sources/images/ai-approx-ising.png" alt="ai-approx-ising" width="880">
 
-*Left: approximate marginals on $4\times4$ Ising models with random fields $h_i\sim\mathcal N(0,0.3^2)$, against exact values from all 65,536 configurations, averaged over five models per coupling. Mean-field errors grow from 0.0014 at $J=0.05$ to 0.37 at $J=0.5$; loopy belief propagation is far more accurate at weak coupling, with errors of $5\times10^{-6}$ at $J=0.05$ and 0.011 at $J=0.3$, and also degrades once the coupling is strong; Gibbs sampling with 2,000 sweeps has errors of 0.02–0.04 up to $J=0.6$, which grow to 0.22 at $J=1$ as it starts to stick in one of the aligned states. Right: the magnetization of a $24\times24$ grid with no field, under Gibbs sampling started with all spins up. At $J=0.3$ the chain forgets its start within a few sweeps and fluctuates around 0 between $-0.36$ and $0.30$. At $J=0.6$ it stays between 0.79 and 0.99 for all 1,500 sweeps, although by symmetry the true mean is 0.*
+*Left: approximate marginals on $`4\times4`$ Ising models with random fields $`h_i\sim\mathcal N(0,0.3^2)`$, against exact values from all 65,536 configurations, averaged over five models per coupling. Mean-field errors grow from 0.0014 at $`J=0.05`$ to 0.37 at $`J=0.5`$; loopy belief propagation is far more accurate at weak coupling, with errors of $`5\times10^{-6}`$ at $`J=0.05`$ and 0.011 at $`J=0.3`$, and also degrades once the coupling is strong; Gibbs sampling with 2,000 sweeps has errors of 0.02–0.04 up to $`J=0.6`$, which grow to 0.22 at $`J=1`$ as it starts to stick in one of the aligned states. Right: the magnetization of a $`24\times24`$ grid with no field, under Gibbs sampling started with all spins up. At $`J=0.3`$ the chain forgets its start within a few sweeps and fluctuates around 0 between $`-0.36`$ and $`0.30`$. At $`J=0.6`$ it stays between 0.79 and 0.99 for all 1,500 sweeps, although by symmetry the true mean is 0.*
 
-Practitioners discard an initial **burn-in** segment, run several chains from dispersed starting points, and compare the variance within chains to the variance between them (the $\hat R$ statistic of [Gelman and Rubin, 1992](https://doi.org/10.1214/ss/1177011136)); disagreement proves non-convergence, while agreement is only evidence of it. Better samplers change the moves rather than the diagnostics. **Cluster** algorithms such as Swendsen–Wang flip whole aligned regions of an Ising model at once. **Hamiltonian Monte Carlo** ([Neal, 2011](https://arxiv.org/abs/1206.1901)) proposes distant points by simulating the dynamics of a particle on the energy surface $-\log\pi$, using gradients, and is the default sampler of probabilistic programming languages such as Stan for continuous models. **Parallel tempering** runs chains at several temperatures and swaps their states, letting the hot chains carry the cold ones across barriers.
+Practitioners discard an initial **burn-in** segment, run several chains from dispersed starting points, and compare the variance within chains to the variance between them (the $`\hat R`$ statistic of [Gelman and Rubin, 1992](https://doi.org/10.1214/ss/1177011136)); disagreement proves non-convergence, while agreement is only evidence of it. Better samplers change the moves rather than the diagnostics. **Cluster** algorithms such as Swendsen–Wang flip whole aligned regions of an Ising model at once. **Hamiltonian Monte Carlo** ([Neal, 2011](https://arxiv.org/abs/1206.1901)) proposes distant points by simulating the dynamics of a particle on the energy surface $`-\log\pi`$, using gradients, and is the default sampler of probabilistic programming languages such as Stan for continuous models. **Parallel tempering** runs chains at several temperatures and swaps their states, letting the hot chains carry the cold ones across barriers.
 
 ## <a id="variational-inference"></a>Variational inference
 
 ### <a id="inference-as-optimization"></a>Inference as optimization
 
-Variational methods choose a family $\mathcal Q$ of tractable distributions and look for the member closest to the posterior. With the target $p(x)=\tilde p(x)/Z$ known up to its normalizing constant, the **reverse Kullback–Leibler divergence** gives
+Variational methods choose a family $`\mathcal Q`$ of tractable distributions and look for the member closest to the posterior. With the target $`p(x)=\tilde p(x)/Z`$ known up to its normalizing constant, the **reverse Kullback–Leibler divergence** gives
 
 $$
 \mathrm{KL}(q\,\|\,p)=\sum_xq(x)\log\frac{q(x)}{p(x)}=\log Z-\underbrace{\Bigl(\mathbb E_q[\log\tilde p(x)]+H(q)\Bigr)}_{\mathrm{ELBO}(q)}.
 $$
 
-Since the divergence is nonnegative (Foundations chapter 5), the bracketed quantity is a lower bound on $\log Z$, the **evidence lower bound**, and maximizing it over $q$ minimizes the divergence without knowing $Z$. The same bound, with $q$ the distribution of the hidden variables, underlies EM (ML chapter 14), and in the Generative AI module it becomes the training objective of variational autoencoders, where $q$ is produced by a network (Generative AI chapter 3). The reverse divergence penalizes $q$ for putting mass where $p$ has little, not for missing mass where $p$ has some, so its minimizers are **mode-seeking**: a unimodal $q$ fitted to a bimodal $p$ locks onto one mode and underestimates the variance.
+Since the divergence is nonnegative (Foundations chapter 5), the bracketed quantity is a lower bound on $`\log Z`$, the **evidence lower bound**, and maximizing it over $`q`$ minimizes the divergence without knowing $`Z`$. The same bound, with $`q`$ the distribution of the hidden variables, underlies EM (ML chapter 14), and in the Generative AI module it becomes the training objective of variational autoencoders, where $`q`$ is produced by a network (Generative AI chapter 3). The reverse divergence penalizes $`q`$ for putting mass where $`p`$ has little, not for missing mass where $`p`$ has some, so its minimizers are **mode-seeking**: a unimodal $`q`$ fitted to a bimodal $`p`$ locks onto one mode and underestimates the variance.
 
 ### <a id="mean-field"></a>Mean field
 
-The **mean-field** family makes all variables independent, $q(x)=\prod_iq_i(x_i)$. Maximizing the ELBO over one factor with the others fixed has a closed form ([Appendix C](#block-ai10-appendix-c)):
+The **mean-field** family makes all variables independent, $`q(x)=\prod_iq_i(x_i)`$. Maximizing the ELBO over one factor with the others fixed has a closed form ([Appendix C](#block-ai10-appendix-c)):
 
 $$
 q_i(x_i)\propto\exp\Bigl(\mathbb E_{q_{-i}}\bigl[\log\tilde p(x_i,x_{-i})\bigr]\Bigr),
 $$
 
-and cycling through the factors, **coordinate ascent variational inference**, increases the ELBO monotonically to a local optimum. For the Ising model with $\tilde p(s)=\exp\bigl(J\sum_{(i,j)}s_is_j+\sum_ih_is_i\bigr)$ the update gives the mean-field equations of statistical physics, $m_i=\tanh\bigl(h_i+J\sum_{j\in N(i)}m_j\bigr)$ for the means $m_i=\mathbb E_q[s_i]$: each spin sees its neighbors only through their averages. Mean field is cheap and always converges, but it ignores correlations, and it is overconfident: at strong coupling, the means lock into one aligned state.
+and cycling through the factors, **coordinate ascent variational inference**, increases the ELBO monotonically to a local optimum. For the Ising model with $`\tilde p(s)=\exp\bigl(J\sum_{(i,j)}s_is_j+\sum_ih_is_i\bigr)`$ the update gives the mean-field equations of statistical physics, $`m_i=\tanh\bigl(h_i+J\sum_{j\in N(i)}m_j\bigr)`$ for the means $`m_i=\mathbb E_q[s_i]`$: each spin sees its neighbors only through their averages. Mean field is cheap and always converges, but it ignores correlations, and it is overconfident: at strong coupling, the means lock into one aligned state.
 
 ### <a id="loopy-belief-propagation"></a>Loopy belief propagation
 
@@ -258,7 +258,7 @@ for J in [0.1, 0.3, 0.6]:
 # J=0.6: log Z = 16.7990, mean-field ELBO = 16.2644 (a lower bound); largest marginal error: mean field 0.2657, loopy BP 0.1516 after 148 iterations
 ```
 
-On a $4\times4$ Ising model, the mean-field ELBO stays below the exact $\log Z$ at every coupling, as it must, by 0.09 at $J=0.1$ and 0.78 at $J=0.3$. Loopy belief propagation's marginals are about eighty times more accurate than mean field's at $J=0.1$ and ten times at $J=0.3$; at $J=0.6$ both are poor.
+On a $`4\times4`$ Ising model, the mean-field ELBO stays below the exact $`\log Z`$ at every coupling, as it must, by 0.09 at $`J=0.1`$ and 0.78 at $`J=0.3`$. Loopy belief propagation's marginals are about eighty times more accurate than mean field's at $`J=0.1`$ and ten times at $`J=0.3`$; at $`J=0.6`$ both are poor.
 
 ### <a id="choosing-a-method"></a>Choosing a method
 
@@ -266,10 +266,10 @@ On a $4\times4$ Ising model, the mean-field ELBO stays below the exact $\log Z$ 
 | --- | --- | --- | --- | --- |
 | Exact in the limit | yes | yes | no | no (exact on trees) |
 | Main failure | unlikely evidence | slow mixing, undetected | overconfidence, ignores correlations | may not converge; errors on tight cycles |
-| Output | weighted samples | correlated samples | a distribution $q$, a bound on $\log Z$ | approximate marginals |
+| Output | weighted samples | correlated samples | a distribution $`q`$, a bound on $`\log Z`$ | approximate marginals |
 | Typical use | small networks, forward simulation | continuous models, Bayesian statistics | large models, inner loops of learning | coding, vision, networks with many weak loops |
 
-Modern practice mixes the families: variational approximations serve as proposals for importance sampling or MCMC, stochastic gradients of the ELBO scale variational inference to large datasets and non-conjugate models ([Blei, Kucukelbir, and McAuliffe, 2017](https://doi.org/10.1080/01621459.2017.1285773)), and amortized inference trains a network to output $q$ for each observation, which is the step from this chapter to the Generative AI module.
+Modern practice mixes the families: variational approximations serve as proposals for importance sampling or MCMC, stochastic gradients of the ELBO scale variational inference to large datasets and non-conjugate models ([Blei, Kucukelbir, and McAuliffe, 2017](https://doi.org/10.1080/01621459.2017.1285773)), and amortized inference trains a network to output $`q`$ for each observation, which is the step from this chapter to the Generative AI module.
 
 ## <a id="appendices"></a>Appendices
 
@@ -278,19 +278,19 @@ Modern practice mixes the families: variational approximations serve as proposal
 <summary><a id="block-ai10-appendix-a"></a><b>A. Likelihood weighting is consistent</b></summary>
 
 
-Let $Z$ be the non-evidence variables and $E=e$ the evidence. Likelihood weighting samples each non-evidence variable from its CPT given its parents, with evidence variables clamped, so the probability of generating $z$ is
+Let $`Z`$ be the non-evidence variables and $`E=e`$ the evidence. Likelihood weighting samples each non-evidence variable from its CPT given its parents, with evidence variables clamped, so the probability of generating $`z`$ is
 
 $$
 q(z)=\prod_{Z_i\in Z}P\bigl(z_i\mid\mathrm{parents}(Z_i)\bigr),
 $$
 
-with parents' values taken from $z$ and $e$. The weight is $w(z)=\prod_{E_j}P\bigl(e_j\mid\mathrm{parents}(E_j)\bigr)$. Their product is the full factorization, $q(z)\,w(z)=P(z,e)$. For any value $x$ of a query variable,
+with parents' values taken from $`z`$ and $`e`$. The weight is $`w(z)=\prod_{E_j}P\bigl(e_j\mid\mathrm{parents}(E_j)\bigr)`$. Their product is the full factorization, $`q(z)\,w(z)=P(z,e)`$. For any value $`x`$ of a query variable,
 
 $$
 \mathbb E_q\bigl[w\,\mathbb 1[x]\bigr]=\sum_zq(z)\,w(z)\,\mathbb 1[x\in z]=P(x,e),\qquad\mathbb E_q[w]=P(e),
 $$
 
-so by the law of large numbers the ratio of the weighted count to the total weight converges to $P(x,e)/P(e)=P(x\mid e)$. This is importance sampling with proposal $q$ and weights $w=P(z,e)/q(z)$ for the unnormalized target $P(z,e)$.
+so by the law of large numbers the ratio of the weighted count to the total weight converges to $`P(x,e)/P(e)=P(x\mid e)`$. This is importance sampling with proposal $`q`$ and weights $`w=P(z,e)/q(z)`$ for the unnormalized target $`P(z,e)`$.
 
 </details>
 
@@ -300,23 +300,23 @@ so by the law of large numbers the ratio of the weighted count to the total weig
 <summary><a id="block-ai10-appendix-b"></a><b>B. Detailed balance, Metropolis–Hastings, and Gibbs sampling</b></summary>
 
 
-**Detailed balance implies stationarity.** Summing $\pi(x)T(x\to x')=\pi(x')T(x'\to x)$ over $x$ gives $\sum_x\pi(x)T(x\to x')=\pi(x')\sum_xT(x'\to x)=\pi(x')$.
+**Detailed balance implies stationarity.** Summing $`\pi(x)T(x\to x')=\pi(x')T(x'\to x)`$ over $`x`$ gives $`\sum_x\pi(x)T(x\to x')=\pi(x')\sum_xT(x'\to x)=\pi(x')`$.
 
-**Metropolis–Hastings satisfies detailed balance.** For $x\neq x'$, the transition probability is $T(x\to x')=q(x'\mid x)A(x\to x')$. Suppose, without loss of generality, that $\pi(x')q(x\mid x')\le\pi(x)q(x'\mid x)$, so $A(x\to x')=\frac{\pi(x')q(x\mid x')}{\pi(x)q(x'\mid x)}$ and $A(x'\to x)=1$. Then
+**Metropolis–Hastings satisfies detailed balance.** For $`x\neq x'`$, the transition probability is $`T(x\to x')=q(x'\mid x)A(x\to x')`$. Suppose, without loss of generality, that $`\pi(x')q(x\mid x')\le\pi(x)q(x'\mid x)`$, so $`A(x\to x')=\frac{\pi(x')q(x\mid x')}{\pi(x)q(x'\mid x)}`$ and $`A(x'\to x)=1`$. Then
 
 $$
 \pi(x)\,q(x'\mid x)\,A(x\to x')=\pi(x')\,q(x\mid x')=\pi(x')\,q(x\mid x')\,A(x'\to x).
 $$
 
-The self-transitions satisfy detailed balance trivially. Only ratios of $\pi$ appear, so the normalizing constant is never needed.
+The self-transitions satisfy detailed balance trivially. Only ratios of $`\pi`$ appear, so the normalizing constant is never needed.
 
-**Gibbs sampling is Metropolis–Hastings with acceptance 1.** Updating variable $i$ proposes $x'=(x_i',x_{-i})$ with $q(x'\mid x)=\pi(x_i'\mid x_{-i})$. Then
+**Gibbs sampling is Metropolis–Hastings with acceptance 1.** Updating variable $`i`$ proposes $`x'=(x_i',x_{-i})`$ with $`q(x'\mid x)=\pi(x_i'\mid x_{-i})`$. Then
 
 $$
 \frac{\pi(x')\,q(x\mid x')}{\pi(x)\,q(x'\mid x)}=\frac{\pi(x_i'\mid x_{-i})\pi(x_{-i})\;\pi(x_i\mid x_{-i})}{\pi(x_i\mid x_{-i})\pi(x_{-i})\;\pi(x_i'\mid x_{-i})}=1.
 $$
 
-Each single-variable update therefore leaves $\pi$ invariant, and so does any sequence of them. A systematic sweep is not itself reversible, but it has $\pi$ as a stationary distribution, which is what convergence requires together with ergodicity.
+Each single-variable update therefore leaves $`\pi`$ invariant, and so does any sequence of them. A systematic sweep is not itself reversible, but it has $`\pi`$ as a stationary distribution, which is what convergence requires together with ergodicity.
 
 </details>
 
@@ -326,15 +326,15 @@ Each single-variable update therefore leaves $\pi$ invariant, and so does any se
 <summary><a id="block-ai10-appendix-c"></a><b>C. The mean-field update</b></summary>
 
 
-Write the ELBO as a function of one factor $q_j$ with the others fixed. With $q=\prod_iq_i$,
+Write the ELBO as a function of one factor $`q_j`$ with the others fixed. With $`q=\prod_iq_i`$,
 
 $$
 \mathrm{ELBO}=\sum_{x_j}q_j(x_j)\,\mathbb E_{q_{-j}}\bigl[\log\tilde p(x)\bigr]+H(q_j)+\text{const},
 $$
 
-since the entropy of a product is the sum of the entropies. Let $\log g(x_j)=\mathbb E_{q_{-j}}[\log\tilde p(x_j,x_{-j})]$ and $\hat q_j=g/\sum g$. Then the ELBO equals $-\mathrm{KL}(q_j\,\|\,\hat q_j)+\text{const}$, maximized uniquely by $q_j=\hat q_j$, which is the update in the text. Each update increases the ELBO, which is bounded above by $\log Z$, so coordinate ascent converges, in general to a local optimum.
+since the entropy of a product is the sum of the entropies. Let $`\log g(x_j)=\mathbb E_{q_{-j}}[\log\tilde p(x_j,x_{-j})]`$ and $`\hat q_j=g/\sum g`$. Then the ELBO equals $`-\mathrm{KL}(q_j\,\|\,\hat q_j)+\text{const}`$, maximized uniquely by $`q_j=\hat q_j`$, which is the update in the text. Each update increases the ELBO, which is bounded above by $`\log Z`$, so coordinate ascent converges, in general to a local optimum.
 
-**Ising model.** With $\log\tilde p(s)=J\sum_{(i,k)}s_is_k+\sum_ih_is_i$, the terms involving $s_j$ give $\mathbb E_{q_{-j}}[\log\tilde p]=s_j\bigl(h_j+J\sum_{k\in N(j)}m_k\bigr)+\text{const}$, so $q_j(s_j)\propto\exp\bigl(s_j(h_j+J\sum_km_k)\bigr)$, whose mean is $m_j=\tanh\bigl(h_j+J\sum_{k\in N(j)}m_k\bigr)$. The ELBO at the solution is $\sum_ih_im_i+J\sum_{(i,k)}m_im_k+\sum_iH(q_i)$, the quantity printed by the code.
+**Ising model.** With $`\log\tilde p(s)=J\sum_{(i,k)}s_is_k+\sum_ih_is_i`$, the terms involving $`s_j`$ give $`\mathbb E_{q_{-j}}[\log\tilde p]=s_j\bigl(h_j+J\sum_{k\in N(j)}m_k\bigr)+\text{const}`$, so $`q_j(s_j)\propto\exp\bigl(s_j(h_j+J\sum_km_k)\bigr)`$, whose mean is $`m_j=\tanh\bigl(h_j+J\sum_{k\in N(j)}m_k\bigr)`$. The ELBO at the solution is $`\sum_ih_im_i+J\sum_{(i,k)}m_im_k+\sum_iH(q_i)`$, the quantity printed by the code.
 
 </details>
 

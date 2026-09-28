@@ -10,7 +10,7 @@
 
 The model-based agents of chapter 23 use their models mainly to generate experience or to plan a short trajectory of continuous actions. This chapter follows the other great line of model-based RL: **tree search** at decision time, guided by networks that the search itself trains. Chapter 10 introduced Monte Carlo tree search (MCTS) and AI chapter 4 its use in games. Here the focus is on why search and learning reinforce each other, and on the algorithms that turned the idea into superhuman play in Go, chess, and Atari, and then into discoveries in mathematics and computer science.
 
-The key observation is that search is a **policy improvement operator**. Given a policy network $p(a\mid s)$ and a value network $v(s)$, a search that looks ahead from $s$, using $p$ to decide which actions to examine and $v$ to evaluate the positions it reaches, chooses better actions than $p$ alone, because it corrects the network's mistakes with lookahead. Training $p$ to imitate the search's choices, and $v$ to predict the outcomes of games played with search, then improves the networks, which makes the next search better. This is policy iteration (chapter 2) with search as the improvement step and the networks as a compact, generalizing memory of its results. [Anthony, Tian, and Barber (2017)](https://arxiv.org/abs/1705.08439) named it **expert iteration**: the search is an expert, the network an apprentice that imitates it, and the apprentice in turn makes the expert stronger. The next code measures the improvement directly: in tic-tac-toe, whose exact values are known, it gives a search networks with controlled amounts of error and counts how often the search picks an optimal move.
+The key observation is that search is a **policy improvement operator**. Given a policy network $`p(a\mid s)`$ and a value network $`v(s)`$, a search that looks ahead from $`s`$, using $`p`$ to decide which actions to examine and $`v`$ to evaluate the positions it reaches, chooses better actions than $`p`$ alone, because it corrects the network's mistakes with lookahead. Training $`p`$ to imitate the search's choices, and $`v`$ to predict the outcomes of games played with search, then improves the networks, which makes the next search better. This is policy iteration (chapter 2) with search as the improvement step and the networks as a compact, generalizing memory of its results. [Anthony, Tian, and Barber (2017)](https://arxiv.org/abs/1705.08439) named it **expert iteration**: the search is an expert, the network an apprentice that imitates it, and the apprentice in turn makes the expert stronger. The next code measures the improvement directly: in tic-tac-toe, whose exact values are known, it gives a search networks with controlled amounts of error and counts how often the search picks an optimal move.
 
 ```python
 import functools
@@ -131,7 +131,7 @@ With moderately noisy networks, the prior's most likely move is optimal in 79% o
 
 ### <a id="alphago-zero-and-alphazero"></a>AlphaGo Zero and AlphaZero
 
-**AlphaGo Zero** ([Silver et al., 2017](https://doi.org/10.1038/nature24270)) removed the human data and the rollouts. One residual network with a policy head and a value head, $(\mathbf p,v)=f_{\boldsymbol\theta}(s)$, is trained entirely by self-play: every move of every game is chosen by an MCTS of 1,600 simulations guided by the current best network, and the network is trained to predict the search's **visit distribution** $\boldsymbol\pi$ and the game's final **outcome** $z\in\{-1,1\}$ ($\{-1,0,1\}$ in AlphaZero, where draws occur) with the loss
+**AlphaGo Zero** ([Silver et al., 2017](https://doi.org/10.1038/nature24270)) removed the human data and the rollouts. One residual network with a policy head and a value head, $`(\mathbf p,v)=f_{\boldsymbol\theta}(s)`$, is trained entirely by self-play: every move of every game is chosen by an MCTS of 1,600 simulations guided by the current best network, and the network is trained to predict the search's **visit distribution** $`\boldsymbol\pi`$ and the game's final **outcome** $`z\in\{-1,1\}`$ ($`\{-1,0,1\}`$ in AlphaZero, where draws occur) with the loss
 
 $$
 \ell(\boldsymbol\theta)=(z-v)^2-\boldsymbol\pi^\top\ln\mathbf p+c\|\boldsymbol\theta\|^2.
@@ -143,7 +143,7 @@ $$
 a=\arg\max_a\Bigl(Q(s,a)+c_{\text{puct}}\,P(s,a)\,\frac{\sqrt{\sum_bN(s,b)}}{1+N(s,a)}\Bigr),
 $$
 
-a variant of the UCB rule of chapter 3 in which the network's prior $P(s,a)$ decides which moves deserve exploration (AlphaZero let $c_{\text{puct}}$ grow slowly with the number of visits, as MuZero does in [appendix B](#block-rl24-appendix-b)). When it reaches a new position, it evaluates it with the network rather than with a rollout, and backs up the value along the path, with alternating signs for the two players. After 800 simulations, the move is chosen in proportion to the visit counts, with a temperature that makes play varied in the opening moves and nearly greedy afterward. Exploration at the root comes from **Dirichlet noise** added to the prior, $P=(1-\epsilon)\mathbf p+\epsilon\boldsymbol\eta$ with $\boldsymbol\eta\sim\operatorname{Dir}(\alpha)$, $\epsilon=0.25$, and $\alpha$ smaller for games with more legal moves (0.3 for chess, 0.03 for Go), so that the search sometimes examines moves the network considers unlikely (exercise 24.2).
+a variant of the UCB rule of chapter 3 in which the network's prior $`P(s,a)`$ decides which moves deserve exploration (AlphaZero let $`c_{\text{puct}}`$ grow slowly with the number of visits, as MuZero does in [appendix B](#block-rl24-appendix-b)). When it reaches a new position, it evaluates it with the network rather than with a rollout, and backs up the value along the path, with alternating signs for the two players. After 800 simulations, the move is chosen in proportion to the visit counts, with a temperature that makes play varied in the opening moves and nearly greedy afterward. Exploration at the root comes from **Dirichlet noise** added to the prior, $`P=(1-\epsilon)\mathbf p+\epsilon\boldsymbol\eta`$ with $`\boldsymbol\eta\sim\operatorname{Dir}(\alpha)`$, $`\epsilon=0.25`$, and $`\alpha`$ smaller for games with more legal moves (0.3 for chess, 0.03 for Go), so that the search sometimes examines moves the network considers unlikely (exercise 24.2).
 
 Why train the policy on visit counts rather than on the search's best move? The visit distribution is a smoothed version of the search's preferences: moves the search found nearly as good as the best still receive probability, so the network learns a policy that keeps them in consideration, and its cross-entropy loss provides a rich target at every position (exercise 24.3). And why train the value on the final outcome rather than on the search's value? The outcome is unbiased, while the search's value is only as good as the current network, though MuZero and its successors do use bootstrapped targets where games are long.
 
@@ -151,7 +151,7 @@ Why train the policy on visit counts rather than on the search's best move? The 
 
 ### <a id="planning-with-a-learned-model"></a>Planning with a learned model
 
-AlphaZero needs the rules of the game to simulate moves inside its search. **MuZero** ([Schrittwieser et al., 2020](https://www.nature.com/articles/s41586-020-03051-4)) learns a model instead, and it learns only what the search needs: the value-equivalent model of chapter 23. It has three functions. A **representation** $h$ encodes the past observations into a hidden state $s^0$; a **dynamics** function $g$ maps a hidden state and an action to the next hidden state and a predicted reward, $(r^k,s^k)=g(s^{k-1},a^k)$; and a **prediction** function $f$ outputs a policy and a value for each hidden state, $(\mathbf p^k,v^k)=f(s^k)$. The search runs entirely on hidden states, as AlphaZero's does on game positions. Training unrolls the model for $K=5$ steps along the actions actually taken, and at every step $k$ matches the predicted policy to the search's visit distribution, the predicted value to a target $z$ (the game outcome in board games, an $n$-step bootstrapped return in Atari), and the predicted reward to the observed one:
+AlphaZero needs the rules of the game to simulate moves inside its search. **MuZero** ([Schrittwieser et al., 2020](https://www.nature.com/articles/s41586-020-03051-4)) learns a model instead, and it learns only what the search needs: the value-equivalent model of chapter 23. It has three functions. A **representation** $`h`$ encodes the past observations into a hidden state $`s^0`$; a **dynamics** function $`g`$ maps a hidden state and an action to the next hidden state and a predicted reward, $`(r^k,s^k)=g(s^{k-1},a^k)`$; and a **prediction** function $`f`$ outputs a policy and a value for each hidden state, $`(\mathbf p^k,v^k)=f(s^k)`$. The search runs entirely on hidden states, as AlphaZero's does on game positions. Training unrolls the model for $`K=5`$ steps along the actions actually taken, and at every step $`k`$ matches the predicted policy to the search's visit distribution, the predicted value to a target $`z`$ (the game outcome in board games, an $`n`$-step bootstrapped return in Atari), and the predicted reward to the observed one:
 
 $$
 \ell=\sum_{k=0}^{K}\Bigl(\ell^p(\boldsymbol\pi_{t+k},\mathbf p^k)+\ell^v(z_{t+k},v^k)+\ell^r(u_{t+k},r^k)\Bigr)+c\|\boldsymbol\theta\|^2.
@@ -173,11 +173,11 @@ $$
 \bar{\boldsymbol\pi}=\arg\max_{\mathbf y}\Bigl\{\mathbf q^\top\mathbf y-\lambda_N\,D_{\mathrm{KL}}(\mathbf p\,\|\,\mathbf y)\Bigr\},\qquad\lambda_N=c_{\text{puct}}\frac{\sqrt{\sum_bN_b}}{|\mathcal A|+\sum_bN_b},
 $$
 
-where $\mathbf q$ are the search's action values: the improvement of the prior toward higher values with a KL regularizer whose weight decreases as the search progresses. This is the regularized, mirror-descent form of policy improvement of chapter 20, with the KL divergence in the other direction (exercise 24.5). The approximation is poor when the number of simulations is small compared with the number of actions, since visit counts are integers and most actions receive none; Grill et al. showed that computing $\bar{\boldsymbol\pi}$ exactly and using it for acting and training improves MuZero with few simulations.
+where $`\mathbf q`$ are the search's action values: the improvement of the prior toward higher values with a KL regularizer whose weight decreases as the search progresses. This is the regularized, mirror-descent form of policy improvement of chapter 20, with the KL divergence in the other direction (exercise 24.5). The approximation is poor when the number of simulations is small compared with the number of actions, since visit counts are integers and most actions receive none; Grill et al. showed that computing $`\bar{\boldsymbol\pi}`$ exactly and using it for acting and training improves MuZero with few simulations.
 
 ### <a id="gumbel-search"></a>Gumbel search
 
-**Gumbel MuZero** ([Danihelka, Guez, Schrittwieser, and Silver, 2022](https://openreview.net/forum?id=bERaNdoegnO)) redesigned the search, chiefly at the root, so that it improves the policy even with very few simulations. It samples $n$ distinct actions without replacement from the prior with the **Gumbel-top-k trick**: add independent Gumbel noise $g(a)$ to the logits and take the $n$ largest, which samples from the policy without replacement (exercise 24.6). It divides the simulations among them by **sequential halving**, repeatedly discarding the worse half by $g(a)+\text{logits}(a)+\sigma(\hat q(a))$, where $\sigma$ is an increasing transformation of the estimated values, and acts with the survivor. Because the Gumbel-max trick makes $\arg\max_a(g(a)+\text{logits}(a))$ a sample from the prior, adding $\sigma(\hat q)$ can only move the choice toward better actions: the expected value of the chosen action is at least that of the prior policy, a guarantee PUCT lacks. Its training target is the improved policy $\operatorname{softmax}(\text{logits}+\sigma(\text{completed }\hat q))$, where unvisited actions receive an estimate of the state's value. The next code compares the two in the one-step setting, where each simulation reveals an action's value exactly.
+**Gumbel MuZero** ([Danihelka, Guez, Schrittwieser, and Silver, 2022](https://openreview.net/forum?id=bERaNdoegnO)) redesigned the search, chiefly at the root, so that it improves the policy even with very few simulations. It samples $`n`$ distinct actions without replacement from the prior with the **Gumbel-top-k trick**: add independent Gumbel noise $`g(a)`$ to the logits and take the $`n`$ largest, which samples from the policy without replacement (exercise 24.6). It divides the simulations among them by **sequential halving**, repeatedly discarding the worse half by $`g(a)+\text{logits}(a)+\sigma(\hat q(a))`$, where $`\sigma`$ is an increasing transformation of the estimated values, and acts with the survivor. Because the Gumbel-max trick makes $`\arg\max_a(g(a)+\text{logits}(a))`$ a sample from the prior, adding $`\sigma(\hat q)`$ can only move the choice toward better actions: the expected value of the chosen action is at least that of the prior policy, a guarantee PUCT lacks. Its training target is the improved policy $`\operatorname{softmax}(\text{logits}+\sigma(\text{completed }\hat q))`$, where unvisited actions receive an estimate of the state's value. The next code compares the two in the one-step setting, where each simulation reveals an action's value exactly.
 
 ```python
 import math
@@ -266,7 +266,7 @@ On average over random problems, both searches improve on acting with the prior 
 
 ## <a id="search-beyond-games"></a>Search beyond games
 
-The AlphaZero recipe applies wherever a problem can be cast as a game with a simulator and a score. **AlphaTensor** ([Fawzi et al., 2022](https://www.nature.com/articles/s41586-022-05172-4)) cast the discovery of matrix multiplication algorithms as a single-player game, TensorGame, in which each move subtracts a rank-one tensor from the tensor that represents matrix multiplication, and the fewer moves needed to reach zero, the fewer multiplications the algorithm uses. It found algorithms better than the best known for several matrix sizes, including 47 multiplications for $4\times4$ matrices in arithmetic modulo 2, improving on the 49 of Strassen's algorithm applied recursively, which had stood for fifty years. **AlphaDev** ([Mankowitz et al., 2023](https://www.nature.com/articles/s41586-023-06004-9)) played a game of writing assembly instructions, rewarded for correct and fast programs, and discovered sorting routines for short sequences faster than the human-written ones, which were integrated into the standard C++ library of LLVM. **AlphaProof** ([Hubert et al., 2025](https://www.nature.com/articles/s41586-025-09833-y)) searched for proofs in the Lean proof assistant, learning from millions of formalized problems and adapting to each new problem by reinforcement learning on generated variants at test time; with AlphaGeometry 2, it achieved a silver-medal standard at the 2024 International Mathematical Olympiad. Search over the outputs of language models, and the reinforcement learning that trains them to reason, are the subject of chapter 28; search in imperfect-information games, which requires reasoning about what the opponent knows, is part of chapter 27.
+The AlphaZero recipe applies wherever a problem can be cast as a game with a simulator and a score. **AlphaTensor** ([Fawzi et al., 2022](https://www.nature.com/articles/s41586-022-05172-4)) cast the discovery of matrix multiplication algorithms as a single-player game, TensorGame, in which each move subtracts a rank-one tensor from the tensor that represents matrix multiplication, and the fewer moves needed to reach zero, the fewer multiplications the algorithm uses. It found algorithms better than the best known for several matrix sizes, including 47 multiplications for $`4\times4`$ matrices in arithmetic modulo 2, improving on the 49 of Strassen's algorithm applied recursively, which had stood for fifty years. **AlphaDev** ([Mankowitz et al., 2023](https://www.nature.com/articles/s41586-023-06004-9)) played a game of writing assembly instructions, rewarded for correct and fast programs, and discovered sorting routines for short sequences faster than the human-written ones, which were integrated into the standard C++ library of LLVM. **AlphaProof** ([Hubert et al., 2025](https://www.nature.com/articles/s41586-025-09833-y)) searched for proofs in the Lean proof assistant, learning from millions of formalized problems and adapting to each new problem by reinforcement learning on generated variants at test time; with AlphaGeometry 2, it achieved a silver-medal standard at the 2024 International Mathematical Olympiad. Search over the outputs of language models, and the reinforcement learning that trains them to reason, are the subject of chapter 28; search in imperfect-information games, which requires reasoning about what the opponent knows, is part of chapter 27.
 
 Lab 13 implements AlphaZero on small board games, trains it by self-play, and compares PUCT and Gumbel search at small simulation budgets.
 
@@ -274,34 +274,34 @@ Lab 13 implements AlphaZero on small board games, trains it by self-play, and co
 
 ### <a id="exercise-24-1-puct-and-ucb"></a>Exercise 24.1 — PUCT and UCB
 
-Compare PUCT's exploration term $c\,P(s,a)\sqrt{\sum_bN(s,b)}/(1+N(s,a))$ with UCB1's $c\sqrt{\ln\sum_bN(s,b)/N(s,a)}$. (a) How does each treat an action never visited? (b) How fast does each bonus shrink with the action's own visits and grow with the total? (c) What role does the prior play, and what happens if it assigns an optimal move probability $10^{-4}$?
+Compare PUCT's exploration term $`c\,P(s,a)\sqrt{\sum_bN(s,b)}/(1+N(s,a))`$ with UCB1's $`c\sqrt{\ln\sum_bN(s,b)/N(s,a)}`$. (a) How does each treat an action never visited? (b) How fast does each bonus shrink with the action's own visits and grow with the total? (c) What role does the prior play, and what happens if it assigns an optimal move probability $`10^{-4}`$?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) UCB1 must try every action once, since its bonus is infinite at $N=0$. PUCT's bonus at $N=0$ is finite, $cP\sqrt{\sum N}$, so an action with a small prior may never be visited in a search of a few hundred simulations: the prior prunes the tree, which is what makes search in Go's 361 moves affordable.
+(a) UCB1 must try every action once, since its bonus is infinite at $`N=0`$. PUCT's bonus at $`N=0`$ is finite, $`cP\sqrt{\sum N}`$, so an action with a small prior may never be visited in a search of a few hundred simulations: the prior prunes the tree, which is what makes search in Go's 361 moves affordable.
 
-(b) UCB1's bonus shrinks like $1/\sqrt N$ in the action's visits and grows like $\sqrt{\ln\sum N}$; PUCT's shrinks like $1/N$ and grows like $\sqrt{\sum N}$. PUCT therefore explores less within an action and more as the total grows, and its visits concentrate on actions in proportion to the prior and the values, rather than logarithmically, which is what makes the visit counts a useful policy target.
+(b) UCB1's bonus shrinks like $`1/\sqrt N`$ in the action's visits and grows like $`\sqrt{\ln\sum N}`$; PUCT's shrinks like $`1/N`$ and grows like $`\sqrt{\sum N}`$. PUCT therefore explores less within an action and more as the total grows, and its visits concentrate on actions in proportion to the prior and the values, rather than logarithmically, which is what makes the visit counts a useful policy target.
 
-(c) The prior scales the bonus: an action is visited when $cP\sqrt{\sum N}$ exceeds the value gap to the best action. With $P=10^{-4}$ and $c\approx1$, that needs $\sqrt{\sum N}\gtrsim10^4$ times the gap, 100 million simulations for a gap of 1: the search effectively never considers the move. This is why AlphaZero adds Dirichlet noise to the prior at the root during self-play, and why a network that has learned to rule out good moves can stay blind to them.
+(c) The prior scales the bonus: an action is visited when $`cP\sqrt{\sum N}`$ exceeds the value gap to the best action. With $`P=10^{-4}`$ and $`c\approx1`$, that needs $`\sqrt{\sum N}\gtrsim10^4`$ times the gap, 100 million simulations for a gap of 1: the search effectively never considers the move. This is why AlphaZero adds Dirichlet noise to the prior at the root during self-play, and why a network that has learned to rule out good moves can stay blind to them.
 
 </details>
 
 
 ### <a id="exercise-24-2-dirichlet-noise"></a>Exercise 24.2 — Dirichlet noise
 
-AlphaZero mixes the root prior with $\boldsymbol\eta\sim\operatorname{Dir}(\alpha,\dots,\alpha)$ over the $L$ legal moves, with weight 0.25, and chooses $\alpha$ in inverse proportion to the typical number of legal moves, roughly $10/L$ (0.3 for chess, 0.15 for shogi, 0.03 for Go). (a) What is the expected noise mass on each move, and what does a small $\alpha$ do to the distribution of that mass? (b) Why scale $\alpha$ with $1/L$?
+AlphaZero mixes the root prior with $`\boldsymbol\eta\sim\operatorname{Dir}(\alpha,\dots,\alpha)`$ over the $`L`$ legal moves, with weight 0.25, and chooses $`\alpha`$ in inverse proportion to the typical number of legal moves, roughly $`10/L`$ (0.3 for chess, 0.15 for shogi, 0.03 for Go). (a) What is the expected noise mass on each move, and what does a small $`\alpha`$ do to the distribution of that mass? (b) Why scale $`\alpha`$ with $`1/L`$?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) The mean of each component is $1/L$, whatever $\alpha$, so the noise adds $0.25/L$ in expectation to every move. With $\alpha<1$ the samples are sparse: most components are near zero and a few carry most of the mass. The noise therefore gives a large boost to a few random moves in each search, rather than a small boost to all, which is what lets the search examine a move the network has ruled out.
+(a) The mean of each component is $`1/L`$, whatever $`\alpha`$, so the noise adds $`0.25/L`$ in expectation to every move. With $`\alpha<1`$ the samples are sparse: most components are near zero and a few carry most of the mass. The noise therefore gives a large boost to a few random moves in each search, rather than a small boost to all, which is what lets the search examine a move the network has ruled out.
 
-(b) With $\alpha L\approx10$, the number of moves that receive a substantial share of the noise is roughly constant, about ten, across games: a Dirichlet with total concentration $\alpha L$ puts most of its mass on about that many components. The number of moves that the noise forces the search to consider then does not grow with the size of the game.
+(b) With $`\alpha L\approx10`$, the number of moves that receive a substantial share of the noise is roughly constant, about ten, across games: a Dirichlet with total concentration $`\alpha L`$ puts most of its mass on about that many components. The number of moves that the noise forces the search to consider then does not grow with the size of the game.
 
 </details>
 
@@ -317,66 +317,66 @@ AlphaZero mixes the root prior with $\boldsymbol\eta\sim\operatorname{Dir}(\alph
 
 (a) A one-hot target tells the network only which move won; the visit distribution also says which moves were close, so the network learns to keep them in consideration, and its gradient carries information about every examined move at every position. By the analysis of Grill et al., the visit distribution approximates a KL-regularized improvement of the prior, so training on it moves the network a controlled step toward the improved policy, a trust region in the sense of chapter 20. A one-hot target is the unregularized greedy step, which is noisy when the search is short.
 
-(b) The root value is a bootstrapped estimate: it inherits the network's errors, and training on it can reinforce them, the deadly-triad risk of bootstrapping (chapter 12). The outcome is an unbiased Monte Carlo target that anchors the values to reality. It has high variance in long games, which is why MuZero uses $n$-step bootstrapped targets in Atari, where episodes last thousands of steps, and outcomes in board games.
+(b) The root value is a bootstrapped estimate: it inherits the network's errors, and training on it can reinforce them, the deadly-triad risk of bootstrapping (chapter 12). The outcome is an unbiased Monte Carlo target that anchors the values to reality. It has high variance in long games, which is why MuZero uses $`n`$-step bootstrapped targets in Atari, where episodes last thousands of steps, and outcomes in board games.
 
 </details>
 
 
 ### <a id="exercise-24-4-two-player-backups"></a>Exercise 24.4 — Two-player backups
 
-In the tic-tac-toe code, the search backs up a value $v$ along the path and flips its sign at every level. (a) Why? (b) What would happen if the flip were forgotten? (c) How must the backup change in a single-agent problem with rewards and discounting, as in MuZero's Atari games?
+In the tic-tac-toe code, the search backs up a value $`v`$ along the path and flips its sign at every level. (a) Why? (b) What would happen if the flip were forgotten? (c) How must the backup change in a single-agent problem with rewards and discounting, as in MuZero's Atari games?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) The statistics $W(s,a)$ and $Q(s,a)$ at each node are from the point of view of the player who chooses at that node. A leaf's value for the player who moved into it is the negative of its value for the player to move there, and the value alternates at each level; this is the negamax form of minimax (AI chapter 4).
+(a) The statistics $`W(s,a)`$ and $`Q(s,a)`$ at each node are from the point of view of the player who chooses at that node. A leaf's value for the player who moved into it is the negative of its value for the player to move there, and the value alternates at each level; this is the negamax form of minimax (AI chapter 4).
 
 (b) Every node would prefer the moves that are good for the opponent at every other level: the search would help the opponent on alternate moves. Its choices would be nearly random or worse, and the policy trained on them would degrade. It is one of the most common bugs in game-playing search, and one that the accuracy test of the code would reveal immediately.
 
-(c) With one agent, there is no sign flip; instead the value backed up to the parent is $r+\gamma v$, the reward of the transition plus the discounted value of the child. Because rewards in Atari have arbitrary scales, MuZero also normalizes the Q-values in the PUCT rule by the minimum and maximum values seen in the tree, so that the same $c_{\text{puct}}$ works in every game.
+(c) With one agent, there is no sign flip; instead the value backed up to the parent is $`r+\gamma v`$, the reward of the transition plus the discounted value of the child. Because rewards in Atari have arbitrary scales, MuZero also normalizes the Q-values in the PUCT rule by the minimum and maximum values seen in the tree, so that the same $`c_{\text{puct}}`$ works in every game.
 
 </details>
 
 
 ### <a id="exercise-24-5-mcts-as-regularized-policy-optimization"></a>Exercise 24.5 — MCTS as regularized policy optimization
 
-(a) Show that the maximizer of $\mathbf q^\top\mathbf y-\lambda D_{\mathrm{KL}}(\mathbf p\,\|\,\mathbf y)$ over distributions $\mathbf y$ is $y(a)=\lambda p(a)/(\alpha-q(a))$, with $\alpha>\max_aq(a)$ chosen so that $\mathbf y$ sums to 1. (b) Compare it with the maximizer of $\mathbf q^\top\mathbf y-\lambda D_{\mathrm{KL}}(\mathbf y\,\|\,\mathbf p)$, the mirror descent step of chapter 20. How do the two treat an action with a small prior and a large value?
+(a) Show that the maximizer of $`\mathbf q^\top\mathbf y-\lambda D_{\mathrm{KL}}(\mathbf p\,\|\,\mathbf y)`$ over distributions $`\mathbf y`$ is $`y(a)=\lambda p(a)/(\alpha-q(a))`$, with $`\alpha>\max_aq(a)`$ chosen so that $`\mathbf y`$ sums to 1. (b) Compare it with the maximizer of $`\mathbf q^\top\mathbf y-\lambda D_{\mathrm{KL}}(\mathbf y\,\|\,\mathbf p)`$, the mirror descent step of chapter 20. How do the two treat an action with a small prior and a large value?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) $D_{\mathrm{KL}}(\mathbf p\,\|\,\mathbf y)=\sum_ap(a)\ln(p(a)/y(a))$. With a multiplier $\alpha$ for the constraint, stationarity gives $q(a)+\lambda p(a)/y(a)-\alpha=0$, so $y(a)=\lambda p(a)/(\alpha-q(a))$, positive when $\alpha>q(a)$. The sum decreases from infinity to 0 as $\alpha$ increases from $\max_aq$, so exactly one $\alpha$ normalizes it; it can be found by bisection.
+(a) $`D_{\mathrm{KL}}(\mathbf p\,\|\,\mathbf y)=\sum_ap(a)\ln(p(a)/y(a))`$. With a multiplier $`\alpha`$ for the constraint, stationarity gives $`q(a)+\lambda p(a)/y(a)-\alpha=0`$, so $`y(a)=\lambda p(a)/(\alpha-q(a))`$, positive when $`\alpha>q(a)`$. The sum decreases from infinity to 0 as $`\alpha`$ increases from $`\max_aq`$, so exactly one $`\alpha`$ normalizes it; it can be found by bisection.
 
-(b) Mirror descent gives $y(a)\propto p(a)e^{q(a)/\lambda}$. Both multiply the prior by an increasing function of the value. The exponential factor can overcome any prior: with a large value and a small $\lambda$, even a tiny prior probability becomes large. The factor $1/(\alpha-q(a))$ is bounded by $1/(\alpha-\max q)$ and diverges only for the best action as $\lambda\to0$, when $\alpha$ approaches $\max q$: the reverse KL is **mass-covering**, never letting $\mathbf y$ put too little probability where $\mathbf p$ has it, so it changes the prior more conservatively where values are close. In both, the weight $\lambda$ plays the role of an inverse step size; in MCTS it decreases like $1/\sqrt{\sum N}$, so more search means a larger step away from the prior.
+(b) Mirror descent gives $`y(a)\propto p(a)e^{q(a)/\lambda}`$. Both multiply the prior by an increasing function of the value. The exponential factor can overcome any prior: with a large value and a small $`\lambda`$, even a tiny prior probability becomes large. The factor $`1/(\alpha-q(a))`$ is bounded by $`1/(\alpha-\max q)`$ and diverges only for the best action as $`\lambda\to0`$, when $`\alpha`$ approaches $`\max q`$: the reverse KL is **mass-covering**, never letting $`\mathbf y`$ put too little probability where $`\mathbf p`$ has it, so it changes the prior more conservatively where values are close. In both, the weight $`\lambda`$ plays the role of an inverse step size; in MCTS it decreases like $`1/\sqrt{\sum N}`$, so more search means a larger step away from the prior.
 
 </details>
 
 
 ### <a id="exercise-24-6-sampling-with-gumbel-noise"></a>Exercise 24.6 — Sampling with Gumbel noise
 
-(a) Show that if $g(a)$ are independent standard Gumbel variables, then $\arg\max_a(g(a)+\ell(a))$ is distributed as $\operatorname{softmax}(\boldsymbol\ell)$. (b) Why does the set of the $n$ largest values of $g(a)+\ell(a)$ form a sample of $n$ actions without replacement from the same distribution? (c) Use (a) to prove that $\mathbb E[q(A)]\ge\sum_a\operatorname{softmax}(\boldsymbol\ell)_aq(a)$ for $A=\arg\max_{a\in S}(g(a)+\ell(a)+\sigma(q(a)))$, where $S$ is the set of the $n$ sampled actions and $\sigma$ is increasing, when the values are known exactly.
+(a) Show that if $`g(a)`$ are independent standard Gumbel variables, then $`\arg\max_a(g(a)+\ell(a))`$ is distributed as $`\operatorname{softmax}(\boldsymbol\ell)`$. (b) Why does the set of the $`n`$ largest values of $`g(a)+\ell(a)`$ form a sample of $`n`$ actions without replacement from the same distribution? (c) Use (a) to prove that $`\mathbb E[q(A)]\ge\sum_a\operatorname{softmax}(\boldsymbol\ell)_aq(a)`$ for $`A=\arg\max_{a\in S}(g(a)+\ell(a)+\sigma(q(a)))`$, where $`S`$ is the set of the $`n`$ sampled actions and $`\sigma`$ is increasing, when the values are known exactly.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Adding $\ell(a)$ to a standard Gumbel variable gives a Gumbel variable with location $\ell(a)$, whose CDF is $\exp(-e^{-(x-\ell(a))})$. The probability that $a$ attains the maximum is $\int f_a(x)\prod_{b\ne a}F_b(x)\,dx$, which evaluates to $e^{\ell(a)}/\sum_be^{\ell(b)}$: the Gumbel-max trick.
+(a) Adding $`\ell(a)`$ to a standard Gumbel variable gives a Gumbel variable with location $`\ell(a)`$, whose CDF is $`\exp(-e^{-(x-\ell(a))})`$. The probability that $`a`$ attains the maximum is $`\int f_a(x)\prod_{b\ne a}F_b(x)\,dx`$, which evaluates to $`e^{\ell(a)}/\sum_be^{\ell(b)}`$: the Gumbel-max trick.
 
-(b) Transform: $E(a)=e^{-(g(a)+\ell(a))}$ is exponentially distributed with rate $e^{\ell(a)}$, and the largest perturbed values are the smallest $E(a)$, the first arrivals in a race of independent exponential clocks. The first clock to ring is $a$ with probability $e^{\ell(a)}/\sum_be^{\ell(b)}$, and by the memorylessness of exponential distributions, the remaining clocks then restart as fresh independent exponentials with the same rates, so the second to ring is a softmax sample from the remaining actions, and so on. The top $n$, in order, are therefore a sample of $n$ actions without replacement ([Kool, van Hoof, and Welling, 2019](https://arxiv.org/abs/1903.06059)).
+(b) Transform: $`E(a)=e^{-(g(a)+\ell(a))}`$ is exponentially distributed with rate $`e^{\ell(a)}`$, and the largest perturbed values are the smallest $`E(a)`$, the first arrivals in a race of independent exponential clocks. The first clock to ring is $`a`$ with probability $`e^{\ell(a)}/\sum_be^{\ell(b)}`$, and by the memorylessness of exponential distributions, the remaining clocks then restart as fresh independent exponentials with the same rates, so the second to ring is a softmax sample from the remaining actions, and so on. The top $`n`$, in order, are therefore a sample of $`n`$ actions without replacement ([Kool, van Hoof, and Welling, 2019](https://arxiv.org/abs/1903.06059)).
 
-(c) Let $A_0=\arg\max_a(g(a)+\ell(a))$, which is in $S$ and is distributed as the prior by (a). Among the actions of $S$, $A$ maximizes $g+\ell+\sigma(q)$ and $A_0$ maximizes $g+\ell$, so $g(A)+\ell(A)+\sigma(q(A))\ge g(A_0)+\ell(A_0)+\sigma(q(A_0))$ and $g(A)+\ell(A)\le g(A_0)+\ell(A_0)$. Together these give $\sigma(q(A))\ge\sigma(q(A_0))$, so $q(A)\ge q(A_0)$ for every draw of the noise, and taking expectations, $\mathbb E[q(A)]\ge\mathbb E[q(A_0)]=\sum_a\operatorname{softmax}(\boldsymbol\ell)_aq(a)$. With estimated rather than exact values, the guarantee holds for the estimates, which is why Gumbel MuZero also uses sequential halving to spend its simulations on the most promising sampled actions.
+(c) Let $`A_0=\arg\max_a(g(a)+\ell(a))`$, which is in $`S`$ and is distributed as the prior by (a). Among the actions of $`S`$, $`A`$ maximizes $`g+\ell+\sigma(q)`$ and $`A_0`$ maximizes $`g+\ell`$, so $`g(A)+\ell(A)+\sigma(q(A))\ge g(A_0)+\ell(A_0)+\sigma(q(A_0))`$ and $`g(A)+\ell(A)\le g(A_0)+\ell(A_0)`$. Together these give $`\sigma(q(A))\ge\sigma(q(A_0))`$, so $`q(A)\ge q(A_0)`$ for every draw of the noise, and taking expectations, $`\mathbb E[q(A)]\ge\mathbb E[q(A_0)]=\sum_a\operatorname{softmax}(\boldsymbol\ell)_aq(a)`$. With estimated rather than exact values, the guarantee holds for the estimates, which is why Gumbel MuZero also uses sequential halving to spend its simulations on the most promising sampled actions.
 
 </details>
 
 
 ### <a id="exercise-24-7-what-muzero-s-hidden-state-must-encode"></a>Exercise 24.7 — What MuZero's hidden state must encode
 
-MuZero's model is trained only to predict policies, values, and rewards over $K$ steps. (a) Give an example of information about the environment that its hidden state need not represent. (b) What does this imply for reusing the model for a new task in the same environment? (c) Why unroll for $K$ steps rather than predicting only from the encoded current state?
+MuZero's model is trained only to predict policies, values, and rewards over $`K`$ steps. (a) Give an example of information about the environment that its hidden state need not represent. (b) What does this imply for reusing the model for a new task in the same environment? (c) Why unroll for $`K`$ steps rather than predicting only from the encoded current state?
 
 
 <details>
@@ -394,14 +394,14 @@ MuZero's model is trained only to predict policies, values, and rewards over $K$
 
 ### <a id="exercise-24-8-measuring-progress-in-self-play"></a>Exercise 24.8 — Measuring progress in self-play
 
-Self-play progress is measured by **Elo ratings**: a player rated $R_A$ is expected to score $1/(1+10^{(R_B-R_A)/400})$ against one rated $R_B$. (a) What score does a 200-point difference predict? (b) Why is winning against the previous version of oneself not enough to establish progress? (c) How did AlphaGo Zero evaluate new networks, and how did AlphaZero change this?
+Self-play progress is measured by **Elo ratings**: a player rated $`R_A`$ is expected to score $`1/(1+10^{(R_B-R_A)/400})`$ against one rated $`R_B`$. (a) What score does a 200-point difference predict? (b) Why is winning against the previous version of oneself not enough to establish progress? (c) How did AlphaGo Zero evaluate new networks, and how did AlphaZero change this?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) $1/(1+10^{-0.5})\approx0.76$: the stronger player scores about 76%.
+(a) $`1/(1+10^{-0.5})\approx0.76`$: the stronger player scores about 76%.
 
 (b) Strength in games need not be transitive: a new version can beat its predecessor by exploiting a specific weakness while losing to older versions or to other styles of play, and self-play can cycle through such strategies without improving. Measuring against a fixed pool of opponents, or against many past versions, detects this; multi-agent training with populations and leagues (chapter 27) addresses it directly.
 
@@ -418,7 +418,7 @@ Self-play progress is measured by **Elo ratings**: a player rated $R_A$ is expec
 
 
 - **Self-play actors** play games with the latest network. At each move they run MCTS (800 simulations in AlphaZero, 1,600 in AlphaGo Zero), with Dirichlet noise added to the root prior, choose moves in proportion to the visit counts for the first moves (30 in AlphaGo Zero) and greedily afterward, and store each position with its visit distribution and, at the end of the game, the outcome from the point of view of the player to move.
-- **The learner** samples positions uniformly from recent games (the last 500,000 games in AlphaGo Zero, a million in AlphaZero's pseudocode) and minimizes $(z-v)^2-\boldsymbol\pi^\top\ln\mathbf p+c\|\boldsymbol\theta\|^2$ with SGD with momentum and a decreasing step size. AlphaGo Zero also augmented the data with the eight rotations and reflections of the Go board; AlphaZero, designed for games without these symmetries, did not.
+- **The learner** samples positions uniformly from recent games (the last 500,000 games in AlphaGo Zero, a million in AlphaZero's pseudocode) and minimizes $`(z-v)^2-\boldsymbol\pi^\top\ln\mathbf p+c\|\boldsymbol\theta\|^2`$ with SGD with momentum and a decreasing step size. AlphaGo Zero also augmented the data with the eight rotations and reflections of the Go board; AlphaZero, designed for games without these symmetries, did not.
 - **Scale.** AlphaZero trained for 700,000 steps with minibatches of 4,096 positions, with self-play generated by 5,000 first-generation TPUs.
 - **Search details.** The network evaluates positions in batches, with a **virtual loss** that temporarily counts a node being evaluated as a loss so that parallel simulations explore different paths; unvisited children are initialized with a value (the parent's value, or a loss, depending on the implementation); and the search tree is reused for the next move, keeping the subtree below the move played.
 
@@ -430,9 +430,9 @@ Self-play progress is measured by **Elo ratings**: a player rated $R_A$ is expec
 <summary><a id="block-rl24-appendix-b"></a><b>B. MuZero in practice</b></summary>
 
 
-- **Unroll and targets.** $K=5$ steps; value targets are game outcomes in board games and $n$-step returns in Atari ($n=10$, $\gamma=0.997$), bootstrapped from the root value of the search run when the data were generated; MuZero Reanalyze instead bootstraps from a target network's value, with $n=5$. Values and rewards in Atari are represented as categorical distributions over a transformed scale, with the invertible rescaling of R2D2 (exercise 18.6).
-- **Search.** The PUCT constant grows slowly with the number of visits, $c=c_1+\ln\bigl((\sum_bN_b+c_2+1)/c_2\bigr)$ with $c_1=1.25$ and $c_2=19{,}652$; Q-values are normalized by the minimum and maximum seen in the tree; 800 simulations per move in board games, 50 in Atari.
-- **Gradient scaling.** The gradient through the dynamics function is halved at each unroll step, and the loss of each unrolled step is scaled by $1/K$, so that the total gradient does not grow with the unroll length.
+- **Unroll and targets.** $`K=5`$ steps; value targets are game outcomes in board games and $`n`$-step returns in Atari ($`n=10`$, $`\gamma=0.997`$), bootstrapped from the root value of the search run when the data were generated; MuZero Reanalyze instead bootstraps from a target network's value, with $`n=5`$. Values and rewards in Atari are represented as categorical distributions over a transformed scale, with the invertible rescaling of R2D2 (exercise 18.6).
+- **Search.** The PUCT constant grows slowly with the number of visits, $`c=c_1+\ln\bigl((\sum_bN_b+c_2+1)/c_2\bigr)`$ with $`c_1=1.25`$ and $`c_2=19{,}652`$; Q-values are normalized by the minimum and maximum seen in the tree; 800 simulations per move in board games, 50 in Atari.
+- **Gradient scaling.** The gradient through the dynamics function is halved at each unroll step, and the loss of each unrolled step is scaled by $`1/K`$, so that the total gradient does not grow with the unroll length.
 - **Reanalyze.** A fraction of each batch comes from old trajectories whose policy targets are recomputed by a fresh search with the latest network (MuZero Unplugged also takes the value targets from it); with a high fraction, MuZero becomes highly data-efficient and, with only reanalysis, an offline algorithm.
 
 </details>

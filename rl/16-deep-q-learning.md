@@ -14,13 +14,13 @@ Neural networks had been used as value functions long before. TD-Gammon learned 
 
 ### <a id="fitted-q-iteration-with-neural-networks"></a>Fitted Q iteration with neural networks
 
-DQN's ancestor is **fitted Q iteration** (chapter 12): given a data set of transitions, repeatedly fit a function approximator to the targets $r+\gamma\max_{a'}\hat q_k(s',a')$ computed with the previous iterate, a sequence of supervised regressions. With trees it was introduced by [Ernst, Geurts, and Wehenkel (2005)](https://jmlr.org/papers/v6/ernst05a.html); **neural fitted Q iteration** (NFQ) ([Riedmiller, 2005](https://doi.org/10.1007/11564096_32)) fitted a multilayer network to the whole data set at each iteration and solved small control problems from few interactions. Each regression is stable because its targets are fixed while it is solved. DQN turns this batch procedure into an online agent that collects its data as it learns, keeping two of its ingredients: a large store of past transitions, and targets that are held fixed for a while.
+DQN's ancestor is **fitted Q iteration** (chapter 12): given a data set of transitions, repeatedly fit a function approximator to the targets $`r+\gamma\max_{a'}\hat q_k(s',a')`$ computed with the previous iterate, a sequence of supervised regressions. With trees it was introduced by [Ernst, Geurts, and Wehenkel (2005)](https://jmlr.org/papers/v6/ernst05a.html); **neural fitted Q iteration** (NFQ) ([Riedmiller, 2005](https://doi.org/10.1007/11564096_32)) fitted a multilayer network to the whole data set at each iteration and solved small control problems from few interactions. Each regression is stable because its targets are fixed while it is solved. DQN turns this batch procedure into an online agent that collects its data as it learns, keeping two of its ingredients: a large store of past transitions, and targets that are held fixed for a while.
 
 ## <a id="the-dqn-agent"></a>The DQN agent
 
 ### <a id="experience-replay"></a>Experience replay
 
-DQN stores the agent's transitions $(S_t,A_t,R_{t+1},S_{t+1})$ in a **replay memory** of fixed capacity, the last million in the original, and updates the network on minibatches sampled uniformly from it, an idea due to [Lin (1992)](https://doi.org/10.1007/BF00992699). Replay does three things:
+DQN stores the agent's transitions $`(S_t,A_t,R_{t+1},S_{t+1})`$ in a **replay memory** of fixed capacity, the last million in the original, and updates the network on minibatches sampled uniformly from it, an idea due to [Lin (1992)](https://doi.org/10.1007/BF00992699). Replay does three things:
 
 - **It decorrelates the updates.** Consecutive transitions are strongly correlated, and stochastic gradient descent on them is like training a classifier on data sorted by class: the network chases the recent past and forgets the rest.
 - **It reuses data.** Each transition contributes to many updates instead of one, which improves sample efficiency.
@@ -30,25 +30,25 @@ Replay also makes the method off-policy by construction, since the stored transi
 
 ### <a id="the-target-network"></a>The target network
 
-The second ingredient is a separate **target network** $\hat q(\cdot,\cdot;\mathbf w^-)$, a copy of the online network whose weights are updated only every $C$ updates, 10,000 in the original. The targets are computed with it,
+The second ingredient is a separate **target network** $`\hat q(\cdot,\cdot;\mathbf w^-)`$, a copy of the online network whose weights are updated only every $`C`$ updates, 10,000 in the original. The targets are computed with it,
 
 $$
 y=r+\gamma\max_{a'}\hat q(s',a';\mathbf w^-),\qquad L(\mathbf w)=\mathbb E_{(s,a,r,s')\sim\mathcal D}\bigl[\ell\bigl(y-\hat q(s,a;\mathbf w)\bigr)\bigr],
 $$
 
-so that between copies, the online network solves a fixed regression problem, as in fitted Q iteration. Without it, each update moves the targets in the direction of the update, and because the network generalizes, raising $\hat q(s,a)$ also raises $\hat q(s',a')$ for similar states, the bootstrapping loop that can spiral into divergence. An alternative to periodic copies is **Polyak averaging**, $\mathbf w^-\leftarrow(1-\tau)\mathbf w^-+\tau\mathbf w$ at every step with a small $\tau$ (0.001 in the original, 0.005 in later actor–critic methods), introduced for continuous control ([Lillicrap et al., 2016](https://arxiv.org/abs/1509.02971)) and standard in actor–critic methods (exercise 16.5).
+so that between copies, the online network solves a fixed regression problem, as in fitted Q iteration. Without it, each update moves the targets in the direction of the update, and because the network generalizes, raising $`\hat q(s,a)`$ also raises $`\hat q(s',a')`$ for similar states, the bootstrapping loop that can spiral into divergence. An alternative to periodic copies is **Polyak averaging**, $`\mathbf w^-\leftarrow(1-\tau)\mathbf w^-+\tau\mathbf w`$ at every step with a small $`\tau`$ (0.001 in the original, 0.005 in later actor–critic methods), introduced for continuous control ([Lillicrap et al., 2016](https://arxiv.org/abs/1509.02971)) and standard in actor–critic methods (exercise 16.5).
 
-The loss $\ell$ in the original was the squared error with the error term clipped to $[-1,1]$, which is equivalent to the **Huber loss**: quadratic for errors smaller than 1 and linear beyond, so that its gradient is the error, clipped (exercise 16.2). Large, occasional errors from bootstrapped targets then cannot dominate the updates.
+The loss $`\ell`$ in the original was the squared error with the error term clipped to $`[-1,1]`$, which is equivalent to the **Huber loss**: quadratic for errors smaller than 1 and linear beyond, so that its gradient is the error, clipped (exercise 16.2). Large, occasional errors from bootstrapped targets then cannot dominate the updates.
 
 ### <a id="the-full-recipe"></a>The full recipe
 
 The DQN of the 2015 paper has many further details, most of which became defaults:
 
-- **Preprocessing.** Each frame is the maximum of two consecutive emulator frames (some games flicker), converted to grayscale and downsampled to $84\times84$; the network's input is a stack of the last 4 such frames, which makes motion visible (chapter 14).
+- **Preprocessing.** Each frame is the maximum of two consecutive emulator frames (some games flicker), converted to grayscale and downsampled to $`84\times84`$; the network's input is a stack of the last 4 such frames, which makes motion visible (chapter 14).
 - **Action repeat.** The agent chooses an action every 4 frames and repeats it in between, which quadruples the speed of play and makes decisions coarser.
-- **Architecture.** Three convolutional layers (32 filters of $8\times8$ with stride 4, 64 of $4\times4$ with stride 2, 64 of $3\times3$ with stride 1) and a fully connected layer of 512 units, with ReLU activations, followed by one output per action, so that one forward pass gives all the action values.
-- **Rewards.** Clipped to $\{-1,0,+1\}$, which lets one learning rate serve all games but changes what is optimized: the agent maximizes the number of rewarding events rather than the score (exercise 16.3).
-- **Training.** RMSProp with step size 0.00025, minibatches of 32, one update every 4 actions, $\gamma=0.99$, and ε-greedy exploration with ε annealed from 1 to 0.1 over the first million steps; the replay memory is filled with 50,000 transitions before learning starts; training takes 50 million steps per game, which the paper calls frames: 200 million emulator frames with the action repeat, about 38 days of play.
+- **Architecture.** Three convolutional layers (32 filters of $`8\times8`$ with stride 4, 64 of $`4\times4`$ with stride 2, 64 of $`3\times3`$ with stride 1) and a fully connected layer of 512 units, with ReLU activations, followed by one output per action, so that one forward pass gives all the action values.
+- **Rewards.** Clipped to $`\{-1,0,+1\}`$, which lets one learning rate serve all games but changes what is optimized: the agent maximizes the number of rewarding events rather than the score (exercise 16.3).
+- **Training.** RMSProp with step size 0.00025, minibatches of 32, one update every 4 actions, $`\gamma=0.99`$, and ε-greedy exploration with ε annealed from 1 to 0.1 over the first million steps; the replay memory is filled with 50,000 transitions before learning starts; training takes 50 million steps per game, which the paper calls frames: 200 million emulator frames with the action repeat, about 38 days of play.
 - **Episodes.** During training, losing a life is treated as the end of an episode, which speeds learning in games with several lives; evaluation episodes start with a random number, up to 30, of no-op actions, so that the agent cannot memorize a single deterministic trajectory.
 
 The whole algorithm, with its ε-greedy behavior, replay, and target network, fits in a few dozen lines. The next code runs it on Gymnasium's CartPole with a small network, once with the target network copied every 500 steps and once every 100.
@@ -142,17 +142,17 @@ The two runs show the three characteristic behaviors of DQN. With copies every 5
 
 <img src="sources/images/rl-dqn-cartpole.png" alt="rl-dqn-cartpole" width="880">
 
-*DQN on CartPole, the runs of the code above, evaluated every 1,000 steps. Left: the greedy policy's episode length (the maximum is 500). Right: the network's prediction $\max_a\hat q(s_0,a)$ of the value of the start state (solid) against the policy's actual discounted return (dashed). With a target network copied every 500 steps, the predictions lag far behind the returns. With copies every 100 steps they catch up, overshoot the largest possible return, and the policy collapses after reaching the maximum.*
+*DQN on CartPole, the runs of the code above, evaluated every 1,000 steps. Left: the greedy policy's episode length (the maximum is 500). Right: the network's prediction $`\max_a\hat q(s_0,a)`$ of the value of the start state (solid) against the policy's actual discounted return (dashed). With a target network copied every 500 steps, the predictions lag far behind the returns. With copies every 100 steps they catch up, overshoot the largest possible return, and the policy collapses after reaching the maximum.*
 
 ### <a id="measuring-progress"></a>Measuring progress
 
-On Atari, performance is summarized by the **human-normalized score** of each game, $(\text{agent}-\text{random})/(\text{human}-\text{random})$, and its median across games, which is less sensitive than the mean to a few games with enormous scores. DQN's median, with no-op starts, is about 94% over the 49 games of the original evaluation ([van Hasselt, Guez, and Silver, 2016](https://arxiv.org/abs/1509.06461)) and about 79% over the 57 games later adopted as the standard suite ([Wang et al., 2016](https://arxiv.org/abs/1511.06581)); its successors, in the next two chapters, exceed human performance on most of the 57 games of the standard suite. Two lessons about evaluation emerged over the following years. Deterministic emulators allow agents to exploit memorized action sequences, so evaluations add **sticky actions**, which repeat the previous action with probability 0.25 ([Machado et al., 2018](https://doi.org/10.1613/jair.5699)). And deep RL results vary enormously across random seeds and implementation details ([Henderson et al., 2018](https://arxiv.org/abs/1709.06560)), so comparisons need many runs and interval estimates of robust aggregates, such as the interquartile mean with bootstrap confidence intervals, rather than point estimates from a few seeds ([Agarwal et al., 2021](https://arxiv.org/abs/2108.13264)).
+On Atari, performance is summarized by the **human-normalized score** of each game, $`(\text{agent}-\text{random})/(\text{human}-\text{random})`$, and its median across games, which is less sensitive than the mean to a few games with enormous scores. DQN's median, with no-op starts, is about 94% over the 49 games of the original evaluation ([van Hasselt, Guez, and Silver, 2016](https://arxiv.org/abs/1509.06461)) and about 79% over the 57 games later adopted as the standard suite ([Wang et al., 2016](https://arxiv.org/abs/1511.06581)); its successors, in the next two chapters, exceed human performance on most of the 57 games of the standard suite. Two lessons about evaluation emerged over the following years. Deterministic emulators allow agents to exploit memorized action sequences, so evaluations add **sticky actions**, which repeat the previous action with probability 0.25 ([Machado et al., 2018](https://doi.org/10.1613/jair.5699)). And deep RL results vary enormously across random seeds and implementation details ([Henderson et al., 2018](https://arxiv.org/abs/1709.06560)), so comparisons need many runs and interval estimates of robust aggregates, such as the interquartile mean with bootstrap confidence intervals, rather than point estimates from a few seeds ([Agarwal et al., 2021](https://arxiv.org/abs/2108.13264)).
 
 ## <a id="overestimation-and-double-dqn"></a>Overestimation and double DQN
 
 ### <a id="where-overestimation-comes-from"></a>Where overestimation comes from
 
-Chapter 7 showed that the maximum of noisy estimates is biased upward: if each $\hat q(s,a)$ has independent zero-mean error, $\mathbb E[\max_a\hat q(s,a)]\ge\max_a q(s,a)$, and the bias grows with the number of actions and the size of the errors (exercise 16.6). [Thrun and Schwartz (1993)](https://publications.ri.cmu.edu/issues-in-using-function-approximation-for-reinforcement-learning) pointed out that function approximation produces such errors even without noise in the rewards, and that bootstrapping propagates the bias from state to state. [van Hasselt, Guez, and Silver (2016)](https://arxiv.org/abs/1509.06461) showed that it occurs in DQN on Atari, where the estimated values of many games were far above the returns the policies achieved, and that it harms the policies.
+Chapter 7 showed that the maximum of noisy estimates is biased upward: if each $`\hat q(s,a)`$ has independent zero-mean error, $`\mathbb E[\max_a\hat q(s,a)]\ge\max_a q(s,a)`$, and the bias grows with the number of actions and the size of the errors (exercise 16.6). [Thrun and Schwartz (1993)](https://publications.ri.cmu.edu/issues-in-using-function-approximation-for-reinforcement-learning) pointed out that function approximation produces such errors even without noise in the rewards, and that bootstrapping propagates the bias from state to state. [van Hasselt, Guez, and Silver (2016)](https://arxiv.org/abs/1509.06461) showed that it occurs in DQN on Atari, where the estimated values of many games were far above the returns the policies achieved, and that it harms the policies.
 
 ```python
 import numpy as np
@@ -198,7 +198,7 @@ In this experiment the regression targets are the exact true values, and there i
 
 <img src="sources/images/rl-dqn-overestimation.png" alt="rl-dqn-overestimation" width="880">
 
-*Left: ten polynomial fits (gray) to the same true values, sin(s), each fitted by least squares to the exact true values at the integer states in $[-6,6]$ except two adjacent interior ones. The maximum over the fits (red) is far above the true maximum where some fit overshoots; the double estimate (dashed), which chooses the action with these fits and evaluates it with a second set fitted with different points left out, is nearly unbiased. Right: the average error of the two estimates of the maximum as the number of actions grows, for two true value functions. The left panel follows Figure 2 of van Hasselt, Guez, and Silver (2016).*
+*Left: ten polynomial fits (gray) to the same true values, sin(s), each fitted by least squares to the exact true values at the integer states in $`[-6,6]`$ except two adjacent interior ones. The maximum over the fits (red) is far above the true maximum where some fit overshoots; the double estimate (dashed), which chooses the action with these fits and evaluates it with a second set fitted with different points left out, is nearly unbiased. Right: the average error of the two estimates of the maximum as the number of actions grows, for two true value functions. The left panel follows Figure 2 of van Hasselt, Guez, and Silver (2016).*
 
 ### <a id="double-dqn"></a>Double DQN
 
@@ -214,13 +214,13 @@ The two networks are not independent, so the bias is reduced rather than removed
 
 ### <a id="dueling-networks"></a>Dueling networks
 
-In many states the choice of action matters little: in a racing game, when no car is near, every action has nearly the same value. The **dueling architecture** ([Wang et al., 2016](https://arxiv.org/abs/1511.06581)) splits the network after the shared convolutional layers into two streams, one estimating the state value $V(s)$ and one the advantages $A(s,a)$, and combines them as
+In many states the choice of action matters little: in a racing game, when no car is near, every action has nearly the same value. The **dueling architecture** ([Wang et al., 2016](https://arxiv.org/abs/1511.06581)) splits the network after the shared convolutional layers into two streams, one estimating the state value $`V(s)`$ and one the advantages $`A(s,a)`$, and combines them as
 
 $$
 \hat q(s,a)=V(s)+\Bigl(A(s,a)-\frac1{|\mathcal A|}\sum_{b}A(s,b)\Bigr).
 $$
 
-The subtraction makes the decomposition identifiable: without it, adding a constant to $V$ and subtracting it from every $A$ gives the same $\hat q$ (exercise 16.4). Every update then improves $V(s)$, which is shared by all actions, even though only one action's value is observed per transition, and the network learns which states are valuable without having to learn the effect of each action in each of them. Dueling networks improved DQN and double DQN on most Atari games, and the architecture is a standard component of later agents.
+The subtraction makes the decomposition identifiable: without it, adding a constant to $`V`$ and subtracting it from every $`A`$ gives the same $`\hat q`$ (exercise 16.4). Every update then improves $`V(s)`$, which is shared by all actions, even though only one action's value is observed per transition, and the network learns which states are valuable without having to learn the effect of each action in each of them. Dueling networks improved DQN and double DQN on most Atari games, and the architecture is a standard component of later agents.
 
 ### <a id="other-heads-and-inputs"></a>Other heads and inputs
 
@@ -258,7 +258,7 @@ Lab 8 trains two dozen DQN agents at once on the cart-pole to measure the effect
 <summary><b>Solution</b></summary>
 
 
-(a) With the target weights $\mathbf w^-_k$ fixed, the loss $\mathbb E_{\mathcal D}[\ell(r+\gamma\max_{a'}\hat q(s',a';\mathbf w^-_k)-\hat q(s,a;\mathbf w))]$ is a regression of the targets on the state–action pairs of the data set. Minimizing it fully gives $\mathbf w_{k+1}$, the approximator's best fit to the backed-up values of $\hat q_k$, and copying it to the target network starts the next regression: this is exactly fitted Q iteration with the network class as the regression method (with the Huber loss instead of the squared error).
+(a) With the target weights $`\mathbf w^-_k`$ fixed, the loss $`\mathbb E_{\mathcal D}[\ell(r+\gamma\max_{a'}\hat q(s',a';\mathbf w^-_k)-\hat q(s,a;\mathbf w))]`$ is a regression of the targets on the state–action pairs of the data set. Minimizing it fully gives $`\mathbf w_{k+1}`$, the approximator's best fit to the backed-up values of $`\hat q_k`$, and copying it to the target network starts the next regression: this is exactly fitted Q iteration with the network class as the regression method (with the Huber loss instead of the squared error).
 
 (b) With new data arriving, the regression problem changes with the data distribution, and the procedure is fitted Q iteration on a moving data set, whose fixed point depends on the behavior of the agent itself. With a short copy period, each regression is only partially solved, and the method moves toward the semi-gradient Q-learning of chapter 12, in which the targets move with every update. The CartPole runs show both sides: copying every 500 steps propagates values one step per copy and is slow; copying every 100 steps propagates them faster, at the risk of instability.
 
@@ -267,18 +267,18 @@ Lab 8 trains two dozen DQN agents at once on the cart-pole to measure the effect
 
 ### <a id="exercise-16-2-error-clipping-is-the-huber-loss"></a>Exercise 16.2 — Error clipping is the Huber loss
 
-The Huber loss with threshold $\delta$ is $\ell_\delta(e)=e^2/2$ for $|e|\le\delta$ and $\delta(|e|-\delta/2)$ otherwise. (a) Compute its derivative. (b) Show that clipping the TD error to $[-1,1]$ in the gradient of the squared loss, as the DQN paper describes, is gradient descent on $\ell_1$. (c) What does the Huber loss estimate, when the targets are noisy?
+The Huber loss with threshold $`\delta`$ is $`\ell_\delta(e)=e^2/2`$ for $`|e|\le\delta`$ and $`\delta(|e|-\delta/2)`$ otherwise. (a) Compute its derivative. (b) Show that clipping the TD error to $`[-1,1]`$ in the gradient of the squared loss, as the DQN paper describes, is gradient descent on $`\ell_1`$. (c) What does the Huber loss estimate, when the targets are noisy?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) $\ell'_\delta(e)=e$ for $|e|\le\delta$ and $\delta\,\mathrm{sign}(e)$ otherwise: the error, clipped to $[-\delta,\delta]$.
+(a) $`\ell'_\delta(e)=e`$ for $`|e|\le\delta`$ and $`\delta\,\mathrm{sign}(e)`$ otherwise: the error, clipped to $`[-\delta,\delta]`$.
 
-(b) The gradient of $\tfrac12(y-\hat q(s,a;\mathbf w))^2$ with respect to $\mathbf w$ is $-(y-\hat q)\nabla\hat q$. Replacing the error by its clipped value gives $-\mathrm{clip}(y-\hat q,-1,1)\nabla\hat q$, which by (a) is the gradient of $\ell_1(y-\hat q)$.
+(b) The gradient of $`\tfrac12(y-\hat q(s,a;\mathbf w))^2`$ with respect to $`\mathbf w`$ is $`-(y-\hat q)\nabla\hat q`$. Replacing the error by its clipped value gives $`-\mathrm{clip}(y-\hat q,-1,1)\nabla\hat q`$, which by (a) is the gradient of $`\ell_1(y-\hat q)`$.
 
-(c) The minimizer of $\mathbb E[\ell_\delta(Y-c)]$ over $c$ is a robust location estimate between the mean (for large $\delta$) and the median (for small $\delta$). When the distribution of the target is skewed, the Huber loss does not estimate the mean, and so it does not estimate the expected return exactly; in practice $\delta$ is large relative to typical errors after reward clipping, and the difference is small, but it is one more way in which the practical algorithm departs from Q-learning.
+(c) The minimizer of $`\mathbb E[\ell_\delta(Y-c)]`$ over $`c`$ is a robust location estimate between the mean (for large $`\delta`$) and the median (for small $`\delta`$). When the distribution of the target is skewed, the Huber loss does not estimate the mean, and so it does not estimate the expected return exactly; in practice $`\delta`$ is large relative to typical errors after reward clipping, and the difference is small, but it is one more way in which the practical algorithm departs from Q-learning.
 
 </details>
 
@@ -294,50 +294,50 @@ The Huber loss with threshold $\delta$ is $\ell_\delta(e)=e^2/2$ for $|e|\le\del
 
 (a) After clipping, the first sequence earns 1 and the second 10, so the agent prefers the second, although its score is ten times lower. With clipping, the agent maximizes the (discounted) number of positive events minus the number of negative ones, not the score.
 
-(b) Rewards in Atari games range over several orders of magnitude, from 1 to thousands of points per event, and a single learning rate and a single network architecture had to work for all of them: without clipping, the gradients of games with large rewards would be enormous. The alternatives normalize the targets rather than the rewards. **Pop-Art** adaptively rescales the targets while preserving the network's outputs ([van Hasselt et al., 2016](https://arxiv.org/abs/1602.07714)); an invertible squashing function applied to the value, $h(x)=\mathrm{sign}(x)(\sqrt{|x|+1}-1)+\epsilon x$, used by R2D2 and its successors, compresses large values while preserving the greedy policy in deterministic environments ([Pohlen et al., 2018](https://arxiv.org/abs/1805.11593); chapter 18).
+(b) Rewards in Atari games range over several orders of magnitude, from 1 to thousands of points per event, and a single learning rate and a single network architecture had to work for all of them: without clipping, the gradients of games with large rewards would be enormous. The alternatives normalize the targets rather than the rewards. **Pop-Art** adaptively rescales the targets while preserving the network's outputs ([van Hasselt et al., 2016](https://arxiv.org/abs/1602.07714)); an invertible squashing function applied to the value, $`h(x)=\mathrm{sign}(x)(\sqrt{|x|+1}-1)+\epsilon x`$, used by R2D2 and its successors, compresses large values while preserving the greedy policy in deterministic environments ([Pohlen et al., 2018](https://arxiv.org/abs/1805.11593); chapter 18).
 
 </details>
 
 
 ### <a id="exercise-16-4-identifiability-in-the-dueling-architecture"></a>Exercise 16.4 — Identifiability in the dueling architecture
 
-(a) Show that $Q(s,a)=V(s)+A(s,a)$ does not determine $V$ and $A$. (b) With $Q(s,a)=V(s)+A(s,a)-\max_bA(s,b)$, what are $V$ and $A$ in terms of $Q$? (c) With the mean instead of the maximum?
+(a) Show that $`Q(s,a)=V(s)+A(s,a)`$ does not determine $`V`$ and $`A`$. (b) With $`Q(s,a)=V(s)+A(s,a)-\max_bA(s,b)`$, what are $`V`$ and $`A`$ in terms of $`Q`$? (c) With the mean instead of the maximum?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) For any function $c(s)$, $V+c$ and $A-c$ give the same $Q$, so the two streams cannot be recovered from $Q$, and gradient descent may let them drift in opposite directions without changing any output.
+(a) For any function $`c(s)`$, $`V+c`$ and $`A-c`$ give the same $`Q`$, so the two streams cannot be recovered from $`Q`$, and gradient descent may let them drift in opposite directions without changing any output.
 
-(b) Maximizing both sides over $a$ gives $\max_aQ(s,a)=V(s)$, so the value stream estimates the optimal value, and $A(s,a)-\max_bA(s,b)=Q(s,a)-V(s)$, the advantage of $a$ relative to the best action, which is 0 for the greedy action. $A$ itself is still determined only up to a constant, but that constant cancels in $Q$.
+(b) Maximizing both sides over $`a`$ gives $`\max_aQ(s,a)=V(s)`$, so the value stream estimates the optimal value, and $`A(s,a)-\max_bA(s,b)=Q(s,a)-V(s)`$, the advantage of $`a`$ relative to the best action, which is 0 for the greedy action. $`A`$ itself is still determined only up to a constant, but that constant cancels in $`Q`$.
 
-(c) Averaging over $a$ gives $V(s)=\frac1{|\mathcal A|}\sum_aQ(s,a)$, the mean action value rather than the maximum, and the centered advantages sum to zero. The version with the maximum gives $V$ its intended meaning, but [Wang et al. (2016)](https://arxiv.org/abs/1511.06581) found that the mean made optimization more stable: the advantages only need to change as fast as their mean, not as fast as the maximum, which switches from one action to another.
+(c) Averaging over $`a`$ gives $`V(s)=\frac1{|\mathcal A|}\sum_aQ(s,a)`$, the mean action value rather than the maximum, and the centered advantages sum to zero. The version with the maximum gives $`V`$ its intended meaning, but [Wang et al. (2016)](https://arxiv.org/abs/1511.06581) found that the mean made optimization more stable: the advantages only need to change as fast as their mean, not as fast as the maximum, which switches from one action to another.
 
 </details>
 
 
 ### <a id="exercise-16-5-periodic-copies-and-polyak-averaging"></a>Exercise 16.5 — Periodic copies and Polyak averaging
 
-(a) If the target network is copied every $C$ steps, how old, on average, are its weights? (b) With Polyak averaging, $\mathbf w^-\leftarrow(1-\tau)\mathbf w^-+\tau\mathbf w$, what is the average age of the weights it contains? (c) Which $\tau$ corresponds to $C=500$?
+(a) If the target network is copied every $`C`$ steps, how old, on average, are its weights? (b) With Polyak averaging, $`\mathbf w^-\leftarrow(1-\tau)\mathbf w^-+\tau\mathbf w`$, what is the average age of the weights it contains? (c) Which $`\tau`$ corresponds to $`C=500`$?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Just after a copy, the target weights are from the current step; just before the next, they are $C-1$ steps old. Averaged over the period, their age is $(C-1)/2$ steps.
+(a) Just after a copy, the target weights are from the current step; just before the next, they are $`C-1`$ steps old. Averaged over the period, their age is $`(C-1)/2`$ steps.
 
-(b) Unrolling the update, $\mathbf w^-_t=\sum_{k\ge0}\tau(1-\tau)^k\mathbf w_{t-k}$ (plus a vanishing contribution of the initial weights), a geometric average of past weights with mean age $\sum_kk\,\tau(1-\tau)^k=(1-\tau)/\tau$ steps.
+(b) Unrolling the update, $`\mathbf w^-_t=\sum_{k\ge0}\tau(1-\tau)^k\mathbf w_{t-k}`$ (plus a vanishing contribution of the initial weights), a geometric average of past weights with mean age $`\sum_kk\,\tau(1-\tau)^k=(1-\tau)/\tau`$ steps.
 
-(c) Matching $(1-\tau)/\tau=(C-1)/2$ gives $\tau=2/(C+1)\approx0.004$ for $C=500$. The averaged target changes smoothly instead of jumping, which avoids the discontinuities in the regression problem at each copy, and the lag, not the mechanism, is what sets the speed at which value information propagates.
+(c) Matching $`(1-\tau)/\tau=(C-1)/2`$ gives $`\tau=2/(C+1)\approx0.004`$ for $`C=500`$. The averaged target changes smoothly instead of jumping, which avoids the discontinuities in the regression problem at each copy, and the lag, not the mechanism, is what sets the speed at which value information propagates.
 
 </details>
 
 
 ### <a id="exercise-16-6-how-large-is-the-maximization-bias"></a>Exercise 16.6 — How large is the maximization bias?
 
-Let $M$ actions have true value 0 and estimates with independent $\mathcal N(0,\sigma^2)$ errors. (a) Compute $\mathbb E[\max_a\hat q(a)]$ for $\sigma=1$, and compare with $\sqrt{2\ln M}$. (b) Show that the double estimator is unbiased when all true values are equal, and negatively biased otherwise.
+Let $`M`$ actions have true value 0 and estimates with independent $`\mathcal N(0,\sigma^2)`$ errors. (a) Compute $`\mathbb E[\max_a\hat q(a)]`$ for $`\sigma=1`$, and compare with $`\sqrt{2\ln M}`$. (b) Show that the double estimator is unbiased when all true values are equal, and negatively biased otherwise.
 
 
 <details>
@@ -372,9 +372,9 @@ print(f"true values (0, -1): single estimator bias {A.max(1).mean():+.3f}, doubl
 # true values (0, -1): single estimator bias +0.201, double estimator bias -0.240
 ```
 
-(a) The expected maximum of $M$ standard normals is $\int x\,M\phi(x)\Phi(x)^{M-1}dx$: $1/\sqrt\pi\approx0.564$ for two actions, 1.54 for ten, and 1.82 for Atari's 18. It grows like $\sqrt{2\ln M}$, which it approaches slowly from below. The bias is proportional to $\sigma$, so it matters most where the estimates are least accurate, which early in training is everywhere, and bootstrapping carries it from state to state.
+(a) The expected maximum of $`M`$ standard normals is $`\int x\,M\phi(x)\Phi(x)^{M-1}dx`$: $`1/\sqrt\pi\approx0.564`$ for two actions, 1.54 for ten, and 1.82 for Atari's 18. It grows like $`\sqrt{2\ln M}`$, which it approaches slowly from below. The bias is proportional to $`\sigma`$, so it matters most where the estimates are least accurate, which early in training is everywhere, and bootstrapping carries it from state to state.
 
-(b) The double estimator reads $\hat q_B(a^*)$ with $a^*=\arg\max_a\hat q_A(a)$ chosen from independent estimates, so $\mathbb E[\hat q_B(a^*)\mid a^*]=q(a^*)$ and $\mathbb E[\hat q_B(a^*)]=\mathbb E[q(a^*)]\le\max_aq(a)$, with equality when all true values are equal. With values 0 and $-1$, the double estimator sometimes chooses the worse action, and its expectation, $-0.24$, is below the true maximum, while the single estimator's is $+0.20$ above it ([van Hasselt, 2010](https://papers.nips.cc/paper_files/paper/2010/hash/091d584fced301b442654dd8c23b3fc9-Abstract.html)).
+(b) The double estimator reads $`\hat q_B(a^*)`$ with $`a^*=\arg\max_a\hat q_A(a)`$ chosen from independent estimates, so $`\mathbb E[\hat q_B(a^*)\mid a^*]=q(a^*)`$ and $`\mathbb E[\hat q_B(a^*)]=\mathbb E[q(a^*)]\le\max_aq(a)`$, with equality when all true values are equal. With values 0 and $`-1`$, the double estimator sometimes chooses the worse action, and its expectation, $`-0.24`$, is below the true maximum, while the single estimator's is $`+0.20`$ above it ([van Hasselt, 2010](https://papers.nips.cc/paper_files/paper/2010/hash/091d584fced301b442654dd8c23b3fc9-Abstract.html)).
 
 </details>
 
@@ -388,7 +388,7 @@ DQN treats the loss of a life as the end of an episode during training, but not 
 <summary><b>Solution</b></summary>
 
 
-(a) With a life loss treated as terminal, the target at that transition is $r$ with no bootstrapped continuation, so the value function estimates the discounted reward until the next loss of a life, not until the end of the game. The two differ by the discounted value of the remaining lives.
+(a) With a life loss treated as terminal, the target at that transition is $`r`$ with no bootstrapped continuation, so the value function estimates the discounted reward until the next loss of a life, not until the end of the game. The two differ by the discounted value of the remaining lives.
 
 (b) It helps because losing a life is usually bad, and the terminal signal makes that immediately visible in the targets, without waiting for bootstrapping to propagate the lower value of the states with fewer lives. It can hurt in games where losing a life is sometimes the best move, for example to reposition, since the agent then undervalues it; and it makes the state non-Markov if the number of remaining lives, which changes the value, is not visible. [Machado et al. (2018)](https://doi.org/10.1613/jair.5699) recommend against it as a source of game-specific knowledge in evaluations.
 
@@ -404,7 +404,7 @@ DQN trained for 50 million agent steps per game, each repeating an action for 4 
 <summary><b>Solution</b></summary>
 
 
-(a) 50 million steps are 50 million transitions, and one update every 4 steps gives 12.5 million updates of 32 transitions, 400 million sampled transitions: each transition is replayed 8 times on average, a **replay ratio** of one update per 4 steps with minibatches of 32. The memory holds the last million transitions, so each transition stays in it for a million steps, during which it is sampled with probability $32/10^6$ at each of 250,000 updates, again 8 times on average.
+(a) 50 million steps are 50 million transitions, and one update every 4 steps gives 12.5 million updates of 32 transitions, 400 million sampled transitions: each transition is replayed 8 times on average, a **replay ratio** of one update per 4 steps with minibatches of 32. The memory holds the last million transitions, so each transition stays in it for a million steps, during which it is sampled with probability $`32/10^6`$ at each of 250,000 updates, again 8 times on average.
 
 (b) With the action repeat, 50 million steps are 200 million emulator frames, which at 60 frames per second take about 3.3 million seconds: 926 hours, or 38.6 days of continuous play per game, the paper's 38 days. The human testers practiced for about two hours per game. This gap in sample efficiency, rather than in final performance, drives much of chapter 18, and it is why later papers state their budgets carefully in emulator frames or in agent steps.
 
@@ -418,14 +418,14 @@ DQN trained for 50 million agent steps per game, each repeating an action for 4 
 <summary><a id="block-rl16-appendix-a"></a><b>A. The DQN algorithm</b></summary>
 
 
-Initialize the online network $\hat q(\cdot,\cdot;\mathbf w)$ and the target network with $\mathbf w^-=\mathbf w$, and an empty replay memory $\mathcal D$ of capacity $N$. For each step $t$:
+Initialize the online network $`\hat q(\cdot,\cdot;\mathbf w)`$ and the target network with $`\mathbf w^-=\mathbf w`$, and an empty replay memory $`\mathcal D`$ of capacity $`N`$. For each step $`t`$:
 
-1. Observe the preprocessed state $S_t$ (the stack of the last frames). With probability $\varepsilon_t$ choose a random action, otherwise $A_t=\arg\max_a\hat q(S_t,a;\mathbf w)$. Repeat it for the fixed number of frames, receive the total reward, clipped, and observe $S_{t+1}$ and whether the episode (or a life) ended.
-2. Store $(S_t,A_t,R_{t+1},S_{t+1},\text{done}_{t+1})$ in $\mathcal D$, overwriting the oldest transition when it is full.
-3. Every $k$ steps, once $\mathcal D$ holds enough transitions, sample a minibatch $\{(s_j,a_j,r_j,s'_j,d_j)\}$ uniformly from $\mathcal D$, compute $y_j=r_j+\gamma(1-d_j)\max_{a'}\hat q(s'_j,a';\mathbf w^-)$ (or the double DQN target), and take a gradient step on $\frac1B\sum_j\ell\bigl(y_j-\hat q(s_j,a_j;\mathbf w)\bigr)$ with respect to $\mathbf w$.
-4. Every $C$ updates, set $\mathbf w^-\leftarrow\mathbf w$.
+1. Observe the preprocessed state $`S_t`$ (the stack of the last frames). With probability $`\varepsilon_t`$ choose a random action, otherwise $`A_t=\arg\max_a\hat q(S_t,a;\mathbf w)`$. Repeat it for the fixed number of frames, receive the total reward, clipped, and observe $`S_{t+1}`$ and whether the episode (or a life) ended.
+2. Store $`(S_t,A_t,R_{t+1},S_{t+1},\text{done}_{t+1})`$ in $`\mathcal D`$, overwriting the oldest transition when it is full.
+3. Every $`k`$ steps, once $`\mathcal D`$ holds enough transitions, sample a minibatch $`\{(s_j,a_j,r_j,s'_j,d_j)\}`$ uniformly from $`\mathcal D`$, compute $`y_j=r_j+\gamma(1-d_j)\max_{a'}\hat q(s'_j,a';\mathbf w^-)`$ (or the double DQN target), and take a gradient step on $`\frac1B\sum_j\ell\bigl(y_j-\hat q(s_j,a_j;\mathbf w)\bigr)`$ with respect to $`\mathbf w`$.
+4. Every $`C`$ updates, set $`\mathbf w^-\leftarrow\mathbf w`$.
 
-Only true terminations set $d_j=1$: an episode cut off by a time limit is not over, and its last transition must bootstrap (Lab 6 shows what goes wrong otherwise). The memory stores frames, not stacks: storing each frame once and assembling the stacks when sampling reduces the memory of a million transitions from about 56 GB to about 7 GB.
+Only true terminations set $`d_j=1`$: an episode cut off by a time limit is not over, and its last transition must bootstrap (Lab 6 shows what goes wrong otherwise). The memory stores frames, not stacks: storing each frame once and assembling the stacks when sampling reduces the memory of a million transitions from about 56 GB to about 7 GB.
 
 </details>
 
@@ -435,7 +435,7 @@ Only true terminations set $d_j=1$: an episode cut off by a time limit is not ov
 <summary><a id="block-rl16-appendix-b"></a><b>B. Why a target network stabilizes: a linear example</b></summary>
 
 
-Consider linear function approximation, $\hat q(s,a)=\boldsymbol\phi(s,a)^\top\mathbf w$, and expected updates on a fixed data distribution $\mu$. Without a target network, semi-gradient Q-learning for a fixed greedy policy is the linear system $\mathbf w\leftarrow\mathbf w+\alpha(\mathbf b-M\mathbf w)$ with $M=\Phi^\top D(\Phi-\gamma P_\pi\Phi)$, which converges only if the eigenvalues of $M$ have positive real parts, a condition that off-policy distributions can violate (chapter 12). With a target network updated every $C$ steps and the regression solved exactly in between, the update of the target weights becomes $\mathbf w^-\leftarrow(\Phi^\top D\Phi)^{-1}\Phi^\top D(\mathbf r+\gamma P_\pi\Phi\mathbf w^-)$, the projected Bellman operator $\Pi_\mu T_\pi$ in weight space. It converges if $\Pi_\mu T_\pi$ is a contraction, which holds for the on-policy distribution and for averagers (chapter 12), and can fail otherwise, as the least-squares example of Tsitsiklis and Van Roy (1996) in chapter 12 shows. So the target network does not remove the deadly triad; it replaces the conditions for the stability of a stochastic approximation by those of fitted value iteration. The price is speed: information propagates one Bellman backup per copy.
+Consider linear function approximation, $`\hat q(s,a)=\boldsymbol\phi(s,a)^\top\mathbf w`$, and expected updates on a fixed data distribution $`\mu`$. Without a target network, semi-gradient Q-learning for a fixed greedy policy is the linear system $`\mathbf w\leftarrow\mathbf w+\alpha(\mathbf b-M\mathbf w)`$ with $`M=\Phi^\top D(\Phi-\gamma P_\pi\Phi)`$, which converges only if the eigenvalues of $`M`$ have positive real parts, a condition that off-policy distributions can violate (chapter 12). With a target network updated every $`C`$ steps and the regression solved exactly in between, the update of the target weights becomes $`\mathbf w^-\leftarrow(\Phi^\top D\Phi)^{-1}\Phi^\top D(\mathbf r+\gamma P_\pi\Phi\mathbf w^-)`$, the projected Bellman operator $`\Pi_\mu T_\pi`$ in weight space. It converges if $`\Pi_\mu T_\pi`$ is a contraction, which holds for the on-policy distribution and for averagers (chapter 12), and can fail otherwise, as the least-squares example of Tsitsiklis and Van Roy (1996) in chapter 12 shows. So the target network does not remove the deadly triad; it replaces the conditions for the stability of a stochastic approximation by those of fitted value iteration. The price is speed: information propagates one Bellman backup per copy.
 
 </details>
 

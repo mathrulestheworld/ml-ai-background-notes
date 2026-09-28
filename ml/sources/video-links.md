@@ -31,6 +31,6 @@ The lecture recordings of the two courses in the course links, arranged by chapt
 | 14. Gaussian Mixtures and Expectation Maximization | [Feb 25: Learning with hidden variables and EM](https://www.youtube.com/watch?v=E16cqVHXow8)<br>[Mar 4: Gaussian mixtures, EM and clustering](https://www.youtube.com/watch?v=ek0JtB1Ftn0) | — |
 | 15. Gaussian Processes | — | [Video 26](https://www.youtube.com/watch?v=R-NUdqxKjos) · [Video 27](https://www.youtube.com/watch?v=BzHJ57QCdVo) |
 | 16. Semi-Supervised and Active Learning | [Mar 30: Semi-supervised learning](https://www.youtube.com/watch?v=gnNLjX50F7U)<br>[Apr 1: Active learning](https://www.youtube.com/watch?v=2BZhsEakEH8) | — |
-| 17. Smoothing, Density Estimation, and Basis Expansions | — | [Video 27](https://www.youtube.com/watch?v=BzHJ57QCdVo), later portion: $k$-d trees and ball trees |
+| 17. Smoothing, Density Estimation, and Basis Expansions | — | [Video 27](https://www.youtube.com/watch?v=BzHJ57QCdVo), later portion: $`k`$-d trees and ball trees |
 
 Some lectures cover more than one chapter. The CMU lecture of 12 January introduces decision trees (chapter 9) as the first example of learning; the lecture of 4 February compares generative and discriminative classifiers (chapters 4–5); the boosting lecture of 18 March returns to the perceptron (chapter 2); and the SVM lecture of 25 March includes semi-supervised learning (chapter 16). Cornell video 21, from the model-selection lecture, also introduces kernels (chapter 8).

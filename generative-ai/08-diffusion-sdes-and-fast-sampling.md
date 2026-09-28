@@ -14,33 +14,33 @@ $$
 dx=f(x,t)\,dt+g(t)\,dW
 $$
 
-describes a path that moves with a deterministic **drift** $f$ and is shaken by a **Brownian motion** $W$, whose increments over a time $h$ are independent Gaussians of variance $h$, scaled by the **diffusion coefficient** $g$. Its simplest numerical solution, the **Euler–Maruyama** method, repeats
+describes a path that moves with a deterministic **drift** $`f`$ and is shaken by a **Brownian motion** $`W`$, whose increments over a time $`h`$ are independent Gaussians of variance $`h`$, scaled by the **diffusion coefficient** $`g`$. Its simplest numerical solution, the **Euler–Maruyama** method, repeats
 
 $$
 x_{k+1}=x_k+f(x_k,t_k)\,h+g(t_k)\sqrt h\;z_k,\qquad z_k\sim\mathcal N(0,I),
 $$
 
-with an error that shrinks as the step $h$ does: for the distribution of the result, in proportion to $h$ ([Kloeden and Platen, 1992](https://link.springer.com/book/10.1007/978-3-662-12616-5)). The noise term scales with $\sqrt h$ rather than $h$, which is what makes the paths continuous but nowhere smooth. Langevin dynamics is an SDE of this kind, with the score as its drift (chapter 6, Appendix A).
+with an error that shrinks as the step $`h`$ does: for the distribution of the result, in proportion to $`h`$ ([Kloeden and Platen, 1992](https://link.springer.com/book/10.1007/978-3-662-12616-5)). The noise term scales with $`\sqrt h`$ rather than $`h`$, which is what makes the paths continuous but nowhere smooth. Langevin dynamics is an SDE of this kind, with the score as its drift (chapter 6, Appendix A).
 
 ### <a id="variance-preserving-and-variance-exploding-processes"></a>Variance-preserving and variance-exploding processes
 
-[Song et al. (2021)](https://arxiv.org/abs/2011.13456), in a paper that received an outstanding paper award at ICLR 2021, observed that both noising schemes are SDEs. With $\beta_t=\beta(t)\,h$, the DDPM step $x_t=\sqrt{1-\beta_t}\,x_{t-1}+\sqrt{\beta_t}\,z$ is an Euler–Maruyama step of the **variance-preserving** (VP) SDE
+[Song et al. (2021)](https://arxiv.org/abs/2011.13456), in a paper that received an outstanding paper award at ICLR 2021, observed that both noising schemes are SDEs. With $`\beta_t=\beta(t)\,h`$, the DDPM step $`x_t=\sqrt{1-\beta_t}\,x_{t-1}+\sqrt{\beta_t}\,z`$ is an Euler–Maruyama step of the **variance-preserving** (VP) SDE
 
 $$
 dx=-\tfrac12\beta(t)\,x\,dt+\sqrt{\beta(t)}\,dW,
 $$
 
-whose marginals are $\mathcal N(\sqrt{\bar\alpha(t)}\,x_0,(1-\bar\alpha(t))I)$ with $\bar\alpha(t)=\exp(-\int_0^t\beta)$; they used $\beta(t)$ rising linearly from 0.1 to 20 over $t\in[0,1]$. Adding noise of growing variance $\sigma(t)^2$ without shrinking the data, as the noise-conditional score network does, is the **variance-exploding** (VE) SDE
+whose marginals are $`\mathcal N(\sqrt{\bar\alpha(t)}\,x_0,(1-\bar\alpha(t))I)`$ with $`\bar\alpha(t)=\exp(-\int_0^t\beta)`$; they used $`\beta(t)`$ rising linearly from 0.1 to 20 over $`t\in[0,1]`$. Adding noise of growing variance $`\sigma(t)^2`$ without shrinking the data, as the noise-conditional score network does, is the **variance-exploding** (VE) SDE
 
 $$
 dx=\sqrt{\frac{d\,[\sigma(t)^2]}{dt}}\;dW,
 $$
 
-whose marginals are $\mathcal N(x_0,\sigma(t)^2I)$, with $\sigma$ growing to a maximum large enough to swamp the data. The two differ only by a change of coordinates: dividing the VP state by $\sqrt{\bar\alpha(t)}$ gives the VE state with $\sigma(t)^2=(1-\bar\alpha(t))/\bar\alpha(t)=1/\operatorname{SNR}(t)$. What distinguishes one noising process from another is the signal-to-noise ratio as a function of time, as in chapter 7, and how the state is scaled, which matters for the network, not for the mathematics. [Karras et al. (2022)](https://arxiv.org/abs/2206.00364) wrote every such process as $x_t=s(t)\bigl(x_0+\sigma(t)\,\epsilon\bigr)$ and argued for the simplest choice, $s(t)=1$ and $\sigma(t)=t$, which this chapter uses for sampling.
+whose marginals are $`\mathcal N(x_0,\sigma(t)^2I)`$, with $`\sigma`$ growing to a maximum large enough to swamp the data. The two differ only by a change of coordinates: dividing the VP state by $`\sqrt{\bar\alpha(t)}`$ gives the VE state with $`\sigma(t)^2=(1-\bar\alpha(t))/\bar\alpha(t)=1/\operatorname{SNR}(t)`$. What distinguishes one noising process from another is the signal-to-noise ratio as a function of time, as in chapter 7, and how the state is scaled, which matters for the network, not for the mathematics. [Karras et al. (2022)](https://arxiv.org/abs/2206.00364) wrote every such process as $`x_t=s(t)\bigl(x_0+\sigma(t)\,\epsilon\bigr)`$ and argued for the simplest choice, $`s(t)=1`$ and $`\sigma(t)=t`$, which this chapter uses for sampling.
 
 ### <a id="how-densities-evolve"></a>How densities evolve
 
-The density $p_t$ of $x_t$ obeys the **Fokker–Planck equation**
+The density $`p_t`$ of $`x_t`$ obeys the **Fokker–Planck equation**
 
 $$
 \frac{\partial p_t}{\partial t}=-\nabla\cdot\bigl(f\,p_t\bigr)+\tfrac12g(t)^2\,\Delta p_t,
@@ -52,19 +52,19 @@ a conservation law in which the drift transports probability and the diffusion t
 
 ### <a id="the-reverse-time-sde"></a>The reverse-time SDE
 
-A diffusion run backward in time is again a diffusion. [Anderson (1982)](https://www.sciencedirect.com/science/article/pii/0304414982900515) showed that the paths of the forward SDE, traversed from $t=T$ down to $t=0$, follow
+A diffusion run backward in time is again a diffusion. [Anderson (1982)](https://www.sciencedirect.com/science/article/pii/0304414982900515) showed that the paths of the forward SDE, traversed from $`t=T`$ down to $`t=0`$, follow
 
 $$
 dx=\bigl[f(x,t)-g(t)^2\,\nabla_x\log p_t(x)\bigr]\,dt+g(t)\,d\bar W,
 $$
 
-where time runs backward and $\bar W$ is a Brownian motion in reversed time ([Appendix A](#block-gen08-appendix-a)). The only unknown is the score of the noisy marginals at every time, which is what a time-conditional network trained by denoising score matching estimates (chapter 6). Generation draws $x_T$ from the Gaussian prior and integrates this SDE numerically with the learned score. DDPM's ancestral sampling is one discretization of the reverse VP SDE, and the extra drift, $g^2$ times the score, is the move along the score that chapter 7 found in each reverse step.
+where time runs backward and $`\bar W`$ is a Brownian motion in reversed time ([Appendix A](#block-gen08-appendix-a)). The only unknown is the score of the noisy marginals at every time, which is what a time-conditional network trained by denoising score matching estimates (chapter 6). Generation draws $`x_T`$ from the Gaussian prior and integrates this SDE numerically with the learned score. DDPM's ancestral sampling is one discretization of the reverse VP SDE, and the extra drift, $`g^2`$ times the score, is the move along the score that chapter 7 found in each reverse step.
 
-The continuous view also separates two ways of sampling that NCSN had mixed. A **predictor** takes a step of the reverse SDE, moving from one time to the next; a **corrector** then runs a few steps of Langevin dynamics at the new time, with the same score, to pull the samples toward that time's marginal and repair the predictor's error. Annealed Langevin dynamics is the corrector alone, with no predictor. With these **predictor–corrector** samplers, deeper architectures, and the VE SDE, Song et al. reached an FID of 2.20 and an Inception score of 9.89 on CIFAR-10, the best for unconditional generation at the time, and produced the first $1024\times1024$ images from a score-based model, of faces from CelebA-HQ.
+The continuous view also separates two ways of sampling that NCSN had mixed. A **predictor** takes a step of the reverse SDE, moving from one time to the next; a **corrector** then runs a few steps of Langevin dynamics at the new time, with the same score, to pull the samples toward that time's marginal and repair the predictor's error. Annealed Langevin dynamics is the corrector alone, with no predictor. With these **predictor–corrector** samplers, deeper architectures, and the VE SDE, Song et al. reached an FID of 2.20 and an Inception score of 9.89 on CIFAR-10, the best for unconditional generation at the time, and produced the first $`1024\times1024`$ images from a score-based model, of faces from CelebA-HQ.
 
 ### <a id="the-probability-flow-ode"></a>The probability-flow ODE
 
-The Fokker–Planck equation has a second reading. Since $\Delta p=\nabla\cdot(p\,\nabla\log p)$, the diffusion term can be written as a transport term, and the forward SDE has the same marginals as the deterministic **probability-flow ODE**
+The Fokker–Planck equation has a second reading. Since $`\Delta p=\nabla\cdot(p\,\nabla\log p)`$, the diffusion term can be written as a transport term, and the forward SDE has the same marginals as the deterministic **probability-flow ODE**
 
 $$
 \frac{dx}{dt}=f(x,t)-\tfrac12g(t)^2\,\nabla_x\log p_t(x)
@@ -148,41 +148,41 @@ for a, b, c, d in zip(x0, log_p1 + total, log_gauss + total, log_p0(x0)):
 # x = +5.0: log-density through the ODE   -3.835 (with N(0, 1) at t = 1:   -3.795), exact   -3.835
 ```
 
-Both samplers reproduce the mixture: 80% of the mass in the left mode, with the right mean and spread. The score at large noise, where the modes have merged, carries the information about the weights that the score at the data lacks, and integrating from pure noise uses it. The ODE's log-densities match the exact ones to three decimals, even at $x=0$, where the density is $e^{-32}$. With the standard Gaussian in place of the exact density at $t=1$, the values are off by up to 0.04: the linear schedule leaves $\sqrt{\bar\alpha(1)}=0.0066$ of the signal, a small mismatch between the prior and the last marginal that every diffusion model has unless its schedule reaches zero signal.
+Both samplers reproduce the mixture: 80% of the mass in the left mode, with the right mean and spread. The score at large noise, where the modes have merged, carries the information about the weights that the score at the data lacks, and integrating from pure noise uses it. The ODE's log-densities match the exact ones to three decimals, even at $`x=0`$, where the density is $`e^{-32}`$. With the standard Gaussian in place of the exact density at $`t=1`$, the values are off by up to 0.04: the linear schedule leaves $`\sqrt{\bar\alpha(1)}=0.0066`$ of the signal, a small mismatch between the prior and the last marginal that every diffusion model has unless its schedule reaches zero signal.
 
 <img src="sources/images/gen-sde-paths.png" alt="gen-sde-paths" width="880">
 
-*The same mixture under the VP SDE, with the density of $x_t$ shaded, from pure noise at $t=1$ on the left to the data at $t=0$ on the right. Left: 40 paths of the reverse-time SDE from random starting points. Right: 40 paths of the probability-flow ODE started at evenly spaced quantiles of the Gaussian. In both, 32 of the 40 paths, 80%, end in the left mode, dark, and 8 in the right, orange. The SDE paths wander and cross; the ODE paths never cross, stay nearly still until about $t=0.6$, when the signal emerges, and split at the 80th percentile of the starting distribution.*
+*The same mixture under the VP SDE, with the density of $`x_t`$ shaded, from pure noise at $`t=1`$ on the left to the data at $`t=0`$ on the right. Left: 40 paths of the reverse-time SDE from random starting points. Right: 40 paths of the probability-flow ODE started at evenly spaced quantiles of the Gaussian. In both, 32 of the 40 paths, 80%, end in the left mode, dark, and 8 in the right, orange. The SDE paths wander and cross; the ODE paths never cross, stay nearly still until about $`t=0.6`$, when the signal emerges, and split at the 80th percentile of the starting distribution.*
 
-The two samplers are related by more than their marginals. The reverse SDE is the probability-flow ODE plus a Langevin process at the current noise level, $-\tfrac12g^2\nabla\log p_t\,dt+g\,d\bar W$, which by itself leaves $p_t$ unchanged. The Langevin part corrects errors: if earlier steps have left the samples off the current marginal, it pulls them back, at the cost of noise that takes more steps to integrate accurately. The ODE has no such correction but tolerates much larger steps. [Karras et al. (2022)](https://arxiv.org/abs/2206.00364) made the amount of Langevin noise a tunable parameter and found that a little helps when the score is imperfect, but that the deterministic solver is the better choice with few steps.
+The two samplers are related by more than their marginals. The reverse SDE is the probability-flow ODE plus a Langevin process at the current noise level, $`-\tfrac12g^2\nabla\log p_t\,dt+g\,d\bar W`$, which by itself leaves $`p_t`$ unchanged. The Langevin part corrects errors: if earlier steps have left the samples off the current marginal, it pulls them back, at the cost of noise that takes more steps to integrate accurately. The ODE has no such correction but tolerates much larger steps. [Karras et al. (2022)](https://arxiv.org/abs/2206.00364) made the amount of Langevin noise a tunable parameter and found that a little helps when the score is imperfect, but that the deterministic solver is the better choice with few steps.
 
 ## <a id="solving-fast"></a>Solving fast
 
 ### <a id="the-design-space-of-samplers"></a>The design space of samplers
 
-Karras et al. separated the choices that had been bundled together in each paper, and their choices form the standard today. With $s(t)=1$ and $\sigma(t)=t$, the probability-flow ODE becomes
+Karras et al. separated the choices that had been bundled together in each paper, and their choices form the standard today. With $`s(t)=1`$ and $`\sigma(t)=t`$, the probability-flow ODE becomes
 
 $$
 \frac{dx}{d\sigma}=\frac{x-D(x;\sigma)}{\sigma},\qquad D(x;\sigma)=x+\sigma^2\,\nabla_x\log p_\sigma(x),
 $$
 
-where $D$ is the **denoiser**, the minimum-mean-squared-error estimate of the clean data by Tweedie's formula. The velocity points from the current point toward its denoised version, and the ODE is solved from $\sigma_{\max}=80$, where $x\sim\mathcal N(0,\sigma_{\max}^2I)$, down to $\sigma=0$. The paths are nearly straight at large $\sigma$, where the denoiser returns roughly the mean of the data, and curve sharply at small $\sigma$, where they turn toward a particular mode, so the steps should be concentrated at low noise. Karras et al. used
+where $`D`$ is the **denoiser**, the minimum-mean-squared-error estimate of the clean data by Tweedie's formula. The velocity points from the current point toward its denoised version, and the ODE is solved from $`\sigma_{\max}=80`$, where $`x\sim\mathcal N(0,\sigma_{\max}^2I)`$, down to $`\sigma=0`$. The paths are nearly straight at large $`\sigma`$, where the denoiser returns roughly the mean of the data, and curve sharply at small $`\sigma`$, where they turn toward a particular mode, so the steps should be concentrated at low noise. Karras et al. used
 
 $$
 \sigma_i=\Bigl(\sigma_{\max}^{1/\rho}+\tfrac i{N-1}\bigl(\sigma_{\min}^{1/\rho}-\sigma_{\max}^{1/\rho}\bigr)\Bigr)^{\rho},\qquad\rho=7,\quad\sigma_{\min}=0.002,
 $$
 
-followed by a final step to $\sigma=0$, and **Heun's method**, which follows an Euler step with a correction that averages the slopes at both ends of the step. Its error falls with the square of the step size instead of in proportion to it, for one extra network evaluation per step. With 35 network evaluations, their deterministic sampler reached an FID of 1.97 on unconditional CIFAR-10 and 1.79 on class-conditional CIFAR-10. For training, they rescaled the network's input and output so that both have unit variance at every noise level, the **preconditioning**
+followed by a final step to $`\sigma=0`$, and **Heun's method**, which follows an Euler step with a correction that averages the slopes at both ends of the step. Its error falls with the square of the step size instead of in proportion to it, for one extra network evaluation per step. With 35 network evaluations, their deterministic sampler reached an FID of 1.97 on unconditional CIFAR-10 and 1.79 on class-conditional CIFAR-10. For training, they rescaled the network's input and output so that both have unit variance at every noise level, the **preconditioning**
 
 $$
 D_\theta(x;\sigma)=c_{\text{skip}}(\sigma)\,x+c_{\text{out}}(\sigma)\,F_\theta\bigl(c_{\text{in}}(\sigma)\,x;\ c_{\text{noise}}(\sigma)\bigr),\qquad c_{\text{skip}}=\frac{\sigma_{\text{data}}^2}{\sigma^2+\sigma_{\text{data}}^2},\quad c_{\text{out}}=\frac{\sigma\,\sigma_{\text{data}}}{\sqrt{\sigma^2+\sigma_{\text{data}}^2}},\quad c_{\text{in}}=\frac1{\sqrt{\sigma^2+\sigma_{\text{data}}^2}},
 $$
 
-with $c_{\text{noise}}=\frac14\ln\sigma$ and $\sigma_{\text{data}}=0.5$ for images in $[-1,1]$ ([Appendix B](#block-gen08-appendix-b)). The raw network $F_\theta$ then predicts the noise at low noise levels and the data at high ones, the same interpolation as velocity prediction (chapter 7). They sampled training noise levels with $\ln\sigma$ normal with mean −1.2 and standard deviation 1.2, concentrating training on the intermediate levels where the loss can be reduced, and weighted the loss so that every level contributes equally. With a stochastic sampler that injects and removes a controlled amount of noise at each step, the same study improved a pretrained ImageNet $64\times64$ model from an FID of 2.07 to 1.55 by changing only the sampler, and retrained it to 1.36. The paper received an outstanding paper award at NeurIPS 2022.
+with $`c_{\text{noise}}=\frac14\ln\sigma`$ and $`\sigma_{\text{data}}=0.5`$ for images in $`[-1,1]`$ ([Appendix B](#block-gen08-appendix-b)). The raw network $`F_\theta`$ then predicts the noise at low noise levels and the data at high ones, the same interpolation as velocity prediction (chapter 7). They sampled training noise levels with $`\ln\sigma`$ normal with mean −1.2 and standard deviation 1.2, concentrating training on the intermediate levels where the loss can be reduced, and weighted the loss so that every level contributes equally. With a stochastic sampler that injects and removes a controlled amount of noise at each step, the same study improved a pretrained ImageNet $`64\times64`$ model from an FID of 2.07 to 1.55 by changing only the sampler, and retrained it to 1.36. The paper received an outstanding paper award at NeurIPS 2022.
 
 ### <a id="exponential-integrators"></a>Exponential integrators
 
-The ODE has a linear part, $x/\sigma$ in the form above and $-\tfrac12\beta(t)\,x$ in the VP form, which can be integrated exactly; only the term with the network needs approximating. Solving the linear part exactly and holding the denoiser fixed over a step gives
+The ODE has a linear part, $`x/\sigma`$ in the form above and $`-\tfrac12\beta(t)\,x`$ in the VP form, which can be integrated exactly; only the term with the network needs approximating. Solving the linear part exactly and holding the denoiser fixed over a step gives
 
 $$
 x_{\sigma'}=\frac{\sigma'}{\sigma}\,x_\sigma+\Bigl(1-\frac{\sigma'}{\sigma}\Bigr)D(x_\sigma;\sigma),
@@ -273,7 +273,7 @@ print(f"Euler, 79 evaluations with steps uniform in sigma instead: median distan
 # Euler, 79 evaluations with steps uniform in sigma instead: median distance 0.4406, 20.3% near a mode
 ```
 
-With enough evaluations, the orders show. Doubling the evaluations halves Euler's median error, from 0.045 to 0.021 to 0.010, as a first-order method should, while the two second-order methods reduce theirs four- to eightfold, and at 79 evaluations DPM-Solver++(2M) is about ten times closer to the exact solution than Euler. The multistep method gets second-order accuracy for one evaluation per step, where Heun pays two, and is the best of the three from 19 evaluations on. With very few steps, the ordering reverses: Heun's method with three steps, five evaluations, is unstable and sends almost every sample off the modes, and DPM-Solver++(2M) is poor at five and nine, while Euler still puts 59.9% of samples near a mode with five. A second-order correction evaluates the slope at the end of a step, and when a single step spans the noise levels at which the paths turn toward their modes, that slope is not a useful guide to the path in between. The spacing of the steps matters as much as the solver: Euler with 79 steps spaced uniformly in $\sigma$ places almost all of them at high noise, where nothing happens, and ends with 20.3% of samples near a mode, against 98.2% with the spacing of Karras et al.
+With enough evaluations, the orders show. Doubling the evaluations halves Euler's median error, from 0.045 to 0.021 to 0.010, as a first-order method should, while the two second-order methods reduce theirs four- to eightfold, and at 79 evaluations DPM-Solver++(2M) is about ten times closer to the exact solution than Euler. The multistep method gets second-order accuracy for one evaluation per step, where Heun pays two, and is the best of the three from 19 evaluations on. With very few steps, the ordering reverses: Heun's method with three steps, five evaluations, is unstable and sends almost every sample off the modes, and DPM-Solver++(2M) is poor at five and nine, while Euler still puts 59.9% of samples near a mode with five. A second-order correction evaluates the slope at the end of a step, and when a single step spans the noise levels at which the paths turn toward their modes, that slope is not a useful guide to the path in between. The spacing of the steps matters as much as the solver: Euler with 79 steps spaced uniformly in $`\sigma`$ places almost all of them at high noise, where nothing happens, and ends with 20.3% of samples near a mode, against 98.2% with the spacing of Karras et al.
 
 ## <a id="learning-to-take-fewer-steps"></a>Learning to take fewer steps
 
@@ -283,15 +283,15 @@ Solvers reduce the number of steps to about ten before the approximation breaks 
 
 <img src="sources/images/gen-sde-distillation.png" alt="gen-sde-distillation" width="880">
 
-*Progressive distillation on the eight Gaussians of chapter 6 (weights 1/36 to 8/36, standard deviation 0.1), with the preconditioned denoiser above computed by an MLP of three hidden layers of 256 units. Top: the base model, trained by denoising for 4,000 steps on a 64-step schedule with $\rho=7$, sampled by DDIM from the same 4,000 starting points with 64, 8, 2, and 1 steps. Bottom: the data, and the students distilled in six rounds of 1,500 training steps each, halving the schedule from 64 steps to 32, 16, 8, 4, 2, and 1, sampled with 8, 2, and 1 steps. Percentages are the shares of samples within 0.3 of a mode. DDIM with the base model falls from 90% with 64 steps to 62% with 8 and to 0% with 2 and 1, where a single step from $\sigma=80$ returns nearly the mean of the data. The students keep 87.9%, 84.4%, and 84.2%, and the shares of the eight modes stay within a total variation of 0.032 of the true weights. The samples off the modes lie on thin bridges between neighboring modes, as they do for the base model with 64 steps, and each halving adds a few.*
+*Progressive distillation on the eight Gaussians of chapter 6 (weights 1/36 to 8/36, standard deviation 0.1), with the preconditioned denoiser above computed by an MLP of three hidden layers of 256 units. Top: the base model, trained by denoising for 4,000 steps on a 64-step schedule with $`\rho=7`$, sampled by DDIM from the same 4,000 starting points with 64, 8, 2, and 1 steps. Bottom: the data, and the students distilled in six rounds of 1,500 training steps each, halving the schedule from 64 steps to 32, 16, 8, 4, 2, and 1, sampled with 8, 2, and 1 steps. Percentages are the shares of samples within 0.3 of a mode. DDIM with the base model falls from 90% with 64 steps to 62% with 8 and to 0% with 2 and 1, where a single step from $`\sigma=80`$ returns nearly the mean of the data. The students keep 87.9%, 84.4%, and 84.2%, and the shares of the eight modes stay within a total variation of 0.032 of the true weights. The samples off the modes lie on thin bridges between neighboring modes, as they do for the base model with 64 steps, and each halving adds a few.*
 
 ### <a id="consistency-models"></a>Consistency models
 
-A **consistency model** ([Song et al., 2023](https://proceedings.mlr.press/v202/song23a.html)) learns in one stage the map that progressive distillation reaches in several: a network $f_\theta(x_t,t)$ that sends every point on a path of the probability-flow ODE to the path's origin. Its defining property is **self-consistency**: $f_\theta(x_t,t)=f_\theta(x_{t'},t')$ for any two points on the same path, with the boundary condition $f_\theta(x,\epsilon)=x$ at the smallest noise level, enforced by a skip connection as in the preconditioning above. In **consistency distillation**, a pretrained diffusion model takes one ODE step from $x_{t_{n+1}}$ to $x_{t_n}$, and the network is trained to give the same output at both points, with the output at $x_{t_n}$ computed by a slowly updated copy of the network as the target; in **consistency training**, no teacher is needed, since two noisy versions of the same image with the same noise vector lie approximately on one path. Sampling takes one evaluation, or a few, alternating denoising with re-noising to a smaller level. Distilled consistency models reached an FID on CIFAR-10 of 3.55 with one step and 2.93 with two, and on ImageNet $64\times64$ of 6.20 and 4.70; trained from scratch, 8.70 with one step on CIFAR-10. Replacing the learned perceptual distance in the loss by a robust Pseudo-Huber loss, and sampling noise levels log-normally, brought consistency training without a teacher to 2.83 on CIFAR-10 and 4.02 on ImageNet $64\times64$ in one step ([Song and Dhariwal, 2023](https://arxiv.org/abs/2310.14189)), and a continuous-time formulation scaled to 1.5 billion parameters reached 1.88 on ImageNet $512\times512$ with two steps, within 10% of the diffusion model it was distilled from ([Lu and Song, 2024](https://arxiv.org/abs/2410.11081)).
+A **consistency model** ([Song et al., 2023](https://proceedings.mlr.press/v202/song23a.html)) learns in one stage the map that progressive distillation reaches in several: a network $`f_\theta(x_t,t)`$ that sends every point on a path of the probability-flow ODE to the path's origin. Its defining property is **self-consistency**: $`f_\theta(x_t,t)=f_\theta(x_{t'},t')`$ for any two points on the same path, with the boundary condition $`f_\theta(x,\epsilon)=x`$ at the smallest noise level, enforced by a skip connection as in the preconditioning above. In **consistency distillation**, a pretrained diffusion model takes one ODE step from $`x_{t_{n+1}}`$ to $`x_{t_n}`$, and the network is trained to give the same output at both points, with the output at $`x_{t_n}`$ computed by a slowly updated copy of the network as the target; in **consistency training**, no teacher is needed, since two noisy versions of the same image with the same noise vector lie approximately on one path. Sampling takes one evaluation, or a few, alternating denoising with re-noising to a smaller level. Distilled consistency models reached an FID on CIFAR-10 of 3.55 with one step and 2.93 with two, and on ImageNet $`64\times64`$ of 6.20 and 4.70; trained from scratch, 8.70 with one step on CIFAR-10. Replacing the learned perceptual distance in the loss by a robust Pseudo-Huber loss, and sampling noise levels log-normally, brought consistency training without a teacher to 2.83 on CIFAR-10 and 4.02 on ImageNet $`64\times64`$ in one step ([Song and Dhariwal, 2023](https://arxiv.org/abs/2310.14189)), and a continuous-time formulation scaled to 1.5 billion parameters reached 1.88 on ImageNet $`512\times512`$ with two steps, within 10% of the diffusion model it was distilled from ([Lu and Song, 2024](https://arxiv.org/abs/2410.11081)).
 
 ### <a id="distribution-matching-and-adversarial-distillation"></a>Distribution matching and adversarial distillation
 
-Progressive distillation and consistency models make the student match the teacher's paths point by point. Other methods only ask the student's outputs to have the teacher's distribution. **Distribution matching distillation** ([Yin et al., 2024](https://arxiv.org/abs/2311.18828)) trains a one-step generator with a gradient given by the difference of two scores at the noisy versions of its samples: the teacher's score of the data and the score of the generator's own outputs, estimated by a second diffusion model trained on them; it reached an FID of 2.62 on ImageNet $64\times64$ with one step and generated text-conditioned images at 20 per second. **Adversarial diffusion distillation** ([Sauer et al., 2023](https://arxiv.org/abs/2311.17042)) combines a score-distillation loss from the teacher with the loss of a discriminator, and generated images from text in one to four steps; it is the method behind the SDXL Turbo model. These methods bring back parts of the adversarial machinery of chapter 5, and with it some of the loss of diversity, in exchange for real-time generation. Chapter 9 attacks the problem at its source, by learning paths that are straight to begin with.
+Progressive distillation and consistency models make the student match the teacher's paths point by point. Other methods only ask the student's outputs to have the teacher's distribution. **Distribution matching distillation** ([Yin et al., 2024](https://arxiv.org/abs/2311.18828)) trains a one-step generator with a gradient given by the difference of two scores at the noisy versions of its samples: the teacher's score of the data and the score of the generator's own outputs, estimated by a second diffusion model trained on them; it reached an FID of 2.62 on ImageNet $`64\times64`$ with one step and generated text-conditioned images at 20 per second. **Adversarial diffusion distillation** ([Sauer et al., 2023](https://arxiv.org/abs/2311.17042)) combines a score-distillation loss from the teacher with the loss of a discriminator, and generated images from text in one to four steps; it is the method behind the SDXL Turbo model. These methods bring back parts of the adversarial machinery of chapter 5, and with it some of the loss of diversity, in exchange for real-time generation. Chapter 9 attacks the problem at its source, by learning paths that are straight to begin with.
 
 ### <a id="choosing-a-sampler"></a>Choosing a sampler
 
@@ -304,17 +304,17 @@ The choices of this chapter reduce to a few rules of thumb. For the best quality
 <summary><a id="block-gen08-appendix-a"></a><b>A. The probability-flow ODE and the reverse-time SDE</b></summary>
 
 
-**Same marginals.** The forward SDE's density satisfies $\partial_tp=-\nabla\cdot(fp)+\tfrac12g^2\Delta p$. Since $\nabla\cdot(p\nabla\log p)=\nabla\cdot\nabla p=\Delta p$, this is
+**Same marginals.** The forward SDE's density satisfies $`\partial_tp=-\nabla\cdot(fp)+\tfrac12g^2\Delta p`$. Since $`\nabla\cdot(p\nabla\log p)=\nabla\cdot\nabla p=\Delta p`$, this is
 
 $$
 \partial_tp=-\nabla\cdot\Bigl(\bigl(f-\tfrac12g^2\nabla\log p\bigr)\,p\Bigr),
 $$
 
-the continuity equation of the deterministic flow $\dot x=f-\tfrac12g^2\nabla\log p_t(x)$ (chapter 4, Appendix B). Both processes start from the same $p_0$ and their densities obey the same equation, so they agree at every $t$.
+the continuity equation of the deterministic flow $`\dot x=f-\tfrac12g^2\nabla\log p_t(x)`$ (chapter 4, Appendix B). Both processes start from the same $`p_0`$ and their densities obey the same equation, so they agree at every $`t`$.
 
-**Reverse time.** Let $\tau=T-t$ and $q_\tau=p_{T-\tau}$. Then $\partial_\tau q=-\partial_tp=\nabla\cdot\bigl((f-\tfrac12g^2\nabla\log p)\,p\bigr)$. Write the right side as the Fokker–Planck operator of an SDE in $\tau$ with diffusion $g$: $\nabla\cdot\bigl((f-\tfrac12g^2\nabla\log p)\,p\bigr)=-\nabla\cdot\bigl((-f+g^2\nabla\log p)\,p\bigr)+\tfrac12g^2\Delta p$, again using $\Delta p=\nabla\cdot(p\nabla\log p)$. So $q_\tau$ is the marginal of $dx=\bigl(-f+g^2\nabla\log p_{T-\tau}\bigr)d\tau+g\,dW_\tau$. Written in the original time, whose increments are $dt=-d\tau$, the drift is $f-g^2\nabla\log p_t$, which is Anderson's equation. This argument matches the marginals only; Anderson showed that the reverse process has the same joint distribution of paths as well.
+**Reverse time.** Let $`\tau=T-t`$ and $`q_\tau=p_{T-\tau}`$. Then $`\partial_\tau q=-\partial_tp=\nabla\cdot\bigl((f-\tfrac12g^2\nabla\log p)\,p\bigr)`$. Write the right side as the Fokker–Planck operator of an SDE in $`\tau`$ with diffusion $`g`$: $`\nabla\cdot\bigl((f-\tfrac12g^2\nabla\log p)\,p\bigr)=-\nabla\cdot\bigl((-f+g^2\nabla\log p)\,p\bigr)+\tfrac12g^2\Delta p`$, again using $`\Delta p=\nabla\cdot(p\nabla\log p)`$. So $`q_\tau`$ is the marginal of $`dx=\bigl(-f+g^2\nabla\log p_{T-\tau}\bigr)d\tau+g\,dW_\tau`$. Written in the original time, whose increments are $`dt=-d\tau`$, the drift is $`f-g^2\nabla\log p_t`$, which is Anderson's equation. This argument matches the marginals only; Anderson showed that the reverse process has the same joint distribution of paths as well.
 
-**Likelihood.** Along a path of the ODE, $\frac d{dt}\log p_t(x(t))=-\nabla\cdot\bigl(f-\tfrac12g^2\nabla\log p_t\bigr)$. Integrating from $0$ to $T$ gives $\log p_0(x(0))=\log p_T(x(T))+\int_0^T\nabla\cdot\bigl(f-\tfrac12g^2\nabla\log p_t\bigr)\,dt$, which the code evaluates for the VP SDE, where the divergence is $-\tfrac12\beta(t)\bigl(D+\Delta\log p_t\bigr)$ in $D$ dimensions.
+**Likelihood.** Along a path of the ODE, $`\frac d{dt}\log p_t(x(t))=-\nabla\cdot\bigl(f-\tfrac12g^2\nabla\log p_t\bigr)`$. Integrating from $`0`$ to $`T`$ gives $`\log p_0(x(0))=\log p_T(x(T))+\int_0^T\nabla\cdot\bigl(f-\tfrac12g^2\nabla\log p_t\bigr)\,dt`$, which the code evaluates for the VP SDE, where the divergence is $`-\tfrac12\beta(t)\bigl(D+\Delta\log p_t\bigr)`$ in $`D`$ dimensions.
 
 </details>
 
@@ -324,13 +324,13 @@ the continuity equation of the deterministic flow $\dot x=f-\tfrac12g^2\nabla\lo
 <summary><a id="block-gen08-appendix-b"></a><b>B. The preconditioning of Karras et al.</b></summary>
 
 
-Write the noisy input as $x=y+n$ with data $y$ of variance $\sigma_{\text{data}}^2$ per coordinate and noise $n$ of variance $\sigma^2$. The input to the network has unit variance if $c_{\text{in}}=1/\sqrt{\sigma^2+\sigma_{\text{data}}^2}$. The loss $\lambda(\sigma)\,\|c_{\text{skip}}x+c_{\text{out}}F-y\|^2$ equals $\lambda\,c_{\text{out}}^2\,\|F-T\|^2$ with the effective target $T=(y-c_{\text{skip}}x)/c_{\text{out}}$, whose variance is $\bigl((1-c_{\text{skip}})^2\sigma_{\text{data}}^2+c_{\text{skip}}^2\sigma^2\bigr)/c_{\text{out}}^2$. Requiring unit variance, and choosing $c_{\text{skip}}$ to make $c_{\text{out}}$ as small as possible, so that errors of $F$ are amplified as little as possible, minimizes $(1-c)^2\sigma_{\text{data}}^2+c^2\sigma^2$ over $c$:
+Write the noisy input as $`x=y+n`$ with data $`y`$ of variance $`\sigma_{\text{data}}^2`$ per coordinate and noise $`n`$ of variance $`\sigma^2`$. The input to the network has unit variance if $`c_{\text{in}}=1/\sqrt{\sigma^2+\sigma_{\text{data}}^2}`$. The loss $`\lambda(\sigma)\,\|c_{\text{skip}}x+c_{\text{out}}F-y\|^2`$ equals $`\lambda\,c_{\text{out}}^2\,\|F-T\|^2`$ with the effective target $`T=(y-c_{\text{skip}}x)/c_{\text{out}}`$, whose variance is $`\bigl((1-c_{\text{skip}})^2\sigma_{\text{data}}^2+c_{\text{skip}}^2\sigma^2\bigr)/c_{\text{out}}^2`$. Requiring unit variance, and choosing $`c_{\text{skip}}`$ to make $`c_{\text{out}}`$ as small as possible, so that errors of $`F`$ are amplified as little as possible, minimizes $`(1-c)^2\sigma_{\text{data}}^2+c^2\sigma^2`$ over $`c`$:
 
 $$
 c_{\text{skip}}=\frac{\sigma_{\text{data}}^2}{\sigma^2+\sigma_{\text{data}}^2},\qquad c_{\text{out}}^2=\frac{\sigma^2\sigma_{\text{data}}^2}{\sigma^2+\sigma_{\text{data}}^2}.
 $$
 
-Setting $\lambda=1/c_{\text{out}}^2$ makes the effective weight of every noise level one. At small $\sigma$, $c_{\text{skip}}\approx1$ and $T\approx-n/\sigma$, the negative of the standardized noise; at large $\sigma$, $c_{\text{skip}}\approx0$ and $T\approx y/\sigma_{\text{data}}$, the standardized data.
+Setting $`\lambda=1/c_{\text{out}}^2`$ makes the effective weight of every noise level one. At small $`\sigma`$, $`c_{\text{skip}}\approx1`$ and $`T\approx-n/\sigma`$, the negative of the standardized noise; at large $`\sigma`$, $`c_{\text{skip}}\approx0`$ and $`T\approx y/\sigma_{\text{data}}`$, the standardized data.
 
 </details>
 
@@ -340,13 +340,13 @@ Setting $\lambda=1/c_{\text{out}}^2$ makes the effective weight of every noise l
 <summary><a id="block-gen08-appendix-c"></a><b>C. Exponential integrators</b></summary>
 
 
-For $dx/d\sigma=(x-D(x;\sigma))/\sigma$, the product rule gives $\frac d{d\sigma}\bigl(x/\sigma\bigr)=-D/\sigma^2$, so exactly
+For $`dx/d\sigma=(x-D(x;\sigma))/\sigma`$, the product rule gives $`\frac d{d\sigma}\bigl(x/\sigma\bigr)=-D/\sigma^2`$, so exactly
 
 $$
 \frac{x_{\sigma'}}{\sigma'}=\frac{x_\sigma}{\sigma}-\int_\sigma^{\sigma'}\frac{D(x_u;u)}{u^2}\,du.
 $$
 
-Treating $D$ as constant over the step, the integral is $D\,(1/\sigma-1/\sigma')$, which gives the DDIM update of the text. In the variable $\lambda=-\log\sigma$, the log signal-to-noise ratio up to a factor of 2 for this process, the weight $du/u^2$ becomes $-e^{\lambda}d\lambda$, and higher-order methods replace the constant $D$ by a polynomial in $\lambda$ fitted to recent evaluations, integrating the product with the exponential exactly. DPM-Solver++(2M), used in the code, extrapolates $D$ linearly in $\lambda$ from the current and previous evaluations, $D_i+\frac1{2r}(D_i-D_{i-1})$ with $r$ the ratio of the previous step length in $\lambda$ to the current one, which is the extrapolated value at the middle of the step, and uses it in place of $D$ in the first-order update.
+Treating $`D`$ as constant over the step, the integral is $`D\,(1/\sigma-1/\sigma')`$, which gives the DDIM update of the text. In the variable $`\lambda=-\log\sigma`$, the log signal-to-noise ratio up to a factor of 2 for this process, the weight $`du/u^2`$ becomes $`-e^{\lambda}d\lambda`$, and higher-order methods replace the constant $`D`$ by a polynomial in $`\lambda`$ fitted to recent evaluations, integrating the product with the exponential exactly. DPM-Solver++(2M), used in the code, extrapolates $`D`$ linearly in $`\lambda`$ from the current and previous evaluations, $`D_i+\frac1{2r}(D_i-D_{i-1})`$ with $`r`$ the ratio of the previous step length in $`\lambda`$ to the current one, which is the extrapolated value at the middle of the step, and uses it in place of $`D`$ in the first-order update.
 
 </details>
 
@@ -356,13 +356,13 @@ Treating $D$ as constant over the step, the integral is $D\,(1/\sigma-1/\sigma')
 <summary><a id="block-gen08-appendix-d"></a><b>D. The target of progressive distillation</b></summary>
 
 
-In the form $x_\sigma=x_0+\sigma\epsilon$, one DDIM step from $z$ at level $\sigma$ with predicted clean image $\hat x$ lands at $\hat x+(\sigma''/\sigma)(z-\hat x)$ at level $\sigma''$. The teacher's two steps, through an intermediate level $\sigma'$, land at $z''$. Solving $\hat x+(\sigma''/\sigma)(z-\hat x)=z''$ for $\hat x$ gives the student's target
+In the form $`x_\sigma=x_0+\sigma\epsilon`$, one DDIM step from $`z`$ at level $`\sigma`$ with predicted clean image $`\hat x`$ lands at $`\hat x+(\sigma''/\sigma)(z-\hat x)`$ at level $`\sigma''`$. The teacher's two steps, through an intermediate level $`\sigma'`$, land at $`z''`$. Solving $`\hat x+(\sigma''/\sigma)(z-\hat x)=z''`$ for $`\hat x`$ gives the student's target
 
 $$
 \tilde x=\frac{z''-(\sigma''/\sigma)\,z}{1-\sigma''/\sigma}.
 $$
 
-In the variance-preserving form $z_t=\alpha_tx+\sigma_t\epsilon$ of Salimans and Ho, the same argument gives $\tilde x=\bigl(z_{t''}-(\sigma_{t''}/\sigma_t)z_t\bigr)/\bigl(\alpha_{t''}-(\sigma_{t''}/\sigma_t)\alpha_t\bigr)$. At the last step, $\sigma''=0$ and the target is the teacher's output itself.
+In the variance-preserving form $`z_t=\alpha_tx+\sigma_t\epsilon`$ of Salimans and Ho, the same argument gives $`\tilde x=\bigl(z_{t''}-(\sigma_{t''}/\sigma_t)z_t\bigr)/\bigl(\alpha_{t''}-(\sigma_{t''}/\sigma_t)\alpha_t\bigr)`$. At the last step, $`\sigma''=0`$ and the target is the teacher's output itself.
 
 </details>
 

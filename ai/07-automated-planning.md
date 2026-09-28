@@ -12,16 +12,16 @@ A search agent of chapter 1 needs a problem-specific state representation, succe
 
 The classical formalism is **STRIPS** ([Fikes and Nilsson, 1971](https://www.sciencedirect.com/science/article/pii/0004370271900105)). A planning task consists of
 
-- a finite set of atoms, an initial state $s_0$ (a set of atoms), and a goal $G$, a set of atoms that must all be true at the end;
-- a set of actions, each with a set of **preconditions** $\mathrm{pre}(a)$, an **add list** $\mathrm{add}(a)$, and a **delete list** $\mathrm{del}(a)$.
+- a finite set of atoms, an initial state $`s_0`$ (a set of atoms), and a goal $`G`$, a set of atoms that must all be true at the end;
+- a set of actions, each with a set of **preconditions** $`\mathrm{pre}(a)`$, an **add list** $`\mathrm{add}(a)`$, and a **delete list** $`\mathrm{del}(a)`$.
 
-An action is applicable in $s$ when $\mathrm{pre}(a)\subseteq s$, and applying it produces
+An action is applicable in $`s`$ when $`\mathrm{pre}(a)\subseteq s`$, and applying it produces
 
 $$
 \mathrm{Result}(s,a)=\bigl(s\setminus\mathrm{del}(a)\bigr)\cup\mathrm{add}(a).
 $$
 
-Everything not mentioned stays as it was, which solves the frame problem of chapter 5 by convention. A **plan** is a sequence of actions, each applicable in the state produced by its predecessors, that ends in a state containing $G$. The **Planning Domain Definition Language** (PDDL) writes actions as schemas with variables, such as
+Everything not mentioned stays as it was, which solves the frame problem of chapter 5 by convention. A **plan** is a sequence of actions, each applicable in the state produced by its predecessors, that ends in a state containing $`G`$. The **Planning Domain Definition Language** (PDDL) writes actions as schemas with variables, such as
 
 ```lisp
 (:action move
@@ -32,56 +32,56 @@ Everything not mentioned stays as it was, which solves the frame problem of chap
 
 which a planner **grounds** into STRIPS actions by substituting objects for variables. A domain description (the schemas) is written once and reused for any number of problem instances (objects, initial state, goal). PDDL has grown to include typed objects, conditional effects, numeric fluents, action costs, durative actions, and preferences, and the International Planning Competition has compared planners on it since 1998.
 
-The **blocks world** is the running example: blocks sit on a table or on each other, a block can be moved only if nothing is on it, and it can be moved onto the table or onto another clear block. With $n$ blocks there are $n(n-1)(n-2)$ moves between blocks and $2n(n-1)$ moves to and from the table.
+The **blocks world** is the running example: blocks sit on a table or on each other, a block can be moved only if nothing is on it, and it can be moved onto the table or onto another clear block. With $`n`$ blocks there are $`n(n-1)(n-2)`$ moves between blocks and $`2n(n-1)`$ moves to and from the table.
 
 ### <a id="the-complexity-of-planning"></a>The complexity of planning
 
-Deciding whether a STRIPS task has a plan, PlanSAT, is PSPACE-complete ([Bylander, 1994](https://www.sciencedirect.com/science/article/pii/0004370294900817)). The state space is exponential in the number of atoms, and plans can be exponentially long: the Towers of Hanoi with $n$ disks has a STRIPS encoding of polynomial size, and its shortest solution has $2^n-1$ moves. Finding an *optimal* plan is harder than finding *some* plan in many domains: a blocks-world plan is easy to find in at most $2n$ moves (put every block on the table, then build the goal towers), but finding a shortest one is NP-hard. Planners therefore distinguish **satisficing** planning, which seeks good plans quickly, from **optimal** planning, which must prove optimality and uses admissible heuristics.
+Deciding whether a STRIPS task has a plan, PlanSAT, is PSPACE-complete ([Bylander, 1994](https://www.sciencedirect.com/science/article/pii/0004370294900817)). The state space is exponential in the number of atoms, and plans can be exponentially long: the Towers of Hanoi with $`n`$ disks has a STRIPS encoding of polynomial size, and its shortest solution has $`2^n-1`$ moves. Finding an *optimal* plan is harder than finding *some* plan in many domains: a blocks-world plan is easy to find in at most $`2n`$ moves (put every block on the table, then build the goal towers), but finding a shortest one is NP-hard. Planners therefore distinguish **satisficing** planning, which seeks good plans quickly, from **optimal** planning, which must prove optimality and uses admissible heuristics.
 
 ## <a id="state-space-search"></a>State-space search
 
 ### <a id="progression"></a>Progression
 
-**Forward search**, or **progression**, applies the search algorithms of chapters 1–2 to the state space: start from $s_0$, apply applicable actions, and stop at a state containing the goal. Ground planning tasks often have thousands of applicable actions per state, most of them irrelevant, so forward search depends entirely on good heuristics. It is the basis of the most successful modern planners, because heuristics derived from the task description turned out to be very informative.
+**Forward search**, or **progression**, applies the search algorithms of chapters 1–2 to the state space: start from $`s_0`$, apply applicable actions, and stop at a state containing the goal. Ground planning tasks often have thousands of applicable actions per state, most of them irrelevant, so forward search depends entirely on good heuristics. It is the basis of the most successful modern planners, because heuristics derived from the task description turned out to be very informative.
 
 ### <a id="regression"></a>Regression
 
-**Backward search**, or **regression**, starts from the goal and works toward the initial state through sets of states described by partial conditions. An action $a$ is **relevant** to a goal description $g$ if it adds some atom of $g$ and deletes none, and the regressed goal is
+**Backward search**, or **regression**, starts from the goal and works toward the initial state through sets of states described by partial conditions. An action $`a`$ is **relevant** to a goal description $`g`$ if it adds some atom of $`g`$ and deletes none, and the regressed goal is
 
 $$
 \mathrm{Regress}(g,a)=\bigl(g\setminus\mathrm{add}(a)\bigr)\cup\mathrm{pre}(a):
 $$
 
-the conditions that must hold before $a$ so that $g$ holds after it. The search succeeds when the initial state satisfies the regressed description. Regression considers only relevant actions, which reduces the branching factor, and can be done with action schemas without grounding them all. Its drawback is that the regressed descriptions stand for sets of states, which makes good heuristics harder to design and duplicate detection harder, so most current planners search forward.
+the conditions that must hold before $`a`$ so that $`g`$ holds after it. The search succeeds when the initial state satisfies the regressed description. Regression considers only relevant actions, which reduces the branching factor, and can be done with action schemas without grounding them all. Its drawback is that the regressed descriptions stand for sets of states, which makes good heuristics harder to design and duplicate detection harder, so most current planners search forward.
 
 ## <a id="heuristics-for-planning"></a>Heuristics for planning
 
 ### <a id="the-delete-relaxation"></a>The delete relaxation
 
-The central idea of domain-independent planning heuristics, developed in HSP ([Bonet and Geffner, 2001](https://www.sciencedirect.com/science/article/pii/S0004370201001084)), is a relaxed problem in the sense of chapter 2: **ignore the delete lists**. In the relaxed task, atoms once true stay true, so states only grow, applying an action can never hurt, and whether the goal is reachable can be decided in polynomial time by applying every applicable action until nothing changes. The cost $h^+(s)$ of an optimal relaxed plan from $s$ is an admissible heuristic, since every real plan is also a relaxed plan. Computing $h^+$ is itself NP-hard, so practical heuristics approximate it.
+The central idea of domain-independent planning heuristics, developed in HSP ([Bonet and Geffner, 2001](https://www.sciencedirect.com/science/article/pii/S0004370201001084)), is a relaxed problem in the sense of chapter 2: **ignore the delete lists**. In the relaxed task, atoms once true stay true, so states only grow, applying an action can never hurt, and whether the goal is reachable can be decided in polynomial time by applying every applicable action until nothing changes. The cost $`h^+(s)`$ of an optimal relaxed plan from $`s`$ is an admissible heuristic, since every real plan is also a relaxed plan. Computing $`h^+`$ is itself NP-hard, so practical heuristics approximate it.
 
-### <a id="h-max-and-h-mathrm-add"></a>$h^{\max}$ and $h^{\mathrm{add}}$
+### <a id="h-max-and-h-mathrm-add"></a>$`h^{\max}`$ and $`h^{\mathrm{add}}`$
 
-Both approximations estimate a cost for each atom by a fixed-point equation over the relaxed task. With unit action costs, $\mathrm{cost}(p)=0$ for atoms true in $s$, and otherwise
+Both approximations estimate a cost for each atom by a fixed-point equation over the relaxed task. With unit action costs, $`\mathrm{cost}(p)=0`$ for atoms true in $`s`$, and otherwise
 
 $$
 \mathrm{cost}(p)=\min_{a:\;p\in\mathrm{add}(a)}\Bigl(1+\bigoplus_{q\in\mathrm{pre}(a)}\mathrm{cost}(q)\Bigr),
 $$
 
-where $\bigoplus$ is either the maximum or the sum. The heuristic value of a state combines the goal atoms the same way.
+where $`\bigoplus`$ is either the maximum or the sum. The heuristic value of a state combines the goal atoms the same way.
 
-- $h^{\max}$ takes maxima. It assumes that achieving the hardest precondition achieves the others along the way, so it never overestimates $h^+$ and is admissible ([Appendix A](#block-ai07-appendix-a)). It is usually far too small to guide the search well.
-- $h^{\mathrm{add}}$ takes sums. It assumes the preconditions are achieved independently, ignoring positive interactions between subgoals, so it can greatly overestimate and is not admissible, but it is much more informative for satisficing search.
+- $`h^{\max}`$ takes maxima. It assumes that achieving the hardest precondition achieves the others along the way, so it never overestimates $`h^+`$ and is admissible ([Appendix A](#block-ai07-appendix-a)). It is usually far too small to guide the search well.
+- $`h^{\mathrm{add}}`$ takes sums. It assumes the preconditions are achieved independently, ignoring positive interactions between subgoals, so it can greatly overestimate and is not admissible, but it is much more informative for satisficing search.
 
 Both are computed by a generalized Bellman–Ford or Dijkstra iteration in time polynomial in the size of the task, and both are exact when the goal is a single atom and the actions have one precondition each.
 
-### <a id="h-mathrm-ff-and-relaxed-plans"></a>$h^{\mathrm{FF}}$ and relaxed plans
+### <a id="h-mathrm-ff-and-relaxed-plans"></a>$`h^{\mathrm{FF}}`$ and relaxed plans
 
-The FF planner ([Hoffmann and Nebel, 2001](https://doi.org/10.1613/jair.855)) extracts an explicit **relaxed plan**: starting from the goal atoms, it chooses for each needed atom its best achiever, the action attaining the minimum in the equation above, and recursively the achievers of that action's preconditions, collecting the chosen actions. The number of distinct actions collected, $h^{\mathrm{FF}}$, counts shared actions once, which corrects $h^{\mathrm{add}}$'s double counting, and is usually close to $h^+$, though not admissible. The relaxed plan is also useful beyond its length: its first actions are **helpful actions**, and FF considers them first, a form of forward pruning. FF combined $h^{\mathrm{FF}}$ with **enforced hill-climbing**, a local search that breaks out of plateaus by breadth-first search for any better state, and dominated the 2000 planning competition.
+The FF planner ([Hoffmann and Nebel, 2001](https://doi.org/10.1613/jair.855)) extracts an explicit **relaxed plan**: starting from the goal atoms, it chooses for each needed atom its best achiever, the action attaining the minimum in the equation above, and recursively the achievers of that action's preconditions, collecting the chosen actions. The number of distinct actions collected, $`h^{\mathrm{FF}}`$, counts shared actions once, which corrects $`h^{\mathrm{add}}`$'s double counting, and is usually close to $`h^+`$, though not admissible. The relaxed plan is also useful beyond its length: its first actions are **helpful actions**, and FF considers them first, a form of forward pruning. FF combined $`h^{\mathrm{FF}}`$ with **enforced hill-climbing**, a local search that breaks out of plateaus by breadth-first search for any better state, and dominated the 2000 planning competition.
 
 ### <a id="landmarks-and-other-heuristics"></a>Landmarks and other heuristics
 
-A **landmark** is an atom that must be true at some point in every plan, or an action that every plan must contain; the goal atoms are trivial landmarks, and others are found by analyzing the relaxed task. Counting the landmarks not yet achieved gives an informative heuristic: the LAMA planner ([Richter and Westphal, 2010](https://doi.org/10.1613/jair.2972)) combines it with $h^{\mathrm{FF}}$ in a greedy search followed by weighted A\* with decreasing weights, the anytime scheme of chapter 2. For optimal planning, the **LM-cut** heuristic computes disjunctive action landmarks, sets of actions one of which every plan must use, by cuts in a graph of the relaxed task, and assigns costs to them without double counting; it is admissible and dominates $h^{\max}$. **Abstraction heuristics**, including the pattern databases of chapter 2 computed automatically from the task, and **cost partitioning**, which splits each action's cost among several heuristics so that their sum stays admissible, complete the toolkit of optimal planners.
+A **landmark** is an atom that must be true at some point in every plan, or an action that every plan must contain; the goal atoms are trivial landmarks, and others are found by analyzing the relaxed task. Counting the landmarks not yet achieved gives an informative heuristic: the LAMA planner ([Richter and Westphal, 2010](https://doi.org/10.1613/jair.2972)) combines it with $`h^{\mathrm{FF}}`$ in a greedy search followed by weighted A\* with decreasing weights, the anytime scheme of chapter 2. For optimal planning, the **LM-cut** heuristic computes disjunctive action landmarks, sets of actions one of which every plan must use, by cuts in a graph of the relaxed task, and assigns costs to them without double counting; it is admissible and dominates $`h^{\max}`$. **Abstraction heuristics**, including the pattern databases of chapter 2 computed automatically from the task, and **cost partitioning**, which splits each action's cost among several heuristics so that their sum stays admissible, complete the toolkit of optimal planners.
 
 A small STRIPS planner shows the relaxation heuristics at work:
 
@@ -193,23 +193,23 @@ for label, h, w_g in [("breadth-first (h = 0)", lambda s, g, a: 0, 1), ("A* with
 # greedy with h_FF       plan of 10 moves, 12 states expanded
 ```
 
-For this task of stacking six blocks from two towers into one, the shortest plan has eight moves. From the start, $h^{\max}=3$ badly underestimates it, $h^{\mathrm{add}}=14$ overestimates it, and $h^{\mathrm{FF}}=8$ happens to be exact. Breadth-first search expands 3,691 states and A\* with $h^{\max}$ 829, both finding the optimal plan; A\* with the inadmissible $h^{\mathrm{add}}$ expands 13 states and finds a nine-move plan, and greedy best-first search with $h^{\mathrm{FF}}$ expands 12 and finds a ten-move plan.
+For this task of stacking six blocks from two towers into one, the shortest plan has eight moves. From the start, $`h^{\max}=3`$ badly underestimates it, $`h^{\mathrm{add}}=14`$ overestimates it, and $`h^{\mathrm{FF}}=8`$ happens to be exact. Breadth-first search expands 3,691 states and A\* with $`h^{\max}`$ 829, both finding the optimal plan; A\* with the inadmissible $`h^{\mathrm{add}}`$ expands 13 states and finds a nine-move plan, and greedy best-first search with $`h^{\mathrm{FF}}`$ expands 12 and finds a ten-move plan.
 
 <img src="sources/images/ai-plan-heuristics.png" alt="ai-plan-heuristics" width="880">
 
-*Left: states expanded on ten random blocks-world tasks for each number of blocks, with random initial towers and random goal towers. Breadth-first search expands 194 states on average for five blocks and 15,936 for seven; A\* with the admissible $h^{\max}$ reduces the 1,813 states of breadth-first search on six blocks to 235, but each of its expansions costs a heuristic computation. A\* with $h^{\mathrm{add}}$ expands 107 states for ten blocks, and greedy best-first search with $h^{\mathrm{FF}}$ only 30 for fourteen. Right: the length of the plans found with the inadmissible heuristics, relative to the optimal length computed by breadth-first search. Both are optimal on the smallest tasks; for seven blocks, A\* with $h^{\mathrm{add}}$ finds plans 7% longer than optimal on average, and greedy search with $h^{\mathrm{FF}}$ 19% longer.*
+*Left: states expanded on ten random blocks-world tasks for each number of blocks, with random initial towers and random goal towers. Breadth-first search expands 194 states on average for five blocks and 15,936 for seven; A\* with the admissible $`h^{\max}`$ reduces the 1,813 states of breadth-first search on six blocks to 235, but each of its expansions costs a heuristic computation. A\* with $`h^{\mathrm{add}}`$ expands 107 states for ten blocks, and greedy best-first search with $`h^{\mathrm{FF}}`$ only 30 for fourteen. Right: the length of the plans found with the inadmissible heuristics, relative to the optimal length computed by breadth-first search. Both are optimal on the smallest tasks; for seven blocks, A\* with $`h^{\mathrm{add}}`$ finds plans 7% longer than optimal on average, and greedy search with $`h^{\mathrm{FF}}`$ 19% longer.*
 
 ## <a id="planning-as-satisfiability"></a>Planning as satisfiability
 
-A plan of a fixed length $T$ can also be found by logical inference, as chapter 5 anticipated. **SATPlan** ([Kautz and Selman, 1996](https://aaai.org/papers/177-aaai96-177-pushing-the-envelope-planning-propositional-logic-and-stochastic-search/)) introduces a propositional variable $p^t$ for each atom $p$ and time step $t=0,\dots,T$, and $a^t$ for each action and step $t<T$, and writes clauses for
+A plan of a fixed length $`T`$ can also be found by logical inference, as chapter 5 anticipated. **SATPlan** ([Kautz and Selman, 1996](https://aaai.org/papers/177-aaai96-177-pushing-the-envelope-planning-propositional-logic-and-stochastic-search/)) introduces a propositional variable $`p^t`$ for each atom $`p`$ and time step $`t=0,\dots,T`$, and $`a^t`$ for each action and step $`t<T`$, and writes clauses for
 
-- the **initial state**: $p^0$ for atoms in $s_0$ and $\neg p^0$ for the others;
-- the **goal**: $g^T$ for each goal atom;
-- **preconditions and effects**: $a^t\Rightarrow p^t$ for each precondition, $a^t\Rightarrow q^{t+1}$ for each added atom, and $a^t\Rightarrow\neg q^{t+1}$ for each deleted one;
-- **explanatory frame axioms**: an atom changes only if some action changes it, $p^t\wedge\neg p^{t+1}\Rightarrow\bigvee_{a:\,p\in\mathrm{del}(a)}a^t$, and similarly for atoms that become true;
+- the **initial state**: $`p^0`$ for atoms in $`s_0`$ and $`\neg p^0`$ for the others;
+- the **goal**: $`g^T`$ for each goal atom;
+- **preconditions and effects**: $`a^t\Rightarrow p^t`$ for each precondition, $`a^t\Rightarrow q^{t+1}`$ for each added atom, and $`a^t\Rightarrow\neg q^{t+1}`$ for each deleted one;
+- **explanatory frame axioms**: an atom changes only if some action changes it, $`p^t\wedge\neg p^{t+1}\Rightarrow\bigvee_{a:\,p\in\mathrm{del}(a)}a^t`$, and similarly for atoms that become true;
 - **exclusion**: at most one action per step, or, in the parallel encodings used in practice, no two actions at the same step that interfere, which allows shorter horizons.
 
-A model of these clauses is a plan: the actions whose variables are true. The planner tries $T=0,1,2,\dots$ until the formula becomes satisfiable, so with one action per step the first plan found is a shortest one. The **Sussman anomaly**, a three-block task whose two goals cannot be achieved one after the other without undoing the first, is a classic test:
+A model of these clauses is a plan: the actions whose variables are true. The planner tries $`T=0,1,2,\dots`$ until the formula becomes satisfiable, so with one action per step the first plan found is a shortest one. The **Sussman anomaly**, a three-block task whose two goals cannot be achieved one after the other without undoing the first, is a classic test:
 
 ```python
 from collections import Counter
@@ -313,7 +313,7 @@ For one and two steps, unit propagation alone proves the formula unsatisfiable, 
 
 ### <a id="partial-order-planning"></a>Partial-order planning
 
-State-space planners produce totally ordered sequences. A **partial-order planner** searches in the space of partial plans: sets of actions with ordering constraints between some pairs and **causal links** $a\xrightarrow{p}b$ recording that $a$ achieves precondition $p$ of $b$. It refines a plan by adding an action for an open precondition or resolving a **threat**, an action that could delete $p$ between $a$ and $b$, by ordering it before $a$ or after $b$. This **least-commitment** strategy orders actions only when it must, and it handles the Sussman anomaly naturally, where planners that achieve one subgoal at a time fail. Partial-order planning dominated the field in the 1990s; after heuristic state-space search overtook it in speed, it remained valuable where plans must be explained or executed flexibly, and its ideas persist in temporal planning and plan repair.
+State-space planners produce totally ordered sequences. A **partial-order planner** searches in the space of partial plans: sets of actions with ordering constraints between some pairs and **causal links** $`a\xrightarrow{p}b`$ recording that $`a`$ achieves precondition $`p`$ of $`b`$. It refines a plan by adding an action for an open precondition or resolving a **threat**, an action that could delete $`p`$ between $`a`$ and $`b`$, by ordering it before $`a`$ or after $`b`$. This **least-commitment** strategy orders actions only when it must, and it handles the Sussman anomaly naturally, where planners that achieve one subgoal at a time fail. Partial-order planning dominated the field in the 1990s; after heuristic state-space search overtook it in speed, it remained valuable where plans must be explained or executed flexibly, and its ideas persist in temporal planning and plan repair.
 
 ### <a id="hierarchical-task-networks"></a>Hierarchical task networks
 
@@ -337,11 +337,11 @@ Large language models add a new ingredient. Asked directly for plans in PDDL dom
 <summary><a id="block-ai07-appendix-a"></a><b>A. Properties of the relaxation heuristics</b></summary>
 
 
-**Relaxed reachability is polynomial.** In the delete-relaxed task, applying an action only adds atoms. Starting from $s$, apply all applicable actions in parallel, repeatedly; each round either adds an atom or changes nothing, so after at most as many rounds as there are atoms the set of reachable atoms is fixed. The goal is relaxed-reachable if and only if it is contained in that set, and if it is not, no real plan exists either, so $h^+(s)=\infty$ correctly detects dead ends.
+**Relaxed reachability is polynomial.** In the delete-relaxed task, applying an action only adds atoms. Starting from $`s`$, apply all applicable actions in parallel, repeatedly; each round either adds an atom or changes nothing, so after at most as many rounds as there are atoms the set of reachable atoms is fixed. The goal is relaxed-reachable if and only if it is contained in that set, and if it is not, no real plan exists either, so $`h^+(s)=\infty`$ correctly detects dead ends.
 
-**$h^{\max}\le h^+$.** Take an optimal relaxed plan $a_1,\dots,a_k$ from $s$, $k=h^+(s)$. Show by induction on $i$ that every atom $p$ added by $a_1,\dots,a_i$ and not already in $s$ has $\mathrm{cost}_{\max}(p)\le i$: the preconditions of $a_i$ are in $s$ or added by earlier actions, so they have cost at most $i-1$, and $a_i$ is an achiever of $p$ with $1+\max_q\mathrm{cost}(q)\le i$. Every goal atom is in $s$ or added by the plan, so $h^{\max}(s)=\max_g\mathrm{cost}(g)\le k$. Since $h^+\le h^*$, $h^{\max}$ is admissible. It is also consistent: an action changes the fixed point by at most one level, which gives $h^{\max}(s)\le1+h^{\max}(\mathrm{Result}(s,a))$ with unit costs.
+**$`h^{\max}\le h^+`$.** Take an optimal relaxed plan $`a_1,\dots,a_k`$ from $`s`$, $`k=h^+(s)`$. Show by induction on $`i`$ that every atom $`p`$ added by $`a_1,\dots,a_i`$ and not already in $`s`$ has $`\mathrm{cost}_{\max}(p)\le i`$: the preconditions of $`a_i`$ are in $`s`$ or added by earlier actions, so they have cost at most $`i-1`$, and $`a_i`$ is an achiever of $`p`$ with $`1+\max_q\mathrm{cost}(q)\le i`$. Every goal atom is in $`s`$ or added by the plan, so $`h^{\max}(s)=\max_g\mathrm{cost}(g)\le k`$. Since $`h^+\le h^*`$, $`h^{\max}`$ is admissible. It is also consistent: an action changes the fixed point by at most one level, which gives $`h^{\max}(s)\le1+h^{\max}(\mathrm{Result}(s,a))`$ with unit costs.
 
-**$h^{\mathrm{add}}$ can overestimate.** If the goal is $\{p_1,\dots,p_k\}$ and one action achieves all of them, then $h^+=1$ but $h^{\mathrm{add}}=k$. The overestimate comes from counting shared subplans once per subgoal, which the relaxed-plan extraction of $h^{\mathrm{FF}}$ avoids by collecting a set of actions. $h^{\mathrm{FF}}\ge h^+$ always holds, since it counts the actions of a valid relaxed plan, and the inequality can be strict when the best achievers do not form an optimal relaxed plan.
+**$`h^{\mathrm{add}}`$ can overestimate.** If the goal is $`\{p_1,\dots,p_k\}`$ and one action achieves all of them, then $`h^+=1`$ but $`h^{\mathrm{add}}=k`$. The overestimate comes from counting shared subplans once per subgoal, which the relaxed-plan extraction of $`h^{\mathrm{FF}}`$ avoids by collecting a set of actions. $`h^{\mathrm{FF}}\ge h^+`$ always holds, since it counts the actions of a valid relaxed plan, and the inequality can be strict when the best achievers do not form an optimal relaxed plan.
 
 </details>
 
@@ -351,13 +351,13 @@ Large language models add a new ingredient. Asked directly for plans in PDDL dom
 <summary><a id="block-ai07-appendix-b"></a><b>B. Regression is sound and complete</b></summary>
 
 
-Let $g$ be a set of atoms describing the states that contain it. For an action $a$ with $\mathrm{add}(a)\cap g\neq\emptyset$ and $\mathrm{del}(a)\cap g=\emptyset$, the regression $g'=(g\setminus\mathrm{add}(a))\cup\mathrm{pre}(a)$ satisfies, for every state $s$:
+Let $`g`$ be a set of atoms describing the states that contain it. For an action $`a`$ with $`\mathrm{add}(a)\cap g\neq\emptyset`$ and $`\mathrm{del}(a)\cap g=\emptyset`$, the regression $`g'=(g\setminus\mathrm{add}(a))\cup\mathrm{pre}(a)`$ satisfies, for every state $`s`$:
 
 $$
 g'\subseteq s\quad\Longrightarrow\quad a\text{ is applicable in }s\text{ and }g\subseteq\mathrm{Result}(s,a).
 $$
 
-Indeed $\mathrm{pre}(a)\subseteq g'\subseteq s$, and every atom of $g$ is either added by $a$ or in $g\setminus\mathrm{add}(a)\subseteq s$ and not deleted, since $a$ deletes nothing in $g$. Conversely, if $a$ is applicable in $s$ and $g\subseteq\mathrm{Result}(s,a)$, then $g'\subseteq s$ whenever $a$ deletes nothing in $g$: preconditions hold in $s$, and an atom of $g$ that $a$ does not add must already be in $s$. So $g'$ describes exactly the states from which $a$ leads into $g$ (up to actions that add and delete the same atom). By induction on plan length, backward search from $G$ finds a description satisfied by $s_0$ if and only if a plan exists, and the actions along the path, read in reverse order of discovery, form the plan. Relevance, requiring $a$ to add some atom of $g$, loses no plans that are minimal, since an action contributing nothing to $g$ can be removed from the end of a plan.
+Indeed $`\mathrm{pre}(a)\subseteq g'\subseteq s`$, and every atom of $`g`$ is either added by $`a`$ or in $`g\setminus\mathrm{add}(a)\subseteq s`$ and not deleted, since $`a`$ deletes nothing in $`g`$. Conversely, if $`a`$ is applicable in $`s`$ and $`g\subseteq\mathrm{Result}(s,a)`$, then $`g'\subseteq s`$ whenever $`a`$ deletes nothing in $`g`$: preconditions hold in $`s`$, and an atom of $`g`$ that $`a`$ does not add must already be in $`s`$. So $`g'`$ describes exactly the states from which $`a`$ leads into $`g`$ (up to actions that add and delete the same atom). By induction on plan length, backward search from $`G`$ finds a description satisfied by $`s_0`$ if and only if a plan exists, and the actions along the path, read in reverse order of discovery, form the plan. Relevance, requiring $`a`$ to add some atom of $`g`$, loses no plans that are minimal, since an action contributing nothing to $`g`$ can be removed from the end of a plan.
 
 </details>
 

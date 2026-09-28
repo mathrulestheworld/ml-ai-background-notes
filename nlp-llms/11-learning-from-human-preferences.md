@@ -12,19 +12,19 @@ Supervised fine-tuning (chapter 10) trains a model to imitate demonstrations, wh
 
 ### <a id="collecting-preferences"></a>Collecting preferences
 
-A preference datum consists of a prompt $x$ and two or more responses, usually sampled from the model being trained, with a human judgment of which is better, sometimes with a strength or a tie. InstructGPT's labelers ranked between four and nine responses per prompt, which yields many pairs per prompt; Anthropic's public dataset asked people to choose the more helpful or the more harmless of two responses in a conversation ([Bai et al., 2022](https://arxiv.org/abs/2204.05862)). Pairwise judgments are more consistent than absolute scores, but they are noisy: InstructGPT's labelers agreed with each other on about 73% of comparisons. Guidelines matter a great deal, because they define what "better" means, and the population of labelers shapes the values the model learns.
+A preference datum consists of a prompt $`x`$ and two or more responses, usually sampled from the model being trained, with a human judgment of which is better, sometimes with a strength or a tie. InstructGPT's labelers ranked between four and nine responses per prompt, which yields many pairs per prompt; Anthropic's public dataset asked people to choose the more helpful or the more harmless of two responses in a conversation ([Bai et al., 2022](https://arxiv.org/abs/2204.05862)). Pairwise judgments are more consistent than absolute scores, but they are noisy: InstructGPT's labelers agreed with each other on about 73% of comparisons. Guidelines matter a great deal, because they define what "better" means, and the population of labelers shapes the values the model learns.
 
 ## <a id="reward-models"></a>Reward models
 
 ### <a id="the-bradleyterry-model"></a>The Bradley–Terry model
 
-A reward model assigns a scalar $r_\phi(x,y)$ to a prompt and response, and models the probability that people prefer $y_w$ to $y_l$ by the **Bradley–Terry** model,
+A reward model assigns a scalar $`r_\phi(x,y)`$ to a prompt and response, and models the probability that people prefer $`y_w`$ to $`y_l`$ by the **Bradley–Terry** model,
 
 $$
 P(y_w\succ y_l\mid x)=\sigma\bigl(r_\phi(x,y_w)-r_\phi(x,y_l)\bigr),
 $$
 
-where $\sigma$ is the logistic function. Training minimizes the negative log-likelihood of the observed preferences, $-\log\sigma(r_\phi(x,y_w)-r_\phi(x,y_l))$, a logistic regression on differences of rewards (ML chapter 5). The reward is identified only up to an additive constant per prompt, since only differences enter. In practice the reward model is a copy of the language model, usually after supervised fine-tuning, with its output layer replaced by a scalar head that reads the final hidden state. The same model of pairwise comparisons ranks chess players and chatbots (chapter 14). The code fits a linear Bradley–Terry reward model to simulated comparisons among 200 responses, each described by eight features, labeled by annotators whose judgments follow the Bradley–Terry model with a hidden utility.
+where $`\sigma`$ is the logistic function. Training minimizes the negative log-likelihood of the observed preferences, $`-\log\sigma(r_\phi(x,y_w)-r_\phi(x,y_l))`$, a logistic regression on differences of rewards (ML chapter 5). The reward is identified only up to an additive constant per prompt, since only differences enter. In practice the reward model is a copy of the language model, usually after supervised fine-tuning, with its output layer replaced by a scalar head that reads the final hidden state. The same model of pairwise comparisons ranks chess players and chatbots (chapter 14). The code fits a linear Bradley–Terry reward model to simulated comparisons among 200 responses, each described by eight features, labeled by annotators whose judgments follow the Bradley–Terry model with a hidden utility.
 
 ```python
 import numpy as np
@@ -81,51 +81,51 @@ A reward model is evaluated by its accuracy on held-out preference pairs, on ben
 
 ### <a id="the-kl-regularized-objective"></a>The KL-regularized objective
 
-Given a reward model, the policy $\pi_\theta$ is trained to maximize the expected reward while staying close to a **reference policy** $\pi_{\mathrm{ref}}$, usually the fine-tuned model it starts from:
+Given a reward model, the policy $`\pi_\theta`$ is trained to maximize the expected reward while staying close to a **reference policy** $`\pi_{\mathrm{ref}}`$, usually the fine-tuned model it starts from:
 
 $$
 \max_{\pi_\theta}\ \mathbb E_{x\sim\mathcal D,\,y\sim\pi_\theta(\cdot\mid x)}\bigl[r_\phi(x,y)\bigr]-\beta\,\mathbb E_x\,D_{\mathrm{KL}}\bigl(\pi_\theta(\cdot\mid x)\,\Vert\,\pi_{\mathrm{ref}}(\cdot\mid x)\bigr).
 $$
 
-The penalty, weighted by $\beta$, keeps the policy near the distribution on which the reward model was trained, where its judgments are reliable, and preserves the fluency and diversity of the reference model. The objective has a closed-form maximizer,
+The penalty, weighted by $`\beta`$, keeps the policy near the distribution on which the reward model was trained, where its judgments are reliable, and preserves the fluency and diversity of the reference model. The objective has a closed-form maximizer,
 
 $$
 \pi^*(y\mid x)=\frac1{Z(x)}\,\pi_{\mathrm{ref}}(y\mid x)\exp\Bigl(\frac{r_\phi(x,y)}\beta\Bigr),
 $$
 
-the reference policy reweighted by the exponentiated reward, with $Z(x)$ normalizing over all responses ([Appendix A](#block-nlp11-appendix-a)). This is the Gibbs distribution with $-r$ as energy and $\beta$ as temperature, and it cannot be computed directly because the sum over all possible responses in $Z(x)$ is intractable.
+the reference policy reweighted by the exponentiated reward, with $`Z(x)`$ normalizing over all responses ([Appendix A](#block-nlp11-appendix-a)). This is the Gibbs distribution with $`-r`$ as energy and $`\beta`$ as temperature, and it cannot be computed directly because the sum over all possible responses in $`Z(x)`$ is intractable.
 
 ### <a id="rlhf-with-policy-gradients"></a>RLHF with policy gradients
 
-**Reinforcement learning from human feedback** (RLHF) approximates $\pi^*$ by training the language model as a policy. Each training step samples prompts, generates responses with the current policy, scores them with the reward model, subtracts the KL penalty, often estimated per token as $\beta\log(\pi_\theta/\pi_{\mathrm{ref}})$, and updates the policy with a policy-gradient method. InstructGPT and most early systems used **proximal policy optimization** (PPO; [Schulman et al., 2017](https://arxiv.org/abs/1707.06347)), which also trains a value network as a baseline and clips each update to stay near the policy that generated the data; the algorithm belongs to the RL module. PPO for language models is expensive and delicate: four models are involved (the policy, the reference, the reward model, and the value network), generation dominates the cost, and results depend on many implementation details. Simpler estimators that drop the value network and use the average reward of several samples for the same prompt as the baseline work as well for language models ([Ahmadian et al., 2024](https://arxiv.org/abs/2402.14740)); one of them, GRPO, is described with reasoning in chapter 12.
+**Reinforcement learning from human feedback** (RLHF) approximates $`\pi^*`$ by training the language model as a policy. Each training step samples prompts, generates responses with the current policy, scores them with the reward model, subtracts the KL penalty, often estimated per token as $`\beta\log(\pi_\theta/\pi_{\mathrm{ref}})`$, and updates the policy with a policy-gradient method. InstructGPT and most early systems used **proximal policy optimization** (PPO; [Schulman et al., 2017](https://arxiv.org/abs/1707.06347)), which also trains a value network as a baseline and clips each update to stay near the policy that generated the data; the algorithm belongs to the RL module. PPO for language models is expensive and delicate: four models are involved (the policy, the reference, the reward model, and the value network), generation dominates the cost, and results depend on many implementation details. Simpler estimators that drop the value network and use the average reward of several samples for the same prompt as the baseline work as well for language models ([Ahmadian et al., 2024](https://arxiv.org/abs/2402.14740)); one of them, GRPO, is described with reasoning in chapter 12.
 
 ### <a id="best-of-n"></a>Best-of-n
 
-The simplest way to use a reward model needs no training at all: sample $n$ responses from the reference policy and return the one with the highest reward. **Best-of-$n$** sampling is surprisingly strong, and its divergence from the reference policy is at most
+The simplest way to use a reward model needs no training at all: sample $`n`$ responses from the reference policy and return the one with the highest reward. **Best-of-$`n`$** sampling is surprisingly strong, and its divergence from the reference policy is at most
 
 $$
 D_{\mathrm{KL}}(\pi_{\text{BoN}}\,\Vert\,\pi_{\mathrm{ref}})\le\log n-\frac{n-1}n
 $$
 
-([Appendix B](#block-nlp11-appendix-b)), about 3.2 nats for $n=64$: a large improvement in reward for a modest distance, but at $n$ times the cost of generation. Fine-tuning on the best of $n$ samples, **rejection-sampling fine-tuning**, distills the improvement into the model, and was one of the stages of Llama 2's post-training, together with PPO and separate reward models for helpfulness and safety ([Touvron et al., 2023](https://arxiv.org/abs/2307.09288)).
+([Appendix B](#block-nlp11-appendix-b)), about 3.2 nats for $`n=64`$: a large improvement in reward for a modest distance, but at $`n`$ times the cost of generation. Fine-tuning on the best of $`n`$ samples, **rejection-sampling fine-tuning**, distills the improvement into the model, and was one of the stages of Llama 2's post-training, together with PPO and separate reward models for helpfulness and safety ([Touvron et al., 2023](https://arxiv.org/abs/2307.09288)).
 
 ## <a id="direct-preference-optimization"></a>Direct preference optimization
 
 ### <a id="skipping-the-reward-model"></a>Skipping the reward model
 
-The closed form of $\pi^*$ can be inverted: any policy defines an **implicit reward**
+The closed form of $`\pi^*`$ can be inverted: any policy defines an **implicit reward**
 
 $$
 r(x,y)=\beta\log\frac{\pi(y\mid x)}{\pi_{\mathrm{ref}}(y\mid x)}+\beta\log Z(x)
 $$
 
-for which it is the optimal KL-regularized policy. Substituting this reward into the Bradley–Terry likelihood, the intractable $\log Z(x)$ cancels in the difference between the two responses to the same prompt, leaving a loss on the policy alone ([Rafailov et al., 2023](https://arxiv.org/abs/2305.18290)):
+for which it is the optimal KL-regularized policy. Substituting this reward into the Bradley–Terry likelihood, the intractable $`\log Z(x)`$ cancels in the difference between the two responses to the same prompt, leaving a loss on the policy alone ([Rafailov et al., 2023](https://arxiv.org/abs/2305.18290)):
 
 $$
 \mathcal L_{\mathrm{DPO}}(\theta)=-\mathbb E_{(x,y_w,y_l)}\log\sigma\Bigl(\beta\log\frac{\pi_\theta(y_w\mid x)}{\pi_{\mathrm{ref}}(y_w\mid x)}-\beta\log\frac{\pi_\theta(y_l\mid x)}{\pi_{\mathrm{ref}}(y_l\mid x)}\Bigr).
 $$
 
-**Direct preference optimization** (DPO) fits the reward model and extracts its optimal policy in one step, by supervised training on the preference pairs: no reward model, no sampling during training, and no reinforcement learning. Its gradient raises the probability of the preferred response and lowers that of the rejected one, weighted by how strongly the implicit reward currently misorders them ([Appendix C](#block-nlp11-appendix-c)). The code checks the equivalence in a case small enough to compute everything: a single prompt with six responses, a reference policy, and 2,316 preference pairs sampled from the reference and labeled with a Bradley–Terry utility. It computes the RLHF solution, fitting the reward model and forming $\pi^*$ exactly, and the DPO solution, optimizing the policy's six probabilities directly.
+**Direct preference optimization** (DPO) fits the reward model and extracts its optimal policy in one step, by supervised training on the preference pairs: no reward model, no sampling during training, and no reinforcement learning. Its gradient raises the probability of the preferred response and lowers that of the rejected one, weighted by how strongly the implicit reward currently misorders them ([Appendix C](#block-nlp11-appendix-c)). The code checks the equivalence in a case small enough to compute everything: a single prompt with six responses, a reference policy, and 2,316 preference pairs sampled from the reference and labeled with a Bradley–Terry utility. It computes the RLHF solution, fitting the reward model and forming $`\pi^*`$ exactly, and the DPO solution, optimizing the policy's six probabilities directly.
 
 ```python
 import numpy as np
@@ -186,7 +186,7 @@ print(f"largest difference between the RLHF and DPO policies: {np.abs(pi_rlhf - 
 # largest difference between the RLHF and DPO policies: 1.7e-16
 ```
 
-The two policies agree to within rounding error, as the derivation predicts: with a policy able to represent any distribution over responses, DPO and RLHF with the same data and $\beta$ have the same optimum. Both fall short of the optimum for the true utility only because the preferences are finite and noisy.
+The two policies agree to within rounding error, as the derivation predicts: with a policy able to represent any distribution over responses, DPO and RLHF with the same data and $`\beta`$ have the same optimum. Both fall short of the optimum for the true utility only because the preferences are finite and noisy.
 
 ### <a id="variants-and-limits"></a>Variants and limits
 
@@ -196,11 +196,11 @@ The equivalence holds at the optimum, not along the way, and practice differs fr
 
 ### <a id="goodhart-s-law"></a>Goodhart's law
 
-A reward model is a proxy for what people want, and optimizing a proxy hard enough exploits its errors: when a measure becomes a target, it ceases to be a good measure. [Gao, Schulman, and Hilton (2023)](https://arxiv.org/abs/2210.10760) measured the effect with a large "gold" reward model standing in for humans, which labeled the data for smaller proxy reward models. As optimization against the proxy moved the policy away from the reference, the proxy reward kept rising while the gold reward rose, peaked, and declined, following simple functional forms in $d=\sqrt{D_{\mathrm{KL}}}$, and the peak moved to larger distances for larger reward models and more data. The figure reproduces the phenomenon in a toy model.
+A reward model is a proxy for what people want, and optimizing a proxy hard enough exploits its errors: when a measure becomes a target, it ceases to be a good measure. [Gao, Schulman, and Hilton (2023)](https://arxiv.org/abs/2210.10760) measured the effect with a large "gold" reward model standing in for humans, which labeled the data for smaller proxy reward models. As optimization against the proxy moved the policy away from the reference, the proxy reward kept rising while the gold reward rose, peaked, and declined, following simple functional forms in $`d=\sqrt{D_{\mathrm{KL}}}`$, and the peak moved to larger distances for larger reward models and more data. The figure reproduces the phenomenon in a toy model.
 
 <img src="sources/images/nlp-rlhf-overoptimization.png" alt="nlp-rlhf-overoptimization" width="880">
 
-*Responses are eight-dimensional feature vectors drawn from a standard normal reference policy. The gold reward is linear in seven features and concave in the first, like a quality such as length that helps up to a point and then hurts: $2\phi_0-0.5\phi_0^2$. A linear proxy reward model fitted to 2,000 comparisons of reference samples agrees with the gold reward on 95.4% of reference pairs. Optimizing it by best-of-$n$ ($n$ up to $10^5$) or by the exact KL-regularized policy (computed over a pool of a million reference samples) raises the proxy reward steadily, while the gold reward, $-0.50$ under the reference, peaks at 2.24 for best-of-$n$ at 3.2 nats and at 1.88 for the KL-regularized policy at 2.4 nats, then falls toward its starting value.*
+*Responses are eight-dimensional feature vectors drawn from a standard normal reference policy. The gold reward is linear in seven features and concave in the first, like a quality such as length that helps up to a point and then hurts: $`2\phi_0-0.5\phi_0^2`$. A linear proxy reward model fitted to 2,000 comparisons of reference samples agrees with the gold reward on 95.4% of reference pairs. Optimizing it by best-of-$`n`$ ($`n`$ up to $`10^5`$) or by the exact KL-regularized policy (computed over a pool of a million reference samples) raises the proxy reward steadily, while the gold reward, $`-0.50`$ under the reference, peaks at 2.24 for best-of-$`n`$ at 3.2 nats and at 1.88 for the KL-regularized policy at 2.4 nats, then falls toward its starting value.*
 
 The proxy learned the right direction for the first feature, and within the range of the reference samples it is an excellent reward model. Optimization pushes the policy to values of that feature far outside the range where the proxy was trained, where its linear extrapolation is wrong. Real reward models fail the same way on features that correlate with quality in the training data. They favor longer responses, since longer answers were often better in the comparisons, so optimization inflates length ([Singhal et al., 2023](https://arxiv.org/abs/2310.03716)); and people, and reward models trained on their judgments, prefer responses that agree with the user's stated views, so preference-trained models become **sycophantic**, telling users what they want to hear ([Sharma et al., 2023](https://arxiv.org/abs/2310.13548)).
 
@@ -225,13 +225,13 @@ Preference training makes models more helpful, better at following instructions,
 <summary><a id="block-nlp11-appendix-a"></a><b>A. The optimal KL-regularized policy</b></summary>
 
 
-Fix a prompt and write $p=\pi(\cdot\mid x)$, $q=\pi_{\mathrm{ref}}(\cdot\mid x)$, and $r(y)$. The objective is $J(p)=\sum_yp(y)r(y)-\beta\sum_yp(y)\log\frac{p(y)}{q(y)}$. Define $p^*(y)=q(y)e^{r(y)/\beta}/Z$ with $Z=\sum_yq(y)e^{r(y)/\beta}$. Then $r(y)=\beta\log\frac{p^*(y)}{q(y)}+\beta\log Z$, and substituting,
+Fix a prompt and write $`p=\pi(\cdot\mid x)`$, $`q=\pi_{\mathrm{ref}}(\cdot\mid x)`$, and $`r(y)`$. The objective is $`J(p)=\sum_yp(y)r(y)-\beta\sum_yp(y)\log\frac{p(y)}{q(y)}`$. Define $`p^*(y)=q(y)e^{r(y)/\beta}/Z`$ with $`Z=\sum_yq(y)e^{r(y)/\beta}`$. Then $`r(y)=\beta\log\frac{p^*(y)}{q(y)}+\beta\log Z`$, and substituting,
 
 $$
 J(p)=\sum_yp(y)\Bigl[\beta\log\frac{p^*(y)}{q(y)}+\beta\log Z-\beta\log\frac{p(y)}{q(y)}\Bigr]=\beta\log Z-\beta\,D_{\mathrm{KL}}(p\,\Vert\,p^*).
 $$
 
-Since the divergence is nonnegative and zero only at $p=p^*$, the unique maximizer is $p^*$, with maximum value $\beta\log Z$. This is the Gibbs variational principle: $\beta\log\mathbb E_q[e^{r/\beta}]=\max_p\{\mathbb E_p[r]-\beta D_{\mathrm{KL}}(p\Vert q)\}$. As $\beta\to\infty$ the optimum stays at $q$; as $\beta\to0$ it concentrates on the responses with the highest reward among those $q$ can produce, since $p^*(y)=0$ wherever $q(y)=0$.
+Since the divergence is nonnegative and zero only at $`p=p^*`$, the unique maximizer is $`p^*`$, with maximum value $`\beta\log Z`$. This is the Gibbs variational principle: $`\beta\log\mathbb E_q[e^{r/\beta}]=\max_p\{\mathbb E_p[r]-\beta D_{\mathrm{KL}}(p\Vert q)\}`$. As $`\beta\to\infty`$ the optimum stays at $`q`$; as $`\beta\to0`$ it concentrates on the responses with the highest reward among those $`q`$ can produce, since $`p^*(y)=0`$ wherever $`q(y)=0`$.
 
 </details>
 
@@ -241,13 +241,13 @@ Since the divergence is nonnegative and zero only at $p=p^*$, the unique maximiz
 <summary><a id="block-nlp11-appendix-b"></a><b>B. The divergence of best-of-n</b></summary>
 
 
-Suppose the reward has a continuous distribution under $q$, so ties occur with probability zero, and let $F(y)=P_{Y'\sim q}(r(Y')\le r(y))$ be the quantile of $y$'s reward. The best of $n$ independent samples has reward quantile $U_{(n)}$, the maximum of $n$ uniform variables, with density $nu^{n-1}$ on $[0,1]$. Since the quantile $F(Y)$ of a sample from $q$ is uniform, the best-of-$n$ policy is $\pi_{\text{BoN}}(y)=q(y)\,nF(y)^{n-1}$, and
+Suppose the reward has a continuous distribution under $`q`$, so ties occur with probability zero, and let $`F(y)=P_{Y'\sim q}(r(Y')\le r(y))`$ be the quantile of $`y`$'s reward. The best of $`n`$ independent samples has reward quantile $`U_{(n)}`$, the maximum of $`n`$ uniform variables, with density $`nu^{n-1}`$ on $`[0,1]`$. Since the quantile $`F(Y)`$ of a sample from $`q`$ is uniform, the best-of-$`n`$ policy is $`\pi_{\text{BoN}}(y)=q(y)\,nF(y)^{n-1}`$, and
 
 $$
 D_{\mathrm{KL}}(\pi_{\text{BoN}}\,\Vert\,q)=\mathbb E_{\pi_{\text{BoN}}}\bigl[\log\bigl(nF(Y)^{n-1}\bigr)\bigr]=\log n+(n-1)\int_0^1nu^{n-1}\log u\,du=\log n-\frac{n-1}n,
 $$
 
-using $\int_0^1nu^{n-1}\log u\,du=-1/n$. With discrete responses, ties among repeated samples make the best-of-$n$ distribution closer to $q$, and the formula becomes an upper bound ([Beirami et al., 2024](https://arxiv.org/abs/2401.01879)). The divergence grows only logarithmically in $n$, while the expected reward of the best sample under a Gaussian reward grows like $\sqrt{2\log n}$, which is why best-of-$n$ reaches high rewards for a small divergence.
+using $`\int_0^1nu^{n-1}\log u\,du=-1/n`$. With discrete responses, ties among repeated samples make the best-of-$`n`$ distribution closer to $`q`$, and the formula becomes an upper bound ([Beirami et al., 2024](https://arxiv.org/abs/2401.01879)). The divergence grows only logarithmically in $`n`$, while the expected reward of the best sample under a Gaussian reward grows like $`\sqrt{2\log n}`$, which is why best-of-$`n`$ reaches high rewards for a small divergence.
 
 </details>
 
@@ -257,13 +257,13 @@ using $\int_0^1nu^{n-1}\log u\,du=-1/n$. With discrete responses, ties among rep
 <summary><a id="block-nlp11-appendix-c"></a><b>C. The DPO gradient</b></summary>
 
 
-Write $h_\theta(x,y)=\beta\log\frac{\pi_\theta(y\mid x)}{\pi_{\mathrm{ref}}(y\mid x)}$ for the implicit reward and $\Delta=h_\theta(x,y_w)-h_\theta(x,y_l)$. The DPO loss for one pair is $-\log\sigma(\Delta)$, and since $\frac{d}{d\Delta}\log\sigma(\Delta)=1-\sigma(\Delta)=\sigma(-\Delta)$,
+Write $`h_\theta(x,y)=\beta\log\frac{\pi_\theta(y\mid x)}{\pi_{\mathrm{ref}}(y\mid x)}`$ for the implicit reward and $`\Delta=h_\theta(x,y_w)-h_\theta(x,y_l)`$. The DPO loss for one pair is $`-\log\sigma(\Delta)`$, and since $`\frac{d}{d\Delta}\log\sigma(\Delta)=1-\sigma(\Delta)=\sigma(-\Delta)`$,
 
 $$
 \nabla_\theta\mathcal L_{\mathrm{DPO}}=-\beta\,\sigma(-\Delta)\bigl[\nabla_\theta\log\pi_\theta(y_w\mid x)-\nabla_\theta\log\pi_\theta(y_l\mid x)\bigr].
 $$
 
-The update raises the log-probability of the preferred response and lowers that of the rejected one, weighted by $\sigma(-\Delta)$, the probability that the current implicit reward assigns to the wrong ordering: pairs the policy already orders correctly with a large margin contribute little. The loss depends on $\pi_\theta$ only through differences of log-probabilities between the two responses, so it can lower both at once as long as the rejected one falls faster, and in practice the likelihood of preferred responses often decreases during DPO training, moving probability to responses outside the data. With a tabular policy, the map $\theta\mapsto h_\theta$ is a reparametrization of all rewards up to a constant, so minimizing the DPO loss is exactly maximum-likelihood Bradley–Terry estimation, and the resulting policy is the RLHF optimum for the fitted reward, as the code in the chapter confirms.
+The update raises the log-probability of the preferred response and lowers that of the rejected one, weighted by $`\sigma(-\Delta)`$, the probability that the current implicit reward assigns to the wrong ordering: pairs the policy already orders correctly with a large margin contribute little. The loss depends on $`\pi_\theta`$ only through differences of log-probabilities between the two responses, so it can lower both at once as long as the rejected one falls faster, and in practice the likelihood of preferred responses often decreases during DPO training, moving probability to responses outside the data. With a tabular policy, the map $`\theta\mapsto h_\theta`$ is a reparametrization of all rewards up to a constant, so minimizing the DPO loss is exactly maximum-likelihood Bradley–Terry estimation, and the resulting policy is the RLHF optimum for the fitted reward, as the code in the chapter confirms.
 
 </details>
 

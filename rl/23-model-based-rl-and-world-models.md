@@ -99,9 +99,9 @@ The first deep model-based agents to match model-free ones on continuous control
 
 ### <a id="model-based-policy-optimization"></a>Model-based policy optimization
 
-Planning at every step is expensive, and planning over long horizons compounds errors. **Dyna**-style methods (chapter 10) instead use the model to generate experience for a model-free learner. **MBPO** ([Janner, Fu, Zhang, and Levine, 2019](https://arxiv.org/abs/1906.08253)) found the key to making this work with neural models: **short branched rollouts**. It starts model rollouts from states in the real replay memory, runs them for only $k$ steps (from 1 up to 15 or 25 depending on the task, lengthened on a fixed linear schedule as training progresses), and trains a soft actor–critic on a mixture of real and model data, with many updates per real step. Starting from real states keeps the rollouts inside the data distribution, and short rollouts limit the compounding of errors, while the model still multiplies the data available near every state the agent has visited. The authors derived a bound on the policy's true return in terms of the model's error and the length of the rollouts that motivates this design (exercise 23.3). MBPO learned the MuJoCo locomotion tasks several times faster than SAC, an order of magnitude faster on some (on Ant it matched SAC's 3-million-step performance after 300,000 steps), and the model-free REDQ of chapter 21 later matched its efficiency with an ensemble of critics and a high replay ratio, which suggests that a large part of its gain comes from the many updates per real sample that the model makes possible.
+Planning at every step is expensive, and planning over long horizons compounds errors. **Dyna**-style methods (chapter 10) instead use the model to generate experience for a model-free learner. **MBPO** ([Janner, Fu, Zhang, and Levine, 2019](https://arxiv.org/abs/1906.08253)) found the key to making this work with neural models: **short branched rollouts**. It starts model rollouts from states in the real replay memory, runs them for only $`k`$ steps (from 1 up to 15 or 25 depending on the task, lengthened on a fixed linear schedule as training progresses), and trains a soft actor–critic on a mixture of real and model data, with many updates per real step. Starting from real states keeps the rollouts inside the data distribution, and short rollouts limit the compounding of errors, while the model still multiplies the data available near every state the agent has visited. The authors derived a bound on the policy's true return in terms of the model's error and the length of the rollouts that motivates this design (exercise 23.3). MBPO learned the MuJoCo locomotion tasks several times faster than SAC, an order of magnitude faster on some (on Ant it matched SAC's 3-million-step performance after 300,000 steps), and the model-free REDQ of chapter 21 later matched its efficiency with an ensemble of critics and a high replay ratio, which suggests that a large part of its gain comes from the many updates per real sample that the model makes possible.
 
-A model can also sharpen the value targets rather than add data. **Model-based value expansion** ([Feinberg et al., 2018](https://arxiv.org/abs/1803.00101)) computes $h$-step targets with the model's rewards before bootstrapping, and **STEVE** ([Buckman, Hafner, Tucker, Brevdo, and Lee, 2018](https://arxiv.org/abs/1807.01675)) weights targets of different horizons by their uncertainty under an ensemble. And a differentiable model gives the policy gradients directly: **stochastic value gradients** ([Heess et al., 2015](https://arxiv.org/abs/1510.09142)) backpropagate the value of a trajectory through the model and the policy, the approach that Dreamer scales up.
+A model can also sharpen the value targets rather than add data. **Model-based value expansion** ([Feinberg et al., 2018](https://arxiv.org/abs/1803.00101)) computes $`h`$-step targets with the model's rewards before bootstrapping, and **STEVE** ([Buckman, Hafner, Tucker, Brevdo, and Lee, 2018](https://arxiv.org/abs/1807.01675)) weights targets of different horizons by their uncertainty under an ensemble. And a differentiable model gives the policy gradients directly: **stochastic value gradients** ([Heess et al., 2015](https://arxiv.org/abs/1510.09142)) backpropagate the value of a trajectory through the model and the policy, the approach that Dreamer scales up.
 
 ## <a id="latent-world-models"></a>Latent world models
 
@@ -241,52 +241,52 @@ Models help most where data are expensive and the dynamics are learnable: robots
 
 ### <a id="exercise-23-1-how-errors-compound"></a>Exercise 23.1 — How errors compound
 
-A linear system $x_{t+1}=Ax_t$ is modeled by $\hat A=A+E$ with $\|E\|\le\epsilon$. (a) Show that the error of an $h$-step open-loop prediction satisfies $\|\hat A^hx_0-A^hx_0\|\le\epsilon\sum_{k=0}^{h-1}\|\hat A\|^k\|A\|^{h-1-k}\|x_0\|$. (b) Evaluate the bound for $\|A\|=\|\hat A\|=\rho$ with $\rho<1$, $\rho=1$, and $\rho>1$, and relate it to the code's two regions.
+A linear system $`x_{t+1}=Ax_t`$ is modeled by $`\hat A=A+E`$ with $`\|E\|\le\epsilon`$. (a) Show that the error of an $`h`$-step open-loop prediction satisfies $`\|\hat A^hx_0-A^hx_0\|\le\epsilon\sum_{k=0}^{h-1}\|\hat A\|^k\|A\|^{h-1-k}\|x_0\|`$. (b) Evaluate the bound for $`\|A\|=\|\hat A\|=\rho`$ with $`\rho<1`$, $`\rho=1`$, and $`\rho>1`$, and relate it to the code's two regions.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Telescope: $\hat A^h-A^h=\sum_{k=0}^{h-1}\hat A^k(\hat A-A)A^{h-1-k}$, as expanding the sum shows, and bound each term by submultiplicativity.
+(a) Telescope: $`\hat A^h-A^h=\sum_{k=0}^{h-1}\hat A^k(\hat A-A)A^{h-1-k}`$, as expanding the sum shows, and bound each term by submultiplicativity.
 
-(b) With both norms equal to $\rho$ the bound is $h\rho^{h-1}\epsilon\|x_0\|$. For $\rho<1$ it peaks (if $\rho>1/2$) and then decays to zero, so errors die out: stable systems forget their initial conditions and the model's past mistakes. For $\rho=1$ it grows linearly, as the in-distribution error of the code does over the first steps. For $\rho>1$ it grows exponentially, as near an unstable equilibrium such as the pendulum's upright position, where small errors in the predicted angle are amplified by gravity at every step. Nonlinear models add a second source of growth that this bound ignores: after a few steps the predictions leave the region where the model was trained, and $\epsilon$ itself grows, which is what the out-of-distribution row of the code shows.
+(b) With both norms equal to $`\rho`$ the bound is $`h\rho^{h-1}\epsilon\|x_0\|`$. For $`\rho<1`$ it peaks (if $`\rho>1/2`$) and then decays to zero, so errors die out: stable systems forget their initial conditions and the model's past mistakes. For $`\rho=1`$ it grows linearly, as the in-distribution error of the code does over the first steps. For $`\rho>1`$ it grows exponentially, as near an unstable equilibrium such as the pendulum's upright position, where small errors in the predicted angle are amplified by gravity at every step. Nonlinear models add a second source of growth that this bound ignores: after a few steps the predictions leave the region where the model was trained, and $`\epsilon`$ itself grows, which is what the out-of-distribution row of the code shows.
 
 </details>
 
 
 ### <a id="exercise-23-2-the-simulation-lemma"></a>Exercise 23.2 — The simulation lemma
 
-Let $M$ and $\hat M$ be two MDPs with the same states and actions, rewards in $[0,R_{\max}]$, and $\|P(\cdot\mid s,a)-\hat P(\cdot\mid s,a)\|_1\le\epsilon_P$ and $|r(s,a)-\hat r(s,a)|\le\epsilon_R$ everywhere. Show that for every policy, $\|V^\pi_M-V^\pi_{\hat M}\|_\infty\le\frac{\epsilon_R}{1-\gamma}+\frac{\gamma\epsilon_PR_{\max}}{(1-\gamma)^2}$.
+Let $`M`$ and $`\hat M`$ be two MDPs with the same states and actions, rewards in $`[0,R_{\max}]`$, and $`\|P(\cdot\mid s,a)-\hat P(\cdot\mid s,a)\|_1\le\epsilon_P`$ and $`|r(s,a)-\hat r(s,a)|\le\epsilon_R`$ everywhere. Show that for every policy, $`\|V^\pi_M-V^\pi_{\hat M}\|_\infty\le\frac{\epsilon_R}{1-\gamma}+\frac{\gamma\epsilon_PR_{\max}}{(1-\gamma)^2}`$.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-Write $V=V^\pi_M$ and $\hat V=V^\pi_{\hat M}$. From the Bellman equations,
+Write $`V=V^\pi_M`$ and $`\hat V=V^\pi_{\hat M}`$. From the Bellman equations,
 
 $$
 V(s)-\hat V(s)=\mathbb E_{a\sim\pi}\Bigl[r-\hat r+\gamma\sum_{s'}\bigl(P-\hat P\bigr)(s'\mid s,a)V(s')+\gamma\sum_{s'}\hat P(s'\mid s,a)\bigl(V-\hat V\bigr)(s')\Bigr].
 $$
 
-The first term is at most $\epsilon_R$. For the second, $\sum_{s'}(P-\hat P)(s')V(s')=\sum_{s'}(P-\hat P)(s')\bigl(V(s')-c\bigr)$ for any constant $c$, since both distributions sum to 1; with $c=R_{\max}/(2(1-\gamma))$ and $0\le V\le R_{\max}/(1-\gamma)$ it is at most $\frac{\epsilon_P}2\cdot\frac{R_{\max}}{1-\gamma}$, and at most $\epsilon_PR_{\max}/(1-\gamma)$ without this refinement. The last term is at most $\gamma\|V-\hat V\|_\infty$. Taking the maximum over $s$ and solving, $\|V-\hat V\|_\infty\le\bigl(\epsilon_R+\gamma\epsilon_PR_{\max}/(1-\gamma)\bigr)/(1-\gamma)$ (with the refinement, half the second term). The factor $(1-\gamma)^{-2}$ on the dynamics error is the compounding of errors over an effective horizon of $1/(1-\gamma)$ steps, in the form of a guarantee; this lemma underlies the analyses of R-max (chapter 22) and of MBPO.
+The first term is at most $`\epsilon_R`$. For the second, $`\sum_{s'}(P-\hat P)(s')V(s')=\sum_{s'}(P-\hat P)(s')\bigl(V(s')-c\bigr)`$ for any constant $`c`$, since both distributions sum to 1; with $`c=R_{\max}/(2(1-\gamma))`$ and $`0\le V\le R_{\max}/(1-\gamma)`$ it is at most $`\frac{\epsilon_P}2\cdot\frac{R_{\max}}{1-\gamma}`$, and at most $`\epsilon_PR_{\max}/(1-\gamma)`$ without this refinement. The last term is at most $`\gamma\|V-\hat V\|_\infty`$. Taking the maximum over $`s`$ and solving, $`\|V-\hat V\|_\infty\le\bigl(\epsilon_R+\gamma\epsilon_PR_{\max}/(1-\gamma)\bigr)/(1-\gamma)`$ (with the refinement, half the second term). The factor $`(1-\gamma)^{-2}`$ on the dynamics error is the compounding of errors over an effective horizon of $`1/(1-\gamma)`$ steps, in the form of a guarantee; this lemma underlies the analyses of R-max (chapter 22) and of MBPO.
 
 </details>
 
 
 ### <a id="exercise-23-3-why-short-branched-rollouts"></a>Exercise 23.3 — Why short branched rollouts
 
-MBPO's analysis bounds the true return of the policy by its return under branched model rollouts minus two penalties: one proportional to the rollout length $k$ times the model's error, and one proportional to the divergence between the current policy and the policy that collected the data, discounted by $\gamma^k$, so that it shrinks as $k$ grows. (a) Why does starting rollouts from states in the replay memory, rather than from the initial state, change the trade-off? (b) Why does MBPO lengthen the rollouts as training progresses?
+MBPO's analysis bounds the true return of the policy by its return under branched model rollouts minus two penalties: one proportional to the rollout length $`k`$ times the model's error, and one proportional to the divergence between the current policy and the policy that collected the data, discounted by $`\gamma^k`$, so that it shrinks as $`k`$ grows. (a) Why does starting rollouts from states in the replay memory, rather than from the initial state, change the trade-off? (b) Why does MBPO lengthen the rollouts as training progresses?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) A rollout of the full episode length from the initial state compounds the model's error over the whole horizon, and it visits states determined by the model's own predictions, where the model is least reliable. A branched rollout of $k$ steps starting from a real state compounds errors over only $k$ steps, and starts where the model was trained. The policy still sees states along the whole distribution of real experience, because the starting states cover it. The penalty in the bound grows with $k$ rather than with the effective horizon, and the gain, more data near every visited state, remains.
+(a) A rollout of the full episode length from the initial state compounds the model's error over the whole horizon, and it visits states determined by the model's own predictions, where the model is least reliable. A branched rollout of $`k`$ steps starting from a real state compounds errors over only $`k`$ steps, and starts where the model was trained. The policy still sees states along the whole distribution of real experience, because the starting states cover it. The penalty in the bound grows with $`k`$ rather than with the effective horizon, and the gain, more data near every visited state, remains.
 
-(b) As the model sees more data, its error shrinks, and the penalty per step of rollout falls, so longer rollouts, which propagate information further and correct more of the value function's bootstrapping errors, become affordable. MBPO grows $k$ linearly over a schedule chosen per task, from 1 to at most 25 (Ant, Humanoid), and keeps $k=1$ on some tasks.
+(b) As the model sees more data, its error shrinks, and the penalty per step of rollout falls, so longer rollouts, which propagate information further and correct more of the value function's bootstrapping errors, become affordable. MBPO grows $`k`$ linearly over a schedule chosen per task, from 1 to at most 25 (Ant, Humanoid), and keeps $`k=1`$ on some tasks.
 
 </details>
 
@@ -352,23 +352,23 @@ In the code on what a model should predict: (a) why does the reconstruction-only
 
 (a) Its two latent dimensions track mostly the distractors, with a small admixture of the controllable state. Its fitted latent dynamics and reward are those of the distractors, and its LQR gain acts on them; the control it applies depends on the true state only through that admixture, with a sign and a size that nothing in its training constrained. When that accidental feedback has the wrong sign, it pushes the state further in the direction it already moves, and the double integrator, which is only marginally stable without control, diverges. Doing nothing would have been better; a model that misunderstands what it controls is worse than no model.
 
-(b) First, the random controls in the data excite the dynamics only moderately, and the reward loss constrains the model only through the rewards of the next 10 steps; directions of the true state that affect the rewards little are estimated imprecisely. Second, its latent $z=Wo$ is a linear function of the whole observation, and ignoring the distractors requires the weights on them to vanish exactly; any residual weight injects distractor noise into the control. Both shrink with more data and training; the reconstruction losses, in contrast, do not improve with more data, since they are optimized by modeling the distractors.
+(b) First, the random controls in the data excite the dynamics only moderately, and the reward loss constrains the model only through the rewards of the next 10 steps; directions of the true state that affect the rewards little are estimated imprecisely. Second, its latent $`z=Wo`$ is a linear function of the whole observation, and ignoring the distractors requires the weights on them to vanish exactly; any residual weight injects distractor noise into the control. Both shrink with more data and training; the reconstruction losses, in contrast, do not improve with more data, since they are optimized by modeling the distractors.
 
 </details>
 
 
 ### <a id="exercise-23-8-symlog-and-two-hot"></a>Exercise 23.8 — Symlog and two-hot
 
-DreamerV3 predicts quantities with $\operatorname{symlog}(x)=\operatorname{sign}(x)\ln(|x|+1)$ and represents rewards and values as **two-hot** vectors over bins $b_1<\dots<b_K$: a scalar $y$ between $b_k$ and $b_{k+1}$ puts weight $(b_{k+1}-y)/(b_{k+1}-b_k)$ on bin $k$ and the rest on bin $k+1$. (a) Give the inverse of symlog, and compare it with the value rescaling of R2D2 (exercise 18.6). (b) Show that the two-hot vector's expectation over the bins is $y$, and explain why training a categorical output with cross-entropy against it is robust to the scale of the targets.
+DreamerV3 predicts quantities with $`\operatorname{symlog}(x)=\operatorname{sign}(x)\ln(|x|+1)`$ and represents rewards and values as **two-hot** vectors over bins $`b_1<\dots<b_K`$: a scalar $`y`$ between $`b_k`$ and $`b_{k+1}`$ puts weight $`(b_{k+1}-y)/(b_{k+1}-b_k)`$ on bin $`k`$ and the rest on bin $`k+1`$. (a) Give the inverse of symlog, and compare it with the value rescaling of R2D2 (exercise 18.6). (b) Show that the two-hot vector's expectation over the bins is $`y`$, and explain why training a categorical output with cross-entropy against it is robust to the scale of the targets.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) $\operatorname{symexp}(x)=\operatorname{sign}(x)(e^{|x|}-1)$. Both symlog and R2D2's $h(x)=\operatorname{sign}(x)(\sqrt{|x|+1}-1)+\epsilon x$ are odd, monotone, linear near zero (symlog with slope 1, $h$ with slope $1/2+\epsilon$), and compress large magnitudes, logarithmically for symlog and like a square root for $h$. DreamerV3 applies symlog to vector observations, as encoder inputs and as reconstruction targets, and places the two-hot bins uniformly in symlog space, so that the bins cover rewards and returns from very small to very large magnitudes.
+(a) $`\operatorname{symexp}(x)=\operatorname{sign}(x)(e^{|x|}-1)`$. Both symlog and R2D2's $`h(x)=\operatorname{sign}(x)(\sqrt{|x|+1}-1)+\epsilon x`$ are odd, monotone, linear near zero (symlog with slope 1, $`h`$ with slope $`1/2+\epsilon`$), and compress large magnitudes, logarithmically for symlog and like a square root for $`h`$. DreamerV3 applies symlog to vector observations, as encoder inputs and as reconstruction targets, and places the two-hot bins uniformly in symlog space, so that the bins cover rewards and returns from very small to very large magnitudes.
 
-(b) $b_k\frac{b_{k+1}-y}{b_{k+1}-b_k}+b_{k+1}\frac{y-b_k}{b_{k+1}-b_k}=\frac{b_kb_{k+1}-b_ky+b_{k+1}y-b_{k+1}b_k}{b_{k+1}-b_k}=y$. The cross-entropy loss's gradient with respect to the logits is the difference between the predicted and the target probabilities, which is bounded whatever the magnitude of $y$, unlike the gradient of a squared error, which grows with the error. Large targets therefore cannot produce large updates, and the same learning rate works across tasks whose rewards differ by orders of magnitude: the classification losses of chapter 18 and the distributional losses of chapter 17 exploit the same property.
+(b) $`b_k\frac{b_{k+1}-y}{b_{k+1}-b_k}+b_{k+1}\frac{y-b_k}{b_{k+1}-b_k}=\frac{b_kb_{k+1}-b_ky+b_{k+1}y-b_{k+1}b_k}{b_{k+1}-b_k}=y`$. The cross-entropy loss's gradient with respect to the logits is the difference between the predicted and the target probabilities, which is bounded whatever the magnitude of $`y`$, unlike the gradient of a squared error, which grows with the error. Large targets therefore cannot produce large updates, and the same learning rate works across tasks whose rewards differ by orders of magnitude: the classification losses of chapter 18 and the distributional losses of chapter 17 exploit the same property.
 
 </details>
 
@@ -398,13 +398,13 @@ The world model and the behavior are trained from the same replay memory, but th
 <summary><a id="block-rl23-appendix-b"></a><b>B. Model-based policy optimization</b></summary>
 
 
-Keep a replay memory of real transitions $\mathcal D_{\text{env}}$ and one of model transitions $\mathcal D_{\text{model}}$.
+Keep a replay memory of real transitions $`\mathcal D_{\text{env}}`$ and one of model transitions $`\mathcal D_{\text{model}}`$.
 
-1. Every so often (for example every 250 steps), train an ensemble of probabilistic dynamics models, predicting the next state and the reward, on $\mathcal D_{\text{env}}$.
-2. At each real step, act with the SAC policy and add the transition to $\mathcal D_{\text{env}}$.
-3. Also at each step, sample a batch of states from $\mathcal D_{\text{env}}$ (for example 400), and roll the policy out from them for $k$ steps in the model, choosing a random ensemble member at each step, adding the transitions to $\mathcal D_{\text{model}}$.
-4. Take $G$ SAC updates (for example 20) on minibatches drawn mostly (95%) from $\mathcal D_{\text{model}}$.
-5. Increase $k$ according to a schedule as training progresses.
+1. Every so often (for example every 250 steps), train an ensemble of probabilistic dynamics models, predicting the next state and the reward, on $`\mathcal D_{\text{env}}`$.
+2. At each real step, act with the SAC policy and add the transition to $`\mathcal D_{\text{env}}`$.
+3. Also at each step, sample a batch of states from $`\mathcal D_{\text{env}}`$ (for example 400), and roll the policy out from them for $`k`$ steps in the model, choosing a random ensemble member at each step, adding the transitions to $`\mathcal D_{\text{model}}`$.
+4. Take $`G`$ SAC updates (for example 20) on minibatches drawn mostly (95%) from $`\mathcal D_{\text{model}}`$.
+5. Increase $`k`$ according to a schedule as training progresses.
 
 </details>
 

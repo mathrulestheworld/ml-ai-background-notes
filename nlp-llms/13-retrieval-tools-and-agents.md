@@ -12,14 +12,14 @@ A language model's knowledge is fixed when training ends, stored diffusely in it
 
 ### <a id="sparse-retrieval"></a>Sparse retrieval
 
-Classical retrieval represents documents and queries by the words they contain and scores matches with weights that reward rare words. A document is a sparse vector over the vocabulary, and an **inverted index**, which maps each word to the list of documents containing it with their counts, lets a query touch only the documents that share a word with it ([Manning, Raghavan, and Schütze, 2008](https://nlp.stanford.edu/IR-book/)). **TF-IDF** weights a word in a document by its term frequency, damped logarithmically, times its inverse document frequency $\log(N/\mathrm{df}_w)$, which is large for words in few of the $N$ documents. **BM25** ([Robertson and Zaragoza, 2009](https://doi.org/10.1561/1500000019)) refines both parts:
+Classical retrieval represents documents and queries by the words they contain and scores matches with weights that reward rare words. A document is a sparse vector over the vocabulary, and an **inverted index**, which maps each word to the list of documents containing it with their counts, lets a query touch only the documents that share a word with it ([Manning, Raghavan, and Schütze, 2008](https://nlp.stanford.edu/IR-book/)). **TF-IDF** weights a word in a document by its term frequency, damped logarithmically, times its inverse document frequency $`\log(N/\mathrm{df}_w)`$, which is large for words in few of the $`N`$ documents. **BM25** ([Robertson and Zaragoza, 2009](https://doi.org/10.1561/1500000019)) refines both parts:
 
 $$
 \mathrm{BM25}(q,d)=\sum_{w\in q}\mathrm{idf}(w)\,\frac{c(w,d)\,(k_1+1)}{c(w,d)+k_1\bigl(1-b+b\,|d|/\overline{|d|}\bigr)},
 \qquad\mathrm{idf}(w)=\log\Bigl(1+\frac{N-\mathrm{df}_w+0.5}{\mathrm{df}_w+0.5}\Bigr),
 $$
 
-where $c(w,d)$ is the count of $w$ in $d$. The term-frequency factor saturates, so the tenth occurrence of a word adds much less than the first, with $k_1$ around 1.2 setting how fast; and $b$ around 0.75 normalizes for document length, so long documents are not favored merely for containing more words. The form derives from a probabilistic model of relevance ([Appendix A](#block-nlp13-appendix-a)). The code builds an inverted index over the 1,446 speeches of Tiny Shakespeare with at least 40 words and tests **known-item search**: each query is five words drawn at random from one speech, and the task is to rank that speech first.
+where $`c(w,d)`$ is the count of $`w`$ in $`d`$. The term-frequency factor saturates, so the tenth occurrence of a word adds much less than the first, with $`k_1`$ around 1.2 setting how fast; and $`b`$ around 0.75 normalizes for document length, so long documents are not favored merely for containing more words. The form derives from a probabilistic model of relevance ([Appendix A](#block-nlp13-appendix-a)). The code builds an inverted index over the 1,446 speeches of Tiny Shakespeare with at least 40 words and tests **known-item search**: each query is five words drawn at random from one speech, and the task is to rank that speech first.
 
 ```python
 import math
@@ -85,7 +85,7 @@ Dense retrievers trained on one domain generalize unevenly. On a benchmark of 18
 
 ### <a id="searching-many-vectors"></a>Searching many vectors
 
-A collection of a billion passages with 768-dimensional embeddings occupies about 3 TB in 32-bit floats, and comparing a query with every vector is too slow. **Approximate nearest-neighbor** search trades a little accuracy for large savings. An **inverted file** (IVF) clusters the vectors with k-means and, for a query, scans only the vectors in the few clusters whose centroids are nearest. **Product quantization** ([Jégou, Douze, and Schmid, 2011](https://doi.org/10.1109/TPAMI.2010.57)) compresses each vector by splitting it into $M$ blocks and replacing each block by the index of its nearest centroid in a small codebook, so a vector becomes $M$ bytes; distances from a query are then computed from a table of query-to-centroid distances, one lookup per block ([Appendix C](#block-nlp13-appendix-c)). Graph-based indexes such as **HNSW** ([Malkov and Yashunin, 2020](https://arxiv.org/abs/1603.09320)) instead navigate a layered graph of near neighbors from coarse to fine. Libraries such as FAISS ([Johnson, Douze, and Jégou, 2021](https://arxiv.org/abs/1702.08734)) combine these structures. The code implements IVF and product quantization from scratch on 20,000 clustered vectors.
+A collection of a billion passages with 768-dimensional embeddings occupies about 3 TB in 32-bit floats, and comparing a query with every vector is too slow. **Approximate nearest-neighbor** search trades a little accuracy for large savings. An **inverted file** (IVF) clusters the vectors with k-means and, for a query, scans only the vectors in the few clusters whose centroids are nearest. **Product quantization** ([Jégou, Douze, and Schmid, 2011](https://doi.org/10.1109/TPAMI.2010.57)) compresses each vector by splitting it into $`M`$ blocks and replacing each block by the index of its nearest centroid in a small codebook, so a vector becomes $`M`$ bytes; distances from a query are then computed from a table of query-to-centroid distances, one lookup per block ([Appendix C](#block-nlp13-appendix-c)). Graph-based indexes such as **HNSW** ([Malkov and Yashunin, 2020](https://arxiv.org/abs/1603.09320)) instead navigate a layered graph of near neighbors from coarse to fine. Libraries such as FAISS ([Johnson, Douze, and Jégou, 2021](https://arxiv.org/abs/1702.08734)) combine these structures. The code implements IVF and product quantization from scratch on 20,000 clustered vectors.
 
 ```python
 import numpy as np
@@ -152,13 +152,13 @@ Scanning only the nearest cell, 0.6% of the vectors, finds 82% of the true ten n
 
 ### <a id="measuring-retrieval"></a>Measuring retrieval
 
-Retrieval is evaluated with relevance judgments for a set of queries. **Recall@$k$** is the fraction of relevant documents found in the top $k$, the most important measure when the results go to a language model that reads all of them. **Mean reciprocal rank** averages $1/\text{rank}$ of the first relevant result, rewarding putting it at the top. **Normalized discounted cumulative gain** handles graded relevance and discounts gains logarithmically with rank ([Appendix C](#block-nlp13-appendix-c)). For retrieval-augmented systems, what matters in the end is the quality of the answer, which retrieval metrics measure only indirectly.
+Retrieval is evaluated with relevance judgments for a set of queries. **Recall@$`k`$** is the fraction of relevant documents found in the top $`k`$, the most important measure when the results go to a language model that reads all of them. **Mean reciprocal rank** averages $`1/\text{rank}`$ of the first relevant result, rewarding putting it at the top. **Normalized discounted cumulative gain** handles graded relevance and discounts gains logarithmically with rank ([Appendix C](#block-nlp13-appendix-c)). For retrieval-augmented systems, what matters in the end is the quality of the answer, which retrieval metrics measure only indirectly.
 
 ## <a id="retrieval-augmented-generation"></a>Retrieval-augmented generation
 
 ### <a id="retrieve-then-read"></a>Retrieve, then read
 
-**Retrieval-augmented generation** (RAG) conditions the language model on retrieved text. [Lewis et al. (2020)](https://arxiv.org/abs/2005.11401) trained a retriever and a sequence-to-sequence generator jointly, treating the retrieved passage as a latent variable and marginalizing over the top $k$: $p(y\mid x)\approx\sum_{z\in\text{top-}k}p(z\mid x)\,p(y\mid x,z)$. Current practice is usually simpler: split the collection into **chunks** of a few hundred tokens, embed them, retrieve the top few for the question, and place them in the prompt of an instruction-tuned model with instructions to answer from the provided sources and cite them. Most of the engineering lies in the details: how to chunk documents without cutting their structure, when to retrieve and with what query, how many chunks to include, and how to rerank them.
+**Retrieval-augmented generation** (RAG) conditions the language model on retrieved text. [Lewis et al. (2020)](https://arxiv.org/abs/2005.11401) trained a retriever and a sequence-to-sequence generator jointly, treating the retrieved passage as a latent variable and marginalizing over the top $`k`$: $`p(y\mid x)\approx\sum_{z\in\text{top-}k}p(z\mid x)\,p(y\mid x,z)`$. Current practice is usually simpler: split the collection into **chunks** of a few hundred tokens, embed them, retrieve the top few for the question, and place them in the prompt of an instruction-tuned model with instructions to answer from the provided sources and cite them. Most of the engineering lies in the details: how to chunk documents without cutting their structure, when to retrieve and with what query, how many chunks to include, and how to rerank them.
 
 ### <a id="retrieval-inside-the-model"></a>Retrieval inside the model
 
@@ -194,7 +194,7 @@ Agent benchmarks pose realistic tasks with automatic checks of success. **SWE-be
 
 ### <a id="why-agents-fail"></a>Why agents fail
 
-Long tasks compound errors: if each of $n$ steps succeeds independently with probability $p$, the whole succeeds with probability $p^n$, so a 99%-reliable step gives only 37% success over 100 steps unless the agent detects and recovers from its mistakes. The ability to notice that something went wrong, back up, and try another way therefore matters more for agents than raw accuracy per step. Agents also create new security risks. Anything they read, whether a web page, an email, or a retrieved document, enters the same context as their instructions, so text written by an attacker can issue instructions of its own, an attack called **indirect prompt injection** ([Greshake et al., 2023](https://arxiv.org/abs/2302.12173)). An agent with access to a user's email and the ability to send messages can be made to exfiltrate data by a single malicious message it reads. Defenses combine training models to distinguish instructions from data, restricting what tools an agent can use without confirmation, and monitoring; none is complete, and the safety of increasingly autonomous agents is a central topic of the Safety and Frontier module.
+Long tasks compound errors: if each of $`n`$ steps succeeds independently with probability $`p`$, the whole succeeds with probability $`p^n`$, so a 99%-reliable step gives only 37% success over 100 steps unless the agent detects and recovers from its mistakes. The ability to notice that something went wrong, back up, and try another way therefore matters more for agents than raw accuracy per step. Agents also create new security risks. Anything they read, whether a web page, an email, or a retrieved document, enters the same context as their instructions, so text written by an attacker can issue instructions of its own, an attack called **indirect prompt injection** ([Greshake et al., 2023](https://arxiv.org/abs/2302.12173)). An agent with access to a user's email and the ability to send messages can be made to exfiltrate data by a single malicious message it reads. Defenses combine training models to distinguish instructions from data, restricting what tools an agent can use without confirmation, and monitoring; none is complete, and the safety of increasingly autonomous agents is a central topic of the Safety and Frontier module.
 
 ## <a id="appendices"></a>Appendices
 
@@ -203,15 +203,15 @@ Long tasks compound errors: if each of $n$ steps succeeds independently with pro
 <summary><a id="block-nlp13-appendix-a"></a><b>A. Where BM25 comes from</b></summary>
 
 
-The **probability ranking principle** ranks documents by the probability that they are relevant to the query, equivalently by the log odds $\log\frac{P(R=1\mid d,q)}{P(R=0\mid d,q)}$. In the **binary independence model**, a document is the set of query words it contains, independent given relevance. With $p_w=P(w\in d\mid R=1)$ and $u_w=P(w\in d\mid R=0)$, the log odds, up to terms that do not depend on the document, are
+The **probability ranking principle** ranks documents by the probability that they are relevant to the query, equivalently by the log odds $`\log\frac{P(R=1\mid d,q)}{P(R=0\mid d,q)}`$. In the **binary independence model**, a document is the set of query words it contains, independent given relevance. With $`p_w=P(w\in d\mid R=1)`$ and $`u_w=P(w\in d\mid R=0)`$, the log odds, up to terms that do not depend on the document, are
 
 $$
 \sum_{w\in q\cap d}\log\frac{p_w(1-u_w)}{u_w(1-p_w)}.
 $$
 
-Without relevance information, take $p_w=1/2$ and estimate $u_w$ by the fraction of all documents containing $w$, since most documents are not relevant: $u_w\approx(\mathrm{df}_w+0.5)/(N+1)$ with smoothing. The weight becomes $\log\frac{N-\mathrm{df}_w+0.5}{\mathrm{df}_w+0.5}$, the Robertson–Spärck Jones form of inverse document frequency; BM25 adds 1 inside the logarithm to keep it positive for very common words.
+Without relevance information, take $`p_w=1/2`$ and estimate $`u_w`$ by the fraction of all documents containing $`w`$, since most documents are not relevant: $`u_w\approx(\mathrm{df}_w+0.5)/(N+1)`$ with smoothing. The weight becomes $`\log\frac{N-\mathrm{df}_w+0.5}{\mathrm{df}_w+0.5}`$, the Robertson–Spärck Jones form of inverse document frequency; BM25 adds 1 inside the logarithm to keep it positive for very common words.
 
-To account for how often a word occurs, the **2-Poisson** model supposes that a document is either "elite" for a word, about its topic, or not, with the word's count Poisson distributed with a higher rate in elite documents. The resulting weight as a function of the count $c$ rises from zero and saturates, and BM25 approximates it by $c(k_1+1)/(c+k_1)$, which equals 1 at $c=1$ and approaches $k_1+1$. Longer documents contain more words by chance, so the count is compared against a length-adjusted constant, $k_1(1-b+b|d|/\overline{|d|})$, which gives the formula in the text.
+To account for how often a word occurs, the **2-Poisson** model supposes that a document is either "elite" for a word, about its topic, or not, with the word's count Poisson distributed with a higher rate in elite documents. The resulting weight as a function of the count $`c`$ rises from zero and saturates, and BM25 approximates it by $`c(k_1+1)/(c+k_1)`$, which equals 1 at $`c=1`$ and approaches $`k_1+1`$. Longer documents contain more words by chance, so the count is compared against a length-adjusted constant, $`k_1(1-b+b|d|/\overline{|d|})`$, which gives the formula in the text.
 
 </details>
 
@@ -221,13 +221,13 @@ To account for how often a word occurs, the **2-Poisson** model supposes that a 
 <summary><a id="block-nlp13-appendix-b"></a><b>B. Contrastive training of dual encoders</b></summary>
 
 
-Let $E_Q$ and $E_P$ map questions and passages to vectors, and score a pair by $s(q,p)=E_Q(q)^\top E_P(p)$. For a batch of $B$ questions with their positive passages $p_1^+,\dots,p_B^+$, and optionally one hard negative each, the loss for question $i$ is
+Let $`E_Q`$ and $`E_P`$ map questions and passages to vectors, and score a pair by $`s(q,p)=E_Q(q)^\top E_P(p)`$. For a batch of $`B`$ questions with their positive passages $`p_1^+,\dots,p_B^+`$, and optionally one hard negative each, the loss for question $`i`$ is
 
 $$
 \mathcal L_i=-\log\frac{\exp s(q_i,p_i^+)}{\sum_{j=1}^B\exp s(q_i,p_j^+)+\sum_{j}\exp s(q_i,p_j^-)},
 $$
 
-a softmax classification of the right passage among all passages in the batch, the InfoNCE loss of DL chapter 10. Each passage embedding computed for the batch serves as a negative for every other question, so a batch of $B$ supplies $B(B-1)$ negatives at the cost of $B$ encodings, which is why large batches help. Random negatives are mostly easy to reject, and the gradient they supply is small; hard negatives, passages that share many words with the question but do not answer it, force the encoders to represent what the question asks. Their risk is false negatives, passages that do answer the question but were not labeled, which the loss pushes away; filtering hard negatives with a cross-encoder reduces it.
+a softmax classification of the right passage among all passages in the batch, the InfoNCE loss of DL chapter 10. Each passage embedding computed for the batch serves as a negative for every other question, so a batch of $`B`$ supplies $`B(B-1)`$ negatives at the cost of $`B`$ encodings, which is why large batches help. Random negatives are mostly easy to reject, and the gradient they supply is small; hard negatives, passages that share many words with the question but do not answer it, force the encoders to represent what the question asks. Their risk is false negatives, passages that do answer the question but were not labeled, which the loss pushes away; filtering hard negatives with a cross-encoder reduces it.
 
 </details>
 
@@ -237,15 +237,15 @@ a softmax classification of the right passage among all passages in the batch, t
 <summary><a id="block-nlp13-appendix-c"></a><b>C. Product quantization and ranking metrics</b></summary>
 
 
-**Product quantization.** Split $x\in\mathbb R^d$ into $M$ blocks $x^{(1)},\dots,x^{(M)}$ of dimension $d/M$ and learn for each block a codebook of $K$ centroids $c^{(m)}_1,\dots,c^{(m)}_K$ by k-means on the corresponding blocks of the data. A vector is stored as the indices $i_m(x)$ of its nearest centroid in each block, $M\log_2K$ bits in all, and approximated by the concatenation $\hat x=(c^{(1)}_{i_1},\dots,c^{(M)}_{i_M})$, a vector from an implicit codebook of $K^M$ points built from only $MK$ stored centroids. For a query $q$, the squared distance to the approximation decomposes over blocks,
+**Product quantization.** Split $`x\in\mathbb R^d`$ into $`M`$ blocks $`x^{(1)},\dots,x^{(M)}`$ of dimension $`d/M`$ and learn for each block a codebook of $`K`$ centroids $`c^{(m)}_1,\dots,c^{(m)}_K`$ by k-means on the corresponding blocks of the data. A vector is stored as the indices $`i_m(x)`$ of its nearest centroid in each block, $`M\log_2K`$ bits in all, and approximated by the concatenation $`\hat x=(c^{(1)}_{i_1},\dots,c^{(M)}_{i_M})`$, a vector from an implicit codebook of $`K^M`$ points built from only $`MK`$ stored centroids. For a query $`q`$, the squared distance to the approximation decomposes over blocks,
 
 $$
 \|q-\hat x\|^2=\sum_{m=1}^M\bigl\|q^{(m)}-c^{(m)}_{i_m(x)}\bigr\|^2,
 $$
 
-so computing the $M\times K$ table of query-to-centroid distances once lets each database vector's distance be evaluated with $M$ lookups and additions, the **asymmetric distance computation**: the query is not quantized, only the database. The error in the distance is bounded by the quantization error of $x$, which is small when the blocks are nearly independent and the codebooks fine.
+so computing the $`M\times K`$ table of query-to-centroid distances once lets each database vector's distance be evaluated with $`M`$ lookups and additions, the **asymmetric distance computation**: the query is not quantized, only the database. The error in the distance is bounded by the quantization error of $`x`$, which is small when the blocks are nearly independent and the codebooks fine.
 
-**Ranking metrics.** For a query with relevance grades $g_1,g_2,\dots$ of the documents at ranks $1,2,\dots$, the discounted cumulative gain at $k$ is $\mathrm{DCG}@k=\sum_{i=1}^k(2^{g_i}-1)/\log_2(i+1)$, and $\mathrm{nDCG}@k$ divides it by the DCG of the ideal ordering, so that it lies in $[0,1]$. With binary relevance and a single relevant document at rank $r$, $\mathrm{nDCG}=1/\log_2(r+1)$, while the reciprocal rank is $1/r$; both reward early ranks, the reciprocal rank more steeply.
+**Ranking metrics.** For a query with relevance grades $`g_1,g_2,\dots`$ of the documents at ranks $`1,2,\dots`$, the discounted cumulative gain at $`k`$ is $`\mathrm{DCG}@k=\sum_{i=1}^k(2^{g_i}-1)/\log_2(i+1)`$, and $`\mathrm{nDCG}@k`$ divides it by the DCG of the ideal ordering, so that it lies in $`[0,1]`$. With binary relevance and a single relevant document at rank $`r`$, $`\mathrm{nDCG}=1/\log_2(r+1)`$, while the reciprocal rank is $`1/r`$; both reward early ranks, the reciprocal rank more steeply.
 
 </details>
 

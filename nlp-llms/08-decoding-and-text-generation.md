@@ -8,13 +8,13 @@
 
 ### <a id="the-decoding-problem"></a>The decoding problem
 
-A language model defines a distribution $p(y\mid x)$ over continuations $y=(y_1,\dots,y_T)$ of a prompt $x$, one token at a time. **Decoding** turns that distribution into text, and the model does not dictate how. Two goals compete. For tasks with a correct answer, such as translation, summarization, or answering a factual question, the aim is usually the single best output, and the natural target is the **mode**, $\arg\max_yp(y\mid x)$. For open-ended tasks, such as stories, dialogue, or brainstorming, the aim is text that reads as if a person wrote it, varied from one request to the next, and the natural procedure is to **sample**. The same model can produce fluent prose or degenerate loops depending on this choice, and this chapter develops the main decoding rules, the reasons for their behavior, and the cost of running them.
+A language model defines a distribution $`p(y\mid x)`$ over continuations $`y=(y_1,\dots,y_T)`$ of a prompt $`x`$, one token at a time. **Decoding** turns that distribution into text, and the model does not dictate how. Two goals compete. For tasks with a correct answer, such as translation, summarization, or answering a factual question, the aim is usually the single best output, and the natural target is the **mode**, $`\arg\max_yp(y\mid x)`$. For open-ended tasks, such as stories, dialogue, or brainstorming, the aim is text that reads as if a person wrote it, varied from one request to the next, and the natural procedure is to **sample**. The same model can produce fluent prose or degenerate loops depending on this choice, and this chapter develops the main decoding rules, the reasons for their behavior, and the cost of running them.
 
 ### <a id="greedy-and-beam-search"></a>Greedy and beam search
 
-The mode is a search problem over $V^T$ sequences, far too many to enumerate. **Greedy decoding** picks the most probable token at each step, which is fast but myopic: a token that looks best now may lead to a continuation that is improbable as a whole. **Beam search** keeps the $k$ highest-scoring partial sequences, extends each by every possible token, and retains the $k$ best of the results, scored by total log-probability; it is the beam search of AI chapter 2 applied to sequences, with no guarantee of finding the mode. Sequences end when they produce an end token, and because every token multiplies the probability by a number less than one, raw scores favor short outputs; translation systems divide the score by a power of the length, a **length penalty** such as the $\bigl((5+|y|)/6\bigr)^{\alpha}$ with $\alpha$ between 0.6 and 0.7 of Google's translation system ([Wu et al., 2016](https://arxiv.org/abs/1609.08144)). Beams of 4 to 10 are typical in translation.
+The mode is a search problem over $`V^T`$ sequences, far too many to enumerate. **Greedy decoding** picks the most probable token at each step, which is fast but myopic: a token that looks best now may lead to a continuation that is improbable as a whole. **Beam search** keeps the $`k`$ highest-scoring partial sequences, extends each by every possible token, and retains the $`k`$ best of the results, scored by total log-probability; it is the beam search of AI chapter 2 applied to sequences, with no guarantee of finding the mode. Sequences end when they produce an end token, and because every token multiplies the probability by a number less than one, raw scores favor short outputs; translation systems divide the score by a power of the length, a **length penalty** such as the $`\bigl((5+|y|)/6\bigr)^{\alpha}`$ with $`\alpha`$ between 0.6 and 0.7 of Google's translation system ([Wu et al., 2016](https://arxiv.org/abs/1609.08144)). Beams of 4 to 10 are typical in translation.
 
-The code compares greedy decoding, beam search with $k=5$, and sampling for the character model of chapter 4, after the start of a line from *The Taming of the Shrew*, and scores each continuation, including the one Shakespeare wrote, by its average log-probability per character.
+The code compares greedy decoding, beam search with $`k=5`$, and sampling for the character model of chapter 4, after the start of a line from *The Taming of the Shrew*, and scores each continuation, including the one Shakespeare wrote, by its average log-probability per character.
 
 ```python
 import math
@@ -122,13 +122,13 @@ for name, out in outputs.items():
 # A more,
 ```
 
-Greedy decoding falls into a loop, *the state of the state*, and beam search finds text more probable still, $-0.64$ nats per character against $-1.14$ for Shakespeare's own line, which the model finds much less likely than its own output. The sample is less probable than Shakespeare's text and less sensible, but it is varied.
+Greedy decoding falls into a loop, *the state of the state*, and beam search finds text more probable still, $`-0.64`$ nats per character against $`-1.14`$ for Shakespeare's own line, which the model finds much less likely than its own output. The sample is less probable than Shakespeare's text and less sensible, but it is varied.
 
 ### <a id="the-trouble-with-the-most-likely-sequence"></a>The trouble with the most likely sequence
 
 For open-ended generation the mode is the wrong target. [Holtzman et al. (2020)](https://arxiv.org/abs/1904.09751) showed that human text does not stay at high probability under a language model: it mixes predictable tokens with surprising ones, while beam search produces text whose every token is highly probable, bland, generic, and prone to repetition. Repetition is self-reinforcing: once a phrase has occurred, copying it becomes more probable, each copy raises the probability further, and the model can be trapped in a loop from which greedy decoding never escapes ([Xu et al., 2022](https://arxiv.org/abs/2206.02369)).
 
-Even for tasks with correct answers, the mode can be wrong. In translation, beam search with very large beams produces worse translations than with small ones, the **beam search curse** ([Koehn and Knowles, 2017](https://arxiv.org/abs/1706.03872)), and exact search showed that for more than half of the sentences in a benchmark, the translation model's single most probable output was the empty string ([Stahlberg and Byrne, 2019](https://arxiv.org/abs/1908.10090)). A model trained with log loss spreads probability over many good outputs, each individually unlikely, and a degenerate output can concentrate more probability than any of them. The general reason is that the mode of a distribution over long sequences is **atypical**: a sequence drawn from the distribution has probability around $e^{-TH}$ for entropy $H$ per token, and almost none of the probability mass lies near the mode ([Appendix C](#block-nlp08-appendix-c); Foundations chapter 5). Beam search works for translation because a small beam is an imperfect search whose errors happen to act as a useful bias toward adequate outputs, a view developed by [Meister, Cotterell, and Vieira (2020)](https://arxiv.org/abs/2010.02650).
+Even for tasks with correct answers, the mode can be wrong. In translation, beam search with very large beams produces worse translations than with small ones, the **beam search curse** ([Koehn and Knowles, 2017](https://arxiv.org/abs/1706.03872)), and exact search showed that for more than half of the sentences in a benchmark, the translation model's single most probable output was the empty string ([Stahlberg and Byrne, 2019](https://arxiv.org/abs/1908.10090)). A model trained with log loss spreads probability over many good outputs, each individually unlikely, and a degenerate output can concentrate more probability than any of them. The general reason is that the mode of a distribution over long sequences is **atypical**: a sequence drawn from the distribution has probability around $`e^{-TH}`$ for entropy $`H`$ per token, and almost none of the probability mass lies near the mode ([Appendix C](#block-nlp08-appendix-c); Foundations chapter 5). Beam search works for translation because a small beam is an imperfect search whose errors happen to act as a useful bias toward adequate outputs, a view developed by [Meister, Cotterell, and Vieira (2020)](https://arxiv.org/abs/2010.02650).
 
 ## <a id="sampling"></a>Sampling
 
@@ -138,22 +138,22 @@ Even for tasks with correct answers, the mode can be wrong. In translation, beam
 
 ### <a id="temperature"></a>Temperature
 
-Dividing the logits $z$ by a **temperature** $\tau$ before the softmax,
+Dividing the logits $`z`$ by a **temperature** $`\tau`$ before the softmax,
 
 $$
 p_\tau(y_t=i)=\frac{\exp(z_i/\tau)}{\sum_j\exp(z_j/\tau)},
 $$
 
-sharpens the distribution for $\tau<1$ and flattens it for $\tau>1$; $\tau\to0$ gives greedy decoding and $\tau\to\infty$ the uniform distribution. It is the Boltzmann distribution of statistical physics with energies $-z_i$, and the entropy of $p_\tau$ increases with $\tau$ ([Appendix C](#block-nlp08-appendix-c)). Temperature changes the probabilities of all tokens, including those in the tail, and does not remove any.
+sharpens the distribution for $`\tau<1`$ and flattens it for $`\tau>1`$; $`\tau\to0`$ gives greedy decoding and $`\tau\to\infty`$ the uniform distribution. It is the Boltzmann distribution of statistical physics with energies $`-z_i`$, and the entropy of $`p_\tau`$ increases with $`\tau`$ ([Appendix C](#block-nlp08-appendix-c)). Temperature changes the probabilities of all tokens, including those in the tail, and does not remove any.
 
 ### <a id="truncation"></a>Truncation
 
 **Truncation** rules set the tail to zero and renormalize what remains.
 
-- **Top-$k$** ([Fan, Lewis, and Dauphin, 2018](https://arxiv.org/abs/1805.04833)) keeps the $k$ most probable tokens. The right $k$ depends on the context: where many continuations are plausible a small $k$ cuts good options, and where one is nearly certain a large $k$ admits nonsense.
-- **Top-$p$** or **nucleus sampling** ([Holtzman et al., 2020](https://arxiv.org/abs/1904.09751)) keeps the smallest set of tokens whose total probability is at least $p$, typically 0.9 to 0.95, so the set grows where the distribution is flat and shrinks where it is peaked.
-- **Min-$p$** ([Nguyen et al., 2024](https://arxiv.org/abs/2407.01082)) keeps the tokens whose probability is at least a fraction $p_{\min}$ of the most probable token's, which scales the threshold with the model's confidence and tolerates higher temperatures.
-- **Typical sampling** ([Meister et al., 2023](https://arxiv.org/abs/2202.00666)) keeps the tokens whose surprisal $-\log p$ is closest to the entropy of the distribution, which can exclude the most probable token when it is atypically probable, and **η-sampling** ([Hewitt, Manning, and Liang, 2022](https://arxiv.org/abs/2210.15191)) treats truncation as undoing the smoothing that log-loss training adds to the true distribution and derives a threshold from the entropy.
+- **Top-$`k`$** ([Fan, Lewis, and Dauphin, 2018](https://arxiv.org/abs/1805.04833)) keeps the $`k`$ most probable tokens. The right $`k`$ depends on the context: where many continuations are plausible a small $`k`$ cuts good options, and where one is nearly certain a large $`k`$ admits nonsense.
+- **Top-$`p`$** or **nucleus sampling** ([Holtzman et al., 2020](https://arxiv.org/abs/1904.09751)) keeps the smallest set of tokens whose total probability is at least $`p`$, typically 0.9 to 0.95, so the set grows where the distribution is flat and shrinks where it is peaked.
+- **Min-$`p`$** ([Nguyen et al., 2024](https://arxiv.org/abs/2407.01082)) keeps the tokens whose probability is at least a fraction $`p_{\min}`$ of the most probable token's, which scales the threshold with the model's confidence and tolerates higher temperatures.
+- **Typical sampling** ([Meister et al., 2023](https://arxiv.org/abs/2202.00666)) keeps the tokens whose surprisal $`-\log p`$ is closest to the entropy of the distribution, which can exclude the most probable token when it is atypically probable, and **η-sampling** ([Hewitt, Manning, and Liang, 2022](https://arxiv.org/abs/2210.15191)) treats truncation as undoing the smoothing that log-loss training adds to the true distribution and derives a threshold from the entropy.
 
 The code applies these rules to the model's next-character distributions at two points of the same line: at the start of a word, where many letters are plausible, and in the middle of *hither*, where one letter is nearly certain.
 
@@ -247,15 +247,15 @@ for context in ["KATHARINA:\nMoved! in good time: let him that moved you ",     
 #   min-p, 0.1         1 kept, entropy 0.00 bits | 'e':1.00 'b':0.00 'j':0.00 'i':0.00 'h':0.00
 ```
 
-At the start of a word, top-$k$ with $k=5$ discards letters that together hold nearly half of the probability, while top-$p$ and min-$p$ keep 14 and 17 letters. In the middle of *hither*, top-$p$ and min-$p$ keep only *e*, while top-$k$ still admits four letters whose probability is negligible. Temperature leaves all 65 characters in play in both contexts.
+At the start of a word, top-$`k`$ with $`k=5`$ discards letters that together hold nearly half of the probability, while top-$`p`$ and min-$`p`$ keep 14 and 17 letters. In the middle of *hither*, top-$`p`$ and min-$`p`$ keep only *e*, while top-$`k`$ still admits four letters whose probability is negligible. Temperature leaves all 65 characters in play in both contexts.
 
 ### <a id="comparing-the-rules"></a>Comparing the rules
 
 <img src="sources/images/nlp-decoding.png" alt="nlp-decoding" width="880">
 
-*Continuations of 300 characters from 24 prompts taken from the held-out plays, generated by the character model of chapter 4 under different decoding rules. Left: the cumulative distribution of the probability that the untruncated model assigns to each generated character. In the held-out text 26.9% of the characters have probability below 0.1; in samples at $\tau=1$, 22.2%; with top-$p$ at 0.8, 15.1%; and in greedy output, 3.5%, while 39.3% of greedy characters have probability above 0.9, against 24.2% in the held-out text. Right: for each rule and setting, the share of generated words that occur somewhere in the corpus, a crude measure of quality, against the model's negative log-likelihood of the generated text. Greedy decoding produces 99.0% real words at 0.60 nats per character but repeats itself, with 47% of its word trigrams occurring earlier in the same sample; sampling at $\tau=1$ gives 89.3% real words at 1.26 nats. The held-out text scores 98.8% real words at 1.47 nats.*
+*Continuations of 300 characters from 24 prompts taken from the held-out plays, generated by the character model of chapter 4 under different decoding rules. Left: the cumulative distribution of the probability that the untruncated model assigns to each generated character. In the held-out text 26.9% of the characters have probability below 0.1; in samples at $`\tau=1`$, 22.2%; with top-$`p`$ at 0.8, 15.1%; and in greedy output, 3.5%, while 39.3% of greedy characters have probability above 0.9, against 24.2% in the held-out text. Right: for each rule and setting, the share of generated words that occur somewhere in the corpus, a crude measure of quality, against the model's negative log-likelihood of the generated text. Greedy decoding produces 99.0% real words at 0.60 nats per character but repeats itself, with 47% of its word trigrams occurring earlier in the same sample; sampling at $`\tau=1`$ gives 89.3% real words at 1.26 nats. The held-out text scores 98.8% real words at 1.47 nats.*
 
-All four families trace nearly the same curve: every rule that raises the share of real words does so by generating more probable text, and the rules differ mainly in how they parametrize the trade-off. Top-$p$ and min-$p$ reach slightly better points than temperature and top-$k$ at the same likelihood, since they cut the tail adaptively. The held-out text sits off the curve, at high quality and low likelihood, because its low likelihood reflects the model's own errors rather than bad text; no decoding rule reproduces that combination. Which setting is best depends on the purpose. Chat assistants typically sample at a temperature between 0.6 and 1 with top-$p$ between 0.9 and 1; code generation and question answering with a single correct answer often use low temperatures or greedy decoding.
+All four families trace nearly the same curve: every rule that raises the share of real words does so by generating more probable text, and the rules differ mainly in how they parametrize the trade-off. Top-$`p`$ and min-$`p`$ reach slightly better points than temperature and top-$`k`$ at the same likelihood, since they cut the tail adaptively. The held-out text sits off the curve, at high quality and low likelihood, because its low likelihood reflects the model's own errors rather than bad text; no decoding rule reproduces that combination. Which setting is best depends on the purpose. Chat assistants typically sample at a temperature between 0.6 and 1 with top-$`p`$ between 0.9 and 1; code generation and question answering with a single correct answer often use low temperatures or greedy decoding.
 
 ### <a id="repetition-penalties-and-other-fixes"></a>Repetition penalties and other fixes
 
@@ -265,7 +265,7 @@ Repetition can also be discouraged directly. The **repetition penalty** of CTRL 
 
 ### <a id="masks-and-automata"></a>Masks and automata
 
-Applications often need output in a fixed format: valid JSON matching a schema, a date, a member of a list of labels, code that parses. **Constrained decoding** enforces the format at each step by setting to $-\infty$ the logits of every token that would make the output impossible to complete validly, and then sampling or searching as usual. For formats described by a regular expression, the constraint is a finite automaton over characters, and a library can precompute, for each state of the automaton, which tokens of the vocabulary are allowed, since a token is a string of characters that the automaton either accepts from that state or does not ([Willard and Louf, 2023](https://arxiv.org/abs/2307.09702)). Context-free grammars need a pushdown automaton and more bookkeeping, and JSON schemas are compiled to such grammars. Tokenization complicates both: a constraint written for characters must be matched against multi-character tokens, and forcing the text to break at an unnatural token boundary pushes the model into non-canonical tokenizations it rarely saw in training (chapter 1).
+Applications often need output in a fixed format: valid JSON matching a schema, a date, a member of a list of labels, code that parses. **Constrained decoding** enforces the format at each step by setting to $`-\infty`$ the logits of every token that would make the output impossible to complete validly, and then sampling or searching as usual. For formats described by a regular expression, the constraint is a finite automaton over characters, and a library can precompute, for each state of the automaton, which tokens of the vocabulary are allowed, since a token is a string of characters that the automaton either accepts from that state or does not ([Willard and Louf, 2023](https://arxiv.org/abs/2307.09702)). Context-free grammars need a pushdown automaton and more bookkeeping, and JSON schemas are compiled to such grammars. Tokenization complicates both: a constraint written for characters must be matched against multi-character tokens, and forcing the text to break at an unnatural token boundary pushes the model into non-canonical tokenizations it rarely saw in training (chapter 1).
 
 ### <a id="constraints-change-the-distribution"></a>Constraints change the distribution
 
@@ -275,11 +275,11 @@ Masking at each step does not sample from the model's distribution conditioned o
 
 ### <a id="draft-and-verify"></a>Draft and verify
 
-Generating one token requires a full forward pass of the model, and for large models on accelerators that pass is limited by reading the weights from memory rather than by arithmetic ([The cost of generation](#the-cost-of-generation)), so scoring several tokens in one pass costs hardly more than scoring one. **Speculative decoding** ([Leviathan, Kalman, and Matias, 2023](https://arxiv.org/abs/2211.17192); [Chen et al., 2023](https://arxiv.org/abs/2302.01318)) exploits this. A cheap **draft** model $q$ proposes $\gamma$ tokens autoregressively; the large **target** model $p$ computes its own distributions at all $\gamma+1$ positions in a single pass; and a rejection rule decides how many proposals to keep:
+Generating one token requires a full forward pass of the model, and for large models on accelerators that pass is limited by reading the weights from memory rather than by arithmetic ([The cost of generation](#the-cost-of-generation)), so scoring several tokens in one pass costs hardly more than scoring one. **Speculative decoding** ([Leviathan, Kalman, and Matias, 2023](https://arxiv.org/abs/2211.17192); [Chen et al., 2023](https://arxiv.org/abs/2302.01318)) exploits this. A cheap **draft** model $`q`$ proposes $`\gamma`$ tokens autoregressively; the large **target** model $`p`$ computes its own distributions at all $`\gamma+1`$ positions in a single pass; and a rejection rule decides how many proposals to keep:
 
-1. For each proposed token $x$ in order, accept it with probability $\min\bigl(1,p(x)/q(x)\bigr)$, where both probabilities are conditioned on the accepted prefix.
-2. At the first rejection, sample a replacement from the **residual** distribution $\propto\max\bigl(p(\cdot)-q(\cdot),0\bigr)$ and discard the remaining proposals.
-3. If all $\gamma$ proposals are accepted, sample one more token from the target's distribution at the last position, which the pass has already computed.
+1. For each proposed token $`x`$ in order, accept it with probability $`\min\bigl(1,p(x)/q(x)\bigr)`$, where both probabilities are conditioned on the accepted prefix.
+2. At the first rejection, sample a replacement from the **residual** distribution $`\propto\max\bigl(p(\cdot)-q(\cdot),0\bigr)`$ and discard the remaining proposals.
+3. If all $`\gamma`$ proposals are accepted, sample one more token from the target's distribution at the last position, which the pass has already computed.
 
 The output has exactly the target model's distribution, whatever the draft ([Appendix A](#block-nlp08-appendix-a)); the draft affects only the speed. The code checks exactness on a toy distribution, then uses a character trigram model, estimated by counting the training text, as the draft for the transformer.
 
@@ -385,11 +385,11 @@ print(decode(out[len(prompt):len(prompt) + 120]))
 # For thou
 ```
 
-The speculative samples match the target distribution to within sampling error, with acceptance probability $\sum_i\min(p_i,q_i)=0.75$. With the trigram draft, about 60% of proposals are accepted, and each target pass yields 1.62 characters with one proposal, 2.30 with four, and 2.40 with eight, in close agreement with the prediction $(1-\alpha^{\gamma+1})/(1-\alpha)$ for independent acceptances at rate $\alpha$ ([Appendix B](#block-nlp08-appendix-b)). The gains saturate because the chance that all proposals survive falls geometrically with $\gamma$.
+The speculative samples match the target distribution to within sampling error, with acceptance probability $`\sum_i\min(p_i,q_i)=0.75`$. With the trigram draft, about 60% of proposals are accepted, and each target pass yields 1.62 characters with one proposal, 2.30 with four, and 2.40 with eight, in close agreement with the prediction $`(1-\alpha^{\gamma+1})/(1-\alpha)`$ for independent acceptances at rate $`\alpha`$ ([Appendix B](#block-nlp08-appendix-b)). The gains saturate because the chance that all proposals survive falls geometrically with $`\gamma`$.
 
 ### <a id="how-much-it-saves"></a>How much it saves
 
-The acceptance rate equals $1-\mathrm{TV}(p,q)$, one minus the total variation distance between target and draft, so the draft should agree with the target as often as possible while costing much less. Drafts are usually a small model of the same family, sharing its tokenizer; for text that copies its input, such as code editing, simply looking up continuations of the last few tokens in the prompt works well. Other methods add extra prediction heads to the target model to propose several tokens at once, as in Medusa ([Cai et al., 2024](https://arxiv.org/abs/2401.10774)), or train a light draft network on the target's hidden states, as in EAGLE ([Li et al., 2024](https://arxiv.org/abs/2401.15077)). Speedups of two to three times in wall-clock time are typical. The saving is in latency for one request; when a server is already batching many requests, the target pass is no longer memory-bound, and speculation gains less.
+The acceptance rate equals $`1-\mathrm{TV}(p,q)`$, one minus the total variation distance between target and draft, so the draft should agree with the target as often as possible while costing much less. Drafts are usually a small model of the same family, sharing its tokenizer; for text that copies its input, such as code editing, simply looking up continuations of the last few tokens in the prompt works well. Other methods add extra prediction heads to the target model to propose several tokens at once, as in Medusa ([Cai et al., 2024](https://arxiv.org/abs/2401.10774)), or train a light draft network on the target's hidden states, as in EAGLE ([Li et al., 2024](https://arxiv.org/abs/2401.15077)). Speedups of two to three times in wall-clock time are typical. The saving is in latency for one request; when a server is already batching many requests, the target pass is no longer memory-bound, and speculation gains less.
 
 ## <a id="the-cost-of-generation"></a>The cost of generation
 
@@ -399,7 +399,7 @@ Serving a request has two phases. **Prefill** processes the prompt: all its toke
 
 ### <a id="batching-and-memory"></a>Batching and memory
 
-The remedy is **batching**: a decode step for $B$ sequences reads the weights once and performs $B$ times as much arithmetic, so throughput grows almost linearly with $B$ until the step becomes compute-bound, at a batch of a few hundred sequences on current hardware. Requests arrive and finish at different times, so servers use **continuous batching**, adding new requests to the batch and removing finished ones at every step rather than waiting for the whole batch to finish ([Yu et al., 2022](https://www.usenix.org/conference/osdi22/presentation/yu)).
+The remedy is **batching**: a decode step for $`B`$ sequences reads the weights once and performs $`B`$ times as much arithmetic, so throughput grows almost linearly with $`B`$ until the step becomes compute-bound, at a batch of a few hundred sequences on current hardware. Requests arrive and finish at different times, so servers use **continuous batching**, adding new requests to the batch and removing finished ones at every step rather than waiting for the whole batch to finish ([Yu et al., 2022](https://www.usenix.org/conference/osdi22/presentation/yu)).
 
 Batching is limited by memory for the **key–value cache** (DL chapter 9), which grows with the batch size and the context length and can exceed the size of the weights. Allocating a contiguous region for each sequence's maximum length wastes most of it, and **PagedAttention** ([Kwon et al., 2023](https://arxiv.org/abs/2309.06180)) instead stores the cache in fixed-size blocks allocated on demand, like pages of virtual memory, which let the vLLM server batch several times more requests. Sequences that share a prefix, such as a long system prompt, can share its cached blocks (**prefix caching**; [Zheng et al., 2024](https://arxiv.org/abs/2312.07104)). Grouped-query and latent attention (chapter 4) and quantization of the cache and the weights (DL chapter 11) attack the same bottleneck from the model's side.
 
@@ -414,19 +414,19 @@ A serving system is judged by the **time to first token**, dominated by prefill,
 <summary><a id="block-nlp08-appendix-a"></a><b>A. Speculative sampling is exact</b></summary>
 
 
-Fix a prefix and let $p$ and $q$ be the target's and draft's next-token distributions. The draft proposes $X\sim q$; it is accepted with probability $\min(1,p(X)/q(X))$; otherwise a replacement is drawn from $r(x)=\max(p(x)-q(x),0)/Z$, where $Z=\sum_x\max(p(x)-q(x),0)$. The probability that the procedure outputs a token $x$ is
+Fix a prefix and let $`p`$ and $`q`$ be the target's and draft's next-token distributions. The draft proposes $`X\sim q`$; it is accepted with probability $`\min(1,p(X)/q(X))`$; otherwise a replacement is drawn from $`r(x)=\max(p(x)-q(x),0)/Z`$, where $`Z=\sum_x\max(p(x)-q(x),0)`$. The probability that the procedure outputs a token $`x`$ is
 
 $$
 P(x)=q(x)\min\Bigl(1,\frac{p(x)}{q(x)}\Bigr)+P(\text{reject})\,r(x)=\min\bigl(p(x),q(x)\bigr)+P(\text{reject})\,r(x).
 $$
 
-The rejection probability is $1-\sum_x\min(p(x),q(x))=\sum_x\bigl(p(x)-\min(p(x),q(x))\bigr)=\sum_x\max(p(x)-q(x),0)=Z$. Hence
+The rejection probability is $`1-\sum_x\min(p(x),q(x))=\sum_x\bigl(p(x)-\min(p(x),q(x))\bigr)=\sum_x\max(p(x)-q(x),0)=Z`$. Hence
 
 $$
 P(x)=\min\bigl(p(x),q(x)\bigr)+\max\bigl(p(x)-q(x),0\bigr)=p(x),
 $$
 
-since $\min(a,b)+\max(a-b,0)=a$. Each emitted token therefore has the target's conditional distribution given the tokens before it. Proposals after the first rejection are discarded, so later positions are always conditioned on tokens with the correct distribution, and the extra token sampled when all proposals are accepted comes directly from $p$. By induction over positions, the whole generated sequence has the target model's distribution. The acceptance probability, $\sum_x\min(p(x),q(x))=1-\mathrm{TV}(p,q)$, is the only place the draft's quality enters.
+since $`\min(a,b)+\max(a-b,0)=a`$. Each emitted token therefore has the target's conditional distribution given the tokens before it. Proposals after the first rejection are discarded, so later positions are always conditioned on tokens with the correct distribution, and the extra token sampled when all proposals are accepted comes directly from $`p`$. By induction over positions, the whole generated sequence has the target model's distribution. The acceptance probability, $`\sum_x\min(p(x),q(x))=1-\mathrm{TV}(p,q)`$, is the only place the draft's quality enters.
 
 </details>
 
@@ -436,15 +436,15 @@ since $\min(a,b)+\max(a-b,0)=a$. Each emitted token therefore has the target's c
 <summary><a id="block-nlp08-appendix-b"></a><b>B. Expected tokens per pass and the arithmetic intensity of decoding</b></summary>
 
 
-**Speculation.** If each proposal is accepted independently with probability $\alpha$, a round with $\gamma$ proposals emits $j+1$ tokens when the first $j$ are accepted and the next rejected ($j<\gamma$), and $\gamma+1$ when all are accepted. The expected number is
+**Speculation.** If each proposal is accepted independently with probability $`\alpha`$, a round with $`\gamma`$ proposals emits $`j+1`$ tokens when the first $`j`$ are accepted and the next rejected ($`j<\gamma`$), and $`\gamma+1`$ when all are accepted. The expected number is
 
 $$
 \sum_{j=0}^{\gamma-1}(j+1)\alpha^j(1-\alpha)+(\gamma+1)\alpha^\gamma=\sum_{j=0}^{\gamma}\alpha^j=\frac{1-\alpha^{\gamma+1}}{1-\alpha},
 $$
 
-using $P(\text{at least }m\text{ tokens})=\alpha^{m-1}$ for $m=1,\dots,\gamma+1$ and $\mathbb E[M]=\sum_mP(M\ge m)$. It never exceeds $1/(1-\alpha)$. Each round costs one target pass plus $\gamma$ draft passes, so with a draft costing a fraction $c$ of the target, the speedup is $\frac{1-\alpha^{\gamma+1}}{(1-\alpha)(1+c\gamma)}$, which has an optimum at a finite $\gamma$.
+using $`P(\text{at least }m\text{ tokens})=\alpha^{m-1}`$ for $`m=1,\dots,\gamma+1`$ and $`\mathbb E[M]=\sum_mP(M\ge m)`$. It never exceeds $`1/(1-\alpha)`$. Each round costs one target pass plus $`\gamma`$ draft passes, so with a draft costing a fraction $`c`$ of the target, the speedup is $`\frac{1-\alpha^{\gamma+1}}{(1-\alpha)(1+c\gamma)}`$, which has an optimum at a finite $`\gamma`$.
 
-**Arithmetic intensity.** A matrix–vector product with an $m\times n$ weight matrix in 16-bit precision reads $2mn$ bytes and performs $2mn$ operations, one operation per byte. With a batch of $B$ vectors it performs $2Bmn$ operations on the same bytes, $B$ operations per byte. An accelerator with peak throughput $F$ operations per second and memory bandwidth $W$ bytes per second is memory-bound when the intensity is below $F/W$; for an H100 in 16-bit arithmetic, $F\approx989\times10^{12}$ and $W\approx3.35\times10^{12}$, so $F/W\approx300$. Decoding a single sequence therefore reaches about $1/300$ of peak throughput, and batches of around 300 sequences are needed before the arithmetic, not the memory, limits the speed. Reading the key–value cache adds memory traffic that grows with the context and is not shared across the batch, which pushes long-context decoding further into the memory-bound regime.
+**Arithmetic intensity.** A matrix–vector product with an $`m\times n`$ weight matrix in 16-bit precision reads $`2mn`$ bytes and performs $`2mn`$ operations, one operation per byte. With a batch of $`B`$ vectors it performs $`2Bmn`$ operations on the same bytes, $`B`$ operations per byte. An accelerator with peak throughput $`F`$ operations per second and memory bandwidth $`W`$ bytes per second is memory-bound when the intensity is below $`F/W`$; for an H100 in 16-bit arithmetic, $`F\approx989\times10^{12}`$ and $`W\approx3.35\times10^{12}`$, so $`F/W\approx300`$. Decoding a single sequence therefore reaches about $`1/300`$ of peak throughput, and batches of around 300 sequences are needed before the arithmetic, not the memory, limits the speed. Reading the key–value cache adds memory traffic that grows with the context and is not shared across the batch, which pushes long-context decoding further into the memory-bound regime.
 
 </details>
 
@@ -454,15 +454,15 @@ using $P(\text{at least }m\text{ tokens})=\alpha^{m-1}$ for $m=1,\dots,\gamma+1$
 <summary><a id="block-nlp08-appendix-c"></a><b>C. The mode is atypical, and temperature controls entropy</b></summary>
 
 
-**Typicality.** For a model with per-token entropy $H$ on sequences of length $T$, the asymptotic equipartition property (Foundations chapter 5) says that a sampled sequence has log-probability close to $-TH$ with high probability, and that the typical set of such sequences carries almost all the probability. The mode has log-probability at least $-T\bar h_{\min}$, where $\bar h_{\min}$ is the average of the smallest surprisals along the greedy path, and for text $\bar h_{\min}$ is far below $H$: in the code of this chapter, greedy text has 0.60 nats per character against the model's entropy of about 1.26. The mode is therefore exponentially more probable than any single typical sequence, yet sampling essentially never produces it or anything like it. Choosing the mode is a decision to produce an output unlike the ones the model would generate.
+**Typicality.** For a model with per-token entropy $`H`$ on sequences of length $`T`$, the asymptotic equipartition property (Foundations chapter 5) says that a sampled sequence has log-probability close to $`-TH`$ with high probability, and that the typical set of such sequences carries almost all the probability. The mode has log-probability at least $`-T\bar h_{\min}`$, where $`\bar h_{\min}`$ is the average of the smallest surprisals along the greedy path, and for text $`\bar h_{\min}`$ is far below $`H`$: in the code of this chapter, greedy text has 0.60 nats per character against the model's entropy of about 1.26. The mode is therefore exponentially more probable than any single typical sequence, yet sampling essentially never produces it or anything like it. Choosing the mode is a decision to produce an output unlike the ones the model would generate.
 
-**Temperature.** Write $p_\tau(i)\propto e^{z_i/\tau}$ and $\beta=1/\tau$. The entropy $H(\beta)=\log Z(\beta)-\beta\,\mathbb E_\beta[z]$ with $Z(\beta)=\sum_ie^{\beta z_i}$ has derivative
+**Temperature.** Write $`p_\tau(i)\propto e^{z_i/\tau}`$ and $`\beta=1/\tau`$. The entropy $`H(\beta)=\log Z(\beta)-\beta\,\mathbb E_\beta[z]`$ with $`Z(\beta)=\sum_ie^{\beta z_i}`$ has derivative
 
 $$
 \frac{dH}{d\beta}=\mathbb E_\beta[z]-\mathbb E_\beta[z]-\beta\frac{d\,\mathbb E_\beta[z]}{d\beta}=-\beta\operatorname{Var}_\beta(z)\le0,
 $$
 
-using $\frac{d}{d\beta}\log Z=\mathbb E_\beta[z]$ and $\frac{d}{d\beta}\mathbb E_\beta[z]=\operatorname{Var}_\beta(z)$. So the entropy decreases as $\beta$ grows, that is, increases with temperature, strictly unless all logits are equal, from $\log V$ at $\tau=\infty$ to the log of the number of tied maxima at $\tau=0$.
+using $`\frac{d}{d\beta}\log Z=\mathbb E_\beta[z]`$ and $`\frac{d}{d\beta}\mathbb E_\beta[z]=\operatorname{Var}_\beta(z)`$. So the entropy decreases as $`\beta`$ grows, that is, increases with temperature, strictly unless all logits are equal, from $`\log V`$ at $`\tau=\infty`$ to the log of the number of tied maxima at $`\tau=0`$.
 
 </details>
 

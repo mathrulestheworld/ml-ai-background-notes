@@ -14,34 +14,34 @@ A logic has three parts. The **syntax** says which sentences are well formed. Th
 
 ### <a id="entailment"></a>Entailment
 
-A sentence $\alpha$ is **entailed** by a knowledge base, written $\mathrm{KB}\models\alpha$, if $\alpha$ is true in every model in which KB is true. Writing $M(\alpha)$ for the set of models of $\alpha$,
+A sentence $`\alpha`$ is **entailed** by a knowledge base, written $`\mathrm{KB}\models\alpha`$, if $`\alpha`$ is true in every model in which KB is true. Writing $`M(\alpha)`$ for the set of models of $`\alpha`$,
 
 $$
 \mathrm{KB}\models\alpha\quad\Longleftrightarrow\quad M(\mathrm{KB})\subseteq M(\alpha).
 $$
 
-The more a knowledge base says, the fewer models it has, and the more it entails. An inference procedure $i$ derives sentences, written $\mathrm{KB}\vdash_i\alpha$. It is **sound** if it derives only entailed sentences and **complete** if it derives every entailed sentence. Soundness is essential; completeness is desirable but, as chapter 6 shows, not always attainable. If the knowledge base is true of the real world, every sentence derived soundly from it is also true of the world, which is what makes logical reasoning useful to an agent: conclusions about parts of the world it cannot perceive follow from what it knows.
+The more a knowledge base says, the fewer models it has, and the more it entails. An inference procedure $`i`$ derives sentences, written $`\mathrm{KB}\vdash_i\alpha`$. It is **sound** if it derives only entailed sentences and **complete** if it derives every entailed sentence. Soundness is essential; completeness is desirable but, as chapter 6 shows, not always attainable. If the knowledge base is true of the real world, every sentence derived soundly from it is also true of the world, which is what makes logical reasoning useful to an agent: conclusions about parts of the world it cannot perceive follow from what it knows.
 
 ## <a id="propositional-logic"></a>Propositional logic
 
 ### <a id="syntax-and-semantics"></a>Syntax and semantics
 
-**Propositional logic** is the simplest logic in which these ideas can be made precise. Its **atomic sentences** are proposition symbols, such as $P$, $Q$, or $\mathit{Raining}$, together with the constants True and False. Complex sentences are built with the **connectives** $\neg$ (not), $\wedge$ (and), $\vee$ (or), $\Rightarrow$ (implies), and $\Leftrightarrow$ (if and only if). A **literal** is an atomic sentence or its negation.
+**Propositional logic** is the simplest logic in which these ideas can be made precise. Its **atomic sentences** are proposition symbols, such as $`P`$, $`Q`$, or $`\mathit{Raining}`$, together with the constants True and False. Complex sentences are built with the **connectives** $`\neg`$ (not), $`\wedge`$ (and), $`\vee`$ (or), $`\Rightarrow`$ (implies), and $`\Leftrightarrow`$ (if and only if). A **literal** is an atomic sentence or its negation.
 
-A model assigns True or False to every proposition symbol, so $n$ symbols have $2^n$ models. The truth of a complex sentence follows from the truth tables of the connectives. Only one is counterintuitive: $P\Rightarrow Q$ is false only when $P$ is true and $Q$ false, so it is true whenever $P$ is false. It says "if $P$ is true, then I am claiming $Q$ is true; otherwise I am making no claim", and implies no causal or relevance connection between $P$ and $Q$.
+A model assigns True or False to every proposition symbol, so $`n`$ symbols have $`2^n`$ models. The truth of a complex sentence follows from the truth tables of the connectives. Only one is counterintuitive: $`P\Rightarrow Q`$ is false only when $`P`$ is true and $`Q`$ false, so it is true whenever $`P`$ is false. It says "if $`P`$ is true, then I am claiming $`Q`$ is true; otherwise I am making no claim", and implies no causal or relevance connection between $`P`$ and $`Q`$.
 
 ### <a id="validity-satisfiability-and-refutation"></a>Validity, satisfiability, and refutation
 
-A sentence is **valid**, a **tautology**, if it is true in all models, such as $P\vee\neg P$. It is **satisfiable** if it is true in some model, and **unsatisfiable** otherwise. Two sentences are **logically equivalent** if they have the same models. These notions are tied together by two theorems:
+A sentence is **valid**, a **tautology**, if it is true in all models, such as $`P\vee\neg P`$. It is **satisfiable** if it is true in some model, and **unsatisfiable** otherwise. Two sentences are **logically equivalent** if they have the same models. These notions are tied together by two theorems:
 
-- **Deduction theorem:** $\alpha\models\beta$ if and only if $\alpha\Rightarrow\beta$ is valid.
-- **Refutation:** $\alpha\models\beta$ if and only if $\alpha\wedge\neg\beta$ is unsatisfiable.
+- **Deduction theorem:** $`\alpha\models\beta`$ if and only if $`\alpha\Rightarrow\beta`$ is valid.
+- **Refutation:** $`\alpha\models\beta`$ if and only if $`\alpha\wedge\neg\beta`$ is unsatisfiable.
 
 The second is proof by contradiction, and it turns every entailment question into a satisfiability question. Deciding satisfiability of a propositional sentence, **SAT**, was the first problem proved NP-complete ([Cook, 1971](https://doi.org/10.1145/800157.805047)), so every known complete algorithm takes exponential time in the worst case. Much of this chapter is about why that worst case rarely matters in practice.
 
 ### <a id="model-checking"></a>Model checking
 
-The direct way to decide entailment is to enumerate all $2^n$ models and check that $\alpha$ holds wherever KB does. The enumeration is sound and complete, needs only $O(n)$ memory as a depth-first traversal of the assignments, and takes $O(2^n)$ time, which limits it to a few dozen symbols.
+The direct way to decide entailment is to enumerate all $`2^n`$ models and check that $`\alpha`$ holds wherever KB does. The enumeration is sound and complete, needs only $`O(n)`$ memory as a depth-first traversal of the assignments, and takes $`O(2^n)`$ time, which limits it to a few dozen symbols.
 
 The following puzzle, a classic exercise, shows both model checking and the proof-based method of the next section on the same five symbols: "If the unicorn is mythical, then it is immortal, but if it is not mythical, then it is a mortal mammal. If the unicorn is either immortal or a mammal, then it is horned. The unicorn is magical if it is horned."
 
@@ -112,13 +112,13 @@ Three of the 32 models satisfy the four sentences. The unicorn is horned and mag
 
 ### <a id="inference-rules"></a>Inference rules
 
-Model checking ignores the structure of the sentences. **Theorem proving** instead applies **inference rules** directly to sentences, which can find a short proof even when the number of models is astronomical. The best-known rule is **modus ponens**: from $\alpha\Rightarrow\beta$ and $\alpha$, infer $\beta$. Others are and-elimination, from $\alpha\wedge\beta$ infer $\alpha$, and all the standard logical equivalences, such as De Morgan's laws, contraposition $(\alpha\Rightarrow\beta)\equiv(\neg\beta\Rightarrow\neg\alpha)$, and the elimination of implication $(\alpha\Rightarrow\beta)\equiv(\neg\alpha\vee\beta)$. Searching for a proof is a search problem in the sense of chapter 1: states are sets of derived sentences, actions apply rules, and the goal is the query.
+Model checking ignores the structure of the sentences. **Theorem proving** instead applies **inference rules** directly to sentences, which can find a short proof even when the number of models is astronomical. The best-known rule is **modus ponens**: from $`\alpha\Rightarrow\beta`$ and $`\alpha`$, infer $`\beta`$. Others are and-elimination, from $`\alpha\wedge\beta`$ infer $`\alpha`$, and all the standard logical equivalences, such as De Morgan's laws, contraposition $`(\alpha\Rightarrow\beta)\equiv(\neg\beta\Rightarrow\neg\alpha)`$, and the elimination of implication $`(\alpha\Rightarrow\beta)\equiv(\neg\alpha\vee\beta)`$. Searching for a proof is a search problem in the sense of chapter 1: states are sets of derived sentences, actions apply rules, and the goal is the query.
 
 Propositional logic, like the first-order logic of chapter 6, is **monotonic**: adding sentences to a knowledge base can only add to what it entails. Once a conclusion is proved, no further information can retract it; defaults and exceptions ("birds fly, but penguins do not") require nonmonotonic reasoning or the probabilistic methods of chapters 8–12.
 
 ### <a id="resolution"></a>Resolution
 
-One rule suffices for a complete procedure if sentences are first put in a normal form. A sentence is in **conjunctive normal form** (CNF) if it is a conjunction of **clauses**, each a disjunction of literals. Every sentence can be converted to CNF by eliminating $\Leftrightarrow$ and $\Rightarrow$, moving negations inward with De Morgan's laws, and distributing $\vee$ over $\wedge$. The last step can make the formula exponentially longer; the **Tseitin transformation** instead introduces a new symbol for each subformula and produces a CNF of linear size that is satisfiable exactly when the original is (**equisatisfiable**, not equivalent), which is all refutation needs ([Appendix A](#block-ai05-appendix-a)).
+One rule suffices for a complete procedure if sentences are first put in a normal form. A sentence is in **conjunctive normal form** (CNF) if it is a conjunction of **clauses**, each a disjunction of literals. Every sentence can be converted to CNF by eliminating $`\Leftrightarrow`$ and $`\Rightarrow`$, moving negations inward with De Morgan's laws, and distributing $`\vee`$ over $`\wedge`$. The last step can make the formula exponentially longer; the **Tseitin transformation** instead introduces a new symbol for each subformula and produces a CNF of linear size that is satisfiable exactly when the original is (**equisatisfiable**, not equivalent), which is all refutation needs ([Appendix A](#block-ai05-appendix-a)).
 
 The **resolution rule** takes two clauses containing complementary literals and produces a clause with all the other literals:
 
@@ -126,18 +126,18 @@ $$
 \frac{\ell_1\vee\dots\vee\ell_k,\qquad m_1\vee\dots\vee m_n}{\ell_1\vee\dots\vee\ell_{i-1}\vee\ell_{i+1}\vee\dots\vee\ell_k\vee m_1\vee\dots\vee m_{j-1}\vee m_{j+1}\vee\dots\vee m_n}\quad\text{where }\ell_i=\neg m_j,
 $$
 
-with duplicate literals removed (**factoring**). Resolution is sound: in any model, one of $\ell_i$ and $m_j$ is false, so the rest of that clause must be true. A **resolution refutation** proves $\mathrm{KB}\models\alpha$ by converting $\mathrm{KB}\wedge\neg\alpha$ to CNF and resolving pairs of clauses until the **empty clause**, a disjunction of nothing, which is false, appears. The **ground resolution theorem** states that if a set of clauses is unsatisfiable, its resolution closure contains the empty clause: resolution is **refutation complete** ([Appendix B](#block-ai05-appendix-b)).
+with duplicate literals removed (**factoring**). Resolution is sound: in any model, one of $`\ell_i`$ and $`m_j`$ is false, so the rest of that clause must be true. A **resolution refutation** proves $`\mathrm{KB}\models\alpha`$ by converting $`\mathrm{KB}\wedge\neg\alpha`$ to CNF and resolving pairs of clauses until the **empty clause**, a disjunction of nothing, which is false, appears. The **ground resolution theorem** states that if a set of clauses is unsatisfiable, its resolution closure contains the empty clause: resolution is **refutation complete** ([Appendix B](#block-ai05-appendix-b)).
 
-Complete does not mean efficient. Resolution proofs can be exponentially long: the statement that $n+1$ pigeons cannot sit in $n$ holes, one per hole, has a CNF encoding of polynomial size but no resolution refutation shorter than exponential in $n$ ([Haken, 1985](https://www.sciencedirect.com/science/article/pii/0304397585901446)). The DPLL and CDCL solvers below are, in effect, resolution provers when they report unsatisfiability, so they inherit this limit.
+Complete does not mean efficient. Resolution proofs can be exponentially long: the statement that $`n+1`$ pigeons cannot sit in $`n`$ holes, one per hole, has a CNF encoding of polynomial size but no resolution refutation shorter than exponential in $`n`$ ([Haken, 1985](https://www.sciencedirect.com/science/article/pii/0304397585901446)). The DPLL and CDCL solvers below are, in effect, resolution provers when they report unsatisfiability, so they inherit this limit.
 
 ### <a id="horn-clauses-and-chaining"></a>Horn clauses and chaining
 
-Many knowledge bases need only a restricted form of clause. A **definite clause** has exactly one positive literal, and can be written as an implication with a conjunction of positive premises and one positive conclusion, $A_1\wedge\dots\wedge A_k\Rightarrow B$, or as a **fact** $B$ when $k=0$. A **Horn clause** has at most one positive literal; the clauses with none, $\neg A_1\vee\dots\vee\neg A_k$, are goals or integrity constraints. Horn clauses are closed under resolution, and entailment with them can be decided in time linear in the size of the knowledge base:
+Many knowledge bases need only a restricted form of clause. A **definite clause** has exactly one positive literal, and can be written as an implication with a conjunction of positive premises and one positive conclusion, $`A_1\wedge\dots\wedge A_k\Rightarrow B`$, or as a **fact** $`B`$ when $`k=0`$. A **Horn clause** has at most one positive literal; the clauses with none, $`\neg A_1\vee\dots\vee\neg A_k`$, are goals or integrity constraints. Horn clauses are closed under resolution, and entailment with them can be decided in time linear in the size of the knowledge base:
 
 - **Forward chaining** starts from the known facts and fires every rule whose premises are all known, adding its conclusion, until the query is derived or nothing new can be added. Keeping, for each rule, a count of premises not yet known makes each rule fire at most once, and the whole procedure linear ([Appendix C](#block-ai05-appendix-c)). It is **data-driven**, like an agent that updates its beliefs as percepts arrive.
 - **Backward chaining** starts from the query and works back through the rules that conclude it, proving their premises recursively. It is **goal-directed**, touching only relevant facts, and usually costs much less than linear in the size of the knowledge base.
 
-Horn-clause reasoning is the basis of logic programming and of Datalog, the first-order versions of which appear in chapter 6. Other polynomial fragments are **2-CNF**, clauses of at most two literals, solvable in linear time through the strongly connected components of an implication graph, and **XOR-SAT**, systems of parity constraints, solvable by Gaussian elimination over $\mathbb F_2$.
+Horn-clause reasoning is the basis of logic programming and of Datalog, the first-order versions of which appear in chapter 6. Other polynomial fragments are **2-CNF**, clauses of at most two literals, solvable in linear time through the strongly connected components of an implication graph, and **XOR-SAT**, systems of parity constraints, solvable by Gaussian elimination over $`\mathbb F_2`$.
 
 ## <a id="satisfiability-solvers"></a>Satisfiability solvers
 
@@ -165,7 +165,7 @@ With these techniques, CDCL solvers routinely decide industrial instances with m
 
 ### <a id="local-search-walksat"></a>Local search: WalkSAT
 
-For satisfiable instances, local search over complete assignments is often much faster than systematic search. **WalkSAT** ([Selman, Kautz, and Cohen, 1994](https://cdn.aaai.org/AAAI/1994/AAAI94-051.pdf)) starts from a random assignment and repeatedly picks a random unsatisfied clause and flips one of its variables: with probability $p$, a random one of them (a **random walk** step); otherwise the one whose flip breaks the fewest currently satisfied clauses (a **greedy** step). The random steps prevent it from being trapped in local minima, the min-conflicts idea of chapter 3 with added noise. WalkSAT cannot prove unsatisfiability: when it fails to find a model within its budget, the formula may still be satisfiable.
+For satisfiable instances, local search over complete assignments is often much faster than systematic search. **WalkSAT** ([Selman, Kautz, and Cohen, 1994](https://cdn.aaai.org/AAAI/1994/AAAI94-051.pdf)) starts from a random assignment and repeatedly picks a random unsatisfied clause and flips one of its variables: with probability $`p`$, a random one of them (a **random walk** step); otherwise the one whose flip breaks the fewest currently satisfied clauses (a **greedy** step). The random steps prevent it from being trapped in local minima, the min-conflicts idea of chapter 3 with added noise. WalkSAT cannot prove unsatisfiability: when it fails to find a model within its budget, the formula may still be satisfiable.
 
 ```python
 import random
@@ -272,29 +272,29 @@ On a random formula with 150 variables and 600 clauses, DPLL finds a model after
 
 ### <a id="hard-and-easy-instances"></a>Hard and easy instances
 
-Random 3-SAT formulas with $n$ variables and $m$ clauses show the phase transition of chapter 3 in its best-studied form. When the ratio $m/n$ is small, almost every formula is satisfiable and easily solved; when it is large, almost every formula is unsatisfiable and quickly refuted; the transition sharpens with $n$ around $m/n\approx4.27$, a value computed by statistical-physics methods ([Mézard, Parisi, and Zecchina, 2002](https://doi.org/10.1126/science.1073287)), and the hardest instances cluster there ([Mitchell, Selman, and Levesque, 1992](https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf)).
+Random 3-SAT formulas with $`n`$ variables and $`m`$ clauses show the phase transition of chapter 3 in its best-studied form. When the ratio $`m/n`$ is small, almost every formula is satisfiable and easily solved; when it is large, almost every formula is unsatisfiable and quickly refuted; the transition sharpens with $`n`$ around $`m/n\approx4.27`$, a value computed by statistical-physics methods ([Mézard, Parisi, and Zecchina, 2002](https://doi.org/10.1126/science.1073287)), and the hardest instances cluster there ([Mitchell, Selman, and Levesque, 1992](https://cdn.aaai.org/AAAI/1992/AAAI92-071.pdf)).
 
 <img src="sources/images/ai-sat-phase.png" alt="ai-sat-phase" width="880">
 
-*Random 3-SAT formulas, 40 for each size and ratio. Left: the fraction that is satisfiable falls from 1 to 0 between about 3.75 and 5 clauses per variable, and the fall steepens as the number of variables grows from 50 to 100; with 75 and 100 variables, half of the formulas at $m/n=4.25$ are satisfiable (0.50 and 0.52). Right: the median number of branching decisions of DPLL, on a logarithmic scale, peaks at the threshold, at 28, 86, and 262 decisions for 50, 75, and 100 variables, while on either side it stays near or below the number of variables.*
+*Random 3-SAT formulas, 40 for each size and ratio. Left: the fraction that is satisfiable falls from 1 to 0 between about 3.75 and 5 clauses per variable, and the fall steepens as the number of variables grows from 50 to 100; with 75 and 100 variables, half of the formulas at $`m/n=4.25`$ are satisfiable (0.50 and 0.52). Right: the median number of branching decisions of DPLL, on a logarithmic scale, peaks at the threshold, at 28, 86, and 262 decisions for 50, 75, and 100 variables, while on either side it stays near or below the number of variables.*
 
 <img src="sources/images/ai-sat-growth.png" alt="ai-sat-growth" width="700">
 
-*The median number of DPLL decisions on 30 random formulas for each size. Underconstrained formulas ($m/n=3$) need roughly one decision per few variables, from 9.5 at 20 variables to 50 at 140, with no real search. At the threshold the cost grows exponentially, from 6 to 1,201 decisions, roughly doubling every 14 variables beyond 60. Overconstrained formulas ($m/n=6$) also need exponential time to refute, but with a much smaller rate, reaching 170 decisions at 140 variables.*
+*The median number of DPLL decisions on 30 random formulas for each size. Underconstrained formulas ($`m/n=3`$) need roughly one decision per few variables, from 9.5 at 20 variables to 50 at 140, with no real search. At the threshold the cost grows exponentially, from 6 to 1,201 decisions, roughly doubling every 14 variables beyond 60. Overconstrained formulas ($`m/n=6`$) also need exponential time to refute, but with a much smaller rate, reaching 170 decisions at 140 variables.*
 
 Industrial instances are not random: they have structure, small backdoors of variables whose assignment makes the rest easy, and modular constraint graphs, and CDCL solvers exploit exactly that. Unsatisfiable random formulas at the threshold, by contrast, remain hard for complete solvers at a few hundred variables, and message-passing algorithms from statistical physics solve satisfiable random instances with millions of variables close to the threshold, where local search struggles.
 
 ## <a id="logical-agents"></a>Logical agents
 
-A logical agent can use propositional inference to track the state of a partially observable world and to plan. Because a propositional symbol cannot refer to a time, facts that change are written as **fluents** indexed by time step, such as $\mathit{At}_{1,1}^0$ and $\mathit{At}_{2,1}^1$, and actions as symbols such as $\mathit{Forward}^0$. The **transition model** must then say not only what actions change but also what they leave unchanged, the **frame problem**. Listing, for every action, every fluent it does not affect needs a number of axioms proportional to the number of actions times the number of fluents. **Successor-state axioms** avoid this by stating, for each fluent, exactly when it is true at the next step:
+A logical agent can use propositional inference to track the state of a partially observable world and to plan. Because a propositional symbol cannot refer to a time, facts that change are written as **fluents** indexed by time step, such as $`\mathit{At}_{1,1}^0`$ and $`\mathit{At}_{2,1}^1`$, and actions as symbols such as $`\mathit{Forward}^0`$. The **transition model** must then say not only what actions change but also what they leave unchanged, the **frame problem**. Listing, for every action, every fluent it does not affect needs a number of axioms proportional to the number of actions times the number of fluents. **Successor-state axioms** avoid this by stating, for each fluent, exactly when it is true at the next step:
 
 $$
 F^{t+1}\;\Leftrightarrow\;\mathit{ActionCausesF}^t\vee\bigl(F^t\wedge\neg\mathit{ActionCausesNotF}^t\bigr).
 $$
 
-With the percepts added as they arrive, asking whether a fluent is entailed at time $t$ performs **logical state estimation**, the deterministic counterpart of the probabilistic filtering of chapter 11. Asking for a model of the axioms together with an initial state and a goal at time $T$ produces a plan: the action symbols true in the model. This is **SATPlan**, the subject of chapter 7.
+With the percepts added as they arrive, asking whether a fluent is entailed at time $`t`$ performs **logical state estimation**, the deterministic counterpart of the probabilistic filtering of chapter 11. Asking for a model of the axioms together with an initial state and a goal at time $`T`$ produces a plan: the action symbols true in the model. This is **SATPlan**, the subject of chapter 7.
 
-The propositional encoding has an obvious limitation. A grid world with $k$ squares needs separate symbols, and separate axioms, for every square and every time step, and the knowledge base grows accordingly. Statements such as "every square adjacent to a pit is breezy" must be written out once per square. Chapter 6 adds objects, relations, and quantifiers to say such things once.
+The propositional encoding has an obvious limitation. A grid world with $`k`$ squares needs separate symbols, and separate axioms, for every square and every time step, and the knowledge base grows accordingly. Statements such as "every square adjacent to a pit is breezy" must be written out once per square. Chapter 6 adds objects, relations, and quantifiers to say such things once.
 
 ## <a id="appendices"></a>Appendices
 
@@ -303,15 +303,15 @@ The propositional encoding has an obvious limitation. A grid world with $k$ squa
 <summary><a id="block-ai05-appendix-a"></a><b>A. The Tseitin transformation</b></summary>
 
 
-Converting a formula to an equivalent CNF by distribution can blow up exponentially: $(x_1\wedge y_1)\vee(x_2\wedge y_2)\vee\dots\vee(x_n\wedge y_n)$ has $2^n$ clauses in CNF. The Tseitin transformation introduces a fresh symbol $z_\phi$ for each non-atomic subformula $\phi$ and adds clauses stating $z_\phi\Leftrightarrow\phi$ in terms of the symbols of its immediate subformulas. For $\phi=a\wedge b$:
+Converting a formula to an equivalent CNF by distribution can blow up exponentially: $`(x_1\wedge y_1)\vee(x_2\wedge y_2)\vee\dots\vee(x_n\wedge y_n)`$ has $`2^n`$ clauses in CNF. The Tseitin transformation introduces a fresh symbol $`z_\phi`$ for each non-atomic subformula $`\phi`$ and adds clauses stating $`z_\phi\Leftrightarrow\phi`$ in terms of the symbols of its immediate subformulas. For $`\phi=a\wedge b`$:
 
 $$
 (\neg z\vee a)\wedge(\neg z\vee b)\wedge(z\vee\neg a\vee\neg b),
 $$
 
-for $\phi=a\vee b$: $(\neg z\vee a\vee b)\wedge(z\vee\neg a)\wedge(z\vee\neg b)$, and for $\phi=\neg a$: $(\neg z\vee\neg a)\wedge(z\vee a)$. Finally, the unit clause $z_{\text{root}}$ asserts the whole formula.
+for $`\phi=a\vee b`$: $`(\neg z\vee a\vee b)\wedge(z\vee\neg a)\wedge(z\vee\neg b)`$, and for $`\phi=\neg a`$: $`(\neg z\vee\neg a)\wedge(z\vee a)`$. Finally, the unit clause $`z_{\text{root}}`$ asserts the whole formula.
 
-The result has a constant number of clauses per subformula, so its size is linear in the size of the formula. It is **equisatisfiable** with the original: any model of the original extends to a model of the CNF by setting each $z_\phi$ to the truth value of $\phi$, and in any model of the CNF, by induction on the structure, each $z_\phi$ equals the value of $\phi$ under the original symbols, so $z_{\text{root}}$ true means the formula is true. Since refutation only asks whether $\mathrm{KB}\wedge\neg\alpha$ is satisfiable, equisatisfiability is enough. Only the implication $z_\phi\Rightarrow\phi$ is needed when $\phi$ occurs positively, which halves the clauses (the Plaisted–Greenbaum refinement).
+The result has a constant number of clauses per subformula, so its size is linear in the size of the formula. It is **equisatisfiable** with the original: any model of the original extends to a model of the CNF by setting each $`z_\phi`$ to the truth value of $`\phi`$, and in any model of the CNF, by induction on the structure, each $`z_\phi`$ equals the value of $`\phi`$ under the original symbols, so $`z_{\text{root}}`$ true means the formula is true. Since refutation only asks whether $`\mathrm{KB}\wedge\neg\alpha`$ is satisfiable, equisatisfiability is enough. Only the implication $`z_\phi\Rightarrow\phi`$ is needed when $`\phi`$ occurs positively, which halves the clauses (the Plaisted–Greenbaum refinement).
 
 </details>
 
@@ -321,13 +321,13 @@ The result has a constant number of clauses per subformula, so its size is linea
 <summary><a id="block-ai05-appendix-b"></a><b>B. Completeness of resolution</b></summary>
 
 
-**Ground resolution theorem.** If a finite set of clauses $S$ is unsatisfiable, the resolution closure $RC(S)$, the set of all clauses derivable by repeated resolution, contains the empty clause.
+**Ground resolution theorem.** If a finite set of clauses $`S`$ is unsatisfiable, the resolution closure $`RC(S)`$, the set of all clauses derivable by repeated resolution, contains the empty clause.
 
-**Proof.** Suppose $RC(S)$ does not contain the empty clause; we build a model of $S$. Order the symbols $P_1,\dots,P_k$ of $S$ and assign them in order: set $P_i$ to False if some clause of $RC(S)$ becomes false under the choice $P_i=\text{True}$ given $P_1,\dots,P_{i-1}$, that is, if some clause contains $\neg P_i$ and otherwise only literals already false; otherwise set $P_i$ to True.
+**Proof.** Suppose $`RC(S)`$ does not contain the empty clause; we build a model of $`S`$. Order the symbols $`P_1,\dots,P_k`$ of $`S`$ and assign them in order: set $`P_i`$ to False if some clause of $`RC(S)`$ becomes false under the choice $`P_i=\text{True}`$ given $`P_1,\dots,P_{i-1}`$, that is, if some clause contains $`\neg P_i`$ and otherwise only literals already false; otherwise set $`P_i`$ to True.
 
-Suppose this assignment makes some clause of $RC(S)$ false, and take the first step $i$ at which some clause becomes false. The clause must contain $P_i$ or $\neg P_i$, with all other literals false under $P_1,\dots,P_{i-1}$. If it becomes false because $P_i$ was set to False, it has the form $C_1=(\text{false}\vee\dots\vee P_i)$; the choice False was made because a clause $C_2=(\text{false}\vee\dots\vee\neg P_i)$ would have become false otherwise. Both are in $RC(S)$, so their resolvent is too, and it contains only literals over $P_1,\dots,P_{i-1}$, all false: it would have been false at an earlier step, contradicting the choice of $i$ (or, if it has no literals, it is the empty clause, excluded by assumption). If it becomes false because $P_i$ was set to True, it contains $\neg P_i$ and the rule would have chosen False. Hence the assignment satisfies every clause of $RC(S)$, and in particular of $S$.
+Suppose this assignment makes some clause of $`RC(S)`$ false, and take the first step $`i`$ at which some clause becomes false. The clause must contain $`P_i`$ or $`\neg P_i`$, with all other literals false under $`P_1,\dots,P_{i-1}`$. If it becomes false because $`P_i`$ was set to False, it has the form $`C_1=(\text{false}\vee\dots\vee P_i)`$; the choice False was made because a clause $`C_2=(\text{false}\vee\dots\vee\neg P_i)`$ would have become false otherwise. Both are in $`RC(S)`$, so their resolvent is too, and it contains only literals over $`P_1,\dots,P_{i-1}`$, all false: it would have been false at an earlier step, contradicting the choice of $`i`$ (or, if it has no literals, it is the empty clause, excluded by assumption). If it becomes false because $`P_i`$ was set to True, it contains $`\neg P_i`$ and the rule would have chosen False. Hence the assignment satisfies every clause of $`RC(S)`$, and in particular of $`S`$.
 
-Because $S$ has finitely many symbols, $RC(S)$ is finite, so saturation terminates. Resolution is refutation complete but not complete for deriving arbitrary consequences: from $P$ it cannot derive $P\vee Q$, although $P\models P\vee Q$; refutation proves it instead, by deriving the empty clause from $P$, $\neg P$, and $\neg Q$.
+Because $`S`$ has finitely many symbols, $`RC(S)`$ is finite, so saturation terminates. Resolution is refutation complete but not complete for deriving arbitrary consequences: from $`P`$ it cannot derive $`P\vee Q`$, although $`P\models P\vee Q`$; refutation proves it instead, by deriving the empty clause from $`P`$, $`\neg P`$, and $`\neg Q`$.
 
 </details>
 
@@ -337,11 +337,11 @@ Because $S$ has finitely many symbols, $RC(S)$ is finite, so saturation terminat
 <summary><a id="block-ai05-appendix-c"></a><b>C. Forward chaining in linear time</b></summary>
 
 
-Let the knowledge base consist of definite clauses. Keep, for each rule, a count of its premises not yet known to be true, an index from each symbol to the rules in whose premises it appears, and an agenda of symbols known to be true, initially the facts. Repeatedly remove a symbol $p$ from the agenda; if it was not already marked true, mark it and decrement the count of every rule with $p$ among its premises; a rule whose count reaches zero adds its conclusion to the agenda.
+Let the knowledge base consist of definite clauses. Keep, for each rule, a count of its premises not yet known to be true, an index from each symbol to the rules in whose premises it appears, and an agenda of symbols known to be true, initially the facts. Repeatedly remove a symbol $`p`$ from the agenda; if it was not already marked true, mark it and decrement the count of every rule with $`p`$ among its premises; a rule whose count reaches zero adds its conclusion to the agenda.
 
 **Cost.** Each symbol is processed at most once, and each occurrence of a symbol in a premise is decremented at most once, so the total work is proportional to the number of symbols plus the total size of the rules: linear in the size of the knowledge base.
 
-**Soundness** is immediate, since each step is an application of modus ponens. **Completeness:** when the algorithm stops, consider the model $m$ that makes exactly the marked symbols true. Every definite clause is true in $m$: a fact is marked, and a rule whose premises are all true in $m$ had its count reach zero, so its conclusion was marked. So $m$ is a model of the knowledge base. If $q$ is entailed, it is true in every model of the knowledge base, in particular in $m$, so $q$ was marked. The model $m$ is the **least model**, the set of symbols true in every model of the knowledge base, and forward chaining computes exactly it.
+**Soundness** is immediate, since each step is an application of modus ponens. **Completeness:** when the algorithm stops, consider the model $`m`$ that makes exactly the marked symbols true. Every definite clause is true in $`m`$: a fact is marked, and a rule whose premises are all true in $`m`$ had its count reach zero, so its conclusion was marked. So $`m`$ is a model of the knowledge base. If $`q`$ is entailed, it is true in every model of the knowledge base, in particular in $`m`$, so $`q`$ was marked. The model $`m`$ is the **least model**, the set of symbols true in every model of the knowledge base, and forward chaining computes exactly it.
 
 </details>
 

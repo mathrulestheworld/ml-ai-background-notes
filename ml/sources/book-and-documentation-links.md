@@ -38,7 +38,7 @@ The chapter notes develop the module's main material. These books and official d
 | --- | --- |
 | Mitchell, [*Generative and Discriminative Classifiers: Naive Bayes and Logistic Regression*](https://www.cs.cmu.edu/~tom/mlbook/NBayesLogReg.pdf) | A book-chapter draft comparing the two estimators (chapters 4–5). |
 | Welling, [*Kernel Ridge Regression*](https://web2.qatar.cmu.edu/~gdicaro/10315-Fall19/additional/welling-notes-on-kernel-ridge.pdf) | A short derivation of the dual solution (chapter 8). |
-| Hsu, Chang, and Lin, [*A Practical Guide to Support Vector Classification*](https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf) | Scaling, kernel choice, and grid search over $(C,\gamma)$ (chapter 8). |
+| Hsu, Chang, and Lin, [*A Practical Guide to Support Vector Classification*](https://www.csie.ntu.edu.tw/~cjlin/papers/guide/guide.pdf) | Scaling, kernel choice, and grid search over $`(C,\gamma)`$ (chapter 8). |
 
 ## <a id="library-documentation"></a>Library documentation
 
@@ -46,7 +46,7 @@ The links point to the current stable documentation. The code in the notes was t
 
 | Documentation | Relevant material |
 | --- | --- |
-| [scikit-learn nearest neighbors](https://scikit-learn.org/stable/modules/neighbors.html) and [density estimation](https://scikit-learn.org/stable/modules/density.html) | $k$-NN classifiers and regressors, $k$-d trees and ball trees, and `KernelDensity` (chapters 1 and 17). |
+| [scikit-learn nearest neighbors](https://scikit-learn.org/stable/modules/neighbors.html) and [density estimation](https://scikit-learn.org/stable/modules/density.html) | $`k`$-NN classifiers and regressors, $`k`$-d trees and ball trees, and `KernelDensity` (chapters 1 and 17). |
 | [scikit-learn linear models](https://scikit-learn.org/stable/modules/linear_model.html) | Least squares, [`Ridge`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Ridge.html), [`Lasso`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.Lasso.html), [`ElasticNet`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.ElasticNet.html), and [`LogisticRegression`](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html), including their penalty parameterizations (chapters 3 and 5). |
 | [scikit-learn naive Bayes](https://scikit-learn.org/stable/modules/naive_bayes.html) and [discriminant analysis](https://scikit-learn.org/stable/modules/lda_qda.html) | Event models, smoothing, LDA, QDA, and shrinkage covariance estimates (chapter 4). |
 | [scikit-learn probability calibration](https://scikit-learn.org/stable/modules/calibration.html) | Reliability diagrams, Platt scaling, and isotonic regression (chapter 5). |
@@ -57,7 +57,7 @@ The links point to the current stable documentation. The code in the notes was t
 | [scikit-learn ensembles](https://scikit-learn.org/stable/modules/ensemble.html) | Bagging, random forests, extremely randomized trees, AdaBoost, and gradient boosting, including histogram-based boosting (chapters 10–11). |
 | [scikit-learn permutation importance](https://scikit-learn.org/stable/modules/permutation_importance.html) and [partial dependence](https://scikit-learn.org/stable/modules/partial_dependence.html) | Model inspection for forests and boosted trees (chapters 10–11). |
 | [scikit-learn matrix decompositions](https://scikit-learn.org/stable/modules/decomposition.html) | PCA, probabilistic PCA scores, and kernel PCA (chapter 12). |
-| [scikit-learn clustering](https://scikit-learn.org/stable/modules/clustering.html) | $k$-means, agglomerative clustering, DBSCAN, spectral clustering, and clustering metrics (chapter 13). |
+| [scikit-learn clustering](https://scikit-learn.org/stable/modules/clustering.html) | $`k`$-means, agglomerative clustering, DBSCAN, spectral clustering, and clustering metrics (chapter 13). |
 | [scikit-learn Gaussian mixtures](https://scikit-learn.org/stable/modules/mixture.html) | EM for mixtures, covariance types, initialization, and model selection (chapter 14). |
 | [scikit-learn Gaussian processes](https://scikit-learn.org/stable/modules/gaussian_process.html) | Kernels, hyperparameter fitting, and `GaussianProcessRegressor` (chapter 15). |
 | [scikit-learn semi-supervised learning](https://scikit-learn.org/stable/modules/semi_supervised.html) | Self-training, label propagation, and label spreading (chapter 16). |

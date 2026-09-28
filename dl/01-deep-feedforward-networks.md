@@ -8,31 +8,31 @@
 
 ### <a id="what-changes-in-deep-learning"></a>What changes in deep learning
 
-The ML module fitted models of the form $f(x)=w^\top\phi(x)+b$, where the features $\phi(x)$ were fixed in advance: the raw inputs, polynomial or spline bases, or the implicit feature map of a kernel (ML chapter 8). Given $\phi$, fitting is usually a convex problem. A **neural network** learns the features as well. It composes several parameterized maps, and training adjusts all of them to reduce the same loss. The price is a nonconvex objective; the gain is a representation adapted to the task, which can be far more economical than any fixed basis for high-dimensional inputs such as images, audio, or text.
+The ML module fitted models of the form $`f(x)=w^\top\phi(x)+b`$, where the features $`\phi(x)`$ were fixed in advance: the raw inputs, polynomial or spline bases, or the implicit feature map of a kernel (ML chapter 8). Given $`\phi`$, fitting is usually a convex problem. A **neural network** learns the features as well. It composes several parameterized maps, and training adjusts all of them to reduce the same loss. The price is a nonconvex objective; the gain is a representation adapted to the task, which can be far more economical than any fixed basis for high-dimensional inputs such as images, audio, or text.
 
 The idea is old. The perceptron of ML chapter 2 is a single linear unit; networks with hidden layers trained by backpropagation were popularized by [Rumelhart, Hinton, and Williams (1986)](https://doi.org/10.1038/323533a0). What changed after 2010 was scale: large labeled datasets, graphics processors, and a set of techniques, developed in chapters 2–5, that make deep networks trainable. The ImageNet result of [Krizhevsky, Sutskever, and Hinton (2012)](https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html) is the usual marker of the transition. Foundations places deep learning among the other disciplines.
 
 ### <a id="the-multilayer-perceptron"></a>The multilayer perceptron
 
-A **multilayer perceptron** (MLP), or fully connected feedforward network, with $L$ layers maps an input $x\in\mathbb R^{d_0}$ through hidden layers of widths $d_1,\ldots,d_{L-1}$ to an output in $\mathbb R^{d_L}$:
+A **multilayer perceptron** (MLP), or fully connected feedforward network, with $`L`$ layers maps an input $`x\in\mathbb R^{d_0}`$ through hidden layers of widths $`d_1,\ldots,d_{L-1}`$ to an output in $`\mathbb R^{d_L}`$:
 
 $$
 h^{(0)}=x,\qquad z^{(l)}=W^{(l)}h^{(l-1)}+b^{(l)},\qquad h^{(l)}=\sigma\bigl(z^{(l)}\bigr)\quad(l=1,\ldots,L-1),\qquad f(x)=W^{(L)}h^{(L-1)}+b^{(L)}.
 $$
 
-Here $W^{(l)}\in\mathbb R^{d_l\times d_{l-1}}$ and $b^{(l)}\in\mathbb R^{d_l}$ are the **weights** and **biases** of layer $l$, $z^{(l)}$ are its **pre-activations**, and the **activation function** $\sigma$ acts elementwise. Each coordinate of $h^{(l)}$ is a **unit** or neuron. The last layer has no nonlinearity; its outputs are the scores that the loss interprets. A network with $L-1$ hidden layers is said to have depth $L$ (counting the layers with weights), and the parameters $\theta=\{W^{(l)},b^{(l)}\}$ number
+Here $`W^{(l)}\in\mathbb R^{d_l\times d_{l-1}}`$ and $`b^{(l)}\in\mathbb R^{d_l}`$ are the **weights** and **biases** of layer $`l`$, $`z^{(l)}`$ are its **pre-activations**, and the **activation function** $`\sigma`$ acts elementwise. Each coordinate of $`h^{(l)}`$ is a **unit** or neuron. The last layer has no nonlinearity; its outputs are the scores that the loss interprets. A network with $`L-1`$ hidden layers is said to have depth $`L`$ (counting the layers with weights), and the parameters $`\theta=\{W^{(l)},b^{(l)}\}`$ number
 
 $$
 \sum_{l=1}^Ld_l\,(d_{l-1}+1).
 $$
 
-For a batch of $n$ inputs stored as rows of $X\in\mathbb R^{n\times d_0}$, layer $l$ computes $H^{(l)}=\sigma\bigl(H^{(l-1)}W^{(l)\top}+\mathbf 1b^{(l)\top}\bigr)$, the row convention of Foundations. PyTorch's `nn.Linear(d_in, d_out)` stores its weight with shape `(d_out, d_in)` for this reason, as described in Foundations chapter 6.
+For a batch of $`n`$ inputs stored as rows of $`X\in\mathbb R^{n\times d_0}`$, layer $`l`$ computes $`H^{(l)}=\sigma\bigl(H^{(l-1)}W^{(l)\top}+\mathbf 1b^{(l)\top}\bigr)`$, the row convention of Foundations. PyTorch's `nn.Linear(d_in, d_out)` stores its weight with shape `(d_out, d_in)` for this reason, as described in Foundations chapter 6.
 
-The nonlinearity is essential. Without it, the composition of affine maps is affine, and a network of any depth computes the same functions as a single linear layer. With it, each hidden layer computes new features of the previous layer's features, and the last layer is a linear model on the learned representation $h^{(L-1)}(x)$.
+The nonlinearity is essential. Without it, the composition of affine maps is affine, and a network of any depth computes the same functions as a single linear layer. With it, each hidden layer computes new features of the previous layer's features, and the last layer is a linear model on the learned representation $`h^{(L-1)}(x)`$.
 
 ### <a id="computing-gradients"></a>Computing gradients
 
-Training minimizes an empirical risk $\widehat R_n(\theta)=\frac1n\sum_i\ell\bigl(y_i,f_\theta(x_i)\bigr)$ by stochastic gradient methods. The gradient with respect to every weight comes from one backward pass through the network, the reverse-mode differentiation derived in Foundations chapter 3. For the MLP it takes a compact form. Write $\delta^{(l)}=\partial\ell/\partial z^{(l)}$ for the gradient of the loss with respect to the pre-activations of layer $l$, as a column. Then
+Training minimizes an empirical risk $`\widehat R_n(\theta)=\frac1n\sum_i\ell\bigl(y_i,f_\theta(x_i)\bigr)`$ by stochastic gradient methods. The gradient with respect to every weight comes from one backward pass through the network, the reverse-mode differentiation derived in Foundations chapter 3. For the MLP it takes a compact form. Write $`\delta^{(l)}=\partial\ell/\partial z^{(l)}`$ for the gradient of the loss with respect to the pre-activations of layer $`l`$, as a column. Then
 
 $$
 \delta^{(l)}=\sigma'\bigl(z^{(l)}\bigr)\odot\Bigl(W^{(l+1)\top}\delta^{(l+1)}\Bigr),\qquad
@@ -40,20 +40,20 @@ $$
 \frac{\partial\ell}{\partial b^{(l)}}=\delta^{(l)} .
 $$
 
-The backward pass multiplies by the transposed weight matrices in reverse order, scaled at each layer by the derivative of the activation. Two consequences recur in the next chapters. First, the backward pass needs every $z^{(l)}$ and $h^{(l-1)}$ from the forward pass, so memory grows with depth and batch size (chapter 11). Second, the gradient reaching early layers is a product of many matrices and derivative factors, which can shrink or grow geometrically with depth (chapter 2).
+The backward pass multiplies by the transposed weight matrices in reverse order, scaled at each layer by the derivative of the activation. Two consequences recur in the next chapters. First, the backward pass needs every $`z^{(l)}`$ and $`h^{(l-1)}`$ from the forward pass, so memory grows with depth and batch size (chapter 11). Second, the gradient reaching early layers is a product of many matrices and derivative factors, which can shrink or grow geometrically with depth (chapter 2).
 
 ## <a id="activation-functions"></a>Activation functions
 
-The choice of $\sigma$ affects what is easy to represent and, more importantly in practice, how gradients flow.
+The choice of $`\sigma`$ affects what is easy to represent and, more importantly in practice, how gradients flow.
 
-- The **logistic sigmoid** $1/(1+e^{-z})$ and **tanh** were standard until about 2010. Both **saturate**: for large $|z|$ their derivatives vanish, so a unit pushed far from zero stops learning. The sigmoid's derivative is at most $1/4$, which shrinks gradients by at least a factor of four per layer; tanh is centered at zero and has slope 1 at the origin.
-- The **rectified linear unit** $\mathrm{ReLU}(z)=\max\{z,0\}$ ([Glorot, Bordes, and Bengio, 2011](https://proceedings.mlr.press/v15/glorot11a.html)) does not saturate for positive inputs, is cheap, and produces exact zeros. Its derivative is 0 or 1. A unit whose pre-activation is negative for every input is **dead**: it receives no gradient and cannot recover.
-- **Leaky ReLU** $\max\{z,\alpha z\}$ with small $\alpha$ keeps a gradient for negative inputs; the **ELU** ([Clevert, Unterthiner, and Hochreiter, 2015](https://arxiv.org/abs/1511.07289)) is a smooth variant.
-- **GELU** $z\,\Phi(z)$, with $\Phi$ the standard normal distribution function ([Hendrycks and Gimpel, 2016](https://arxiv.org/abs/1606.08415)), and **SiLU** (or Swish) $z\,\mathrm{sigmoid}(z)$ ([Ramachandran, Zoph, and Le, 2017](https://arxiv.org/abs/1710.05941)) are smooth, slightly non-monotone versions of ReLU. They are the defaults in transformers (chapter 9).
+- The **logistic sigmoid** $`1/(1+e^{-z})`$ and **tanh** were standard until about 2010. Both **saturate**: for large $`|z|`$ their derivatives vanish, so a unit pushed far from zero stops learning. The sigmoid's derivative is at most $`1/4`$, which shrinks gradients by at least a factor of four per layer; tanh is centered at zero and has slope 1 at the origin.
+- The **rectified linear unit** $`\mathrm{ReLU}(z)=\max\{z,0\}`$ ([Glorot, Bordes, and Bengio, 2011](https://proceedings.mlr.press/v15/glorot11a.html)) does not saturate for positive inputs, is cheap, and produces exact zeros. Its derivative is 0 or 1. A unit whose pre-activation is negative for every input is **dead**: it receives no gradient and cannot recover.
+- **Leaky ReLU** $`\max\{z,\alpha z\}`$ with small $`\alpha`$ keeps a gradient for negative inputs; the **ELU** ([Clevert, Unterthiner, and Hochreiter, 2015](https://arxiv.org/abs/1511.07289)) is a smooth variant.
+- **GELU** $`z\,\Phi(z)`$, with $`\Phi`$ the standard normal distribution function ([Hendrycks and Gimpel, 2016](https://arxiv.org/abs/1606.08415)), and **SiLU** (or Swish) $`z\,\mathrm{sigmoid}(z)`$ ([Ramachandran, Zoph, and Le, 2017](https://arxiv.org/abs/1710.05941)) are smooth, slightly non-monotone versions of ReLU. They are the defaults in transformers (chapter 9).
 
 <img src="sources/images/dl-activations.png" alt="dl-activations" width="840">
 
-*Common activation functions and their derivatives, computed with PyTorch's autograd. Sigmoid and tanh saturate on both sides; the sigmoid's derivative never exceeds 0.25. ReLU has derivative exactly 0 for negative inputs; leaky ReLU keeps slope 0.1 there. GELU and SiLU follow ReLU for large $|z|$ but are smooth near zero and dip slightly below zero, so their derivatives are briefly negative.*
+*Common activation functions and their derivatives, computed with PyTorch's autograd. Sigmoid and tanh saturate on both sides; the sigmoid's derivative never exceeds 0.25. ReLU has derivative exactly 0 for negative inputs; leaky ReLU keeps slope 0.1 there. GELU and SiLU follow ReLU for large $`|z|`$ but are smooth near zero and dip slightly below zero, so their derivatives are briefly negative.*
 
 For hidden layers, ReLU and its smooth relatives are the usual choice. The choice matters less than initialization and normalization, which chapters 2 and 4 treat, but saturating activations in deep networks remain a common cause of stalled training.
 
@@ -61,27 +61,27 @@ For hidden layers, ReLU and its smooth relatives are the usual choice. The choic
 
 ### <a id="universal-approximation"></a>Universal approximation
 
-A network with a single hidden layer computes $f(x)=\sum_{j=1}^Na_j\,\sigma(w_j^\top x+b_j)+c$, a sum of $N$ **ridge functions**, each varying only along one direction $w_j$. How large is this class?
+A network with a single hidden layer computes $`f(x)=\sum_{j=1}^Na_j\,\sigma(w_j^\top x+b_j)+c`$, a sum of $`N`$ **ridge functions**, each varying only along one direction $`w_j`$. How large is this class?
 
-**Theorem (universal approximation).** Let $\sigma$ be continuous and not a polynomial. For every continuous function $g$ on a compact set $K\subset\mathbb R^d$ and every $\varepsilon>0$ there are $N$ and parameters $a_j,w_j,b_j,c$ such that
+**Theorem (universal approximation).** Let $`\sigma`$ be continuous and not a polynomial. For every continuous function $`g`$ on a compact set $`K\subset\mathbb R^d`$ and every $`\varepsilon>0`$ there are $`N`$ and parameters $`a_j,w_j,b_j,c`$ such that
 
 $$
 \sup_{x\in K}\Bigl|g(x)-c-\sum_{j=1}^Na_j\,\sigma(w_j^\top x+b_j)\Bigr|<\varepsilon .
 $$
 
-Versions for sigmoidal activations are due to [Cybenko (1989)](https://doi.org/10.1007/BF02551274) and [Hornik, Stinchcombe, and White (1989)](https://www.sciencedirect.com/science/article/abs/pii/0893608089900208); the characterization by non-polynomiality is due to [Leshno, Lin, Pinkus, and Schocken (1993)](https://www.sciencedirect.com/science/article/abs/pii/S0893608005801315). The polynomial exception is necessary: if $\sigma$ is a polynomial of degree $p$, every such network is a polynomial of degree at most $p$ in $x$, and polynomials of bounded degree are not dense.
+Versions for sigmoidal activations are due to [Cybenko (1989)](https://doi.org/10.1007/BF02551274) and [Hornik, Stinchcombe, and White (1989)](https://www.sciencedirect.com/science/article/abs/pii/0893608089900208); the characterization by non-polynomiality is due to [Leshno, Lin, Pinkus, and Schocken (1993)](https://www.sciencedirect.com/science/article/abs/pii/S0893608005801315). The polynomial exception is necessary: if $`\sigma`$ is a polynomial of degree $`p`$, every such network is a polynomial of degree at most $`p`$ in $`x`$, and polynomials of bounded degree are not dense.
 
-For ReLU in one dimension the theorem has a transparent proof. A width-$N$ network
+For ReLU in one dimension the theorem has a transparent proof. A width-$`N`$ network
 
 $$
 f_N(x)=g(t_0)+\sum_{j=0}^{N-1}a_j\,\mathrm{ReLU}(x-t_j)
 $$
 
-is a continuous piecewise-linear function with kinks at the $t_j$: each unit adds a hinge, and $a_j$ is the change of slope at $t_j$. Choosing $a_0$ as the slope of the first segment and $a_j$ as the difference of consecutive slopes makes $f_N$ the linear interpolant of $g$ at the knots $t_0<\cdots<t_N$. For twice-differentiable $g$ on $[0,1]$ with equally spaced knots, the interpolation error is at most $\max|g''|/(8N^2)$. [Appendix A](#block-dl1-appendix-a) proves this and extends the construction to $d$ dimensions.
+is a continuous piecewise-linear function with kinks at the $`t_j`$: each unit adds a hinge, and $`a_j`$ is the change of slope at $`t_j`$. Choosing $`a_0`$ as the slope of the first segment and $`a_j`$ as the difference of consecutive slopes makes $`f_N`$ the linear interpolant of $`g`$ at the knots $`t_0<\cdots<t_N`$. For twice-differentiable $`g`$ on $`[0,1]`$ with equally spaced knots, the interpolation error is at most $`\max|g''|/(8N^2)`$. [Appendix A](#block-dl1-appendix-a) proves this and extends the construction to $`d`$ dimensions.
 
 <img src="sources/images/dl-universal-approximation.png" alt="dl-universal-approximation" width="840">
 
-*Left: one-hidden-layer ReLU networks with 3, 6, and 24 units, with weights set so that each network interpolates $\sin 2\pi x+x/2$ at equally spaced knots (dots). Right: the maximum error falls as $N^{-2}$, from 0.21 with 4 units to $1.9\times10^{-5}$ with 512.*
+*Left: one-hidden-layer ReLU networks with 3, 6, and 24 units, with weights set so that each network interpolates $`\sin 2\pi x+x/2`$ at equally spaced knots (dots). Right: the maximum error falls as $`N^{-2}`$, from 0.21 with 4 units to $`1.9\times10^{-5}`$ with 512.*
 
 ```python
 import numpy as np
@@ -114,23 +114,23 @@ for N in [4, 16, 64, 256]:
 
 Universal approximation is an existence statement. It gives no bound on the width needed, no method for finding the weights from data, and no guarantee that the approximating network generalizes. Polynomials, splines, and Gaussian kernel expansions are universal approximators too. The theorem rules out only one worry, that a network of fixed architecture type is too restricted in principle.
 
-The width needed can be enormous. Approximating an arbitrary function with $s$ bounded derivatives to accuracy $\varepsilon$ in $d$ dimensions requires on the order of $\varepsilon^{-d/s}$ parameters for any method whose parameters depend continuously on the target, the curse of dimensionality of ML chapter 1 in another form. Networks escape it only for restricted function classes. [Barron (1993)](https://doi.org/10.1109/18.256500) showed that if $g$ has a Fourier transform with finite first moment $C_g=\int\|\omega\|\,|\hat g(\omega)|\,d\omega$, then a sigmoidal network with $N$ hidden units achieves squared $L^2$ error at most $(2rC_g)^2/N$ on a ball of radius $r$, a rate that does not depend on $d$, although $C_g$ may. Fixed bases with $N$ terms cannot match this rate uniformly over the same class.
+The width needed can be enormous. Approximating an arbitrary function with $`s`$ bounded derivatives to accuracy $`\varepsilon`$ in $`d`$ dimensions requires on the order of $`\varepsilon^{-d/s}`$ parameters for any method whose parameters depend continuously on the target, the curse of dimensionality of ML chapter 1 in another form. Networks escape it only for restricted function classes. [Barron (1993)](https://doi.org/10.1109/18.256500) showed that if $`g`$ has a Fourier transform with finite first moment $`C_g=\int\|\omega\|\,|\hat g(\omega)|\,d\omega`$, then a sigmoidal network with $`N`$ hidden units achieves squared $`L^2`$ error at most $`(2rC_g)^2/N`$ on a ball of radius $`r`$, a rate that does not depend on $`d`$, although $`C_g`$ may. Fixed bases with $`N`$ terms cannot match this rate uniformly over the same class.
 
 ### <a id="depth-and-linear-regions"></a>Depth and linear regions
 
-A ReLU network is a continuous piecewise-linear function: each pattern of active and inactive units fixes a linear map, and the input space is partitioned into **linear regions** on which the pattern is constant. A single hidden layer of $m$ units in one dimension has at most $m+1$ pieces, and in $d$ dimensions its regions are those of an arrangement of $m$ hyperplanes, at most $\sum_{i=0}^d\binom mi$. Depth multiplies instead of adding. The tent map
+A ReLU network is a continuous piecewise-linear function: each pattern of active and inactive units fixes a linear map, and the input space is partitioned into **linear regions** on which the pattern is constant. A single hidden layer of $`m`$ units in one dimension has at most $`m+1`$ pieces, and in $`d`$ dimensions its regions are those of an arrangement of $`m`$ hyperplanes, at most $`\sum_{i=0}^d\binom mi`$. Depth multiplies instead of adding. The tent map
 
 $$
 \tau(x)=2\,\mathrm{ReLU}(x)-4\,\mathrm{ReLU}\bigl(x-\tfrac12\bigr),
 $$
 
-which maps $[0,1]$ onto itself with two pieces, uses two ReLU units. Composing it $k$ times gives a sawtooth with $2^k$ pieces from a network of depth $k$ and only $2k$ units.
+which maps $`[0,1]`$ onto itself with two pieces, uses two ReLU units. Composing it $`k`$ times gives a sawtooth with $`2^k`$ pieces from a network of depth $`k`$ and only $`2k`$ units.
 
 <img src="sources/images/dl-sawtooth.png" alt="dl-sawtooth" width="880">
 
-*Compositions of the tent map. Each extra layer of two units doubles the number of linear pieces; a network with one hidden layer needs $2^k-1$ units to produce the same function.*
+*Compositions of the tent map. Each extra layer of two units doubles the number of linear pieces; a network with one hidden layer needs $`2^k-1`$ units to produce the same function.*
 
-[Telgarsky (2016)](https://arxiv.org/abs/1602.04485) turned this into a **depth-separation** result: some functions computed by deep networks with a constant number of units per layer cannot be approximated by shallower networks unless those have exponentially many units. [Appendix B](#block-dl1-appendix-b) proves the one-dimensional core of the argument: a network with $L$ hidden layers of width $m$ has at most $(m+1)^L$ pieces, and any function with at most $2^{k-2}$ pieces has $L^1$ distance at least $1/16$ from the $k$-fold sawtooth. [Eldan and Shamir (2016)](https://arxiv.org/abs/1512.03965) gave a separation between depths two and three in high dimension, and [Montúfar, Pascanu, Cho, and Bengio (2014)](https://arxiv.org/abs/1402.1869) showed that the maximal number of linear regions grows exponentially with depth.
+[Telgarsky (2016)](https://arxiv.org/abs/1602.04485) turned this into a **depth-separation** result: some functions computed by deep networks with a constant number of units per layer cannot be approximated by shallower networks unless those have exponentially many units. [Appendix B](#block-dl1-appendix-b) proves the one-dimensional core of the argument: a network with $`L`$ hidden layers of width $`m`$ has at most $`(m+1)^L`$ pieces, and any function with at most $`2^{k-2}`$ pieces has $`L^1`$ distance at least $`1/16`$ from the $`k`$-fold sawtooth. [Eldan and Shamir (2016)](https://arxiv.org/abs/1512.03965) gave a separation between depths two and three in high dimension, and [Montúfar, Pascanu, Cho, and Bengio (2014)](https://arxiv.org/abs/1402.1869) showed that the maximal number of linear regions grows exponentially with depth.
 
 Maximal counts describe carefully constructed weights, not typical ones. [Hanin and Rolnick (2019)](https://arxiv.org/abs/1901.09021) showed that at random initialization, and empirically during training, the number of regions met along a line grows roughly linearly with the total number of units, whatever the depth. The next computation makes both points in one dimension.
 
@@ -170,21 +170,21 @@ for k in [2, 4, 6, 8, 10]:
 # depth 10 (20 units): sawtooth  1024 pieces; one hidden layer of 20 units at most 21; random depth-10 networks: mean 2.6, max 11
 ```
 
-The random narrow networks are nearly linear on $[0,1]$: most units are inactive or active over the whole interval, and a layer of two units in which both are off passes nothing forward. Depth makes exponentially complex functions *possible*; it does not make them typical, and training does not seek them out. The practical case for depth is empirical: deep networks reach a given accuracy with fewer parameters and generalize better on natural data, whose structure is hierarchical and compositional. How to make deep networks trainable is the subject of chapters 2–4.
+The random narrow networks are nearly linear on $`[0,1]`$: most units are inactive or active over the whole interval, and a layer of two units in which both are off passes nothing forward. Depth makes exponentially complex functions *possible*; it does not make them typical, and training does not seek them out. The practical case for depth is empirical: deep networks reach a given accuracy with fewer parameters and generalize better on natural data, whose structure is hierarchical and compositional. How to make deep networks trainable is the subject of chapters 2–4.
 
 <img src="sources/images/dl-linear-regions.png" alt="dl-linear-regions" width="880">
 
-*Linear regions of three randomly initialized ReLU networks with 24 hidden units each, on the square $[-2,2]^2$; each color is one activation pattern. The single hidden layer gives an arrangement of 24 lines, which can have at most 301 regions in the whole plane. The deeper networks bend their boundaries at every layer but, at random initialization, show fewer regions in this window.*
+*Linear regions of three randomly initialized ReLU networks with 24 hidden units each, on the square $`[-2,2]^2`$; each color is one activation pattern. The single hidden layer gives an arrangement of 24 lines, which can have at most 301 regions in the whole plane. The deeper networks bend their boundaries at every layer but, at random initialization, show fewer regions in this window.*
 
 ## <a id="output-layers-and-losses"></a>Output layers and losses
 
-The last layer produces unconstrained scores, and the loss turns them into a statement about the target. As in ML chapter 5, the losses are negative log-likelihoods of a conditional model $p_\theta(y\mid x)$ whose parameters are the network outputs, so training is maximum conditional likelihood and the loss values are in nats (Foundations chapter 5).
+The last layer produces unconstrained scores, and the loss turns them into a statement about the target. As in ML chapter 5, the losses are negative log-likelihoods of a conditional model $`p_\theta(y\mid x)`$ whose parameters are the network outputs, so training is maximum conditional likelihood and the loss values are in nats (Foundations chapter 5).
 
 | Target | Output layer and model | Loss per example |
 | --- | --- | --- |
-| Real vector $y$ | $\mu=f(x)$; $y\sim\mathcal N(\mu,\sigma^2I)$ with fixed $\sigma$ | squared error $\frac12\|y-\mu\|^2$, up to constants |
-| Real $y$ with input-dependent noise | $(\mu,s)=f(x)$, variance $e^{s}$ | $\frac12s+\frac12(y-\mu)^2e^{-s}$ |
-| One of $K$ classes | logits $f(x)\in\mathbb R^K$; softmax probabilities | cross-entropy $-f_y(x)+\log\sum_ke^{f_k(x)}$ |
+| Real vector $`y`$ | $`\mu=f(x)`$; $`y\sim\mathcal N(\mu,\sigma^2I)`$ with fixed $`\sigma`$ | squared error $`\frac12\|y-\mu\|^2`$, up to constants |
+| Real $`y`$ with input-dependent noise | $`(\mu,s)=f(x)`$, variance $`e^{s}`$ | $`\frac12s+\frac12(y-\mu)^2e^{-s}`$ |
+| One of $`K`$ classes | logits $`f(x)\in\mathbb R^K`$; softmax probabilities | cross-entropy $`-f_y(x)+\log\sum_ke^{f_k(x)}`$ |
 | Several binary labels | one logit per label; independent Bernoulli | sum of binary cross-entropies |
 
 Two practical points follow. First, the loss should be computed from logits with a log-sum-exp, as PyTorch's `cross_entropy` does, never by taking the logarithm of computed probabilities (Foundations chapter 6). Second, the likelihood view extends to richer outputs: a network can output the parameters of a mixture ([Bishop's mixture density networks](https://research.aston.ac.uk/en/publications/mixture-density-networks/)), of a distribution over sequences (the NLP and LLMs module), or of an image distribution (the Generative AI module).
@@ -253,7 +253,7 @@ Two features of these results carry over to real problems. Capacity matters: the
 
 ### <a id="nonconvexity-and-symmetry"></a>Nonconvexity and symmetry
 
-The training objective of a network with hidden layers is nonconvex. Part of the reason is **symmetry**. Permuting the hidden units of a layer, together with the corresponding rows of $W^{(l)}$ and $b^{(l)}$ and columns of $W^{(l+1)}$, leaves the function unchanged, so every minimizer comes with $d_l!$ copies for each hidden layer. For ReLU networks there is also a continuous symmetry: $\mathrm{ReLU}(cz)=c\,\mathrm{ReLU}(z)$ for $c>0$, so multiplying a unit's incoming weights and bias by $c$ and its outgoing weights by $1/c$ changes nothing.
+The training objective of a network with hidden layers is nonconvex. Part of the reason is **symmetry**. Permuting the hidden units of a layer, together with the corresponding rows of $`W^{(l)}`$ and $`b^{(l)}`$ and columns of $`W^{(l+1)}`$, leaves the function unchanged, so every minimizer comes with $`d_l!`$ copies for each hidden layer. For ReLU networks there is also a continuous symmetry: $`\mathrm{ReLU}(cz)=c\,\mathrm{ReLU}(z)`$ for $`c>0`$, so multiplying a unit's incoming weights and bias by $`c`$ and its outgoing weights by $`1/c`$ changes nothing.
 
 ```python
 import torch
@@ -292,19 +292,19 @@ Nonconvexity is less damaging in practice than the worst case suggests. Gradient
 <summary><a id="block-dl1-appendix-a"></a><b>A. Universal approximation with ReLU units</b></summary>
 
 
-**One dimension.** Let $g$ be continuous on $[0,1]$ and let $0=t_0<t_1<\cdots<t_N=1$. Let $s_j=\bigl(g(t_{j+1})-g(t_j)\bigr)/(t_{j+1}-t_j)$ be the slope of the chord on $[t_j,t_{j+1}]$, and set $a_0=s_0$ and $a_j=s_j-s_{j-1}$ for $1\le j\le N-1$. The network
+**One dimension.** Let $`g`$ be continuous on $`[0,1]`$ and let $`0=t_0<t_1<\cdots<t_N=1`$. Let $`s_j=\bigl(g(t_{j+1})-g(t_j)\bigr)/(t_{j+1}-t_j)`$ be the slope of the chord on $`[t_j,t_{j+1}]`$, and set $`a_0=s_0`$ and $`a_j=s_j-s_{j-1}`$ for $`1\le j\le N-1`$. The network
 
 $$
 f_N(x)=g(t_0)+\sum_{j=0}^{N-1}a_j\,\mathrm{ReLU}(x-t_j)
 $$
 
-has slope $a_0+\cdots+a_j=s_j$ on $[t_j,t_{j+1}]$ and value $g(t_0)$ at $t_0$, so it is the piecewise-linear interpolant of $g$. Since $g$ is uniformly continuous, the interpolant converges uniformly as the mesh $\max_j(t_{j+1}-t_j)$ tends to zero.
+has slope $`a_0+\cdots+a_j=s_j`$ on $`[t_j,t_{j+1}]`$ and value $`g(t_0)`$ at $`t_0`$, so it is the piecewise-linear interpolant of $`g`$. Since $`g`$ is uniformly continuous, the interpolant converges uniformly as the mesh $`\max_j(t_{j+1}-t_j)`$ tends to zero.
 
-If $g$ is twice continuously differentiable and the knots are equally spaced with spacing $h=1/N$, then on each interval the error $e=g-f_N$ vanishes at both ends and satisfies $e''=g''$. For $x$ in $[t_j,t_{j+1}]$, the standard interpolation remainder gives $e(x)=\frac12g''(\xi)(x-t_j)(x-t_{j+1})$ for some $\xi$ in the interval, and $|(x-t_j)(x-t_{j+1})|\le h^2/4$. Hence $\|g-f_N\|_\infty\le\max|g''|\,h^2/8$.
+If $`g`$ is twice continuously differentiable and the knots are equally spaced with spacing $`h=1/N`$, then on each interval the error $`e=g-f_N`$ vanishes at both ends and satisfies $`e''=g''`$. For $`x`$ in $`[t_j,t_{j+1}]`$, the standard interpolation remainder gives $`e(x)=\frac12g''(\xi)(x-t_j)(x-t_{j+1})`$ for some $`\xi`$ in the interval, and $`|(x-t_j)(x-t_{j+1})|\le h^2/4`$. Hence $`\|g-f_N\|_\infty\le\max|g''|\,h^2/8`$.
 
-**Several dimensions.** Let $K\subset\mathbb R^d$ be compact and $g$ continuous on $K$. Functions of the form $\sum_kc_k\cos(\omega_k^\top x+\varphi_k)$ form an algebra, because products of cosines are sums of cosines; it contains the constants and separates points. By the Stone–Weierstrass theorem it is dense in $C(K)$, so $g$ is within $\varepsilon/2$ of a finite sum $\sum_{k=1}^Mc_k\cos(\omega_k^\top x+\varphi_k)$. Each term is a continuous function of the scalar $u=\omega_k^\top x$, which ranges over a bounded interval as $x$ ranges over $K$. By the one-dimensional result, $c_k\cos(u+\varphi_k)$ is within $\varepsilon/(2M)$ of a one-hidden-layer ReLU network in $u$, and substituting $u=\omega_k^\top x$ turns each unit $\mathrm{ReLU}(u-t)$ into $\mathrm{ReLU}(\omega_k^\top x-t)$. The sum of the $M$ networks is a single one-hidden-layer network within $\varepsilon$ of $g$ on $K$.
+**Several dimensions.** Let $`K\subset\mathbb R^d`$ be compact and $`g`$ continuous on $`K`$. Functions of the form $`\sum_kc_k\cos(\omega_k^\top x+\varphi_k)`$ form an algebra, because products of cosines are sums of cosines; it contains the constants and separates points. By the Stone–Weierstrass theorem it is dense in $`C(K)`$, so $`g`$ is within $`\varepsilon/2`$ of a finite sum $`\sum_{k=1}^Mc_k\cos(\omega_k^\top x+\varphi_k)`$. Each term is a continuous function of the scalar $`u=\omega_k^\top x`$, which ranges over a bounded interval as $`x`$ ranges over $`K`$. By the one-dimensional result, $`c_k\cos(u+\varphi_k)`$ is within $`\varepsilon/(2M)`$ of a one-hidden-layer ReLU network in $`u`$, and substituting $`u=\omega_k^\top x`$ turns each unit $`\mathrm{ReLU}(u-t)`$ into $`\mathrm{ReLU}(\omega_k^\top x-t)`$. The sum of the $`M`$ networks is a single one-hidden-layer network within $`\varepsilon`$ of $`g`$ on $`K`$.
 
-The same argument works for any continuous $\sigma$ that can approximate a one-dimensional hinge or step with a few units, which covers the sigmoid and tanh: $\mathrm{sigmoid}(cz)$ tends to a step as $c\to\infty$.
+The same argument works for any continuous $`\sigma`$ that can approximate a one-dimensional hinge or step with a few units, which covers the sigmoid and tanh: $`\mathrm{sigmoid}(cz)`$ tends to a step as $`c\to\infty`$.
 
 </details>
 
@@ -314,24 +314,24 @@ The same argument works for any continuous $\sigma$ that can approximate a one-d
 <summary><a id="block-dl1-appendix-b"></a><b>B. Depth separation in one dimension</b></summary>
 
 
-**Counting pieces.** Consider a ReLU network with scalar input, $L$ hidden layers of width at most $m$, and a linear output. Let $B_l$ be the set of breakpoints of all functions $x\mapsto h^{(l)}_j(x)$ computed in layers $1,\ldots,l$, with $B_0=\varnothing$. Every pre-activation $z^{(l+1)}_j$ is an affine combination of layer-$l$ outputs, so it is affine on each of the at most $|B_l|+1$ intervals between consecutive points of $B_l$. On each such interval, $\mathrm{ReLU}(z^{(l+1)}_j)$ adds at most one breakpoint, where $z^{(l+1)}_j$ changes sign. Hence
+**Counting pieces.** Consider a ReLU network with scalar input, $`L`$ hidden layers of width at most $`m`$, and a linear output. Let $`B_l`$ be the set of breakpoints of all functions $`x\mapsto h^{(l)}_j(x)`$ computed in layers $`1,\ldots,l`$, with $`B_0=\varnothing`$. Every pre-activation $`z^{(l+1)}_j`$ is an affine combination of layer-$`l`$ outputs, so it is affine on each of the at most $`|B_l|+1`$ intervals between consecutive points of $`B_l`$. On each such interval, $`\mathrm{ReLU}(z^{(l+1)}_j)`$ adds at most one breakpoint, where $`z^{(l+1)}_j`$ changes sign. Hence
 
 $$
 
 |B_{l+1}|\le|B_l|+m\bigl(|B_l|+1\bigr),\qquad\text{so}\qquad |B_{l+1}|+1\le(m+1)\bigl(|B_l|+1\bigr),
 $$
 
-and the network output, an affine combination of the last layer, has at most $(m+1)^L$ pieces. With one hidden layer this is $m+1$.
+and the network output, an affine combination of the last layer, has at most $`(m+1)^L`$ pieces. With one hidden layer this is $`m+1`$.
 
-**The sawtooth is hard to approximate with few pieces.** The $k$-fold composition $g_k$ of the tent map consists of $2^{k-1}$ triangles, each rising from 0 to 1 and falling back to 0 over an interval of length $2^{1-k}$. On each triangle, $g_k>1/2$ on the middle half of the interval and $g_k<1/2$ on the two outer quarters. Let $f$ be piecewise linear with $p$ pieces. Each piece crosses the level $1/2$ at most once, so $f-1/2$ changes sign at most $p$ times in total. Consider a triangle on whose interval $f-1/2$ does not change sign. If $f\le1/2$ there, then $|f-g_k|\ge g_k-1/2$ on the middle half, contributing at least the area of a triangle with base $2^{-k}$ and height $1/2$, which is $2^{-k-2}$. If $f\ge1/2$ there, the two outer quarters contribute the same amount. At least $2^{k-1}-p$ triangles are of this kind, so
+**The sawtooth is hard to approximate with few pieces.** The $`k`$-fold composition $`g_k`$ of the tent map consists of $`2^{k-1}`$ triangles, each rising from 0 to 1 and falling back to 0 over an interval of length $`2^{1-k}`$. On each triangle, $`g_k>1/2`$ on the middle half of the interval and $`g_k<1/2`$ on the two outer quarters. Let $`f`$ be piecewise linear with $`p`$ pieces. Each piece crosses the level $`1/2`$ at most once, so $`f-1/2`$ changes sign at most $`p`$ times in total. Consider a triangle on whose interval $`f-1/2`$ does not change sign. If $`f\le1/2`$ there, then $`|f-g_k|\ge g_k-1/2`$ on the middle half, contributing at least the area of a triangle with base $`2^{-k}`$ and height $`1/2`$, which is $`2^{-k-2}`$. If $`f\ge1/2`$ there, the two outer quarters contribute the same amount. At least $`2^{k-1}-p`$ triangles are of this kind, so
 
 $$
 \int_0^1|f(x)-g_k(x)|\,dx\ \ge\ \bigl(2^{k-1}-p\bigr)\,2^{-k-2}.
 $$
 
-If $p\le2^{k-2}$, the right side is at least $2^{k-2}\cdot2^{-k-2}=1/16$.
+If $`p\le2^{k-2}`$, the right side is at least $`2^{k-2}\cdot2^{-k-2}=1/16`$.
 
-**Conclusion.** The depth-$k$ network with two units per layer computes $g_k$ exactly. A network with $L$ hidden layers of width $m$ has at most $(m+1)^L$ pieces, so if $(m+1)^L\le2^{k-2}$ its $L^1$ error is at least $1/16$. Approximating $g_k$ with $L$ layers therefore needs width at least $2^{(k-2)/L}-1$, exponential in $k/L$; with one hidden layer it needs at least $2^{k-2}$ units. Telgarsky's theorem extends this to networks with several layers and to multivariate inputs.
+**Conclusion.** The depth-$`k`$ network with two units per layer computes $`g_k`$ exactly. A network with $`L`$ hidden layers of width $`m`$ has at most $`(m+1)^L`$ pieces, so if $`(m+1)^L\le2^{k-2}`$ its $`L^1`$ error is at least $`1/16`$. Approximating $`g_k`$ with $`L`$ layers therefore needs width at least $`2^{(k-2)/L}-1`$, exponential in $`k/L`$; with one hidden layer it needs at least $`2^{k-2}`$ units. Telgarsky's theorem extends this to networks with several layers and to multivariate inputs.
 
 </details>
 

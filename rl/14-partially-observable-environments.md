@@ -15,22 +15,22 @@ An agent that cannot see the whole state of its environment is the rule, not the
 - **Unknown parameters.** Some fixed property of the environment is unknown: the mass of an object, the preferences of a user, which of two doors hides the tiger. Treating the unknown dynamics of an MDP as hidden state turns learning itself into a planning problem, the **Bayes-adaptive** view of the last section.
 - **Other agents.** The intentions, information, and strategies of other agents are hidden, which makes multi-agent problems partially observable even when the physical state is not (chapter 27).
 
-Chapter 1 introduced the formal model. A **partially observable MDP** (POMDP) is an MDP $(\mathcal S,\mathcal A,p,r,\gamma)$ together with a set of observations $\mathcal O$ and observation probabilities $Z(o\mid s',a)=\Pr(O_{t+1}=o\mid S_{t+1}=s',A_t=a)$. The agent sees only the observations and its own actions. This chapter covers what to do about it: planning when the model is known, learning when it is not, and the forms of uncertainty that are best understood as partial observability.
+Chapter 1 introduced the formal model. A **partially observable MDP** (POMDP) is an MDP $`(\mathcal S,\mathcal A,p,r,\gamma)`$ together with a set of observations $`\mathcal O`$ and observation probabilities $`Z(o\mid s',a)=\Pr(O_{t+1}=o\mid S_{t+1}=s',A_t=a)`$. The agent sees only the observations and its own actions. This chapter covers what to do about it: planning when the model is known, learning when it is not, and the forms of uncertainty that are best understood as partial observability.
 
 ### <a id="agent-states"></a>Agent states
 
-A policy can depend on anything the agent knows at time $t$, which is the **history** $H_t=(O_0,A_0,O_1,\dots,A_{t-1},O_t)$. The history is always sufficient, but it grows without bound. An **agent state** is a summary $X_t=f(X_{t-1},A_{t-1},O_t)$ computed incrementally from it. The choices differ in what they keep:
+A policy can depend on anything the agent knows at time $`t`$, which is the **history** $`H_t=(O_0,A_0,O_1,\dots,A_{t-1},O_t)`$. The history is always sufficient, but it grows without bound. An **agent state** is a summary $`X_t=f(X_{t-1},A_{t-1},O_t)`$ computed incrementally from it. The choices differ in what they keep:
 
-- **The observation** alone, $X_t=O_t$: a **memoryless** or **reactive** agent. It is optimal only if the observation is Markov.
-- **A window** of the last $k$ observations and actions. This is the frame stacking of the Atari agents, which makes velocities visible (chapter 16). It captures dependencies up to $k$ steps back and no further, and the number of distinct windows grows exponentially with $k$.
-- **The belief state** $b_t(s)=\Pr(S_t=s\mid H_t)$, the posterior over hidden states, updated by Bayes' rule:
+- **The observation** alone, $`X_t=O_t`$: a **memoryless** or **reactive** agent. It is optimal only if the observation is Markov.
+- **A window** of the last $`k`$ observations and actions. This is the frame stacking of the Atari agents, which makes velocities visible (chapter 16). It captures dependencies up to $`k`$ steps back and no further, and the number of distinct windows grows exponentially with $`k`$.
+- **The belief state** $`b_t(s)=\Pr(S_t=s\mid H_t)`$, the posterior over hidden states, updated by Bayes' rule:
   $$
   b_{t+1}(s')=\frac{Z(o\mid s',a)\sum_sp(s'\mid s,a)\,b_t(s)}{\Pr(o\mid b_t,a)}.
   $$
   It is a **sufficient statistic** for the history: the optimal action depends on the history only through the belief ([Åström, 1965](https://doi.org/10.1016/0022-247X%2865%2990154-X)). It requires the model.
 - **A learned state**, such as the hidden state of a recurrent network or a set of predictions about future observations. It is what agents without a model use.
 
-The belief is the ideal that the others approximate. It turns a POMDP into a fully observed MDP over beliefs, the **belief MDP**, with the expected reward $r(b,a)=\sum_sb(s)r(s,a)$ and deterministic transitions to $b'=\tau(b,a,o)$ for each observation $o$, which occurs with probability $\Pr(o\mid b,a)$. Everything known about MDPs applies to it. Its difficulty is that its state space is the continuous simplex of distributions over $\mathcal S$, of dimension $|\mathcal S|-1$.
+The belief is the ideal that the others approximate. It turns a POMDP into a fully observed MDP over beliefs, the **belief MDP**, with the expected reward $`r(b,a)=\sum_sb(s)r(s,a)`$ and deterministic transitions to $`b'=\tau(b,a,o)`$ for each observation $`o`$, which occurs with probability $`\Pr(o\mid b,a)`$. Everything known about MDPs applies to it. Its difficulty is that its state space is the continuous simplex of distributions over $`\mathcal S`$, of dimension $`|\mathcal S|-1`$.
 
 ### <a id="what-memory-buys"></a>What memory buys
 
@@ -45,23 +45,23 @@ The best memoryless policy is also hard to find: for deterministic memoryless po
 
 ### <a id="the-value-function-over-beliefs"></a>The value function over beliefs
 
-For a finite horizon, the optimal value of the belief MDP is **piecewise linear and convex** in the belief ([Smallwood and Sondik, 1973](https://doi.org/10.1287/opre.21.5.1071)): there is a finite set $\Gamma_t$ of vectors in $\mathbb R^{|\mathcal S|}$, the **alpha-vectors**, with
+For a finite horizon, the optimal value of the belief MDP is **piecewise linear and convex** in the belief ([Smallwood and Sondik, 1973](https://doi.org/10.1287/opre.21.5.1071)): there is a finite set $`\Gamma_t`$ of vectors in $`\mathbb R^{|\mathcal S|}`$, the **alpha-vectors**, with
 
 $$
 V_t(b)=\max_{\boldsymbol\alpha\in\Gamma_t}\;\sum_sb(s)\,\alpha(s).
 $$
 
-Each alpha-vector is the value, state by state, of one conditional plan: a first action followed by a plan for each observation that may follow, and so on to the horizon. The value of following a fixed plan is linear in the belief, and the optimal value picks the best plan for each belief ([Appendix A](#block-rl14-appendix-a)). For an infinite horizon with discounting, $V^*$ is the limit of the $V_t$; it is convex but need not be piecewise linear, although it can be approximated arbitrarily well by finitely many vectors ([Sondik, 1978](https://doi.org/10.1287/opre.26.2.282)). The convexity is the value of information: the value of a mixture of beliefs is at most the average of their values, so learning which of them holds can only help on average.
+Each alpha-vector is the value, state by state, of one conditional plan: a first action followed by a plan for each observation that may follow, and so on to the horizon. The value of following a fixed plan is linear in the belief, and the optimal value picks the best plan for each belief ([Appendix A](#block-rl14-appendix-a)). For an infinite horizon with discounting, $`V^*`$ is the limit of the $`V_t`$; it is convex but need not be piecewise linear, although it can be approximated arbitrarily well by finitely many vectors ([Sondik, 1978](https://doi.org/10.1287/opre.26.2.282)). The convexity is the value of information: the value of a mixture of beliefs is at most the average of their values, so learning which of them holds can only help on average.
 
 ### <a id="exact-value-iteration"></a>Exact value iteration
 
-The Bellman backup maps $\Gamma_{t-1}$ to $\Gamma_t$. For each action $a$ and observation $o$, each vector $\boldsymbol\alpha\in\Gamma_{t-1}$ is projected back one step,
+The Bellman backup maps $`\Gamma_{t-1}`$ to $`\Gamma_t`$. For each action $`a`$ and observation $`o`$, each vector $`\boldsymbol\alpha\in\Gamma_{t-1}`$ is projected back one step,
 
 $$
 g_{a,o}^{\boldsymbol\alpha}(s)=\gamma\sum_{s'}p(s'\mid s,a)\,Z(o\mid s',a)\,\alpha(s'),
 $$
 
-and a new vector is formed by choosing one projection for each observation: $\boldsymbol\alpha_{\text{new}}=r(\cdot,a)+\sum_o g_{a,o}^{\boldsymbol\alpha_o}$. All the choices give $|\mathcal A|\,|\Gamma_{t-1}|^{|\mathcal O|}$ vectors, most of which are **dominated**: they are the best at no belief, and can be removed. Deciding whether a vector is best somewhere is a linear program, one per vector. The classic algorithms differ in how they avoid generating dominated vectors in the first place: the enumeration of [Monahan (1982)](https://doi.org/10.1287/mnsc.28.1.1), Sondik's one-pass algorithm, the witness algorithm of [Kaelbling, Littman, and Cassandra (1998)](https://doi.org/10.1016/S0004-3702%2898%2900023-X), and incremental pruning, which prunes the cross-sum one observation at a time ([Cassandra, Littman, and Zhang, 1997](https://arxiv.org/abs/1302.1525)).
+and a new vector is formed by choosing one projection for each observation: $`\boldsymbol\alpha_{\text{new}}=r(\cdot,a)+\sum_o g_{a,o}^{\boldsymbol\alpha_o}`$. All the choices give $`|\mathcal A|\,|\Gamma_{t-1}|^{|\mathcal O|}`$ vectors, most of which are **dominated**: they are the best at no belief, and can be removed. Deciding whether a vector is best somewhere is a linear program, one per vector. The classic algorithms differ in how they avoid generating dominated vectors in the first place: the enumeration of [Monahan (1982)](https://doi.org/10.1287/mnsc.28.1.1), Sondik's one-pass algorithm, the witness algorithm of [Kaelbling, Littman, and Cassandra (1998)](https://doi.org/10.1016/S0004-3702%2898%2900023-X), and incremental pruning, which prunes the cross-sum one observation at a time ([Cassandra, Littman, and Zhang, 1997](https://arxiv.org/abs/1302.1525)).
 
 ```python
 import numpy as np
@@ -119,11 +119,11 @@ for t in range(1, 11):
 # horizon 10: 27 alpha-vectors, V(uniform belief) =   6.693
 ```
 
-Pruning keeps the tiger's value function small, but it still grows with the horizon, and the value of the uniform belief is still far from its infinite-horizon limit, about 19.4, after ten backups. Without pruning, the count grows doubly exponentially: 3, 27, 2,187, and about $1.4\times10^7$ vectors after four steps. This is the **curse of history**, next to the curse of dimensionality of the belief simplex ([Pineau, Gordon, and Thrun, 2003](https://www.ijcai.org/Proceedings/03/Papers/147.pdf)). The complexity results match the experience: deciding whether a finite-horizon POMDP has a policy with a given value is PSPACE-complete ([Papadimitriou and Tsitsiklis, 1987](https://doi.org/10.1287/moor.12.3.441)), against P-complete for MDPs, and for infinite horizons, whether some policy reaches a given value is undecidable, with discounted or undiscounted total reward and with average reward ([Madani, Hanks, and Condon, 2003](https://doi.org/10.1016/S0004-3702%2802%2900378-8); [Appendix B](#block-rl14-appendix-b)).
+Pruning keeps the tiger's value function small, but it still grows with the horizon, and the value of the uniform belief is still far from its infinite-horizon limit, about 19.4, after ten backups. Without pruning, the count grows doubly exponentially: 3, 27, 2,187, and about $`1.4\times10^7`$ vectors after four steps. This is the **curse of history**, next to the curse of dimensionality of the belief simplex ([Pineau, Gordon, and Thrun, 2003](https://www.ijcai.org/Proceedings/03/Papers/147.pdf)). The complexity results match the experience: deciding whether a finite-horizon POMDP has a policy with a given value is PSPACE-complete ([Papadimitriou and Tsitsiklis, 1987](https://doi.org/10.1287/moor.12.3.441)), against P-complete for MDPs, and for infinite horizons, whether some policy reaches a given value is undecidable, with discounted or undiscounted total reward and with average reward ([Madani, Hanks, and Condon, 2003](https://doi.org/10.1016/S0004-3702%2802%2900378-8); [Appendix B](#block-rl14-appendix-b)).
 
 <img src="sources/images/rl-pomdp-tiger.png" alt="rl-pomdp-tiger" width="880">
 
-*Left: the value function of the tiger problem at horizon 10, the upper envelope of 27 lines, one per conditional plan. The envelope is colored by the first action of the best plan: open a door when the belief is nearly certain, listen otherwise. Every line is the best at some belief, many only on intervals too narrow to see. Right: the number of alpha-vectors of exact value iteration, with and without pruning. Without pruning the count is $|\mathcal A|\,|\Gamma_{t-1}|^{|\mathcal O|}$, which exceeds $10^{30}$ at horizon 6.*
+*Left: the value function of the tiger problem at horizon 10, the upper envelope of 27 lines, one per conditional plan. The envelope is colored by the first action of the best plan: open a door when the belief is nearly certain, listen otherwise. Every line is the best at some belief, many only on intervals too narrow to see. Right: the number of alpha-vectors of exact value iteration, with and without pruning. Without pruning the count is $`|\mathcal A|\,|\Gamma_{t-1}|^{|\mathcal O|}`$, which exceeds $`10^{30}`$ at horizon 6.*
 
 ### <a id="heuristics-from-the-underlying-mdp"></a>Heuristics from the underlying MDP
 
@@ -133,7 +133,7 @@ $$
 Q_{\text{MDP}}(b,a)=\sum_sb(s)\,q_*(s,a),
 $$
 
-and acts greedily. It assumes that all uncertainty will disappear after one step, so it overestimates: $\max_aQ_{\text{MDP}}(b,a)\ge V^*(b)$ (exercise 14.3). QMDP lets the next action depend on the next state; the **fast informed bound** of [Hauskrecht (2000)](https://doi.org/10.1613/jair.678) lets it depend on the next observation and the current state, but not on the next state, which gives a tighter upper bound. Upper bounds like these are useful in their own right, to guide search and to certify the quality of other solutions, as in HSVI and SARSOP below.
+and acts greedily. It assumes that all uncertainty will disappear after one step, so it overestimates: $`\max_aQ_{\text{MDP}}(b,a)\ge V^*(b)`$ (exercise 14.3). QMDP lets the next action depend on the next state; the **fast informed bound** of [Hauskrecht (2000)](https://doi.org/10.1613/jair.678) lets it depend on the next observation and the current state, but not on the next state, which gives a tighter upper bound. Upper bounds like these are useful in their own right, to guide search and to certify the quality of other solutions, as in HSVI and SARSOP below.
 
 ```python
 import numpy as np
@@ -212,13 +212,13 @@ On the tiger, QMDP's estimate of its own value is ten times too high, 189 agains
 
 ### <a id="point-based-value-iteration"></a>Point-based value iteration
 
-Most of the belief simplex is never visited. **Point-based value iteration** (PBVI) ([Pineau, Gordon, and Thrun, 2003](https://www.ijcai.org/Proceedings/03/Papers/147.pdf); [2006](https://doi.org/10.1613/jair.2078)) keeps one alpha-vector per belief in a finite set $B$ of beliefs reachable from the start, and backs up only at those points. The backup at a belief $b$ is cheap because the best projection for each observation can be chosen at $b$ alone:
+Most of the belief simplex is never visited. **Point-based value iteration** (PBVI) ([Pineau, Gordon, and Thrun, 2003](https://www.ijcai.org/Proceedings/03/Papers/147.pdf); [2006](https://doi.org/10.1613/jair.2078)) keeps one alpha-vector per belief in a finite set $`B`$ of beliefs reachable from the start, and backs up only at those points. The backup at a belief $`b`$ is cheap because the best projection for each observation can be chosen at $`b`$ alone:
 
 $$
 \boldsymbol\alpha_b=\arg\max_a\;b\cdot\Bigl(r(\cdot,a)+\sum_o\arg\max_{\boldsymbol\alpha\in\Gamma}\;b\cdot g_{a,o}^{\boldsymbol\alpha}\Bigr),
 $$
 
-which costs $O(|\mathcal A|\,|\mathcal O|\,|\Gamma|\,|\mathcal S|^2)$ instead of an exponential number of vectors. Since each vector is the value of a real conditional plan, starting from a lower bound keeps every $V_B$ a lower bound on $V^*$, and the error is bounded by how densely $B$ covers the reachable beliefs: with $\delta_B$ the largest distance, in the 1-norm, from a reachable belief to the nearest point of $B$, the error is at most $(R_{\max}-R_{\min})\,\delta_B/(1-\gamma)^2$ ([Appendix B](#block-rl14-appendix-b)). PBVI alternates backups with expanding $B$ by simulating one step from each point and keeping the successors farthest from the set.
+which costs $`O(|\mathcal A|\,|\mathcal O|\,|\Gamma|\,|\mathcal S|^2)`$ instead of an exponential number of vectors. Since each vector is the value of a real conditional plan, starting from a lower bound keeps every $`V_B`$ a lower bound on $`V^*`$, and the error is bounded by how densely $`B`$ covers the reachable beliefs: with $`\delta_B`$ the largest distance, in the 1-norm, from a reachable belief to the nearest point of $`B`$, the error is at most $`(R_{\max}-R_{\min})\,\delta_B/(1-\gamma)^2`$ ([Appendix B](#block-rl14-appendix-b)). PBVI alternates backups with expanding $`B`$ by simulating one step from each point and keeping the successors farthest from the set.
 
 Several successors refined the choice of points and the order of backups:
 
@@ -226,7 +226,7 @@ Several successors refined the choice of points and the order of backups:
 - **HSVI** ([Smith and Simmons, 2004](https://arxiv.org/abs/1207.4166)) keeps both a lower bound (alpha-vectors) and an upper bound (a convex hull of point values, initialized with the values of the underlying MDP at the corners of the simplex), and explores the beliefs where the gap between them contributes most to the uncertainty about the start. It stops with a certified gap.
 - **SARSOP** ([Kurniawati, Hsu, and Lee, 2008](https://doi.org/10.15607/RSS.2008.IV.009)) samples near the beliefs reachable under optimal policies, using the bounds to prune the rest; with the factored treatment of **mixed observability**, where some state variables are observed, as the position is in the next example ([Ong, Png, Hsu, and Lee, 2010](https://doi.org/10.1177/0278364910369861)), it solves large robotic planning problems.
 
-The next experiment is a classic test of information gathering, often called **heaven and hell**. A T-shaped maze has two exits; one leads to heaven ($+1$) and the other to hell ($-1$), with equal prior probability. The agent always knows its position, but not which exit is which, until it visits a priest at the bottom of the maze, three steps away in the opposite direction.
+The next experiment is a classic test of information gathering, often called **heaven and hell**. A T-shaped maze has two exits; one leads to heaven ($`+1`$) and the other to hell ($`-1`$), with equal prior probability. The agent always knows its position, but not which exit is which, until it visits a priest at the bottom of the maze, three steps away in the opposite direction.
 
 ```python
 import numpy as np
@@ -329,7 +329,7 @@ print(f"visiting the priest first and then going to heaven is worth gamma^10 = {
 # visiting the priest first and then going to heaven is worth gamma^10 = 0.599
 ```
 
-PBVI walks down to the priest, back up, and to heaven, worth $\gamma^{10}\approx0.60$. QMDP never visits the priest: in the underlying MDP the agent already knows the answer, so the detour only delays the reward. It walks up to the junction and one step left, next to an exit, and stays there by walking into the wall, since entering either exit is worth 0 under its belief, while every other move is worth something under the fiction that the uncertainty will disappear. Its estimate of its own value, 0.82, is the value of an agent that knows where heaven is.
+PBVI walks down to the priest, back up, and to heaven, worth $`\gamma^{10}\approx0.60`$. QMDP never visits the priest: in the underlying MDP the agent already knows the answer, so the detour only delays the reward. It walks up to the junction and one step left, next to an exit, and stays there by walking into the wall, since entering either exit is worth 0 under its belief, while every other move is worth something under the fiction that the uncertainty will disappear. Its estimate of its own value, 0.82, is the value of an agent that knows where heaven is.
 
 <img src="sources/images/rl-pomdp-heaven.png" alt="rl-pomdp-heaven" width="880">
 
@@ -353,7 +353,7 @@ Without a model, no belief can be computed, and the agent must learn from its hi
 
 ### <a id="learned-memory"></a>Learned memory
 
-The more general solution is for the agent to learn what to remember. Early work gave the agent **external memory**, bits it can set with its actions, and learned to use them with reinforcement learning ([Peshkin, Meuleau, and Kaelbling, 1999](https://arxiv.org/abs/cs/0103003)). A memory the agent writes makes the agent state $(o,m)$ non-Markov unless the memory is used consistently, and one-step bootstrapping, which assumes that the value of $(o,m)$ does not depend on how the agent got there, fails to learn it; Monte Carlo and policy search methods succeed on short dependencies. **Recurrent networks** replace the bits by a continuous state trained by backpropagation through time (DL chapter 8), which passes gradient information through the memory: an LSTM trained with advantage learning solved T-mazes with long corridors ([Bakker, 2001](https://papers.nips.cc/paper_files/paper/2001/hash/a38b16173474ba8b1a95bcbc30d3b8a5-Abstract.html)).
+The more general solution is for the agent to learn what to remember. Early work gave the agent **external memory**, bits it can set with its actions, and learned to use them with reinforcement learning ([Peshkin, Meuleau, and Kaelbling, 1999](https://arxiv.org/abs/cs/0103003)). A memory the agent writes makes the agent state $`(o,m)`$ non-Markov unless the memory is used consistently, and one-step bootstrapping, which assumes that the value of $`(o,m)`$ does not depend on how the agent got there, fails to learn it; Monte Carlo and policy search methods succeed on short dependencies. **Recurrent networks** replace the bits by a continuous state trained by backpropagation through time (DL chapter 8), which passes gradient information through the memory: an LSTM trained with advantage learning solved T-mazes with long corridors ([Bakker, 2001](https://papers.nips.cc/paper_files/paper/2001/hash/a38b16173474ba8b1a95bcbc30d3b8a5-Abstract.html)).
 
 ```python
 import random
@@ -436,13 +436,13 @@ for label, kind, k, method in [("current observation", "obs", 1, "q"), ("last 4 
 # observation + cue (belief)                    1.00   1.00   1.00   1.00
 ```
 
-The table separates three things. Without memory, the agent turns correctly half the time, whatever the length. A window works only when it reaches back to the cue. A single bit of memory, the least that the task needs, is useless to one-step Q-learning at every length: its target at the junction, $\max_a Q((\text{junction},m),a)$, assumes that the bit means what it meant in other episodes, so writing the wrong bit looks as good as writing the right one. Monte Carlo evaluates what actually happened and learns to store the cue, reliably for a corridor of length 2 and less reliably as the corridor grows, since an exploratory action that overwrites the bit anywhere along the way spoils the lesson; for a corridor of 20, its greedy policy often does not even reach the junction. Given the belief state, here the observation and the cue, the problem is an MDP and every length is easy.
+The table separates three things. Without memory, the agent turns correctly half the time, whatever the length. A window works only when it reaches back to the cue. A single bit of memory, the least that the task needs, is useless to one-step Q-learning at every length: its target at the junction, $`\max_a Q((\text{junction},m),a)`$, assumes that the bit means what it meant in other episodes, so writing the wrong bit looks as good as writing the right one. Monte Carlo evaluates what actually happened and learns to store the cue, reliably for a corridor of length 2 and less reliably as the corridor grows, since an exploratory action that overwrites the bit anywhere along the way spoils the lesson; for a corridor of 20, its greedy policy often does not even reach the junction. Given the belief state, here the observation and the cue, the problem is an MDP and every length is easy.
 
 Deep RL agents for partially observable tasks are recurrent. **DRQN** ([Hausknecht and Stone, 2015](https://arxiv.org/abs/1507.06527)) replaced DQN's frame stack by an LSTM; **R2D2** ([Kapturowski et al., 2019](https://openreview.net/forum?id=r1lyTjAqYX)) showed how to train recurrent agents from replayed sequences, storing the recurrent state and warming it up on a prefix of each sequence before learning (chapter 18). Recurrent model-free agents, carefully tuned, are strong baselines across many partially observable benchmarks ([Ni, Eysenbach, and Salakhutdinov, 2022](https://arxiv.org/abs/2110.05038); [Morad et al., 2023](https://arxiv.org/abs/2303.01859)). **Transformers** over the history (DL chapter 9) can attend directly to an observation far in the past, which helps with long-term memory; gated variants stabilize their training in RL ([Parisotto et al., 2020](https://arxiv.org/abs/1910.06764)). But memory is not the only difficulty: transformers greatly improve tasks that need long memory but not tasks that need long-term credit assignment, where the reward for an action arrives long after it ([Ni et al., 2023](https://arxiv.org/abs/2307.03864)).
 
 ### <a id="learning-a-belief"></a>Learning a belief
 
-A third approach learns a model of the observations and uses the model's own posterior as the agent state. **Predictive state representations** ([Littman, Sutton, and Singh, 2001](https://papers.nips.cc/paper_files/paper/2001/hash/1e4d36177d71bbb3558e43af9577d70e-Abstract.html)) represent the state by the probabilities of a set of future tests, sequences of actions and observations, which are observable quantities and can be estimated from data, unlike hidden states; any POMDP with $n$ states has a linear predictive state representation with at most $n$ tests. With neural networks, a **recurrent state-space model** learns a latent state that is filtered from observations and trained to predict future observations and rewards ([Hafner et al., 2019](https://arxiv.org/abs/1811.04551)); planning or policy learning then works on the latent belief. This is the architecture of the world-model agents of chapter 23. Variational methods learn a particle belief end to end ([Igl et al., 2018](https://arxiv.org/abs/1806.02426)).
+A third approach learns a model of the observations and uses the model's own posterior as the agent state. **Predictive state representations** ([Littman, Sutton, and Singh, 2001](https://papers.nips.cc/paper_files/paper/2001/hash/1e4d36177d71bbb3558e43af9577d70e-Abstract.html)) represent the state by the probabilities of a set of future tests, sequences of actions and observations, which are observable quantities and can be estimated from data, unlike hidden states; any POMDP with $`n`$ states has a linear predictive state representation with at most $`n`$ tests. With neural networks, a **recurrent state-space model** learns a latent state that is filtered from observations and trained to predict future observations and rewards ([Hafner et al., 2019](https://arxiv.org/abs/1811.04551)); planning or policy learning then works on the latent belief. This is the architecture of the world-model agents of chapter 23. Variational methods learn a particle belief end to end ([Igl et al., 2018](https://arxiv.org/abs/1806.02426)).
 
 ### <a id="what-theory-says"></a>What theory says
 
@@ -452,7 +452,7 @@ Learning in POMDPs is hard in general: learning hidden Markov models is as hard 
 
 ### <a id="bayes-adaptive-mdps"></a>Bayes-adaptive MDPs
 
-An agent that does not know the dynamics of an MDP can treat them as hidden state. If the unknown parameters $\phi$ have a prior, the pair $(s,\phi)$ is the state of a POMDP whose observations are the transitions, and its belief is the current state together with the posterior over $\phi$. For discrete MDPs with Dirichlet priors, the posterior is a table of transition counts, the **Bayes-adaptive MDP** ([Duff, 2002](https://scholarworks.umass.edu/dissertations/AAI3039353)). Its optimal policy trades off exploration and exploitation exactly, by planning with the value of the information that each action provides. The Bayesian bandit of chapter 4 is the one-state case, and the Gittins index its solution. Computing the Bayes-optimal policy is intractable in general, but online planners adapted to it, such as **BAMCP** ([Guez, Silver, and Dayan, 2012](https://arxiv.org/abs/1205.3109)), which samples a model from the posterior at the root of each simulation, approximate it well in small problems. **Meta-reinforcement learning** learns an agent whose recurrent state implements the posterior and whose policy is approximately Bayes-optimal for a distribution of tasks (chapter 29).
+An agent that does not know the dynamics of an MDP can treat them as hidden state. If the unknown parameters $`\phi`$ have a prior, the pair $`(s,\phi)`$ is the state of a POMDP whose observations are the transitions, and its belief is the current state together with the posterior over $`\phi`$. For discrete MDPs with Dirichlet priors, the posterior is a table of transition counts, the **Bayes-adaptive MDP** ([Duff, 2002](https://scholarworks.umass.edu/dissertations/AAI3039353)). Its optimal policy trades off exploration and exploitation exactly, by planning with the value of the information that each action provides. The Bayesian bandit of chapter 4 is the one-state case, and the Gittins index its solution. Computing the Bayes-optimal policy is intractable in general, but online planners adapted to it, such as **BAMCP** ([Guez, Silver, and Dayan, 2012](https://arxiv.org/abs/1205.3109)), which samples a model from the posterior at the root of each simulation, approximate it well in small problems. **Meta-reinforcement learning** learns an agent whose recurrent state implements the posterior and whose policy is approximately Bayes-optimal for a distribution of tasks (chapter 29).
 
 ### <a id="many-agents"></a>Many agents
 
@@ -466,52 +466,52 @@ One partially observable problem has an exact and efficient solution. With linea
 
 ### <a id="exercise-14-1-beliefs-in-the-tiger-problem"></a>Exercise 14.1 — Beliefs in the tiger problem
 
-(a) Starting from the uniform belief, compute the belief that the tiger is behind the left door after hearing it on the left, the left, and the right. (b) Show that after any sequence of listens, the belief depends only on the difference $d$ between the numbers of growls heard on the left and on the right, and write it in closed form. (c) The optimal policy opens a door when the belief exceeds 0.961. After how many net growls does it open?
+(a) Starting from the uniform belief, compute the belief that the tiger is behind the left door after hearing it on the left, the left, and the right. (b) Show that after any sequence of listens, the belief depends only on the difference $`d`$ between the numbers of growls heard on the left and on the right, and write it in closed form. (c) The optimal policy opens a door when the belief exceeds 0.961. After how many net growls does it open?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Each growl heard on the left multiplies the odds of "left" by $0.85/0.15=17/3$, and each on the right divides them by it. From even odds: after L, $0.85$; after L, L, $0.85^2/(0.85^2+0.15^2)=0.9698$; after L, L, R, back to $0.85$.
+(a) Each growl heard on the left multiplies the odds of "left" by $`0.85/0.15=17/3`$, and each on the right divides them by it. From even odds: after L, $`0.85`$; after L, L, $`0.85^2/(0.85^2+0.15^2)=0.9698`$; after L, L, R, back to $`0.85`$.
 
-(b) Listening does not move the tiger, so the likelihood of a sequence with $n_L$ left growls and $n_R$ right growls is $0.85^{n_L}0.15^{n_R}$ if the tiger is on the left and $0.15^{n_L}0.85^{n_R}$ if on the right. The posterior odds are $(17/3)^{n_L-n_R}$, so $b=\bigl(1+(3/17)^d\bigr)^{-1}$ with $d=n_L-n_R$.
+(b) Listening does not move the tiger, so the likelihood of a sequence with $`n_L`$ left growls and $`n_R`$ right growls is $`0.85^{n_L}0.15^{n_R}`$ if the tiger is on the left and $`0.15^{n_L}0.85^{n_R}`$ if on the right. The posterior odds are $`(17/3)^{n_L-n_R}`$, so $`b=\bigl(1+(3/17)^d\bigr)^{-1}`$ with $`d=n_L-n_R`$.
 
-(c) $d=1$ gives 0.85 and $d=2$ gives 0.9698, which exceeds 0.961, so the policy opens after two net growls on the same side. The belief is a sufficient statistic, and here it reduces to one integer, which is why a five-node controller implements the optimal policy.
+(c) $`d=1`$ gives 0.85 and $`d=2`$ gives 0.9698, which exceeds 0.961, so the policy opens after two net growls on the same side. The belief is a sufficient statistic, and here it reduces to one integer, which is why a five-node controller implements the optimal policy.
 
 </details>
 
 
 ### <a id="exercise-14-2-convexity-of-the-value-function"></a>Exercise 14.2 — Convexity of the value function
 
-Show by induction that the finite-horizon value function $V_t(b)$ of a POMDP is piecewise linear and convex.
+Show by induction that the finite-horizon value function $`V_t(b)`$ of a POMDP is piecewise linear and convex.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-$V_0=0$ is linear. Suppose $V_{t-1}(b)=\max_{\boldsymbol\alpha\in\Gamma_{t-1}}b\cdot\boldsymbol\alpha$. Then
+$`V_0=0`$ is linear. Suppose $`V_{t-1}(b)=\max_{\boldsymbol\alpha\in\Gamma_{t-1}}b\cdot\boldsymbol\alpha`$. Then
 
 $$V_t(b)=\max_a\Bigl[b\cdot r(\cdot,a)+\gamma\sum_o\Pr(o\mid b,a)\,V_{t-1}(\tau(b,a,o))\Bigr].$$
 
-The updated belief is $\tau(b,a,o)(s')=\sum_sb(s)p(s'\mid s,a)Z(o\mid s',a)/\Pr(o\mid b,a)$, so the normalizer cancels: $\Pr(o\mid b,a)\,V_{t-1}(\tau(b,a,o))=\max_{\boldsymbol\alpha}\sum_sb(s)\sum_{s'}p(s'\mid s,a)Z(o\mid s',a)\alpha(s')=\max_{\boldsymbol\alpha}b\cdot\mathbf g_{a,o}^{\boldsymbol\alpha}/\gamma$. A maximum of linear functions of $b$ is piecewise linear and convex; a sum over $o$ of such functions is a maximum over choices of one vector per observation, so it is also piecewise linear and convex; adding the linear reward term and maximizing over $a$ preserves the property. The vectors of $\Gamma_t$ are exactly the $r(\cdot,a)+\sum_o\mathbf g_{a,o}^{\boldsymbol\alpha_o}$ of the chapter's backup.
+The updated belief is $`\tau(b,a,o)(s')=\sum_sb(s)p(s'\mid s,a)Z(o\mid s',a)/\Pr(o\mid b,a)`$, so the normalizer cancels: $`\Pr(o\mid b,a)\,V_{t-1}(\tau(b,a,o))=\max_{\boldsymbol\alpha}\sum_sb(s)\sum_{s'}p(s'\mid s,a)Z(o\mid s',a)\alpha(s')=\max_{\boldsymbol\alpha}b\cdot\mathbf g_{a,o}^{\boldsymbol\alpha}/\gamma`$. A maximum of linear functions of $`b`$ is piecewise linear and convex; a sum over $`o`$ of such functions is a maximum over choices of one vector per observation, so it is also piecewise linear and convex; adding the linear reward term and maximizing over $`a`$ preserves the property. The vectors of $`\Gamma_t`$ are exactly the $`r(\cdot,a)+\sum_o\mathbf g_{a,o}^{\boldsymbol\alpha_o}`$ of the chapter's backup.
 
 </details>
 
 
 ### <a id="exercise-14-3-qmdp-is-an-upper-bound"></a>Exercise 14.3 — QMDP is an upper bound
 
-(a) Show that $V_{\text{MDP}}(b)=\sum_sb(s)v_*(s)\ge V^*(b)$ for every belief. (b) Show that QMDP's action values satisfy the same inequality after one step: $Q_{\text{MDP}}(b,a)\ge Q^*(b,a)$. (c) When is QMDP optimal?
+(a) Show that $`V_{\text{MDP}}(b)=\sum_sb(s)v_*(s)\ge V^*(b)`$ for every belief. (b) Show that QMDP's action values satisfy the same inequality after one step: $`Q_{\text{MDP}}(b,a)\ge Q^*(b,a)`$. (c) When is QMDP optimal?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) An agent that observes the state can do anything an agent that sees only observations can do, since it can simulate the observations and ignore the state. So for every state, the optimal value with full observation is at least the value of any POMDP policy started in that state, and averaging over $b$ gives $\sum_sb(s)v_*(s)\ge V^*(b)$. Formally, the Bellman operator of the belief MDP applied to the linear function $V_{\text{MDP}}$ gives $\max_a\sum_sb(s)[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)v_*(s')]\le\sum_sb(s)\max_aq_*(s,a)=V_{\text{MDP}}(b)$, since the maximum of a sum is at most the sum of maxima. The operator is monotone and a contraction, so iterating it from $V_{\text{MDP}}$ gives a decreasing sequence converging to $V^*$.
+(a) An agent that observes the state can do anything an agent that sees only observations can do, since it can simulate the observations and ignore the state. So for every state, the optimal value with full observation is at least the value of any POMDP policy started in that state, and averaging over $`b`$ gives $`\sum_sb(s)v_*(s)\ge V^*(b)`$. Formally, the Bellman operator of the belief MDP applied to the linear function $`V_{\text{MDP}}`$ gives $`\max_a\sum_sb(s)[r(s,a)+\gamma\sum_{s'}p(s'\mid s,a)v_*(s')]\le\sum_sb(s)\max_aq_*(s,a)=V_{\text{MDP}}(b)`$, since the maximum of a sum is at most the sum of maxima. The operator is monotone and a contraction, so iterating it from $`V_{\text{MDP}}`$ gives a decreasing sequence converging to $`V^*`$.
 
-(b) $Q^*(b,a)=b\cdot r(\cdot,a)+\gamma\sum_o\Pr(o\mid b,a)V^*(\tau(b,a,o))$. Replacing $V^*$ by the larger $V_{\text{MDP}}$ and using $\sum_o\Pr(o\mid b,a)\tau(b,a,o)(s')=\sum_sb(s)p(s'\mid s,a)$ gives $b\cdot r(\cdot,a)+\gamma\sum_sb(s)\sum_{s'}p(s'\mid s,a)v_*(s')=Q_{\text{MDP}}(b,a)$.
+(b) $`Q^*(b,a)=b\cdot r(\cdot,a)+\gamma\sum_o\Pr(o\mid b,a)V^*(\tau(b,a,o))`$. Replacing $`V^*`$ by the larger $`V_{\text{MDP}}`$ and using $`\sum_o\Pr(o\mid b,a)\tau(b,a,o)(s')=\sum_sb(s)p(s'\mid s,a)`$ gives $`b\cdot r(\cdot,a)+\gamma\sum_sb(s)\sum_{s'}p(s'\mid s,a)v_*(s')=Q_{\text{MDP}}(b,a)`$.
 
 (c) QMDP is optimal when the state becomes known after every step, so that the assumption behind it is true, and more generally when the actions that are optimal under full observability are also optimal under the belief. It fails when information has value only because the state is hidden: the priest in heaven and hell, looking at a map, asking for directions. Its bound is loose in the same cases; the fast informed bound, which lets the continuation depend on the next observation, is tighter.
 
@@ -520,14 +520,14 @@ The updated belief is $\tau(b,a,o)(s')=\sum_sb(s)p(s'\mid s,a)Z(o\mid s',a)/\Pr(
 
 ### <a id="exercise-14-4-randomization-as-a-substitute-for-memory"></a>Exercise 14.4 — Randomization as a substitute for memory
 
-Two states $A$ and $B$ produce the same observation, and the agent starts in $A$. In $A$, action 1 moves to $B$ and action 2 stays in $A$; in $B$, action 2 moves to $A$ and action 1 stays in $B$. Every move between the states pays $+1$, and every step that stays costs $-1$. Compare the average reward of the best deterministic memoryless policy, the best stochastic memoryless policy, and the best policy with one bit of memory.
+Two states $`A`$ and $`B`$ produce the same observation, and the agent starts in $`A`$. In $`A`$, action 1 moves to $`B`$ and action 2 stays in $`A`$; in $`B`$, action 2 moves to $`A`$ and action 1 stays in $`B`$. Every move between the states pays $`+1`$, and every step that stays costs $`-1`$. Compare the average reward of the best deterministic memoryless policy, the best stochastic memoryless policy, and the best policy with one bit of memory.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-In $A$ the agent should take action 1 and in $B$ action 2, which requires knowing the state. A deterministic memoryless policy takes the same action in both: with action 1 it moves from $A$ to $B$ once and then stays in $B$ forever at $-1$ per step; with action 2 it stays in $A$ forever, also at $-1$ per step. Its average reward is $-1$. A stochastic policy that takes each action with probability $1/2$ moves with probability $1/2$ at each step, so its average reward is $\tfrac12(+1)+\tfrac12(-1)=0$; by symmetry this is the best memoryless policy. With one bit of memory the agent can alternate actions, starting with action 1: it then moves at every step, the states alternate with its actions, and its average reward is $+1$. So randomization recovers half the gap between the deterministic memoryless policy and the optimum, and memory recovers all of it; making staying costlier makes the deterministic policy arbitrarily worse, while the stochastic one still moves half the time.
+In $`A`$ the agent should take action 1 and in $`B`$ action 2, which requires knowing the state. A deterministic memoryless policy takes the same action in both: with action 1 it moves from $`A`$ to $`B`$ once and then stays in $`B`$ forever at $`-1`$ per step; with action 2 it stays in $`A`$ forever, also at $`-1`$ per step. Its average reward is $`-1`$. A stochastic policy that takes each action with probability $`1/2`$ moves with probability $`1/2`$ at each step, so its average reward is $`\tfrac12(+1)+\tfrac12(-1)=0`$; by symmetry this is the best memoryless policy. With one bit of memory the agent can alternate actions, starting with action 1: it then moves at every step, the states alternate with its actions, and its average reward is $`+1`$. So randomization recovers half the gap between the deterministic memoryless policy and the optimum, and memory recovers all of it; making staying costlier makes the deterministic policy arbitrarily worse, while the stochastic one still moves half the time.
 
 </details>
 
@@ -703,14 +703,14 @@ for n in (2, 3, 5, 9, 41):
 # 41 belief points:  9 alpha-vectors, value of the uniform belief    19.37, simulated return   19.40
 ```
 
-With two points, at 0.3 and 0.7, no point is certain enough for opening to be the best action there, so the only vector is "listen forever", worth $-20$. With three points, the endpoints give vectors that open a door, and the policy is already optimal, although its value at the uniform belief is still the pessimistic $-20$ of the listening vector: the lower bound is poor between the points, but at the beliefs the policy actually reaches, the vectors rank the actions correctly. Nine points recover the exact value. A good policy needs points only where the decisions are made, which is why sampling the reachable beliefs, and especially those reachable under good policies, as SARSOP does, works much better than a uniform grid in high dimensions.
+With two points, at 0.3 and 0.7, no point is certain enough for opening to be the best action there, so the only vector is "listen forever", worth $`-20`$. With three points, the endpoints give vectors that open a door, and the policy is already optimal, although its value at the uniform belief is still the pessimistic $`-20`$ of the listening vector: the lower bound is poor between the points, but at the beliefs the policy actually reaches, the vectors rank the actions correctly. Nine points recover the exact value. A good policy needs points only where the decisions are made, which is why sampling the reachable beliefs, and especially those reachable under good policies, as SARSOP does, works much better than a uniform grid in high dimensions.
 
 </details>
 
 
 ### <a id="exercise-14-7-particle-filters-and-deprivation"></a>Exercise 14.7 — Particle filters and deprivation
 
-A particle filter represents a belief by $N$ sampled states: it propagates each through the dynamics, weights it by the likelihood of the observation, and resamples. (a) Why do particle filters fail when observations are nearly deterministic? (b) How does POMCP's belief at a node differ from a particle filter's, and what is lost when the real observation was never simulated?
+A particle filter represents a belief by $`N`$ sampled states: it propagates each through the dynamics, weights it by the likelihood of the observation, and resamples. (a) Why do particle filters fail when observations are nearly deterministic? (b) How does POMCP's belief at a node differ from a particle filter's, and what is lost when the real observation was never simulated?
 
 
 <details>
@@ -726,14 +726,14 @@ A particle filter represents a belief by $N$ sampled states: it propagates each 
 
 ### <a id="exercise-14-8-why-one-step-learning-cannot-learn-memory"></a>Exercise 14.8 — Why one-step learning cannot learn memory
 
-In the T-maze of the chapter, the agent with one bit of memory learns nothing with one-step Q-learning but learns to store the cue with Monte Carlo updates. Explain why, in terms of the Markov property of the agent state $(o,m)$.
+In the T-maze of the chapter, the agent with one bit of memory learns nothing with one-step Q-learning but learns to store the cue with Monte Carlo updates. Explain why, in terms of the Markov property of the agent state $`(o,m)`$.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-Q-learning's target for writing bit $w$ in the corridor is $\gamma\max_{a'}Q((o',w),a')$, the value of the next agent state as estimated from all episodes that reached it. Its estimate at the junction, $Q((\text{junction},w),\text{up})$, averages over the cues of all the episodes that arrived with bit $w$. If the agent sometimes writes the right bit and sometimes not, both bits arrive with both cues, and the junction values of the two bits are equal; then writing either bit in the corridor has the same target, so there is no signal to prefer the right one, and the equality persists. The agent state $(o,m)$ is Markov only for a policy that uses the memory consistently, and one-step bootstrapping evaluates it as if it were Markov for every policy. Monte Carlo updates use the returns that actually followed each write, so writing the bit that later matches the cue earns more, and consistent use of the memory can emerge. The same distinction explains why recurrent agents are trained with multi-step returns or policy gradients through time rather than with one-step targets alone, and why R2D2 needs stored recurrent states and burn-in: the value of an agent state depends on the memory policy that produced it.
+Q-learning's target for writing bit $`w`$ in the corridor is $`\gamma\max_{a'}Q((o',w),a')`$, the value of the next agent state as estimated from all episodes that reached it. Its estimate at the junction, $`Q((\text{junction},w),\text{up})`$, averages over the cues of all the episodes that arrived with bit $`w`$. If the agent sometimes writes the right bit and sometimes not, both bits arrive with both cues, and the junction values of the two bits are equal; then writing either bit in the corridor has the same target, so there is no signal to prefer the right one, and the equality persists. The agent state $`(o,m)`$ is Markov only for a policy that uses the memory consistently, and one-step bootstrapping evaluates it as if it were Markov for every policy. Monte Carlo updates use the returns that actually followed each write, so writing the bit that later matches the cue earns more, and consistent use of the memory can emerge. The same distinction explains why recurrent agents are trained with multi-step returns or policy gradients through time rather than with one-step targets alone, and why R2D2 needs stored recurrent states and burn-in: the value of an agent state depends on the memory policy that produced it.
 
 </details>
 
@@ -745,11 +745,11 @@ Q-learning's target for writing bit $w$ in the corridor is $\gamma\max_{a'}Q((o'
 <summary><a id="block-rl14-appendix-a"></a><b>A. Alpha-vectors as conditional plans</b></summary>
 
 
-A $t$-step **conditional plan** $\sigma$ consists of an action $a_\sigma$ and, for each observation $o$, a $(t-1)$-step plan $\sigma_o$. Its value in state $s$ satisfies
+A $`t`$-step **conditional plan** $`\sigma`$ consists of an action $`a_\sigma`$ and, for each observation $`o`$, a $`(t-1)`$-step plan $`\sigma_o`$. Its value in state $`s`$ satisfies
 
 $$\alpha_\sigma(s)=r(s,a_\sigma)+\gamma\sum_{s'}p(s'\mid s,a_\sigma)\sum_oZ(o\mid s',a_\sigma)\,\alpha_{\sigma_o}(s'),$$
 
-and the expected return of following $\sigma$ from belief $b$ is $b\cdot\boldsymbol\alpha_\sigma$, linear in $b$ because the plan does not depend on the belief. Any $t$-step policy from $b$ is some conditional plan, since the histories it can meet are finite, so $V_t(b)=\max_\sigma b\cdot\boldsymbol\alpha_\sigma$: piecewise linear and convex, with one vector per useful plan. The backup of the chapter builds $\boldsymbol\alpha_\sigma$ from the vectors of the continuation plans by exactly the formula above, with $\mathbf g_{a,o}^{\boldsymbol\alpha}$ collecting the terms for one observation. A vector can be removed if it is not strictly the best at any belief, which the linear program $\max\,\delta$ subject to $b\cdot(\boldsymbol\alpha-\boldsymbol\alpha')\ge\delta$ for all other $\boldsymbol\alpha'$ and $b$ in the simplex decides.
+and the expected return of following $`\sigma`$ from belief $`b`$ is $`b\cdot\boldsymbol\alpha_\sigma`$, linear in $`b`$ because the plan does not depend on the belief. Any $`t`$-step policy from $`b`$ is some conditional plan, since the histories it can meet are finite, so $`V_t(b)=\max_\sigma b\cdot\boldsymbol\alpha_\sigma`$: piecewise linear and convex, with one vector per useful plan. The backup of the chapter builds $`\boldsymbol\alpha_\sigma`$ from the vectors of the continuation plans by exactly the formula above, with $`\mathbf g_{a,o}^{\boldsymbol\alpha}`$ collecting the terms for one observation. A vector can be removed if it is not strictly the best at any belief, which the linear program $`\max\,\delta`$ subject to $`b\cdot(\boldsymbol\alpha-\boldsymbol\alpha')\ge\delta`$ for all other $`\boldsymbol\alpha'`$ and $`b`$ in the simplex decides.
 
 The optimal policy of a plan-based value function is read off at each belief: the action of the maximizing vector. For an infinite horizon, if value iteration's vectors stop changing, the plans they encode close into cycles and form a finite-state controller, as for the tiger; when they do not, the controllers grow with the horizon, and the policy is extracted greedily from the approximate value function.
 
@@ -761,13 +761,13 @@ The optimal policy of a plan-based value function is read off at each belief: th
 <summary><a id="block-rl14-appendix-b"></a><b>B. Complexity and the point-based error bound</b></summary>
 
 
-**Complexity.** For finite horizons, deciding whether a POMDP has a policy whose value exceeds a threshold is PSPACE-complete ([Papadimitriou and Tsitsiklis, 1987](https://doi.org/10.1287/moor.12.3.441)); the reduction encodes a quantified Boolean formula, whose alternation of quantifiers the policy must resolve without seeing the choices. For MDPs the same question is P-complete. For infinite horizons, [Madani, Hanks, and Condon (2003)](https://doi.org/10.1016/S0004-3702%2802%2900378-8) show that the policy-existence question is undecidable under discounted and undiscounted total reward and under average reward, through a connection with probabilistic finite automata; for the undiscounted criteria even approximation is undecidable. With discounting, a policy within $\varepsilon$ of optimal can be found by planning to a finite horizon $H=O(\log(1/\varepsilon)/(1-\gamma))$, but the plans grow exponentially with $H$. Finding the best memoryless deterministic policy is NP-hard ([Littman, 1994](https://doi.org/10.7551/mitpress/3117.003.0041)).
+**Complexity.** For finite horizons, deciding whether a POMDP has a policy whose value exceeds a threshold is PSPACE-complete ([Papadimitriou and Tsitsiklis, 1987](https://doi.org/10.1287/moor.12.3.441)); the reduction encodes a quantified Boolean formula, whose alternation of quantifiers the policy must resolve without seeing the choices. For MDPs the same question is P-complete. For infinite horizons, [Madani, Hanks, and Condon (2003)](https://doi.org/10.1016/S0004-3702%2802%2900378-8) show that the policy-existence question is undecidable under discounted and undiscounted total reward and under average reward, through a connection with probabilistic finite automata; for the undiscounted criteria even approximation is undecidable. With discounting, a policy within $`\varepsilon`$ of optimal can be found by planning to a finite horizon $`H=O(\log(1/\varepsilon)/(1-\gamma))`$, but the plans grow exponentially with $`H`$. Finding the best memoryless deterministic policy is NP-hard ([Littman, 1994](https://doi.org/10.7551/mitpress/3117.003.0041)).
 
-**The point-based error bound.** Let $V_B$ be the fixed point of point-based backups on a set $B$, started from a lower bound, and let $\delta_B=\max_{b'\in\bar\Delta}\min_{b\in B}\|b-b'\|_1$ be the density of $B$ in the set $\bar\Delta$ of reachable beliefs. Each backup at a point $b$ produces the exact backed-up vector at $b$; at a reachable belief $b'$ whose nearest point is $b$, the error of using the vector from $b$ instead of the one that would be best at $b'$ is at most $(\boldsymbol\alpha'-\boldsymbol\alpha)\cdot(b'-b)\le\|\boldsymbol\alpha'-\boldsymbol\alpha\|_\infty\|b'-b\|_1$. Alpha-vectors have entries between $R_{\min}/(1-\gamma)$ and $R_{\max}/(1-\gamma)$, so one backup adds at most $(R_{\max}-R_{\min})\delta_B/(1-\gamma)$, and the contraction of the backup by $\gamma$ accumulates these to
+**The point-based error bound.** Let $`V_B`$ be the fixed point of point-based backups on a set $`B`$, started from a lower bound, and let $`\delta_B=\max_{b'\in\bar\Delta}\min_{b\in B}\|b-b'\|_1`$ be the density of $`B`$ in the set $`\bar\Delta`$ of reachable beliefs. Each backup at a point $`b`$ produces the exact backed-up vector at $`b`$; at a reachable belief $`b'`$ whose nearest point is $`b`$, the error of using the vector from $`b`$ instead of the one that would be best at $`b'`$ is at most $`(\boldsymbol\alpha'-\boldsymbol\alpha)\cdot(b'-b)\le\|\boldsymbol\alpha'-\boldsymbol\alpha\|_\infty\|b'-b\|_1`$. Alpha-vectors have entries between $`R_{\min}/(1-\gamma)`$ and $`R_{\max}/(1-\gamma)`$, so one backup adds at most $`(R_{\max}-R_{\min})\delta_B/(1-\gamma)`$, and the contraction of the backup by $`\gamma`$ accumulates these to
 
 $$\|V_B-V^*\|_\infty\le\frac{(R_{\max}-R_{\min})\,\delta_B}{(1-\gamma)^2}$$
 
-over the reachable beliefs ([Pineau, Gordon, and Thrun, 2003](https://www.ijcai.org/Proceedings/03/Papers/147.pdf)). The bound is loose, as exercise 14.6 shows, but it explains why points should be added where they reduce $\delta_B$ the most, which is PBVI's rule for expanding $B$.
+over the reachable beliefs ([Pineau, Gordon, and Thrun, 2003](https://www.ijcai.org/Proceedings/03/Papers/147.pdf)). The bound is loose, as exercise 14.6 shows, but it explains why points should be added where they reduce $`\delta_B`$ the most, which is PBVI's rule for expanding $`B`$.
 
 </details>
 

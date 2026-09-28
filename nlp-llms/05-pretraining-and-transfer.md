@@ -71,7 +71,7 @@ print(f"{len(words)} words: MLM predicts {sum(t != '_' for t in targets)}, T5 in
 
 BERT also trained a **next-sentence prediction** task: given two segments, decide whether the second followed the first in the corpus. **RoBERTa** ([Liu et al., 2019](https://arxiv.org/abs/1907.11692)) found that this task did not help, and that BERT had been substantially undertrained; dropping it, drawing new masks each time a sequence is seen, and training longer on ten times more text (160 GB) with larger batches gave large gains with the same architecture.
 
-The MLM objective has two costs. Only the 15% of selected positions contribute to the loss, so each sequence yields fewer training signals than under causal modeling. And an MLM is not a generative model: its conditionals $p(x_t\mid x_{\setminus t})$ do not define a joint distribution from which text can be sampled left to right, though they can score text by a **pseudo-log-likelihood** ([Appendix A](#block-nlp05-appendix-a)).
+The MLM objective has two costs. Only the 15% of selected positions contribute to the loss, so each sequence yields fewer training signals than under causal modeling. And an MLM is not a generative model: its conditionals $`p(x_t\mid x_{\setminus t})`$ do not define a joint distribution from which text can be sampled left to right, though they can score text by a **pseudo-log-likelihood** ([Appendix A](#block-nlp05-appendix-a)).
 
 ### <a id="replaced-token-detection"></a>Replaced-token detection
 
@@ -89,7 +89,7 @@ T5's paper compared objectives and architectures at equal compute and found span
 
 ### <a id="fine-tuning"></a>Fine-tuning
 
-To fine-tune an encoder such as BERT for classification, a linear layer is placed on the final representation of a special `[CLS]` token prepended to the input, or on the mean of all token representations, and the whole network is trained on the labeled data with the cross-entropy loss. Pairs of sentences, as in entailment or paraphrase detection, are concatenated with a separator token. For generation tasks, a decoder or encoder–decoder is fine-tuned on input–output pairs with the language-modeling loss on the output tokens only. The recommended settings for BERT were small: learning rates of 2 to 5 times $10^{-5}$, batch sizes of 16 or 32, and two to four epochs. With small datasets fine-tuning is unstable, and runs that differ only in the random seed, which fixes the initialization of the new layer and the order of the data, can differ by several points ([Dodge et al., 2020](https://arxiv.org/abs/2002.06305)); longer training with a small learning rate and bias-corrected Adam removes most of the instability ([Mosbach, Andriushchenko, and Klakow, 2021](https://arxiv.org/abs/2006.04884)).
+To fine-tune an encoder such as BERT for classification, a linear layer is placed on the final representation of a special `[CLS]` token prepended to the input, or on the mean of all token representations, and the whole network is trained on the labeled data with the cross-entropy loss. Pairs of sentences, as in entailment or paraphrase detection, are concatenated with a separator token. For generation tasks, a decoder or encoder–decoder is fine-tuned on input–output pairs with the language-modeling loss on the output tokens only. The recommended settings for BERT were small: learning rates of 2 to 5 times $`10^{-5}`$, batch sizes of 16 or 32, and two to four epochs. With small datasets fine-tuning is unstable, and runs that differ only in the random seed, which fixes the initialization of the new layer and the order of the data, can differ by several points ([Dodge et al., 2020](https://arxiv.org/abs/2002.06305)); longer training with a small learning rate and bias-corrected Adam removes most of the instability ([Mosbach, Andriushchenko, and Klakow, 2021](https://arxiv.org/abs/2006.04884)).
 
 The alternative to fine-tuning is **feature extraction**: freeze the pretrained network and train only a classifier on its representations, possibly a weighted combination of its layers as in ELMo. Feature extraction costs less, since one network serves every task and the representations can be computed once, but fine-tuning usually wins, by more when the task differs from the pretraining objective ([Peters, Ruder, and Smith, 2019](https://arxiv.org/abs/1903.05987)). Methods that train only a small number of added parameters sit between the two (chapter 10).
 
@@ -208,7 +208,7 @@ Pretrained models also store facts. **LAMA** ([Petroni et al., 2019](https://arx
 <summary><a id="block-nlp05-appendix-a"></a><b>A. Masked language models and pseudo-log-likelihood</b></summary>
 
 
-The MLM loss for a sequence $x=(x_1,\dots,x_T)$ with selected positions $S$ is $-\sum_{t\in S}\log q_\theta(x_t\mid\tilde x)$, where $\tilde x$ is the corrupted sequence. In the idealized case where a single position $t$ is masked, the minimizer of the expected loss over the data distribution $P$ is the true conditional: $q_\theta(\cdot\mid x_{\setminus t})=P(\cdot\mid x_{\setminus t})$, where $x_{\setminus t}$ is the sequence with position $t$ hidden, because the expected log loss $\mathbb E_{x_t\sim P(\cdot\mid x_{\setminus t})}[-\log q(x_t)]$ is the cross-entropy $H(P,q)=H(P)+D_{\mathrm{KL}}(P\,\Vert\,q)$ and is minimized at $q=P$ (Foundations chapter 5). An MLM therefore learns the set of full conditionals $\{P(x_t\mid x_{\setminus t})\}_t$.
+The MLM loss for a sequence $`x=(x_1,\dots,x_T)`$ with selected positions $`S`$ is $`-\sum_{t\in S}\log q_\theta(x_t\mid\tilde x)`$, where $`\tilde x`$ is the corrupted sequence. In the idealized case where a single position $`t`$ is masked, the minimizer of the expected loss over the data distribution $`P`$ is the true conditional: $`q_\theta(\cdot\mid x_{\setminus t})=P(\cdot\mid x_{\setminus t})`$, where $`x_{\setminus t}`$ is the sequence with position $`t`$ hidden, because the expected log loss $`\mathbb E_{x_t\sim P(\cdot\mid x_{\setminus t})}[-\log q(x_t)]`$ is the cross-entropy $`H(P,q)=H(P)+D_{\mathrm{KL}}(P\,\Vert\,q)`$ and is minimized at $`q=P`$ (Foundations chapter 5). An MLM therefore learns the set of full conditionals $`\{P(x_t\mid x_{\setminus t})\}_t`$.
 
 Full conditionals determine a joint distribution when they come from one, by Brook's lemma, but a set learned independently for each position need not be compatible with any joint distribution, and even when it is, recovering the joint requires Gibbs sampling (AI chapter 10) rather than a single left-to-right pass. A practical score is the **pseudo-log-likelihood**
 
@@ -216,7 +216,7 @@ $$
 \operatorname{PLL}(x)=\sum_{t=1}^T\log q_\theta(x_t\mid x_{\setminus t}),
 $$
 
-which masks each position in turn and so costs $T$ forward passes. It is not a log-probability and is not comparable with the log-likelihood of a causal model, but it ranks sentences well for tasks such as rescoring and acceptability judgments ([Salazar et al., 2020](https://arxiv.org/abs/1910.14659)).
+which masks each position in turn and so costs $`T`$ forward passes. It is not a log-probability and is not comparable with the log-likelihood of a causal model, but it ranks sentences well for tasks such as rescoring and acceptability judgments ([Salazar et al., 2020](https://arxiv.org/abs/1910.14659)).
 
 </details>
 
@@ -226,13 +226,13 @@ which masks each position in turn and so costs $T$ forward passes. It is not a l
 <summary><a id="block-nlp05-appendix-b"></a><b>B. What a probe's loss measures</b></summary>
 
 
-Let $Z$ be a frozen representation and $Y$ a property with entropy $H(Y)$. A probe is a conditional distribution $q(y\mid z)$ from some family, trained to minimize the cross-entropy $\mathcal L(q)=\mathbb E[-\log q(Y\mid Z)]$. For any $q$,
+Let $`Z`$ be a frozen representation and $`Y`$ a property with entropy $`H(Y)`$. A probe is a conditional distribution $`q(y\mid z)`$ from some family, trained to minimize the cross-entropy $`\mathcal L(q)=\mathbb E[-\log q(Y\mid Z)]`$. For any $`q`$,
 
 $$
 \mathcal L(q)=H(Y\mid Z)+\mathbb E_Z\bigl[D_{\mathrm{KL}}\bigl(P(\cdot\mid Z)\,\Vert\,q(\cdot\mid Z)\bigr)\bigr]\ge H(Y\mid Z),
 $$
 
-so the mutual information satisfies $I(Y;Z)=H(Y)-H(Y\mid Z)\ge H(Y)-\mathcal L(q)$. Every trained probe gives a lower bound on how much information about $Y$ the representation contains, and a more expressive family can only tighten the bound ([Pimentel et al., 2020](https://arxiv.org/abs/2004.03061)). This is why "the information is there" is an easy claim to support and a weak one: by the data-processing inequality $I(Y;Z)\le I(Y;X)$ for the input $X$, and a sufficiently flexible probe could extract from any invertible representation everything the input contains. The informative questions concern how easily the information can be extracted, for instance by a linear map, and whether the model uses it, which requires interventions on the representation rather than probes alone.
+so the mutual information satisfies $`I(Y;Z)=H(Y)-H(Y\mid Z)\ge H(Y)-\mathcal L(q)`$. Every trained probe gives a lower bound on how much information about $`Y`$ the representation contains, and a more expressive family can only tighten the bound ([Pimentel et al., 2020](https://arxiv.org/abs/2004.03061)). This is why "the information is there" is an easy claim to support and a weak one: by the data-processing inequality $`I(Y;Z)\le I(Y;X)`$ for the input $`X`$, and a sufficiently flexible probe could extract from any invertible representation everything the input contains. The informative questions concern how easily the information can be extracted, for instance by a linear map, and whether the model uses it, which requires interventions on the representation rather than probes alone.
 
 </details>
 

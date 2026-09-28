@@ -16,17 +16,17 @@ L(D)\approx\Bigl(\frac{D_c}D\Bigr)^{\alpha_D},\qquad
 L(C)\approx\Bigl(\frac{C_c}C\Bigr)^{\alpha_C},
 $$
 
-with $N$ the number of non-embedding parameters, $D$ the number of training tokens, $C$ the training compute, and exponents of about 0.076, 0.095, and 0.050. On log–log axes each is a straight line. The exponents are small, so a tenfold increase in compute lowers the loss by only about 11%, but the lines are straight enough to extrapolate: loss can be predicted for a model a thousand times larger than any that has been trained. Other architectural details, such as the ratio of depth to width or the number of heads, move the loss much less than $N$, $D$, and $C$ (chapter 4).
+with $`N`$ the number of non-embedding parameters, $`D`$ the number of training tokens, $`C`$ the training compute, and exponents of about 0.076, 0.095, and 0.050. On log–log axes each is a straight line. The exponents are small, so a tenfold increase in compute lowers the loss by only about 11%, but the lines are straight enough to extrapolate: loss can be predicted for a model a thousand times larger than any that has been trained. Other architectural details, such as the ratio of depth to width or the number of heads, move the loss much less than $`N`$, $`D`$, and $`C`$ (chapter 4).
 
 A **scaling law** in this sense is an empirical fit, valid over the range where it was measured, for a fixed architecture family, data distribution, tokenizer, and training recipe. Its value is practical: it turns decisions about expensive training runs into extrapolations from cheap ones.
 
 ### <a id="why-power-laws"></a>Why power laws?
 
-Power laws in loss arise when the task consists of many components of decreasing importance, themselves distributed as a power law. The simplest model makes this exact. Let inputs have independent coordinates with variances $\lambda_i\propto i^{-(1+\alpha)}$, let the target be a linear function of all of them, and let a model of size $N$ represent only the $N$ most important coordinates. The loss it cannot remove, however much data it sees, is the variance of the rest, $\sum_{i>N}\lambda_i\propto N^{-\alpha}$: each doubling of the model captures a constant fraction of the remaining structure. Finite data limit it in the same way, since coordinates with small variance cannot be estimated from few samples. [Sharma and Kaplan (2022)](https://arxiv.org/abs/2004.10802) related the exponent to the intrinsic dimension of the data manifold, [Bahri et al. (2024)](https://arxiv.org/abs/2102.06701) distinguished the regimes in which the model size or the data is the bottleneck, [Maloney, Roberts, and Sully (2022)](https://arxiv.org/abs/2210.16859) solved a random-feature version of the model above, and [Michaud et al. (2023)](https://arxiv.org/abs/2303.13506) proposed that language is made of discrete skills, or "quanta," used with power-law frequencies and learned in order of frequency. In natural language, Zipf's law (chapter 1) is one visible source of such a spectrum.
+Power laws in loss arise when the task consists of many components of decreasing importance, themselves distributed as a power law. The simplest model makes this exact. Let inputs have independent coordinates with variances $`\lambda_i\propto i^{-(1+\alpha)}`$, let the target be a linear function of all of them, and let a model of size $`N`$ represent only the $`N`$ most important coordinates. The loss it cannot remove, however much data it sees, is the variance of the rest, $`\sum_{i>N}\lambda_i\propto N^{-\alpha}`$: each doubling of the model captures a constant fraction of the remaining structure. Finite data limit it in the same way, since coordinates with small variance cannot be estimated from few samples. [Sharma and Kaplan (2022)](https://arxiv.org/abs/2004.10802) related the exponent to the intrinsic dimension of the data manifold, [Bahri et al. (2024)](https://arxiv.org/abs/2102.06701) distinguished the regimes in which the model size or the data is the bottleneck, [Maloney, Roberts, and Sully (2022)](https://arxiv.org/abs/2210.16859) solved a random-feature version of the model above, and [Michaud et al. (2023)](https://arxiv.org/abs/2303.13506) proposed that language is made of discrete skills, or "quanta," used with power-law frequencies and learned in order of frequency. In natural language, Zipf's law (chapter 1) is one visible source of such a spectrum.
 
 <img src="sources/images/nlp-scaling-isoflop.png" alt="nlp-scaling-isoflop" width="880">
 
-*A linear model on data whose coordinate variances fall as $i^{-1.6}$: a model of size $N$ sees the $N$ highest-variance coordinates and is fit by Bayes-optimal ridge regression on $D$ samples; the exact test loss is averaged over 20 draws, and the cost of training is taken to be $C=ND$. Left: loss against data for eight model sizes; each curve falls as a power law and then flattens at the floor set by the model's size. A fit of $L=E+AN^{-a}+BD^{-b}$ to all 72 points gives $a=0.64$ (the theory predicts 0.6) and $b=0.69$. Right: at four fixed budgets, loss against model size has a minimum (stars at $N=32$, 64, 128, and 256); parabolas fitted near the minima put the optimal size at 32, 68, 141, and 289, growing as $C^{0.53}$, against $C^{b/(a+b)}=C^{0.52}$ predicted by the fitted law.*
+*A linear model on data whose coordinate variances fall as $`i^{-1.6}`$: a model of size $`N`$ sees the $`N`$ highest-variance coordinates and is fit by Bayes-optimal ridge regression on $`D`$ samples; the exact test loss is averaged over 20 draws, and the cost of training is taken to be $`C=ND`$. Left: loss against data for eight model sizes; each curve falls as a power law and then flattens at the floor set by the model's size. A fit of $`L=E+AN^{-a}+BD^{-b}`$ to all 72 points gives $`a=0.64`$ (the theory predicts 0.6) and $`b=0.69`$. Right: at four fixed budgets, loss against model size has a minimum (stars at $`N=32`$, 64, 128, and 256); parabolas fitted near the minima put the optimal size at 32, 68, 141, and 289, growing as $`C^{0.53}`$, against $`C^{b/(a+b)}=C^{0.52}`$ predicted by the fitted law.*
 
 ### <a id="model-size-and-data-together"></a>Model size and data together
 
@@ -36,13 +36,13 @@ $$
 L(N,D)=E+\frac A{N^\alpha}+\frac B{D^\beta},
 $$
 
-where $E$ is the loss of an ideal model, the entropy of the text under the tokenizer (chapter 2), and the other two terms are the excess loss due to finite size and finite data. The left panel of the figure shows the same structure in the toy model: each curve follows the data term until it meets the floor $E+AN^{-\alpha}$ of its model size, so a small model stops benefiting from data early and a large model benefits for longer.
+where $`E`$ is the loss of an ideal model, the entropy of the text under the tokenizer (chapter 2), and the other two terms are the excess loss due to finite size and finite data. The left panel of the figure shows the same structure in the toy model: each curve follows the data term until it meets the floor $`E+AN^{-\alpha}`$ of its model size, so a small model stops benefiting from data early and a large model benefits for longer.
 
 ## <a id="compute-optimal-training"></a>Compute-optimal training
 
 ### <a id="the-allocation-problem"></a>The allocation problem
 
-Training a transformer costs about $C\approx6ND$ floating-point operations (DL chapter 9). With a fixed budget, a larger model must be trained on fewer tokens, and the question is how to divide the budget. Minimizing $L(N,D)$ subject to $6ND=C$ ([Appendix A](#block-nlp07-appendix-a)) gives
+Training a transformer costs about $`C\approx6ND`$ floating-point operations (DL chapter 9). With a fixed budget, a larger model must be trained on fewer tokens, and the question is how to divide the budget. Minimizing $`L(N,D)`$ subject to $`6ND=C`$ ([Appendix A](#block-nlp07-appendix-a)) gives
 
 $$
 N^*(C)=G\Bigl(\frac C6\Bigr)^{\frac\beta{\alpha+\beta}},\qquad
@@ -50,21 +50,21 @@ D^*(C)=G^{-1}\Bigl(\frac C6\Bigr)^{\frac\alpha{\alpha+\beta}},\qquad
 G=\Bigl(\frac{\alpha A}{\beta B}\Bigr)^{\frac1{\alpha+\beta}},
 $$
 
-so both grow as powers of the budget, with exponents that sum to one. When $\alpha\approx\beta$, as fits to language data find, model size and data should grow at the same rate, and the ratio of tokens to parameters stays roughly constant.
+so both grow as powers of the budget, with exponents that sum to one. When $`\alpha\approx\beta`$, as fits to language data find, model size and data should grow at the same rate, and the ratio of tokens to parameters stays roughly constant.
 
 ### <a id="three-ways-to-estimate-the-optimum"></a>Three ways to estimate the optimum
 
 Hoffmann et al. trained more than 400 models, from 70 million to 16 billion parameters on 5 to 500 billion tokens, and estimated the optimal allocation in three ways.
 
-1. **The envelope of training curves.** For each model size, train with several run lengths, each with its learning rate schedule fitted to that length, and for each amount of compute take the lowest loss reached by any model. The model sizes on this envelope give $N^*(C)$.
-2. **IsoFLOP profiles.** For each of several budgets, train models of different sizes with exactly that budget, fit a parabola to loss against $\log N$, and take its minimum, as in the right panel of the figure.
-3. **A parametric fit.** Fit $L(N,D)$ to all runs and minimize it analytically.
+1. **The envelope of training curves.** For each model size, train with several run lengths, each with its learning rate schedule fitted to that length, and for each amount of compute take the lowest loss reached by any model. The model sizes on this envelope give $`N^*(C)`$.
+2. **IsoFLOP profiles.** For each of several budgets, train models of different sizes with exactly that budget, fit a parabola to loss against $`\log N`$, and take its minimum, as in the right panel of the figure.
+3. **A parametric fit.** Fit $`L(N,D)`$ to all runs and minimize it analytically.
 
-The first two methods found $N^*\propto C^{0.50}$ and $C^{0.49}$, about 20 training tokens per parameter. The toy model reproduces the agreement between methods 2 and 3: its IsoFLOP minima grow as $C^{0.53}$, and its fitted law predicts $C^{0.52}$.
+The first two methods found $`N^*\propto C^{0.50}`$ and $`C^{0.49}`$, about 20 training tokens per parameter. The toy model reproduces the agreement between methods 2 and 3: its IsoFLOP minima grow as $`C^{0.53}`$, and its fitted law predicts $`C^{0.52}`$.
 
 ### <a id="kaplan-versus-chinchilla"></a>Kaplan versus Chinchilla
 
-The result overturned the earlier recommendation. Kaplan et al. had found $N^*\propto C^{0.73}$: most of a larger budget should go into a larger model trained on relatively few tokens, and GPT-3, with 175 billion parameters trained on 300 billion tokens, has 1.7 tokens per parameter. Hoffmann et al. tested their conclusion directly. **Chinchilla**, with 70 billion parameters trained on 1.4 trillion tokens, used about the same compute as the 280-billion-parameter Gopher trained on 300 billion tokens, and outperformed it and larger models on nearly every benchmark. Later analyses traced the discrepancy mainly to details of Kaplan's setup: a learning rate schedule not adjusted to each run's length, which penalizes long runs of small models; counting only non-embedding parameters in small models, where embeddings are a large share; and measurements at small scale ([Porian et al., 2024](https://arxiv.org/abs/2406.19146); [Pearce and Song, 2024](https://arxiv.org/abs/2406.12907)). The code evaluates the allocation formula with two published fits of Hoffmann et al.'s form.
+The result overturned the earlier recommendation. Kaplan et al. had found $`N^*\propto C^{0.73}`$: most of a larger budget should go into a larger model trained on relatively few tokens, and GPT-3, with 175 billion parameters trained on 300 billion tokens, has 1.7 tokens per parameter. Hoffmann et al. tested their conclusion directly. **Chinchilla**, with 70 billion parameters trained on 1.4 trillion tokens, used about the same compute as the 280-billion-parameter Gopher trained on 300 billion tokens, and outperformed it and larger models on nearly every benchmark. Later analyses traced the discrepancy mainly to details of Kaplan's setup: a learning rate schedule not adjusted to each run's length, which penalizes long runs of small models; counting only non-embedding parameters in small models, where embeddings are a large share; and measurements at small scale ([Porian et al., 2024](https://arxiv.org/abs/2406.19146); [Pearce and Song, 2024](https://arxiv.org/abs/2406.12907)). The code evaluates the allocation formula with two published fits of Hoffmann et al.'s form.
 
 ```python
 laws = {"Hoffmann et al. (2022)": (1.6934, 406.4, 410.7, 0.3392, 0.2849),
@@ -118,7 +118,7 @@ With Hoffmann et al.'s published parameters, the optimal ratio of tokens to para
 
 ### <a id="how-reliable-are-the-fits"></a>How reliable are the fits?
 
-Fitting $L(N,D)$ is harder than it looks. The five parameters are strongly correlated, since a larger $A$ can be offset by a larger $\alpha$ over the range of the data, and small errors in the exponents change the extrapolated allocation substantially. Hoffmann et al. fitted the logarithm of the loss with a robust **Huber loss** and reported confidence intervals that the replication found implausibly narrow ([Appendix B](#block-nlp07-appendix-b)). The code simulates 60 training runs at four budgets from a known law with 1% noise in the loss, refits the law as Hoffmann et al. did, and bootstraps over the runs.
+Fitting $`L(N,D)`$ is harder than it looks. The five parameters are strongly correlated, since a larger $`A`$ can be offset by a larger $`\alpha`$ over the range of the data, and small errors in the exponents change the extrapolated allocation substantially. Hoffmann et al. fitted the logarithm of the loss with a robust **Huber loss** and reported confidence intervals that the replication found implausibly narrow ([Appendix B](#block-nlp07-appendix-b)). The code simulates 60 training runs at four budgets from a known law with 1% noise in the loss, refits the law as Hoffmann et al. did, and bootstraps over the runs.
 
 ```python
 import numpy as np
@@ -171,17 +171,17 @@ print(f"bootstrap over runs (20 resamples): exponent {boot[:, 0].mean():.3f} +- 
 # bootstrap over runs (20 resamples): exponent 0.510 +- 0.026, tokens per parameter from 8.4 to 45.5
 ```
 
-The fit recovers the exponent of $N^*(C)$ to within about 0.02, but the data term is poorly identified ($B$ comes out as 1,267 instead of 2,085), and the bootstrap spreads the recommended ratio at $10^{23}$ FLOPs, four orders of magnitude beyond the simulated runs, from about 8 to 46 tokens per parameter. Small uncertainties in exponents become large uncertainties after long extrapolations, and a practitioner planning a large run is well advised to check predictions at intermediate scales before committing the budget.
+The fit recovers the exponent of $`N^*(C)`$ to within about 0.02, but the data term is poorly identified ($`B`$ comes out as 1,267 instead of 2,085), and the bootstrap spreads the recommended ratio at $`10^{23}`$ FLOPs, four orders of magnitude beyond the simulated runs, from about 8 to 46 tokens per parameter. Small uncertainties in exponents become large uncertainties after long extrapolations, and a practitioner planning a large run is well advised to check predictions at intermediate scales before committing the budget.
 
 ## <a id="beyond-compute-optimal"></a>Beyond compute-optimal
 
 ### <a id="paying-for-inference"></a>Paying for inference
 
-Compute-optimal allocation minimizes the cost of training alone. A deployed model is also run, at a cost of about $2N$ operations per generated token, possibly for trillions of tokens. Including inference in the objective favors smaller models trained on more data than the training-optimal ratio ([Sardana et al., 2024](https://arxiv.org/abs/2401.00448)), and the loss penalty for doing so is modest because the loss surface is flat near the optimum. In the code above, an 8-billion-parameter model trained on 15.6 trillion tokens, about 2,000 tokens per parameter, reaches a loss only 0.055 nats higher than the compute-optimal 83-billion-parameter model with the same training budget, while costing about a tenth as much per generated token. Llama 3's 8-billion-parameter model was trained on about 15 trillion tokens for this reason, and small models are now routinely trained far past the Chinchilla ratio.
+Compute-optimal allocation minimizes the cost of training alone. A deployed model is also run, at a cost of about $`2N`$ operations per generated token, possibly for trillions of tokens. Including inference in the objective favors smaller models trained on more data than the training-optimal ratio ([Sardana et al., 2024](https://arxiv.org/abs/2401.00448)), and the loss penalty for doing so is modest because the loss surface is flat near the optimum. In the code above, an 8-billion-parameter model trained on 15.6 trillion tokens, about 2,000 tokens per parameter, reaches a loss only 0.055 nats higher than the compute-optimal 83-billion-parameter model with the same training budget, while costing about a tenth as much per generated token. Llama 3's 8-billion-parameter model was trained on about 15 trillion tokens for this reason, and small models are now routinely trained far past the Chinchilla ratio.
 
 ### <a id="running-out-of-data"></a>Running out of data
 
-The compute-optimal recipe assumes an unlimited supply of fresh tokens. For the largest runs, high-quality text is becoming the binding constraint, and training for several epochs, filtering harder, and generating synthetic data are the responses (chapter 6). [Muennighoff et al. (2023)](https://arxiv.org/abs/2305.16264) extended the scaling law to repeated data by replacing $D$ with an effective number of tokens that saturates with repetition, and found that with limited data the compute-optimal allocation shifts toward more epochs over a larger model than the unconstrained law recommends.
+The compute-optimal recipe assumes an unlimited supply of fresh tokens. For the largest runs, high-quality text is becoming the binding constraint, and training for several epochs, filtering harder, and generating synthetic data are the responses (chapter 6). [Muennighoff et al. (2023)](https://arxiv.org/abs/2305.16264) extended the scaling law to repeated data by replacing $`D`$ with an effective number of tokens that saturates with repetition, and found that with limited data the compute-optimal allocation shifts toward more epochs over a larger model than the unconstrained law recommends.
 
 ### <a id="scaling-the-hyperparameters"></a>Scaling the hyperparameters
 
@@ -212,13 +212,13 @@ Scaling laws describe averages and hold over the ranges where they were measured
 <summary><a id="block-nlp07-appendix-a"></a><b>A. The compute-optimal allocation</b></summary>
 
 
-Minimize $L(N,D)=E+AN^{-\alpha}+BD^{-\beta}$ subject to $6ND=C$. Substituting $D=C/(6N)$ gives a function of $N$ alone,
+Minimize $`L(N,D)=E+AN^{-\alpha}+BD^{-\beta}`$ subject to $`6ND=C`$. Substituting $`D=C/(6N)`$ gives a function of $`N`$ alone,
 
 $$
 \ell(N)=E+AN^{-\alpha}+B\Bigl(\frac C6\Bigr)^{-\beta}N^{\beta}.
 $$
 
-Its derivative, $-\alpha AN^{-\alpha-1}+\beta B(C/6)^{-\beta}N^{\beta-1}$, vanishes where
+Its derivative, $`-\alpha AN^{-\alpha-1}+\beta B(C/6)^{-\beta}N^{\beta-1}`$, vanishes where
 
 $$
 N^{\alpha+\beta}=\frac{\alpha A}{\beta B}\Bigl(\frac C6\Bigr)^{\beta},
@@ -226,13 +226,13 @@ N^{\alpha+\beta}=\frac{\alpha A}{\beta B}\Bigl(\frac C6\Bigr)^{\beta},
 N^*=\Bigl(\frac{\alpha A}{\beta B}\Bigr)^{\frac1{\alpha+\beta}}\Bigl(\frac C6\Bigr)^{\frac\beta{\alpha+\beta}},
 $$
 
-and $\ell$ is convex in $\log N$, so this is the minimum. Then $D^*=C/(6N^*)=G^{-1}(C/6)^{\alpha/(\alpha+\beta)}$. At the optimum the two excess terms are in a fixed ratio: from the stationarity condition, $\alpha AN^{*-\alpha}=\beta BD^{*-\beta}$, so the finite-size term is $\beta/(\alpha+\beta)$ and the finite-data term $\alpha/(\alpha+\beta)$ of the total excess loss. Substituting shows that the excess loss itself falls as a power of compute,
+and $`\ell`$ is convex in $`\log N`$, so this is the minimum. Then $`D^*=C/(6N^*)=G^{-1}(C/6)^{\alpha/(\alpha+\beta)}`$. At the optimum the two excess terms are in a fixed ratio: from the stationarity condition, $`\alpha AN^{*-\alpha}=\beta BD^{*-\beta}`$, so the finite-size term is $`\beta/(\alpha+\beta)`$ and the finite-data term $`\alpha/(\alpha+\beta)`$ of the total excess loss. Substituting shows that the excess loss itself falls as a power of compute,
 
 $$
 L^*(C)-E\propto C^{-\frac{\alpha\beta}{\alpha+\beta}},
 $$
 
-which is why loss against compute on the efficient frontier is a straight line on log–log axes, with an exponent smaller than either $\alpha$ or $\beta$. With $\alpha\approx\beta\approx0.35$ the compute exponent is about 0.18 for the excess loss; Kaplan's exponent of 0.050 refers to the total loss without an irreducible term, which falls more slowly.
+which is why loss against compute on the efficient frontier is a straight line on log–log axes, with an exponent smaller than either $`\alpha`$ or $`\beta`$. With $`\alpha\approx\beta\approx0.35`$ the compute exponent is about 0.18 for the excess loss; Kaplan's exponent of 0.050 refers to the total loss without an irreducible term, which falls more slowly.
 
 </details>
 
@@ -248,9 +248,9 @@ $$
 \log\hat L(N,D)=\operatorname{LSE}\bigl(a-\alpha\log N,\ b-\beta\log D,\ e\bigr),
 $$
 
-where $\operatorname{LSE}$ is the log of the sum of exponentials and $A=e^a$, $B=e^b$, $E=e^e$, which keeps the three terms positive without constraints. They minimize $\sum_i\operatorname{Huber}_\delta\bigl(\log\hat L(N_i,D_i)-\log L_i\bigr)$ with $\delta=10^{-3}$ using L-BFGS from a grid of starting points, since the objective has many local minima. Fitting the logarithm weights runs by their relative error, which matches multiplicative noise across a wide range of losses; the Huber loss, quadratic for residuals below $\delta$ and linear beyond, limits the influence of runs that diverged or were mistuned. With $\delta=10^{-3}$, most residuals exceed $\delta$, so the fit behaves nearly like least absolute deviations.
+where $`\operatorname{LSE}`$ is the log of the sum of exponentials and $`A=e^a`$, $`B=e^b`$, $`E=e^e`$, which keeps the three terms positive without constraints. They minimize $`\sum_i\operatorname{Huber}_\delta\bigl(\log\hat L(N_i,D_i)-\log L_i\bigr)`$ with $`\delta=10^{-3}`$ using L-BFGS from a grid of starting points, since the objective has many local minima. Fitting the logarithm weights runs by their relative error, which matches multiplicative noise across a wide range of losses; the Huber loss, quadratic for residuals below $`\delta`$ and linear beyond, limits the influence of runs that diverged or were mistuned. With $`\delta=10^{-3}`$, most residuals exceed $`\delta`$, so the fit behaves nearly like least absolute deviations.
 
-Uncertainty should be estimated by refitting on bootstrap resamples of the runs, which preserves the correlations between parameters. The quantity of interest is usually not a single parameter but a prediction far outside the data, such as $N^*$ at a budget a thousand times larger, and its uncertainty grows with the distance of the extrapolation: an error $\delta a$ in the allocation exponent multiplies the predicted $N^*$ by $(C/C_0)^{\delta a}$ at a budget $C$ far from the fitted budgets $C_0$, so an error of 0.02 over four orders of magnitude changes $N^*$ by about 20% and the ratio of tokens to parameters by about 45%.
+Uncertainty should be estimated by refitting on bootstrap resamples of the runs, which preserves the correlations between parameters. The quantity of interest is usually not a single parameter but a prediction far outside the data, such as $`N^*`$ at a budget a thousand times larger, and its uncertainty grows with the distance of the extrapolation: an error $`\delta a`$ in the allocation exponent multiplies the predicted $`N^*`$ by $`(C/C_0)^{\delta a}`$ at a budget $`C`$ far from the fitted budgets $`C_0`$, so an error of 0.02 over four orders of magnitude changes $`N^*`$ by about 20% and the ratio of tokens to parameters by about 45%.
 
 </details>
 
@@ -260,13 +260,13 @@ Uncertainty should be estimated by refitting on bootstrap resamples of the runs,
 <summary><a id="block-nlp07-appendix-c"></a><b>C. Sharp transitions from smooth improvement</b></summary>
 
 
-Suppose the answer to a task has $k$ tokens and the model predicts each correctly with probability $p(C)$, independently, and that the per-token error falls as a power of compute, $1-p(C)=cC^{-\gamma}$. Exact-match accuracy is
+Suppose the answer to a task has $`k`$ tokens and the model predicts each correctly with probability $`p(C)`$, independently, and that the per-token error falls as a power of compute, $`1-p(C)=cC^{-\gamma}`$. Exact-match accuracy is
 
 $$
 \operatorname{acc}(C)=p(C)^k=\bigl(1-cC^{-\gamma}\bigr)^k\approx\exp\bigl(-kcC^{-\gamma}\bigr)
 $$
 
-for small errors. As a function of $\log C$ this is a Gumbel-shaped curve, near 0 while $kcC^{-\gamma}\gg1$ and near 1 once it is $\ll1$. The accuracy crosses one half at $C_{1/2}=(kc/\ln2)^{1/\gamma}$, and the transition from 10% to 90% accuracy spans a factor of $(\ln10/\ln(10/9))^{1/\gamma}\approx21.9^{1/\gamma}$ in compute, independent of $k$. Larger $k$ moves the transition to larger scale, where it is typically observed only at the last few model sizes of a family. With $\gamma=0.5$ and a family spaced by factors of ten in compute, the rise from 10% to 90% spans a factor of about 480, less than three model sizes, and looks abrupt, though the per-token error falls smoothly all along. The per-token log-likelihood, $\log p(C)\approx-cC^{-\gamma}$, is a straight line in log–log coordinates and predicts the transition before it happens.
+for small errors. As a function of $`\log C`$ this is a Gumbel-shaped curve, near 0 while $`kcC^{-\gamma}\gg1`$ and near 1 once it is $`\ll1`$. The accuracy crosses one half at $`C_{1/2}=(kc/\ln2)^{1/\gamma}`$, and the transition from 10% to 90% accuracy spans a factor of $`(\ln10/\ln(10/9))^{1/\gamma}\approx21.9^{1/\gamma}`$ in compute, independent of $`k`$. Larger $`k`$ moves the transition to larger scale, where it is typically observed only at the last few model sizes of a family. With $`\gamma=0.5`$ and a family spaced by factors of ten in compute, the rise from 10% to 90% spans a factor of about 480, less than three model sizes, and looks abrupt, though the per-token error falls smoothly all along. The per-token log-likelihood, $`\log p(C)\approx-cC^{-\gamma}`$, is a straight line in log–log coordinates and predicts the transition before it happens.
 
 </details>
 

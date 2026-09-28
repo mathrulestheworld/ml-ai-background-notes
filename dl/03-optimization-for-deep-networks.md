@@ -74,29 +74,29 @@ Even this small network, fitted to low loss, has more than half of its curvature
 
 ### <a id="the-noise-in-a-stochastic-gradient"></a>The noise in a stochastic gradient
 
-A minibatch gradient $g_B=\frac1B\sum_{i\in\mathcal B}\nabla\ell_i(\theta)$, with examples drawn independently, is an unbiased estimate of the full gradient $G=\nabla\widehat R_n(\theta)$ with covariance $\Sigma/B$, where $\Sigma$ is the covariance of the per-example gradients (Foundations chapter 3). A step of size $\eta$ therefore moves the parameters by $-\eta G$ plus noise with covariance $\eta^2\Sigma/B$. Over many small steps, the drift scales with $\eta$ and the accumulated noise variance with $\eta^2/B$ per step, so the ratio $\eta/B$ acts like a temperature: SGD behaves approximately like a diffusion that samples low-loss regions, with fluctuations growing with $\eta/B$ ([Mandt, Hoffman, and Blei, 2017](https://arxiv.org/abs/1704.04289); [Smith and Le, 2018](https://arxiv.org/abs/1710.06451)).
+A minibatch gradient $`g_B=\frac1B\sum_{i\in\mathcal B}\nabla\ell_i(\theta)`$, with examples drawn independently, is an unbiased estimate of the full gradient $`G=\nabla\widehat R_n(\theta)`$ with covariance $`\Sigma/B`$, where $`\Sigma`$ is the covariance of the per-example gradients (Foundations chapter 3). A step of size $`\eta`$ therefore moves the parameters by $`-\eta G`$ plus noise with covariance $`\eta^2\Sigma/B`$. Over many small steps, the drift scales with $`\eta`$ and the accumulated noise variance with $`\eta^2/B`$ per step, so the ratio $`\eta/B`$ acts like a temperature: SGD behaves approximately like a diffusion that samples low-loss regions, with fluctuations growing with $`\eta/B`$ ([Mandt, Hoffman, and Blei, 2017](https://arxiv.org/abs/1704.04289); [Smith and Le, 2018](https://arxiv.org/abs/1710.06451)).
 
-This picture explains the **linear scaling rule** of [Goyal et al. (2017)](https://arxiv.org/abs/1706.02677): when the batch size is multiplied by $k$, multiply the learning rate by $k$, which keeps $\eta/B$ fixed and makes $k$ small steps approximately equal to one large step. With a gradual warmup of the learning rate, they trained ResNet-50 on ImageNet with batches of 8,192 images in one hour, matching the accuracy of batch 256. The rule has a limit. A $k$-fold larger step is equivalent to $k$ small ones only while the gradient changes little over the displacement, and beyond some batch size the learning rate cannot grow further without instability.
+This picture explains the **linear scaling rule** of [Goyal et al. (2017)](https://arxiv.org/abs/1706.02677): when the batch size is multiplied by $`k`$, multiply the learning rate by $`k`$, which keeps $`\eta/B`$ fixed and makes $`k`$ small steps approximately equal to one large step. With a gradual warmup of the learning rate, they trained ResNet-50 on ImageNet with batches of 8,192 images in one hour, matching the accuracy of batch 256. The rule has a limit. A $`k`$-fold larger step is equivalent to $`k`$ small ones only while the gradient changes little over the displacement, and beyond some batch size the learning rate cannot grow further without instability.
 
 ### <a id="the-critical-batch-size"></a>The critical batch size
 
-[McCandlish, Kaplan, and Amodei (2018)](https://arxiv.org/abs/1812.06162) turned this into a quantitative model. Consider one step with the best learning rate for a given batch size on a locally quadratic loss with Hessian $H$. Averaging the gradient over $B$ examples removes noise, and the achievable decrease per step is a fraction $1/(1+B_{\text{noise}}/B)$ of the decrease with the exact gradient, where
+[McCandlish, Kaplan, and Amodei (2018)](https://arxiv.org/abs/1812.06162) turned this into a quantitative model. Consider one step with the best learning rate for a given batch size on a locally quadratic loss with Hessian $`H`$. Averaging the gradient over $`B`$ examples removes noise, and the achievable decrease per step is a fraction $`1/(1+B_{\text{noise}}/B)`$ of the decrease with the exact gradient, where
 
 $$
 B_{\text{noise}}=\frac{\operatorname{tr}(H\Sigma)}{G^\top HG}\approx B_{\text{simple}}=\frac{\operatorname{tr}\Sigma}{\|G\|^2}
 $$
 
-is the **gradient noise scale**, the batch size at which the noise and the signal in the gradient have comparable size. Consequently the number of steps $S$ and the number of examples $E=SB$ needed to reach a given loss trade off as
+is the **gradient noise scale**, the batch size at which the noise and the signal in the gradient have comparable size. Consequently the number of steps $`S`$ and the number of examples $`E=SB`$ needed to reach a given loss trade off as
 
 $$
 S=S_{\min}\Bigl(1+\frac{B_{\text{noise}}}{B}\Bigr),\qquad E=E_{\min}\Bigl(1+\frac{B}{B_{\text{noise}}}\Bigr).
 $$
 
-[Appendix A](#block-dl3-appendix-a) derives both relations from a quadratic model of the loss. Batches much smaller than $B_{\text{noise}}$ use data efficiently but need many sequential steps; batches much larger reduce the steps only to $S_{\min}$ while wasting examples. The **critical batch size** $B_{\text{noise}}$ is the natural compromise, and it grows during training as the gradient signal weakens relative to the noise.
+[Appendix A](#block-dl3-appendix-a) derives both relations from a quadratic model of the loss. Batches much smaller than $`B_{\text{noise}}`$ use data efficiently but need many sequential steps; batches much larger reduce the steps only to $`S_{\min}`$ while wasting examples. The **critical batch size** $`B_{\text{noise}}`$ is the natural compromise, and it grows during training as the gradient signal weakens relative to the noise.
 
 <img src="sources/images/dl-opt-batch-size.png" alt="dl-opt-batch-size" width="880">
 
-*A one-hidden-layer network with 128 units on 1,200 handwritten digits, trained with SGD with momentum 0.9 until the training loss falls below 0.05. Each point uses the best of 13 learning rates between 0.003 and 3. Left: steps fall nearly in proportion to $1/B$ up to a batch of about 64 and then level off; the fitted model gives $B_{\text{noise}}\approx133$. Middle: the examples needed are nearly constant for small batches and grow roughly linearly beyond $B_{\text{noise}}$. Right: the best learning rate grows with the batch size, roughly linearly at first, until it saturates.*
+*A one-hidden-layer network with 128 units on 1,200 handwritten digits, trained with SGD with momentum 0.9 until the training loss falls below 0.05. Each point uses the best of 13 learning rates between 0.003 and 3. Left: steps fall nearly in proportion to $`1/B`$ up to a batch of about 64 and then level off; the fitted model gives $`B_{\text{noise}}\approx133`$. Middle: the examples needed are nearly constant for small batches and grow roughly linearly beyond $`B_{\text{noise}}`$. Right: the best learning rate grows with the batch size, roughly linearly at first, until it saturates.*
 
 The noise scale can be measured directly from per-example gradients, which `torch.func.vmap` computes in one vectorized call.
 
@@ -144,16 +144,16 @@ During the phase that determines the steps to reach a loss of 0.05, the measured
 
 ### <a id="does-noise-help-generalization"></a>Does noise help generalization?
 
-[Keskar et al. (2017)](https://arxiv.org/abs/1609.04836) observed that large-batch training generalized worse and converged to sharper minima, suggesting that minibatch noise steers SGD toward flat, better-generalizing regions. Later work found that much of the gap disappears when the learning rate, schedule, and training length are retuned for each batch size ([Shallue et al., 2019](https://jmlr.org/papers/v20/18-789.html)); what remains depends on the problem. The temperature $\eta/B$ is still a useful knob, and chapter 5 returns to the relation between flatness and generalization.
+[Keskar et al. (2017)](https://arxiv.org/abs/1609.04836) observed that large-batch training generalized worse and converged to sharper minima, suggesting that minibatch noise steers SGD toward flat, better-generalizing regions. Later work found that much of the gap disappears when the learning rate, schedule, and training length are retuned for each batch size ([Shallue et al., 2019](https://jmlr.org/papers/v20/18-789.html)); what remains depends on the problem. The temperature $`\eta/B`$ is still a useful knob, and chapter 5 returns to the relation between flatness and generalization.
 
 ## <a id="learning-rate-schedules"></a>Learning-rate schedules
 
 ### <a id="why-the-rate-should-decay"></a>Why the rate should decay
 
-With a constant learning rate, SGD does not converge: on a quadratic with gradient noise it settles into a stationary distribution whose width grows with $\eta$ (Foundations chapter 3). A large rate early makes fast progress across the landscape; a small rate late lets the iterates settle into the bottom of a basin. Every schedule in common use implements this in a different shape.
+With a constant learning rate, SGD does not converge: on a quadratic with gradient noise it settles into a stationary distribution whose width grows with $`\eta`$ (Foundations chapter 3). A large rate early makes fast progress across the landscape; a small rate late lets the iterates settle into the bottom of a basin. Every schedule in common use implements this in a different shape.
 
 - **Step decay** divides the rate by 10 at fixed epochs, the standard for convolutional networks trained with SGD for many years.
-- **Cosine decay** $\eta_t=\eta_{\min}+\frac12(\eta_{\max}-\eta_{\min})\bigl(1+\cos(\pi t/T)\bigr)$ ([Loshchilov and Hutter, 2017](https://arxiv.org/abs/1608.03983)) decays smoothly, slowly at first and last. It is the default for transformers, usually decaying to about a tenth of the peak.
+- **Cosine decay** $`\eta_t=\eta_{\min}+\frac12(\eta_{\max}-\eta_{\min})\bigl(1+\cos(\pi t/T)\bigr)`$ ([Loshchilov and Hutter, 2017](https://arxiv.org/abs/1608.03983)) decays smoothly, slowly at first and last. It is the default for transformers, usually decaying to about a tenth of the peak.
 - **Linear decay** to zero performs similarly to cosine and is sometimes better.
 - **Warmup–stable–decay** (WSD) holds the peak rate for most of training and decays over the last 10–20% ([Hu et al., 2024](https://arxiv.org/abs/2404.06395)). Because the stable phase does not depend on the total length, one run can be branched into decays at several lengths, which makes it convenient for experiments on how performance scales with training length.
 
@@ -167,8 +167,8 @@ In this example the peak rate is deliberately large, so the differences are exag
 
 **Warmup** increases the learning rate linearly from near zero over the first few hundred or thousand steps. It is essential for training transformers with Adam and for large-batch SGD, and it has several complementary explanations.
 
-- Adam's second-moment estimate $\hat v_t$ is based on few gradients at the start, so its denominator is noisy and the effective step erratic. [Liu et al. (2020)](https://arxiv.org/abs/1908.03265) showed that warmup compensates for this variance.
-- The loss surface at initialization is often sharp, and a full-size step would exceed the stability threshold $2/\lambda_{\max}$ discussed below. During warmup the network moves to flatter regions where the peak rate is stable ([Gilmer et al., 2022](https://arxiv.org/abs/2110.04369); [Kalra and Barkeshli, 2024](https://arxiv.org/abs/2406.09405)).
+- Adam's second-moment estimate $`\hat v_t`$ is based on few gradients at the start, so its denominator is noisy and the effective step erratic. [Liu et al. (2020)](https://arxiv.org/abs/1908.03265) showed that warmup compensates for this variance.
+- The loss surface at initialization is often sharp, and a full-size step would exceed the stability threshold $`2/\lambda_{\max}`$ discussed below. During warmup the network moves to flatter regions where the peak rate is stable ([Gilmer et al., 2022](https://arxiv.org/abs/2110.04369); [Kalra and Barkeshli, 2024](https://arxiv.org/abs/2406.09405)).
 - In transformers with normalization after the residual addition, gradients near the output are large at initialization; placing normalization before the sublayers reduces the need for warmup ([Xiong et al., 2020](https://arxiv.org/abs/2002.04745); chapter 4).
 
 In PyTorch a schedule is a function of the step count wrapped in a scheduler, which must be advanced once per optimizer update. The multiplier below implements linear warmup followed by cosine decay to a tenth of the peak.
@@ -202,16 +202,16 @@ print("learning rate at steps 0, 49, 99, 100, 550, 999:", [f"{lrs[s]:.2e}" for s
 
 ### <a id="the-stability-threshold"></a>The stability threshold
 
-On a quadratic, gradient descent with step $\eta$ diverges along any direction whose curvature exceeds $2/\eta$ (Foundations chapter 3). Classical analysis therefore chooses $\eta<2/L$ for an $L$-smooth loss. In a neural network the curvature is not fixed; the largest Hessian eigenvalue $\lambda_{\max}$, the **sharpness**, changes as the parameters move. [Cohen et al. (2021)](https://arxiv.org/abs/2103.00065) found two consistent regularities in full-batch gradient descent:
+On a quadratic, gradient descent with step $`\eta`$ diverges along any direction whose curvature exceeds $`2/\eta`$ (Foundations chapter 3). Classical analysis therefore chooses $`\eta<2/L`$ for an $`L`$-smooth loss. In a neural network the curvature is not fixed; the largest Hessian eigenvalue $`\lambda_{\max}`$, the **sharpness**, changes as the parameters move. [Cohen et al. (2021)](https://arxiv.org/abs/2103.00065) found two consistent regularities in full-batch gradient descent:
 
 1. **Progressive sharpening.** When the step size is small relative to the curvature, the sharpness increases during training.
-2. **Edge of stability.** Once it reaches $2/\eta$, it stops increasing and hovers just above that value. The loss keeps decreasing, but no longer monotonically: short spikes alternate with rapid descent.
+2. **Edge of stability.** Once it reaches $`2/\eta`$, it stops increasing and hovers just above that value. The loss keeps decreasing, but no longer monotonically: short spikes alternate with rapid descent.
 
 <img src="sources/images/dl-opt-edge-of-stability.png" alt="dl-opt-edge-of-stability" width="880">
 
-*Full-batch gradient descent on a tanh network with two hidden layers of 64 units, fitting one-hot targets of 500 digits with squared error. Left: the sharpness, estimated every 50 steps by power iteration. With $\eta=0.2$ and $\eta=0.1$ it rises to $2/\eta$ within about a thousand steps, overshoots briefly, and then stays within a few percent of it; with $\eta=0.05$ it is still rising toward 40 after 6,000 steps, reaching 39.3. Right: the loss decreases in all three runs, with spikes in the two runs at the edge of stability.*
+*Full-batch gradient descent on a tanh network with two hidden layers of 64 units, fitting one-hot targets of 500 digits with squared error. Left: the sharpness, estimated every 50 steps by power iteration. With $`\eta=0.2`$ and $`\eta=0.1`$ it rises to $`2/\eta`$ within about a thousand steps, overshoots briefly, and then stays within a few percent of it; with $`\eta=0.05`$ it is still rising toward 40 after 6,000 steps, reaching 39.3. Right: the loss decreases in all three runs, with spikes in the two runs at the edge of stability.*
 
-The threshold is self-enforcing: when the sharpness exceeds $2/\eta$, the iterates oscillate along the top eigenvector, and the oscillation moves them to a region of lower sharpness. Classical smoothness-based analysis, which assumes the curvature is below the threshold throughout, does not describe this regime, which is nevertheless where most training with large learning rates takes place. Adaptive methods show the analogous behavior for the preconditioned sharpness, the largest eigenvalue of $P^{-1}H$ for Adam's preconditioner $P$ ([Cohen et al., 2022](https://arxiv.org/abs/2207.14484)). Loss spikes in large training runs are often instabilities of this kind; warmup, lower peak rates, gradient clipping, and normalization all reduce them.
+The threshold is self-enforcing: when the sharpness exceeds $`2/\eta`$, the iterates oscillate along the top eigenvector, and the oscillation moves them to a region of lower sharpness. Classical smoothness-based analysis, which assumes the curvature is below the threshold throughout, does not describe this regime, which is nevertheless where most training with large learning rates takes place. Adaptive methods show the analogous behavior for the preconditioned sharpness, the largest eigenvalue of $`P^{-1}H`$ for Adam's preconditioner $`P`$ ([Cohen et al., 2022](https://arxiv.org/abs/2207.14484)). Loss spikes in large training runs are often instabilities of this kind; warmup, lower peak rates, gradient clipping, and normalization all reduce them.
 
 ### <a id="adaptive-and-second-order-methods"></a>Adaptive and second-order methods
 
@@ -227,7 +227,7 @@ In low dimensions one pictures a rugged landscape full of bad local minima. High
 
 ### <a id="straight-paths-through-parameter-space"></a>Straight paths through parameter space
 
-A simple probe evaluates the loss on the segment $(1-\alpha)\theta_0+\alpha\theta_1$ between two parameter vectors. Between initialization and the trained solution the loss usually decreases monotonically along the segment ([Goodfellow, Vinyals, and Saxe, 2015](https://arxiv.org/abs/1412.6544)), although the optimizer's path is far from straight. Between two solutions found from different initializations the segment usually crosses a barrier of higher loss, yet the two solutions can be joined by simple curved paths of low loss (**mode connectivity**; [Garipov et al., 2018](https://arxiv.org/abs/1802.10026); [Draxler et al., 2018](https://arxiv.org/abs/1803.00885)).
+A simple probe evaluates the loss on the segment $`(1-\alpha)\theta_0+\alpha\theta_1`$ between two parameter vectors. Between initialization and the trained solution the loss usually decreases monotonically along the segment ([Goodfellow, Vinyals, and Saxe, 2015](https://arxiv.org/abs/1412.6544)), although the optimizer's path is far from straight. Between two solutions found from different initializations the segment usually crosses a barrier of higher loss, yet the two solutions can be joined by simple curved paths of low loss (**mode connectivity**; [Garipov et al., 2018](https://arxiv.org/abs/1802.10026); [Draxler et al., 2018](https://arxiv.org/abs/1803.00885)).
 
 Much of the barrier is an artifact of the permutation symmetry of chapter 1. Two networks can compute nearly the same features with their hidden units in different orders, and averaging unit 3 of one with unit 3 of the other mixes unrelated features. Permuting the units of one network to match the other before interpolating removes most of the barrier ([Entezari et al., 2022](https://arxiv.org/abs/2110.06296); [Ainsworth, Hayase, and Srinivasa, 2023](https://arxiv.org/abs/2209.04836)).
 
@@ -246,13 +246,13 @@ UDL chapter 6, DLB chapter 8, UMich lectures 4 and 11, and UNIGE sections 5.2 an
 <summary><a id="block-dl3-appendix-a"></a><b>A. The step-size trade-off behind the critical batch size</b></summary>
 
 
-Let the loss near the current point be approximated by $\widehat R(\theta-\eta g)\approx\widehat R(\theta)-\eta G^\top g+\frac{\eta^2}2g^\top Hg$ for a step along a stochastic gradient $g$ with mean $G$ and covariance $\Sigma/B$. Taking the expectation,
+Let the loss near the current point be approximated by $`\widehat R(\theta-\eta g)\approx\widehat R(\theta)-\eta G^\top g+\frac{\eta^2}2g^\top Hg`$ for a step along a stochastic gradient $`g`$ with mean $`G`$ and covariance $`\Sigma/B`$. Taking the expectation,
 
 $$
 \mathbb E\bigl[\Delta\widehat R\bigr]=-\eta\|G\|^2+\frac{\eta^2}2\Bigl(G^\top HG+\frac{\operatorname{tr}(H\Sigma)}B\Bigr).
 $$
 
-The best step size minimizes this quadratic in $\eta$:
+The best step size minimizes this quadratic in $`\eta`$:
 
 $$
 \eta^*(B)=\frac{\|G\|^2}{G^\top HG+\operatorname{tr}(H\Sigma)/B}=\frac{\eta_{\max}}{1+B_{\text{noise}}/B},
@@ -260,9 +260,9 @@ $$
 \mathbb E\bigl[\Delta\widehat R\bigr]_{\min}=-\frac{\Delta_{\max}}{1+B_{\text{noise}}/B},
 $$
 
-where $\eta_{\max}=\|G\|^2/(G^\top HG)$ and $\Delta_{\max}=\|G\|^4/(2G^\top HG)$ are the optimal step size and decrease with the exact gradient, and $B_{\text{noise}}=\operatorname{tr}(H\Sigma)/(G^\top HG)$.
+where $`\eta_{\max}=\|G\|^2/(G^\top HG)`$ and $`\Delta_{\max}=\|G\|^4/(2G^\top HG)`$ are the optimal step size and decrease with the exact gradient, and $`B_{\text{noise}}=\operatorname{tr}(H\Sigma)/(G^\top HG)`$.
 
-Two conclusions follow. The optimal learning rate grows linearly in $B$ for $B\ll B_{\text{noise}}$ and saturates at $\eta_{\max}$ for $B\gg B_{\text{noise}}$, the pattern in the right panel of the batch-size figure. And the decrease per step is a fraction $1/(1+B_{\text{noise}}/B)$ of the best possible, so reaching a fixed loss takes $S=S_{\min}(1+B_{\text{noise}}/B)$ steps if $B_{\text{noise}}$ is roughly constant over the relevant stretch of training, and $E=SB=S_{\min}(B+B_{\text{noise}})=E_{\min}(1+B/B_{\text{noise}})$ examples with $E_{\min}=S_{\min}B_{\text{noise}}$. If $H$ is proportional to the identity, $B_{\text{noise}}$ reduces to $B_{\text{simple}}=\operatorname{tr}\Sigma/\|G\|^2$, which requires only gradients to estimate.
+Two conclusions follow. The optimal learning rate grows linearly in $`B`$ for $`B\ll B_{\text{noise}}`$ and saturates at $`\eta_{\max}`$ for $`B\gg B_{\text{noise}}`$, the pattern in the right panel of the batch-size figure. And the decrease per step is a fraction $`1/(1+B_{\text{noise}}/B)`$ of the best possible, so reaching a fixed loss takes $`S=S_{\min}(1+B_{\text{noise}}/B)`$ steps if $`B_{\text{noise}}`$ is roughly constant over the relevant stretch of training, and $`E=SB=S_{\min}(B+B_{\text{noise}})=E_{\min}(1+B/B_{\text{noise}})`$ examples with $`E_{\min}=S_{\min}B_{\text{noise}}`$. If $`H`$ is proportional to the identity, $`B_{\text{noise}}`$ reduces to $`B_{\text{simple}}=\operatorname{tr}\Sigma/\|G\|^2`$, which requires only gradients to estimate.
 
 </details>
 

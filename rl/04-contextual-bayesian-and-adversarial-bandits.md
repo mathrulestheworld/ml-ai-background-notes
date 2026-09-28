@@ -68,21 +68,21 @@ for name, f in [("greedy on posterior means", greedy), ("Thompson sampling", tho
 # UCB1                      : 17.546 +- 0.016
 ```
 
-With two arms and 30 pulls, the Bayes-optimal strategy loses only 1.08 pulls' worth of reward to the oracle that knows the better arm. Greedy play on the posterior means is close behind at this short horizon, because the prior already makes the untried arm look reasonable. Thompson sampling, which is excellent for long horizons and is not tuned to $T$, explores more than a 30-step problem warrants, and UCB1 more still. The comparison is fair only in the Bayesian sense, averaged over problems drawn from the prior; for a fixed problem the ranking can differ, and it also changes with the horizon (exercise 4.2).
+With two arms and 30 pulls, the Bayes-optimal strategy loses only 1.08 pulls' worth of reward to the oracle that knows the better arm. Greedy play on the posterior means is close behind at this short horizon, because the prior already makes the untried arm look reasonable. Thompson sampling, which is excellent for long horizons and is not tuned to $`T`$, explores more than a 30-step problem warrants, and UCB1 more still. The comparison is fair only in the Bayesian sense, averaged over problems drawn from the prior; for a fixed problem the ranking can differ, and it also changes with the horizon (exercise 4.2).
 
-The belief MDP grows quickly: with $k$ Bernoulli arms and horizon $T$, the number of posterior states is of order $T^{2k}/(2k)!$, 46,376 here and far too many for ten arms. Exact Bayes-optimal play is therefore rare in practice. Its importance is conceptual: it defines what optimal exploration means when a prior is available, and it shows that exploration is not a separate mechanism but a consequence of planning under uncertainty. Bayes-adaptive planning returns in model-based RL and meta-RL (chapter 29).
+The belief MDP grows quickly: with $`k`$ Bernoulli arms and horizon $`T`$, the number of posterior states is of order $`T^{2k}/(2k)!`$, 46,376 here and far too many for ten arms. Exact Bayes-optimal play is therefore rare in practice. Its importance is conceptual: it defines what optimal exploration means when a prior is available, and it shows that exploration is not a separate mechanism but a consequence of planning under uncertainty. Bayes-adaptive planning returns in model-based RL and meta-RL (chapter 29).
 
 ### <a id="the-gittins-index"></a>The Gittins index
 
-For discounted rewards over an infinite horizon, with arms whose states change only when they are pulled, a far simpler solution exists. [Gittins (1979)](https://doi.org/10.1111/j.2517-6161.1979.tb01068.x) proved that the Bayes-optimal policy has an **index** form: compute for each arm a number that depends only on that arm's own posterior, and pull the arm with the largest. The $k$-dimensional planning problem splits into $k$ one-dimensional ones.
+For discounted rewards over an infinite horizon, with arms whose states change only when they are pulled, a far simpler solution exists. [Gittins (1979)](https://doi.org/10.1111/j.2517-6161.1979.tb01068.x) proved that the Bayes-optimal policy has an **index** form: compute for each arm a number that depends only on that arm's own posterior, and pull the arm with the largest. The $`k`$-dimensional planning problem splits into $`k`$ one-dimensional ones.
 
-The **Gittins index** of an arm in posterior state $x$ is the constant reward per step that makes a player indifferent between retiring with that reward forever and continuing to pull the arm, with the option to retire at any later time:
+The **Gittins index** of an arm in posterior state $`x`$ is the constant reward per step that makes a player indifferent between retiring with that reward forever and continuing to pull the arm, with the option to retire at any later time:
 
 $$
 G(x)=\sup_{\tau\ge1}\frac{\mathbb E\bigl[\sum_{t=0}^{\tau-1}\gamma^tR_t\mid x_0=x\bigr]}{\mathbb E\bigl[\sum_{t=0}^{\tau-1}\gamma^t\mid x_0=x\bigr]},
 $$
 
-the best achievable discounted reward per unit of discounted time, over all stopping times $\tau$. The **calibration** form gives a way to compute it: for a candidate $\lambda$, solve the optimal-stopping problem of pulling the arm or retiring with $\lambda/(1-\gamma)$, and search for the $\lambda$ at which continuing and retiring tie.
+the best achievable discounted reward per unit of discounted time, over all stopping times $`\tau`$. The **calibration** form gives a way to compute it: for a candidate $`\lambda`$, solve the optimal-stopping problem of pulling the arm or retiring with $`\lambda/(1-\gamma)`$, and search for the $`\lambda`$ at which continuing and retiring tie.
 
 ```python
 import numpy as np
@@ -131,25 +131,25 @@ for a, b in [(1, 1), (2, 2), (5, 5), (20, 20), (2, 1), (1, 2), (10, 5), (5, 10)]
 # Beta( 5,10)   0.3333   0.3799   0.0466
 ```
 
-An arm with a uniform prior has index 0.703 at $\gamma=0.9$, much more than its expected reward of 0.5: the option to keep pulling a lucky arm and abandon an unlucky one is worth an **exploration bonus** of 0.2 per step. The bonus shrinks as observations accumulate, from 0.20 with no data to 0.02 with 38 observations, and it is larger for more uncertain arms: Beta(1,2), with mean 1/3 and three pseudo-observations, has a bonus of 0.17, while Beta(5,10), with the same mean and fifteen, has 0.05. The index behaves like an upper confidence bound derived from first principles, without any concentration inequality.
+An arm with a uniform prior has index 0.703 at $`\gamma=0.9`$, much more than its expected reward of 0.5: the option to keep pulling a lucky arm and abandon an unlucky one is worth an **exploration bonus** of 0.2 per step. The bonus shrinks as observations accumulate, from 0.20 with no data to 0.02 with 38 observations, and it is larger for more uncertain arms: Beta(1,2), with mean 1/3 and three pseudo-observations, has a bonus of 0.17, while Beta(5,10), with the same mean and fifteen, has 0.05. The index behaves like an upper confidence bound derived from first principles, without any concentration inequality.
 
 <img src="sources/images/rl-bandit-gittins.png" alt="rl-bandit-gittins" width="880">
 
-*Left: the Gittins exploration bonus, index minus posterior mean, for a Bernoulli arm whose posterior mean is 0.5, as the number of prior-plus-observed pulls grows, for four discount factors. For a patient player ($\gamma=0.99$, effective horizon 100) the bonus decays at first roughly like $1/\sqrt n$, the rate of a confidence bound, and more steeply as $n$ approaches the effective horizon; once the number of observations exceeds the effective horizon it decays like $1/n$, since information that can only be used for a few more steps is worth little. Right: the index as a function of the posterior mean after ten pseudo-observations. With $\gamma=0.5$ the index is nearly the mean, because a myopic player gains little from learning; with $\gamma=0.99$ even an arm with mean 0.1 has index 0.235.*
+*Left: the Gittins exploration bonus, index minus posterior mean, for a Bernoulli arm whose posterior mean is 0.5, as the number of prior-plus-observed pulls grows, for four discount factors. For a patient player ($`\gamma=0.99`$, effective horizon 100) the bonus decays at first roughly like $`1/\sqrt n`$, the rate of a confidence bound, and more steeply as $`n`$ approaches the effective horizon; once the number of observations exceeds the effective horizon it decays like $`1/n`$, since information that can only be used for a few more steps is worth little. Right: the index as a function of the posterior mean after ten pseudo-observations. With $`\gamma=0.5`$ the index is nearly the mean, because a myopic player gains little from learning; with $`\gamma=0.99`$ even an arm with mean 0.1 has index 0.235.*
 
-The index theorem ([Appendix A](#block-rl04-appendix-a)) is one of the most elegant results in the field, and it has clear limits. It needs discounting, or its equivalent; for a finite horizon the optimal policy is not an index policy, although indices remain good heuristics. It needs arms that do not change while they are not played; for **restless bandits**, where they do, Whittle's index is a heuristic and the problem is intractable in general ([Papadimitriou and Tsitsiklis, 1999](https://doi.org/10.1287/moor.24.2.293)). It fails with switching costs, with correlated arms, and when several arms can be played at once. And like any Bayesian procedure it is only as good as its prior; with a discount it deliberately stops caring about the distant future, so over a run much longer than $1/(1-\gamma)$ it may commit to an arm too early.
+The index theorem ([Appendix A](#block-rl04-appendix-a)) is one of the most elegant results in the field, and it has clear limits. It needs discounting, or its equivalent; for a finite horizon the optimal policy is not an index policy, although indices remain good heuristics. It needs arms that do not change while they are not played; for **restless bandits**, where they do, Whittle's index is a heuristic and the problem is intractable in general ([Papadimitriou and Tsitsiklis, 1999](https://doi.org/10.1287/moor.24.2.293)). It fails with switching costs, with correlated arms, and when several arms can be played at once. And like any Bayesian procedure it is only as good as its prior; with a discount it deliberately stops caring about the distant future, so over a run much longer than $`1/(1-\gamma)`$ it may commit to an arm too early.
 
 ## <a id="adversarial-bandits"></a>Adversarial bandits
 
 ### <a id="regret-against-an-adversary"></a>Regret against an adversary
 
-The stochastic model assumes each arm's rewards are independent draws from a fixed distribution. In many applications, from routing packets to playing games against other learners, that assumption is doubtful. The **adversarial bandit** drops it: an adversary fixes a table of rewards $x_t(a)\in[0,1]$ for every step and arm before play begins, possibly with full knowledge of the learner's algorithm but not of its random choices (an **oblivious** adversary), and the learner sees only the reward of the arm it pulls. Since no arm need be good throughout, regret is measured against the **best fixed arm in hindsight**,
+The stochastic model assumes each arm's rewards are independent draws from a fixed distribution. In many applications, from routing packets to playing games against other learners, that assumption is doubtful. The **adversarial bandit** drops it: an adversary fixes a table of rewards $`x_t(a)\in[0,1]`$ for every step and arm before play begins, possibly with full knowledge of the learner's algorithm but not of its random choices (an **oblivious** adversary), and the learner sees only the reward of the arm it pulls. Since no arm need be good throughout, regret is measured against the **best fixed arm in hindsight**,
 
 $$
 \mathcal R_T=\max_a\sum_{t=1}^Tx_t(a)-\mathbb E\Bigl[\sum_{t=1}^Tx_t(A_t)\Bigr],
 $$
 
-with the expectation over the learner's own randomization. This is the external regret of AI chapter 15, where the multiplicative-weights (Hedge) algorithm achieved $O(\sqrt{T\ln k})$ with **full information**, observing the payoffs of all actions after every round. With **bandit feedback**, only the chosen arm's payoff is seen.
+with the expectation over the learner's own randomization. This is the external regret of AI chapter 15, where the multiplicative-weights (Hedge) algorithm achieved $`O(\sqrt{T\ln k})`$ with **full information**, observing the payoffs of all actions after every round. With **bandit feedback**, only the chosen arm's payoff is seen.
 
 ### <a id="why-deterministic-algorithms-fail"></a>Why deterministic algorithms fail
 
@@ -214,43 +214,43 @@ print(f"stochastic arms (means 0.6, 0.5): regret UCB1 {np.mean(ucb_r):.0f}, Exp3
 # stochastic arms (means 0.6, 0.5): regret UCB1 83, Exp3 92
 ```
 
-UCB1 collects nothing, while the best fixed arm collects half the rewards: regret 5,000 in 10,000 steps. A randomized algorithm cannot be predicted this way. Exp3, described next, loses only 27 against the best arm, well within its guarantee, and Thompson sampling, at 52, also stays within it on this particular table, although, unlike Exp3, it has no guarantee against every table. The last line shows the price of that robustness: on a stochastic problem, Exp3's regret grows like $\sqrt T$ rather than $\ln T$, and it loses a little to UCB1.
+UCB1 collects nothing, while the best fixed arm collects half the rewards: regret 5,000 in 10,000 steps. A randomized algorithm cannot be predicted this way. Exp3, described next, loses only 27 against the best arm, well within its guarantee, and Thompson sampling, at 52, also stays within it on this particular table, although, unlike Exp3, it has no guarantee against every table. The last line shows the price of that robustness: on a stochastic problem, Exp3's regret grows like $`\sqrt T`$ rather than $`\ln T`$, and it loses a little to UCB1.
 
 ### <a id="exponential-weights-with-bandit-feedback-exp3"></a>Exponential weights with bandit feedback: Exp3
 
-**Exp3**, for exponential weights for exploration and exploitation ([Auer et al., 2002](https://doi.org/10.1137/S0097539701398375)), runs Hedge on *estimated* reward vectors. At each step it samples $A_t$ from
+**Exp3**, for exponential weights for exploration and exploitation ([Auer et al., 2002](https://doi.org/10.1137/S0097539701398375)), runs Hedge on *estimated* reward vectors. At each step it samples $`A_t`$ from
 
 $$
 p_t(a)=\frac{\exp\bigl(\eta\hat S_{t-1}(a)\bigr)}{\sum_b\exp\bigl(\eta\hat S_{t-1}(b)\bigr)},\qquad\hat S_t(a)=\sum_{s\le t}\hat x_s(a),
 $$
 
-and builds the estimates by **importance weighting** the observed reward: $\hat x_t(a)=x_t(a)\mathbb 1[A_t=a]/p_t(a)$, or, in the variant analyzed in the code and in [Appendix B](#block-rl04-appendix-b), the same estimate applied to the loss $1-x_t(a)$. The estimate is unbiased for every arm, observed or not: $\mathbb E[\hat x_t(a)]=p_t(a)\cdot x_t(a)/p_t(a)=x_t(a)$. Its variance is large for arms with small probability, and the analysis balances this variance against the learning rate. For the loss-based variant, with $\eta=\sqrt{2\ln k/(Tk)}$, the regret satisfies
+and builds the estimates by **importance weighting** the observed reward: $`\hat x_t(a)=x_t(a)\mathbb 1[A_t=a]/p_t(a)`$, or, in the variant analyzed in the code and in [Appendix B](#block-rl04-appendix-b), the same estimate applied to the loss $`1-x_t(a)`$. The estimate is unbiased for every arm, observed or not: $`\mathbb E[\hat x_t(a)]=p_t(a)\cdot x_t(a)/p_t(a)=x_t(a)`$. Its variance is large for arms with small probability, and the analysis balances this variance against the learning rate. For the loss-based variant, with $`\eta=\sqrt{2\ln k/(Tk)}`$, the regret satisfies
 
 $$
 \mathcal R_T\le\sqrt{2Tk\ln k}
 $$
 
-against any oblivious adversary, which is within a factor $\sqrt{\ln k}$ of the $\Omega(\sqrt{kT})$ lower bound that holds even for stochastic problems. Importance weighting, dividing by the probability with which an action was chosen to make an estimate from one action's feedback unbiased for all, is the idea behind off-policy evaluation later in this chapter and throughout chapter 9.
+against any oblivious adversary, which is within a factor $`\sqrt{\ln k}`$ of the $`\Omega(\sqrt{kT})`$ lower bound that holds even for stochastic problems. Importance weighting, dividing by the probability with which an action was chosen to make an estimate from one action's feedback unbiased for all, is the idea behind off-policy evaluation later in this chapter and throughout chapter 9.
 
 ### <a id="high-probability-bounds-and-beyond"></a>High-probability bounds and beyond
 
-The expected regret of Exp3 is small, but its importance weights make the regret of a single run highly variable. Variants that bias the estimates slightly achieve the same order of regret with high probability: Exp3.P adds an optimistic term proportional to $1/p_t(a)$ to every estimate and mixes in uniform exploration, and Exp3-IX uses **implicit exploration**, dividing by $p_t(a)+\gamma$ instead of $p_t(a)$. Algorithms that are optimal for both regimes at once, logarithmic regret on stochastic problems and $\sqrt T$ on adversarial ones, also exist ("best of both worlds" algorithms such as Tsallis-INF). The adversarial view also connects bandits to games: when two bandit learners with high-probability no-regret guarantees (such as Exp3.P or Exp3-IX) play a zero-sum game against each other, their average strategies approach the set of Nash equilibria, as with Hedge in AI chapter 15, which is the basis of the regret-minimization methods for poker in chapter 27.
+The expected regret of Exp3 is small, but its importance weights make the regret of a single run highly variable. Variants that bias the estimates slightly achieve the same order of regret with high probability: Exp3.P adds an optimistic term proportional to $`1/p_t(a)`$ to every estimate and mixes in uniform exploration, and Exp3-IX uses **implicit exploration**, dividing by $`p_t(a)+\gamma`$ instead of $`p_t(a)`$. Algorithms that are optimal for both regimes at once, logarithmic regret on stochastic problems and $`\sqrt T`$ on adversarial ones, also exist ("best of both worlds" algorithms such as Tsallis-INF). The adversarial view also connects bandits to games: when two bandit learners with high-probability no-regret guarantees (such as Exp3.P or Exp3-IX) play a zero-sum game against each other, their average strategies approach the set of Nash equilibria, as with Hedge in AI chapter 15, which is the basis of the regret-minimization methods for poker in chapter 27.
 
 ## <a id="contextual-bandits"></a>Contextual bandits
 
 ### <a id="learning-a-policy-from-contexts"></a>Learning a policy from contexts
 
-In most applications, each decision comes with side information: the user who will see the recommendation, the patient who will receive the treatment, the query whose results will be ranked. In a **contextual bandit**, at each step the environment reveals a **context** $x_t$, the learner chooses an action $A_t$, and it observes the reward $R_t$ of that action only. The contexts are drawn independently from a fixed distribution and do not depend on the learner's actions, which distinguishes the problem from a full MDP; it is an MDP with horizon one, or equivalently a supervised learning problem in which only the label of the chosen action is revealed. The learner competes with the best **policy** $\pi:x\mapsto a$ in some class $\Pi$,
+In most applications, each decision comes with side information: the user who will see the recommendation, the patient who will receive the treatment, the query whose results will be ranked. In a **contextual bandit**, at each step the environment reveals a **context** $`x_t`$, the learner chooses an action $`A_t`$, and it observes the reward $`R_t`$ of that action only. The contexts are drawn independently from a fixed distribution and do not depend on the learner's actions, which distinguishes the problem from a full MDP; it is an MDP with horizon one, or equivalently a supervised learning problem in which only the label of the chosen action is revealed. The learner competes with the best **policy** $`\pi:x\mapsto a`$ in some class $`\Pi`$,
 
 $$
 \mathcal R_T=\max_{\pi\in\Pi}\mathbb E\Bigl[\sum_tr(x_t,\pi(x_t))\Bigr]-\mathbb E\Bigl[\sum_tR_t\Bigr].
 $$
 
-Treating each policy as an arm is hopeless when $\Pi$ is large, but **Exp4** runs exponential weights over the policies while sharing each observation among all of them through importance weighting, and achieves regret $O(\sqrt{kT\ln|\Pi|})$, depending on the number of policies only through $\ln|\Pi|$. Exp4 is not computationally feasible for rich classes, and the modern algorithms instead reduce the contextual bandit to a sequence of supervised learning problems, solved by an **oracle** for the class: first cost-sensitive classification (for example, [Agarwal et al., 2014](https://arxiv.org/abs/1402.0555)), and then plain regression, as in SquareCB ([Foster and Rakhlin, 2020](https://arxiv.org/abs/2002.04926)), which fits a regression model of the rewards and chooses each non-greedy action with probability $1/(k+\gamma(\hat y_{\text{best}}-\hat y_a))$, decreasing in its predicted gap to the best, and the greedy action with the remaining probability.
+Treating each policy as an arm is hopeless when $`\Pi`$ is large, but **Exp4** runs exponential weights over the policies while sharing each observation among all of them through importance weighting, and achieves regret $`O(\sqrt{kT\ln|\Pi|})`$, depending on the number of policies only through $`\ln|\Pi|`$. Exp4 is not computationally feasible for rich classes, and the modern algorithms instead reduce the contextual bandit to a sequence of supervised learning problems, solved by an **oracle** for the class: first cost-sensitive classification (for example, [Agarwal et al., 2014](https://arxiv.org/abs/1402.0555)), and then plain regression, as in SquareCB ([Foster and Rakhlin, 2020](https://arxiv.org/abs/2002.04926)), which fits a regression model of the rewards and chooses each non-greedy action with probability $`1/(k+\gamma(\hat y_{\text{best}}-\hat y_a))`$, decreasing in its predicted gap to the best, and the greedy action with the remaining probability.
 
 ### <a id="linear-bandits-and-linucb"></a>Linear bandits and LinUCB
 
-When the expected reward is linear in known features, $r(x,a)=\theta^\top\phi(x,a)$, or, in the **disjoint** model, $r(x,a)=\theta_a^\top x$ with a separate parameter per action, optimism can be applied to the parameters. After $t$ rounds, the **ridge regression** estimate $\hat\theta=V^{-1}\sum_s\phi_sR_s$ with $V=\lambda I+\sum_s\phi_s\phi_s^\top$ satisfies, with probability at least $1-\delta$ and for all $t$ at once,
+When the expected reward is linear in known features, $`r(x,a)=\theta^\top\phi(x,a)`$, or, in the **disjoint** model, $`r(x,a)=\theta_a^\top x`$ with a separate parameter per action, optimism can be applied to the parameters. After $`t`$ rounds, the **ridge regression** estimate $`\hat\theta=V^{-1}\sum_s\phi_sR_s`$ with $`V=\lambda I+\sum_s\phi_s\phi_s^\top`$ satisfies, with probability at least $`1-\delta`$ and for all $`t`$ at once,
 
 $$
 \|\hat\theta-\theta\|_V\le\beta_t(\delta),\qquad\beta_t=\sigma\sqrt{2\ln(1/\delta)+d\ln\bigl(1+t/(\lambda d)\bigr)}+\sqrt\lambda\,\|\theta\|,
@@ -262,11 +262,11 @@ $$
 \mathrm{UCB}(x,a)=\hat\theta^\top\phi(x,a)+\beta_t\sqrt{\phi(x,a)^\top V^{-1}\phi(x,a)},
 $$
 
-the estimate plus a bonus that is large for feature directions rarely seen. This is **LinUCB** ([Li et al., 2010](https://arxiv.org/abs/1003.0146)), usually run with the theoretical $\beta_t$ replaced by a tuned constant $\alpha$. With the theoretical radius (the OFUL algorithm of Abbasi-Yadkori et al.), the regret is $\tilde O(d\sqrt T)$, independent of the number of actions when all actions share one parameter vector; in the disjoint model the dimension is effectively $kd$. Li et al. evaluated it on logged traffic from the Yahoo! front page, choosing articles for its Today module, and found a click lift of 12.5% over a context-free bandit.
+the estimate plus a bonus that is large for feature directions rarely seen. This is **LinUCB** ([Li et al., 2010](https://arxiv.org/abs/1003.0146)), usually run with the theoretical $`\beta_t`$ replaced by a tuned constant $`\alpha`$. With the theoretical radius (the OFUL algorithm of Abbasi-Yadkori et al.), the regret is $`\tilde O(d\sqrt T)`$, independent of the number of actions when all actions share one parameter vector; in the disjoint model the dimension is effectively $`kd`$. Li et al. evaluated it on logged traffic from the Yahoo! front page, choosing articles for its Today module, and found a click lift of 12.5% over a context-free bandit.
 
 ### <a id="linear-thompson-sampling"></a>Linear Thompson sampling
 
-The Bayesian alternative samples a parameter from an approximate posterior, $\tilde\theta\sim\mathcal N(\hat\theta,v^2V^{-1})$, and acts greedily with respect to it ([Agrawal and Goyal, 2013](https://proceedings.mlr.press/v28/agrawal13.html)). It explores in the same directions as LinUCB, those with large $\phi^\top V^{-1}\phi$, but by randomization rather than by optimism. The code compares both, ε-greedy, and a context-free UCB1 on 50 random linear problems with five-dimensional contexts and five actions.
+The Bayesian alternative samples a parameter from an approximate posterior, $`\tilde\theta\sim\mathcal N(\hat\theta,v^2V^{-1})`$, and acts greedily with respect to it ([Agrawal and Goyal, 2013](https://proceedings.mlr.press/v28/agrawal13.html)). It explores in the same directions as LinUCB, those with large $`\phi^\top V^{-1}\phi`$, but by randomization rather than by optimism. The code compares both, ε-greedy, and a context-free UCB1 on 50 random linear problems with five-dimensional contexts and five actions.
 
 ```python
 import numpy as np
@@ -347,11 +347,11 @@ Linear models rarely describe rewards exactly, and several directions extend the
 
 ### <a id="off-policy-evaluation"></a>Off-policy evaluation
 
-A deployed system that has chosen actions for millions of contexts leaves a log of tuples $(x_i,a_i,p_i,r_i)$, where $p_i=\mu(a_i\mid x_i)$ is the **propensity** with which the **logging policy** $\mu$ chose the action. Before deploying a new policy $\pi$, one wants to know its value $V(\pi)=\mathbb E_x[r(x,\pi(x))]$, but the log only records rewards for the actions $\mu$ took. Three families of estimators answer the question, each with a characteristic weakness.
+A deployed system that has chosen actions for millions of contexts leaves a log of tuples $`(x_i,a_i,p_i,r_i)`$, where $`p_i=\mu(a_i\mid x_i)`$ is the **propensity** with which the **logging policy** $`\mu`$ chose the action. Before deploying a new policy $`\pi`$, one wants to know its value $`V(\pi)=\mathbb E_x[r(x,\pi(x))]`$, but the log only records rewards for the actions $`\mu`$ took. Three families of estimators answer the question, each with a characteristic weakness.
 
-- The **direct method** fits a reward model $\hat r(x,a)$ to the log and averages its predictions for the target's actions, $\hat V_{\text{DM}}=\frac1n\sum_i\hat r(x_i,\pi(x_i))$. Its variance is low, but it inherits the model's bias, which is largest exactly where the target policy acts differently from the logging policy and the log has little data.
-- **Inverse propensity scoring** (IPS) reweights the logged rewards, $\hat V_{\text{IPS}}=\frac1n\sum_iw_ir_i$ with $w_i=\pi(a_i\mid x_i)/p_i$. It is unbiased whenever $\mu$ gives positive probability to every action $\pi$ might take (exercise 4.6), and its variance grows with the size of the weights, that is, with the mismatch between the policies. **Self-normalized IPS** divides by $\sum_iw_i$ instead of $n$, trading a small bias for much lower variance, and **clipping** the weights does the same more crudely.
-- The **doubly robust** estimator ([Dudík, Langford, and Li, 2011](https://arxiv.org/abs/1103.4601)) uses the model as a control variate: $\hat V_{\text{DR}}=\frac1n\sum_i\bigl[\hat r(x_i,\pi(x_i))+w_i\bigl(r_i-\hat r(x_i,a_i)\bigr)\bigr]$. It is unbiased if the propensities are correct, whatever the model, and it has low variance when the model is good.
+- The **direct method** fits a reward model $`\hat r(x,a)`$ to the log and averages its predictions for the target's actions, $`\hat V_{\text{DM}}=\frac1n\sum_i\hat r(x_i,\pi(x_i))`$. Its variance is low, but it inherits the model's bias, which is largest exactly where the target policy acts differently from the logging policy and the log has little data.
+- **Inverse propensity scoring** (IPS) reweights the logged rewards, $`\hat V_{\text{IPS}}=\frac1n\sum_iw_ir_i`$ with $`w_i=\pi(a_i\mid x_i)/p_i`$. It is unbiased whenever $`\mu`$ gives positive probability to every action $`\pi`$ might take (exercise 4.6), and its variance grows with the size of the weights, that is, with the mismatch between the policies. **Self-normalized IPS** divides by $`\sum_iw_i`$ instead of $`n`$, trading a small bias for much lower variance, and **clipping** the weights does the same more crudely.
+- The **doubly robust** estimator ([Dudík, Langford, and Li, 2011](https://arxiv.org/abs/1103.4601)) uses the model as a control variate: $`\hat V_{\text{DR}}=\frac1n\sum_i\bigl[\hat r(x_i,\pi(x_i))+w_i\bigl(r_i-\hat r(x_i,a_i)\bigr)\bigr]`$. It is unbiased if the propensities are correct, whatever the model, and it has low variance when the model is good.
 
 ```python
 import numpy as np
@@ -425,18 +425,18 @@ Lab 2 builds a contextual bandit from a digit-classification dataset, compares L
 
 ### <a id="exercise-4-1-properties-of-the-gittins-index"></a>Exercise 4.1 — Properties of the Gittins index
 
-(a) Show that the Gittins index of an arm is at least its posterior mean. (b) Show that as $\gamma\to0$ the index tends to the posterior mean. (c) Using the calibration code, find the index of a Beta(1,1) arm for $\gamma=0.5$ and $0.99$, and explain the difference.
+(a) Show that the Gittins index of an arm is at least its posterior mean. (b) Show that as $`\gamma\to0`$ the index tends to the posterior mean. (c) Using the calibration code, find the index of a Beta(1,1) arm for $`\gamma=0.5`$ and $`0.99`$, and explain the difference.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Taking $\tau=1$ in the supremum gives the ratio $\mathbb E[R_0]/1$, the posterior mean, so the supremum is at least that.
+(a) Taking $`\tau=1`$ in the supremum gives the ratio $`\mathbb E[R_0]/1`$, the posterior mean, so the supremum is at least that.
 
-(b) For any $\tau\ge1$, the numerator is $\mathbb E[R_0]+O(\gamma)$ and the denominator $1+O(\gamma)$, uniformly in $\tau$ since rewards are bounded, so every ratio, and the supremum, tends to $\mathbb E[R_0]$. A myopic player values only the next reward and has no use for information.
+(b) For any $`\tau\ge1`$, the numerator is $`\mathbb E[R_0]+O(\gamma)`$ and the denominator $`1+O(\gamma)`$, uniformly in $`\tau`$ since rewards are bounded, so every ratio, and the supremum, tends to $`\mathbb E[R_0]`$. A myopic player values only the next reward and has no use for information.
 
-(c) Changing the discount factor in the calibration code gives 0.559 for $\gamma=0.5$ and 0.870 for $\gamma=0.99$ (with a truncation depth of about 2,000 for the latter), against 0.703 for $\gamma=0.9$; the first points of the figure's left panel show the bonuses for $\gamma=0.9$ and $0.99$. A patient player can exploit a good arm for a long time after discovering it, so the option value of trying an unknown arm, the potential upside of $\mu$ near 1, is worth far more when the future counts.
+(c) Changing the discount factor in the calibration code gives 0.559 for $`\gamma=0.5`$ and 0.870 for $`\gamma=0.99`$ (with a truncation depth of about 2,000 for the latter), against 0.703 for $`\gamma=0.9`$; the first points of the figure's left panel show the bonuses for $`\gamma=0.9`$ and $`0.99`$. A patient player can exploit a good arm for a long time after discovering it, so the option value of trying an unknown arm, the potential upside of $`\mu`$ near 1, is worth far more when the future counts.
 
 </details>
 
@@ -490,46 +490,46 @@ for T in [10, 20, 40]:
 # T = 40: Bayesian regret  Bayes-optimal 1.220, greedy 1.443, Thompson 1.926
 ```
 
-The Bayes-optimal regret grows slowly with the horizon (0.65, 0.90, 1.22). Greedy play is nearly optimal for $T=10$ but falls further behind as $T$ grows: without exploration, it sometimes settles on the worse arm after an unlucky start and never corrects itself, which costs more the longer the run, so its regret eventually grows linearly. Thompson sampling is worse than both at these horizons, but it never stops exploring, so its regret keeps growing sublinearly and it overtakes greedy play at longer horizons. The Bayes-optimal strategy tunes its exploration to the remaining horizon, exploring early and exploiting late, which neither heuristic does.
+The Bayes-optimal regret grows slowly with the horizon (0.65, 0.90, 1.22). Greedy play is nearly optimal for $`T=10`$ but falls further behind as $`T`$ grows: without exploration, it sometimes settles on the worse arm after an unlucky start and never corrects itself, which costs more the longer the run, so its regret eventually grows linearly. Thompson sampling is worse than both at these horizons, but it never stops exploring, so its regret keeps growing sublinearly and it overtakes greedy play at longer horizons. The Bayes-optimal strategy tunes its exploration to the remaining horizon, exploring early and exploiting late, which neither heuristic does.
 
 </details>
 
 
 ### <a id="exercise-4-3-the-exp3-estimator"></a>Exercise 4.3 — The Exp3 estimator
 
-(a) Show that the importance-weighted loss estimate $\hat y_t(a)=\mathbb 1[A_t=a]\,y_t(a)/p_t(a)$ is unbiased. (b) Show that $\mathbb E\bigl[\sum_ap_t(a)\hat y_t(a)^2\bigr]=\sum_ay_t(a)^2\le k$ for losses in $[0,1]$. (c) Where does this second moment enter the regret bound?
+(a) Show that the importance-weighted loss estimate $`\hat y_t(a)=\mathbb 1[A_t=a]\,y_t(a)/p_t(a)`$ is unbiased. (b) Show that $`\mathbb E\bigl[\sum_ap_t(a)\hat y_t(a)^2\bigr]=\sum_ay_t(a)^2\le k`$ for losses in $`[0,1]`$. (c) Where does this second moment enter the regret bound?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Conditional on the past, $\mathbb E[\hat y_t(a)]=p_t(a)\cdot y_t(a)/p_t(a)+(1-p_t(a))\cdot0=y_t(a)$.
+(a) Conditional on the past, $`\mathbb E[\hat y_t(a)]=p_t(a)\cdot y_t(a)/p_t(a)+(1-p_t(a))\cdot0=y_t(a)`$.
 
-(b) $\hat y_t(a)^2=\mathbb 1[A_t=a]y_t(a)^2/p_t(a)^2$, so $\mathbb E[p_t(a)\hat y_t(a)^2]=p_t(a)\cdot p_t(a)\,y_t(a)^2/p_t(a)^2=y_t(a)^2$. Summing over arms gives at most $k$.
+(b) $`\hat y_t(a)^2=\mathbb 1[A_t=a]y_t(a)^2/p_t(a)^2`$, so $`\mathbb E[p_t(a)\hat y_t(a)^2]=p_t(a)\cdot p_t(a)\,y_t(a)^2/p_t(a)^2=y_t(a)^2`$. Summing over arms gives at most $`k`$.
 
-(c) The exponential-weights analysis of [Appendix B](#block-rl04-appendix-b) bounds the regret by $\ln k/\eta+(\eta/2)\sum_t\mathbb E[\sum_ap_t(a)\hat y_t(a)^2]$. With full information the second term would be at most $\eta T/2$; with bandit feedback, the variance of the estimates multiplies it by $k$, giving $\ln k/\eta+\eta Tk/2$ and, at the best $\eta$, $\sqrt{2Tk\ln k}$. The factor $k$ is the price of seeing one arm's reward instead of all of them, and the minimax lower bound shows it cannot be avoided.
+(c) The exponential-weights analysis of [Appendix B](#block-rl04-appendix-b) bounds the regret by $`\ln k/\eta+(\eta/2)\sum_t\mathbb E[\sum_ap_t(a)\hat y_t(a)^2]`$. With full information the second term would be at most $`\eta T/2`$; with bandit feedback, the variance of the estimates multiplies it by $`k`$, giving $`\ln k/\eta+\eta Tk/2`$ and, at the best $`\eta`$, $`\sqrt{2Tk\ln k}`$. The factor $`k`$ is the price of seeing one arm's reward instead of all of them, and the minimax lower bound shows it cannot be avoided.
 
 </details>
 
 
 ### <a id="exercise-4-4-randomization-is-necessary"></a>Exercise 4.4 — Randomization is necessary
 
-Show that for every deterministic algorithm on $k$ arms there is an oblivious adversary against which its regret is at least $T(1-1/k)$.
+Show that for every deterministic algorithm on $`k`$ arms there is an oblivious adversary against which its regret is at least $`T(1-1/k)`$.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-Simulate the algorithm, feeding it the table as it is being built: at each step, compute the arm $a_t$ it will choose given the rewards it has seen so far, which are determined because the algorithm is deterministic, and set $x_t(a_t)=0$ and $x_t(b)=1$ for $b\ne a_t$. The algorithm collects 0 in total. Each step gives reward 1 to $k-1$ arms, so the total reward of all arms is $T(k-1)$ and the best arm collects at least $T(k-1)/k$. The regret is at least $T(1-1/k)$. The table is fixed before play, so the adversary is oblivious; what makes it possible is that the algorithm's choices can be predicted. A randomized algorithm's choices cannot, and the best an oblivious adversary can do against Exp3 is $O(\sqrt{Tk\ln k})$.
+Simulate the algorithm, feeding it the table as it is being built: at each step, compute the arm $`a_t`$ it will choose given the rewards it has seen so far, which are determined because the algorithm is deterministic, and set $`x_t(a_t)=0`$ and $`x_t(b)=1`$ for $`b\ne a_t`$. The algorithm collects 0 in total. Each step gives reward 1 to $`k-1`$ arms, so the total reward of all arms is $`T(k-1)`$ and the best arm collects at least $`T(k-1)/k`$. The regret is at least $`T(1-1/k)`$. The table is fixed before play, so the adversary is oblivious; what makes it possible is that the algorithm's choices can be predicted. A randomized algorithm's choices cannot, and the best an oblivious adversary can do against Exp3 is $`O(\sqrt{Tk\ln k})`$.
 
 </details>
 
 
 ### <a id="exercise-4-5-how-much-optimism-does-linucb-need"></a>Exercise 4.5 — How much optimism does LinUCB need?
 
-Run LinUCB with confidence multipliers $\alpha\in\{0,0.25,1,2,4\}$ on the chapter's linear contextual bandit. Explain why $\alpha=0$, pure greedy play on the ridge estimates, does so well here, and describe a context distribution where it would fail.
+Run LinUCB with confidence multipliers $`\alpha\in\{0,0.25,1,2,4\}`$ on the chapter's linear contextual bandit. Explain why $`\alpha=0`$, pure greedy play on the ridge estimates, does so well here, and describe a context distribution where it would fail.
 
 
 <details>
@@ -579,25 +579,25 @@ A small bonus is best; large ones waste pulls on actions whose uncertainty no lo
 
 ### <a id="exercise-4-6-unbiasedness-of-ips-and-dr"></a>Exercise 4.6 — Unbiasedness of IPS and DR
 
-(a) Show that IPS is unbiased when $\mu(a\mid x)>0$ for every action that $\pi$ may take. (b) Show that the doubly robust estimator is unbiased when the propensities are correct, for any reward model $\hat r$, and also when the reward model is correct, for any propensities. (c) What goes wrong for IPS if the logging policy never takes some action that $\pi$ takes?
+(a) Show that IPS is unbiased when $`\mu(a\mid x)>0`$ for every action that $`\pi`$ may take. (b) Show that the doubly robust estimator is unbiased when the propensities are correct, for any reward model $`\hat r`$, and also when the reward model is correct, for any propensities. (c) What goes wrong for IPS if the logging policy never takes some action that $`\pi`$ takes?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) For one logged round, $\mathbb E[w\,r\mid x]=\sum_a\mu(a\mid x)\frac{\pi(a\mid x)}{\mu(a\mid x)}r(x,a)=\sum_a\pi(a\mid x)r(x,a)$, the target's expected reward for context $x$; averaging over $x$ gives $V(\pi)$.
+(a) For one logged round, $`\mathbb E[w\,r\mid x]=\sum_a\mu(a\mid x)\frac{\pi(a\mid x)}{\mu(a\mid x)}r(x,a)=\sum_a\pi(a\mid x)r(x,a)`$, the target's expected reward for context $`x`$; averaging over $`x`$ gives $`V(\pi)`$.
 
-(b) Given $x$, $\mathbb E[w(r-\hat r(x,a))\mid x]=\sum_a\pi(a\mid x)\bigl(r(x,a)-\hat r(x,a)\bigr)$ with correct propensities, so the DR term per round has expectation $\sum_a\pi(a\mid x)\hat r(x,a)+\sum_a\pi(a\mid x)(r-\hat r)=\sum_a\pi(a\mid x)r(x,a)$. If instead $\hat r=r$, the correction term has conditional mean zero whatever the weights, and the first term is exact. Either correct component suffices: hence "doubly robust".
+(b) Given $`x`$, $`\mathbb E[w(r-\hat r(x,a))\mid x]=\sum_a\pi(a\mid x)\bigl(r(x,a)-\hat r(x,a)\bigr)`$ with correct propensities, so the DR term per round has expectation $`\sum_a\pi(a\mid x)\hat r(x,a)+\sum_a\pi(a\mid x)(r-\hat r)=\sum_a\pi(a\mid x)r(x,a)`$. If instead $`\hat r=r`$, the correction term has conditional mean zero whatever the weights, and the first term is exact. Either correct component suffices: hence "doubly robust".
 
-(c) The sum in (a) then runs only over actions with $\mu(a\mid x)>0$, and the missing actions' rewards never appear: IPS is biased, and no amount of logged data fixes it. This **support** or **overlap** condition is the basic requirement of every importance-sampling method in later chapters.
+(c) The sum in (a) then runs only over actions with $`\mu(a\mid x)>0`$, and the missing actions' rewards never appear: IPS is biased, and no amount of logged data fixes it. This **support** or **overlap** condition is the basic requirement of every importance-sampling method in later chapters.
 
 </details>
 
 
 ### <a id="exercise-4-7-when-the-logging-policy-barely-explores"></a>Exercise 4.7 — When the logging policy barely explores
 
-Rerun the chapter's off-policy evaluation with logging policies that put probability at least $f/k$ on every action, for $f=0.2$, 0.05, and 0.01, and compare the RMSE of IPS, clipped IPS, self-normalized IPS, and the doubly robust estimator.
+Rerun the chapter's off-policy evaluation with logging policies that put probability at least $`f/k`$ on every action, for $`f=0.2`$, 0.05, and 0.01, and compare the RMSE of IPS, clipped IPS, self-normalized IPS, and the doubly robust estimator.
 
 
 <details>
@@ -658,9 +658,9 @@ As exploration shrinks, the largest possible weight grows from 25 to 500 and eve
 <summary><a id="block-rl04-appendix-a"></a><b>A. The Gittins index theorem</b></summary>
 
 
-**Setting.** Arms $1,\dots,k$ have states $x_1,\dots,x_k$. Pulling arm $a$ yields a reward $R(x_a)$ and moves $x_a$ to a random new state; the other arms are frozen. The objective is $\mathbb E\sum_t\gamma^tR_t$.
+**Setting.** Arms $`1,\dots,k`$ have states $`x_1,\dots,x_k`$. Pulling arm $`a`$ yields a reward $`R(x_a)`$ and moves $`x_a`$ to a random new state; the other arms are frozen. The objective is $`\mathbb E\sum_t\gamma^tR_t`$.
 
-**Theorem** ([Gittins, 1979](https://doi.org/10.1111/j.2517-6161.1979.tb01068.x)). A policy that always pulls an arm of largest index $G(x_a)$ is optimal.
+**Theorem** ([Gittins, 1979](https://doi.org/10.1111/j.2517-6161.1979.tb01068.x)). A policy that always pulls an arm of largest index $`G(x_a)`$ is optimal.
 
 **Sketch of Weber's proof** ([Weber, 1992](https://doi.org/10.1214/aoap/1177005588)). Imagine that the player must pay a *charge* each time it pulls an arm, and consider one arm alone. Set the charge equal to the arm's current index. By the definition of the index as a calibration, the player is then indifferent between pulling and not: the arm is a fair game, whose best expected net profit is zero. Whenever the arm reaches a state whose index is below the current charge, continuing at that charge would be unprofitable, so lower the charge to the new index; the charge at each time is then the running minimum of the indices seen so far, a nonincreasing sequence called the **prevailing charge**. With these charges the arm remains a fair game: under any policy, the expected discounted reward obtained from the arm is at most the expected discounted sum of the prevailing charges paid for it, with equality for any policy that never leaves the arm idle while its index is above its prevailing charge.
 
@@ -674,19 +674,19 @@ Now for many arms: any policy's expected reward is at most the expected discount
 <summary><a id="block-rl04-appendix-b"></a><b>B. The regret of Exp3</b></summary>
 
 
-Work with losses $y_t(a)=1-x_t(a)\in[0,1]$, estimates $\hat y_t(a)=\mathbb 1[A_t=a]y_t(a)/p_t(a)\ge0$, cumulative estimates $\hat L_t(a)$, and $p_t(a)\propto e^{-\eta\hat L_{t-1}(a)}$. Let $W_t=\sum_ae^{-\eta\hat L_t(a)}$, with $W_0=k$. On one hand, for any arm $a^*$, $\ln(W_T/W_0)\ge-\eta\hat L_T(a^*)-\ln k$. On the other hand,
+Work with losses $`y_t(a)=1-x_t(a)\in[0,1]`$, estimates $`\hat y_t(a)=\mathbb 1[A_t=a]y_t(a)/p_t(a)\ge0`$, cumulative estimates $`\hat L_t(a)`$, and $`p_t(a)\propto e^{-\eta\hat L_{t-1}(a)}`$. Let $`W_t=\sum_ae^{-\eta\hat L_t(a)}`$, with $`W_0=k`$. On one hand, for any arm $`a^*`$, $`\ln(W_T/W_0)\ge-\eta\hat L_T(a^*)-\ln k`$. On the other hand,
 
 $$
 \ln\frac{W_t}{W_{t-1}}=\ln\sum_ap_t(a)e^{-\eta\hat y_t(a)}\le\ln\sum_ap_t(a)\Bigl(1-\eta\hat y_t(a)+\tfrac{\eta^2}2\hat y_t(a)^2\Bigr)\le-\eta\sum_ap_t(a)\hat y_t(a)+\frac{\eta^2}2\sum_ap_t(a)\hat y_t(a)^2,
 $$
 
-using $e^{-z}\le1-z+z^2/2$ for $z\ge0$ and $\ln(1+u)\le u$. Summing over $t$ and combining,
+using $`e^{-z}\le1-z+z^2/2`$ for $`z\ge0`$ and $`\ln(1+u)\le u`$. Summing over $`t`$ and combining,
 
 $$
 \sum_t\sum_ap_t(a)\hat y_t(a)-\hat L_T(a^*)\le\frac{\ln k}\eta+\frac\eta2\sum_t\sum_ap_t(a)\hat y_t(a)^2.
 $$
 
-Take expectations. The estimates are unbiased, so the left side becomes $\mathbb E[\sum_ty_t(A_t)]-\sum_ty_t(a^*)$, the regret against $a^*$; by exercise 4.3 the last sum has expectation at most $Tk$. Hence $\mathcal R_T\le\ln k/\eta+\eta Tk/2$, minimized at $\eta=\sqrt{2\ln k/(Tk)}$, giving $\sqrt{2Tk\ln k}$ ([Lattimore and Szepesvári](https://tor-lattimore.com/downloads/book/book.pdf), chapter 11). Using losses rather than rewards matters: it makes the estimates nonnegative, which is what the inequality $e^{-z}\le1-z+z^2/2$ requires.
+Take expectations. The estimates are unbiased, so the left side becomes $`\mathbb E[\sum_ty_t(A_t)]-\sum_ty_t(a^*)`$, the regret against $`a^*`$; by exercise 4.3 the last sum has expectation at most $`Tk`$. Hence $`\mathcal R_T\le\ln k/\eta+\eta Tk/2`$, minimized at $`\eta=\sqrt{2\ln k/(Tk)}`$, giving $`\sqrt{2Tk\ln k}`$ ([Lattimore and Szepesvári](https://tor-lattimore.com/downloads/book/book.pdf), chapter 11). Using losses rather than rewards matters: it makes the estimates nonnegative, which is what the inequality $`e^{-z}\le1-z+z^2/2`$ requires.
 
 </details>
 
@@ -696,19 +696,19 @@ Take expectations. The estimates are unbiased, so the left side becomes $\mathbb
 <summary><a id="block-rl04-appendix-c"></a><b>C. Confidence ellipsoids and the regret of LinUCB</b></summary>
 
 
-Let $R_s=\theta^\top\phi_s+\eta_s$ with $\sigma$-sub-Gaussian noise, $V_t=\lambda I+\sum_{s\le t}\phi_s\phi_s^\top$, and $\hat\theta_t=V_t^{-1}\sum_s\phi_sR_s$. Then
+Let $`R_s=\theta^\top\phi_s+\eta_s`$ with $`\sigma`$-sub-Gaussian noise, $`V_t=\lambda I+\sum_{s\le t}\phi_s\phi_s^\top`$, and $`\hat\theta_t=V_t^{-1}\sum_s\phi_sR_s`$. Then
 
 $$
 \hat\theta_t-\theta=V_t^{-1}\Bigl(\sum_s\phi_s\eta_s-\lambda\theta\Bigr),\qquad\|\hat\theta_t-\theta\|_{V_t}\le\Bigl\|\sum_s\phi_s\eta_s\Bigr\|_{V_t^{-1}}+\sqrt\lambda\|\theta\|.
 $$
 
-The first term is a **self-normalized** martingale. Its norm cannot be bounded by a fixed-design argument, because the features were chosen adaptively using the past noise; Abbasi-Yadkori, Pál, and Szepesvári proved, by a mixture-of-martingales argument, that with probability at least $1-\delta$, simultaneously for all $t$,
+The first term is a **self-normalized** martingale. Its norm cannot be bounded by a fixed-design argument, because the features were chosen adaptively using the past noise; Abbasi-Yadkori, Pál, and Szepesvári proved, by a mixture-of-martingales argument, that with probability at least $`1-\delta`$, simultaneously for all $`t`$,
 
 $$
 \Bigl\|\sum_{s\le t}\phi_s\eta_s\Bigr\|_{V_t^{-1}}^2\le2\sigma^2\ln\Bigl(\frac{\det(V_t)^{1/2}\det(\lambda I)^{-1/2}}\delta\Bigr),
 $$
 
-which with $\|\phi\|\le1$ gives the radius $\beta_t$ of the text. **Regret.** On the event that $\theta$ lies in every ellipsoid, the optimistic choice satisfies $r(x_t,a^*)\le\mathrm{UCB}(x_t,A_t)$, so the instantaneous regret is at most $2\beta_t\|\phi_t\|_{V_{t-1}^{-1}}$, twice the bonus of the chosen action. The **elliptical potential lemma** bounds the sum of squared bonuses: $\sum_t\min(1,\|\phi_t\|^2_{V_{t-1}^{-1}})\le2d\ln(1+T/(\lambda d))$, because each new feature vector increases $\ln\det V$ by $\ln(1+\|\phi_t\|^2_{V_{t-1}^{-1}})$ and $\ln\det V_T$ can grow only logarithmically in $T$. By Cauchy–Schwarz (taking $\lambda\ge1$, so that $\|\phi_t\|^2_{V_{t-1}^{-1}}\le1$ and the minimum in the lemma is inactive), the regret is at most $2\beta_T\sqrt{T\cdot2d\ln(1+T/(\lambda d))}=\tilde O(d\sqrt T)$. The same potential argument reappears in the theory of exploration with linear function approximation (chapter 30).
+which with $`\|\phi\|\le1`$ gives the radius $`\beta_t`$ of the text. **Regret.** On the event that $`\theta`$ lies in every ellipsoid, the optimistic choice satisfies $`r(x_t,a^*)\le\mathrm{UCB}(x_t,A_t)`$, so the instantaneous regret is at most $`2\beta_t\|\phi_t\|_{V_{t-1}^{-1}}`$, twice the bonus of the chosen action. The **elliptical potential lemma** bounds the sum of squared bonuses: $`\sum_t\min(1,\|\phi_t\|^2_{V_{t-1}^{-1}})\le2d\ln(1+T/(\lambda d))`$, because each new feature vector increases $`\ln\det V`$ by $`\ln(1+\|\phi_t\|^2_{V_{t-1}^{-1}})`$ and $`\ln\det V_T`$ can grow only logarithmically in $`T`$. By Cauchy–Schwarz (taking $`\lambda\ge1`$, so that $`\|\phi_t\|^2_{V_{t-1}^{-1}}\le1`$ and the minimum in the lemma is inactive), the regret is at most $`2\beta_T\sqrt{T\cdot2d\ln(1+T/(\lambda d))}=\tilde O(d\sqrt T)`$. The same potential argument reappears in the theory of exploration with linear function approximation (chapter 30).
 
 </details>
 

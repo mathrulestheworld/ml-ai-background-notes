@@ -4,7 +4,7 @@
 
 # <a id="data-sources"></a>Data sources
 
-The Generative AI code blocks and figure scripts use one small real dataset, the $8\times8$ handwritten digits bundled with scikit-learn, and synthetic distributions generated inside the code that uses them. Nothing needs to be downloaded, and the `Sources/Data` folder is empty.
+The Generative AI code blocks and figure scripts use one small real dataset, the $`8\times8`$ handwritten digits bundled with scikit-learn, and synthetic distributions generated inside the code that uses them. Nothing needs to be downloaded, and the `Sources/Data` folder is empty.
 
 ## <a id="the-digits"></a>The digits
 
@@ -13,10 +13,10 @@ The Generative AI code blocks and figure scripts use one small real dataset, the
 | Source | [Optical Recognition of Handwritten Digits](https://archive.ics.uci.edu/dataset/80/optical+recognition+of+handwritten+digits), E. Alpaydin and C. Kaynak, UCI Machine Learning Repository, 1998 |
 | License | Creative Commons Attribution 4.0 International |
 | Copy used | `sklearn.datasets.load_digits()`, the 1,797 test images of the UCI set, installed with scikit-learn |
-| Images | $8\times8$ pixels, each the count of ink pixels in a $4\times4$ block of a $32\times32$ bitmap, an integer from 0 to 16 |
+| Images | $`8\times8`$ pixels, each the count of ink pixels in a $`4\times4`$ block of a $`32\times32`$ bitmap, an integer from 0 to 16 |
 | Classes | the digits 0–9, about 180 images each |
 
-The UCI set was written by 43 people, 30 for its training part and 13 others for its test part, which is the part scikit-learn distributes; normalized bitmaps were extracted with preprocessing programs from the National Institute of Standards and Technology, and the $8\times8$ block counts reduce the dimension. It is small enough that every model in the module trains on it in seconds to minutes on one CPU core, and large enough to show the qualitative behavior of each family: sharp or blurred samples, memorization, and the effect of guidance.
+The UCI set was written by 43 people, 30 for its training part and 13 others for its test part, which is the part scikit-learn distributes; normalized bitmaps were extracted with preprocessing programs from the National Institute of Standards and Technology, and the $`8\times8`$ block counts reduce the dimension. It is small enough that every model in the module trains on it in seconds to minutes on one CPU core, and large enough to show the qualitative behavior of each family: sharp or blurred samples, memorization, and the effect of guidance.
 
 **The split.** Every chapter that holds out digits uses the same split: the images are permuted by `numpy.random.default_rng(0).permutation(1797)`, the first 1,500 form the training set, and the remaining 297 are held out.
 
@@ -24,12 +24,12 @@ The UCI set was written by 43 people, 30 for its training part and 13 others for
 
 | Form | Transformation | Used in |
 | --- | --- | --- |
-| Binarized | pixel $>7$ becomes 1, otherwise 0 | Chapters 2, 3, and 12 (MADE, VAEs, masked diffusion), whose likelihoods in bits per pixel are comparable across the three |
-| Centered in $[-1,1]$ | $x/8-1$ | Chapters 7, 10, and 11 (diffusion models) |
-| In $[0,1]$ | $x/16$ | Chapter 13 (features for the Fréchet and kernel distances) |
-| Dequantized | $(x+u)/17$ with $u$ uniform in $[0,1)$ | Chapter 13 (densities of continuous models compared in bits per pixel, adding $\log_2 17$) |
+| Binarized | pixel $`>7`$ becomes 1, otherwise 0 | Chapters 2, 3, and 12 (MADE, VAEs, masked diffusion), whose likelihoods in bits per pixel are comparable across the three |
+| Centered in $`[-1,1]`$ | $`x/8-1`$ | Chapters 7, 10, and 11 (diffusion models) |
+| In $`[0,1]`$ | $`x/16`$ | Chapter 13 (features for the Fréchet and kernel distances) |
+| Dequantized | $`(x+u)/17`$ with $`u`$ uniform in $`[0,1)`$ | Chapter 13 (densities of continuous models compared in bits per pixel, adding $`\log_2 17`$) |
 
-Classifiers trained on the training split judge samples in several chapters: logistic regression with $C=0.1$ on the scaled or binarized pixels (chapters 7, 10, 11, and 12), and a small multilayer perceptron whose hidden layer serves as a feature space (chapter 13). They are measuring instruments for the chapters' comparisons, not benchmarks.
+Classifiers trained on the training split judge samples in several chapters: logistic regression with $`C=0.1`$ on the scaled or binarized pixels (chapters 7, 10, 11, and 12), and a small multilayer perceptron whose hidden layer serves as a feature space (chapter 13). They are measuring instruments for the chapters' comparisons, not benchmarks.
 
 ## <a id="synthetic-distributions"></a>Synthetic distributions
 
@@ -38,12 +38,12 @@ The two-dimensional and one-dimensional distributions below recur across chapter
 | Distribution | Definition | Used in |
 | --- | --- | --- |
 | Two moons | `sklearn.datasets.make_moons` with noise 0.06, 3,000 points (`random_state=0`), standardized; the first 2,000 for training | Chapters 4 and 7, which compare a flow's exact likelihood with a diffusion model's bound on the same split |
-| Eight Gaussians | means on a circle of radius 2 at angles $k\pi/4$, standard deviation 0.1, weights $k/36$ for $k=1,\dots,8$ | Chapters 6, 8, 9, 10, and 13 |
-| Two-mode mixture in one dimension | $0.8\,\mathcal N(-4,0.5^2)+0.2\,\mathcal N(4,0.5^2)$ | Chapters 6, 8, 9, and 15, where exact scores, velocities, and densities are known in closed form |
+| Eight Gaussians | means on a circle of radius 2 at angles $`k\pi/4`$, standard deviation 0.1, weights $`k/36`$ for $`k=1,\dots,8`$ | Chapters 6, 8, 9, 10, and 13 |
+| Two-mode mixture in one dimension | $`0.8\,\mathcal N(-4,0.5^2)+0.2\,\mathcal N(4,0.5^2)`$ | Chapters 6, 8, 9, and 15, where exact scores, velocities, and densities are known in closed form |
 | Equal-weight ring and a point mass | eight Gaussians of standard deviation 0.05 and equal weights on the same circle, and a single point | Chapter 5 (adversarial training); chapter 6's first score-matching code uses equal weights with standard deviation 0.1 |
 | Points on a circle | uniform on the circle of radius 2 | Chapter 15 (memorization and generalization) |
-| Gaussian random fields | 128 by 128 images with power spectrum proportional to $1/k^2$ | Chapter 15 (the spectral view of noising) |
-| Lorenz system | the equations of Lorenz (1963) with $\sigma=10$, $\rho=28$, $\beta=8/3$, integrated by the fourth-order Runge–Kutta method with step 0.01 | Chapter 14 (ensemble forecasts) |
-| Demonstrations around an obstacle | lateral positions uniform in $[-1,1]$, actions $\pm1$ plus noise, either sign within 0.3 of the center | Chapter 14 (diffusion policies) |
+| Gaussian random fields | 128 by 128 images with power spectrum proportional to $`1/k^2`$ | Chapter 15 (the spectral view of noising) |
+| Lorenz system | the equations of Lorenz (1963) with $`\sigma=10`$, $`\rho=28`$, $`\beta=8/3`$, integrated by the fourth-order Runge–Kutta method with step 0.01 | Chapter 14 (ensemble forecasts) |
+| Demonstrations around an obstacle | lateral positions uniform in $`[-1,1]`$, actions $`\pm1`$ plus noise, either sign within 0.3 of the center | Chapter 14 (diffusion policies) |
 
 Because the synthetic distributions are known exactly, several chapters compare learned models with the exact answer: the exact score and the probability-flow likelihood in chapter 8, the exact marginal velocity in chapter 9, the exact posterior for inverse problems in chapter 10, and the tilted distribution that guidance is often assumed to sample in chapter 10.

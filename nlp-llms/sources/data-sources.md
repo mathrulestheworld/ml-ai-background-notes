@@ -35,7 +35,7 @@ Most chapters split the file by position. The first 90% (1,003,854 characters) i
 | `state_dict` | The weights of the `CharLM` class defined in chapter 4's figure script and in the code blocks that load it: learned token and position embeddings, four pre-norm transformer blocks with GELU feedforward layers four times the width, a final layer norm, and an output layer tied to the token embeddings; 818,048 parameters |
 | `curves` | Training and held-out loss logged during training, which the chapter 4 figure plots |
 
-The model was trained for 4,000 steps of 32 windows of 128 characters with AdamW (weight decay 0.1) and a one-cycle learning-rate schedule peaking at $2\times10^{-3}$. It reaches 2.19 bits per character on the held-out text, against 2.25 for the best Kneser–Ney model of chapter 2. Chapter 5 fine-tunes it on *The Tempest*, chapter 8 decodes from it, and chapter 10 adapts it with LoRA and task vectors.
+The model was trained for 4,000 steps of 32 windows of 128 characters with AdamW (weight decay 0.1) and a one-cycle learning-rate schedule peaking at $`2\times10^{-3}`$. It reaches 2.19 bits per character on the held-out text, against 2.25 for the best Kneser–Ney model of chapter 2. Chapter 5 fine-tunes it on *The Tempest*, chapter 8 decodes from it, and chapter 10 adapts it with LoRA and task vectors.
 
 The file can be inspected without the model class:
 

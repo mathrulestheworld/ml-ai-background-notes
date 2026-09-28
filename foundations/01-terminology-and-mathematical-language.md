@@ -52,7 +52,7 @@ The ten outputs form a probability distribution over the labels: they are nonneg
 
 *The network gives probability 1.00 to the clear 9. The middle image, recorded as a 9, receives 0.64 for 9 and 0.36 for 3; the right image, recorded as a 3, receives 0.74 for 3 and 0.26 for 5. The network has the architecture above but was trained separately, and all three images were held out from training.*
 
-These are the network's estimates for an $8\times8$ image, not the fraction of people who would read it each way. Whether predicted probabilities agree with observed frequencies is the question of calibration. Simpler methods, such as nearest neighbors, recognize these small images about as well as the network; [Appendix A](#block-terminology-appendix-a) compares them and summarizes why deep networks prevailed on harder images.
+These are the network's estimates for an $`8\times8`$ image, not the fraction of people who would read it each way. Whether predicted probabilities agree with observed frequencies is the question of calibration. Simpler methods, such as nearest neighbors, recognize these small images about as well as the network; [Appendix A](#block-terminology-appendix-a) compares them and summarizes why deep networks prevailed on harder images.
 
 ## <a id="learning-from-experience"></a>Learning from experience
 
@@ -82,7 +82,7 @@ Supervised learning (SL) learns an input-output relationship from [labeled data]
 
 The goal of supervised learning is for the trained model to accurately predict the output for new, unseen data. This requires the learned model to effectively *generalize* beyond its training examples. Its *generalization error* is its expected loss on new examples from the relevant distribution; held-out data is used to estimate this quantity.
 
-Supervised learning is commonly used for tasks such as classification (predicting a category, e.g., spam or not spam), regression (predicting a numerical value, e.g., a house price), and conditional [density estimation](https://en.wikipedia.org/wiki/Density_estimation) (predicting the probability distribution of the output given an input, denoted by $p(y \mid x)$).
+Supervised learning is commonly used for tasks such as classification (predicting a category, e.g., spam or not spam), regression (predicting a numerical value, e.g., a house price), and conditional [density estimation](https://en.wikipedia.org/wiki/Density_estimation) (predicting the probability distribution of the output given an input, denoted by $`p(y \mid x)`$).
 
 #### <a id="unsupervised-learning"></a>Unsupervised learning
 
@@ -144,7 +144,7 @@ $$
 D=\{(x_i,y_i)\}_{i=1}^{n},
 $$
 
-where $x_i\in\mathcal X$ is the input representation and $y_i\in\mathcal Y$ is its target. Here $D$ is an indexed collection: repeated examples are allowed. The input must contain only information available at prediction time. An unlabeled dataset contains the inputs without supplied targets. A task formulation determines what belongs in these spaces and what counts as a useful output.
+where $`x_i\in\mathcal X`$ is the input representation and $`y_i\in\mathcal Y`$ is its target. Here $`D`$ is an indexed collection: repeated examples are allowed. The input must contain only information available at prediction time. An unlabeled dataset contains the inputs without supplied targets. A task formulation determines what belongs in these spaces and what counts as a useful output.
 
 ### <a id="tasks"></a>Tasks
 
@@ -162,7 +162,7 @@ Tasks and learning paradigms describe different aspects of a problem. Classifica
 
 #### <a id="classification"></a>Classification
 
-In the iris example, the input is a pair of measurements, $x=(x_1,x_2)^\top$, and the target is one of three species. A classifier partitions the input space into regions assigned to different labels. Its **decision boundary** separates regions where its predicted label changes.
+In the iris example, the input is a pair of measurements, $`x=(x_1,x_2)^\top`$, and the target is one of three species. A classifier partitions the input space into regions assigned to different labels. Its **decision boundary** separates regions where its predicted label changes.
 
 <img src="sources/images/terminology-classification-two-features.png" alt="terminology-classification-two-features" width="480">
 
@@ -180,39 +180,39 @@ Both examples use numerical inputs. The distinction lies in the required output:
 
 #### <a id="density-estimation"></a>Density estimation
 
-Density estimation describes how observations are spread out, rather than predicting one value. The [Old Faithful geyser](https://en.wikipedia.org/wiki/Old_Faithful) in Yellowstone National Park erupts at irregular intervals. A classic dataset records 272 waiting times between eruptions. A [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation), a smoothed version of the histogram, turns them into an estimated density $\hat p(w)$ for the waiting time $w$.
+Density estimation describes how observations are spread out, rather than predicting one value. The [Old Faithful geyser](https://en.wikipedia.org/wiki/Old_Faithful) in Yellowstone National Park erupts at irregular intervals. A classic dataset records 272 waiting times between eruptions. A [kernel density estimate](https://en.wikipedia.org/wiki/Kernel_density_estimation), a smoothed version of the histogram, turns them into an estimated density $`\hat p(w)`$ for the waiting time $`w`$.
 
 <img src="sources/images/terminology-density-old-faithful.png" alt="terminology-density-old-faithful" width="720">
 
 *Left: 272 waiting times between eruptions, with a kernel density estimate; the dashed line marks the mean. Right: separate estimates for waits after eruptions shorter and longer than 3 minutes, each enclosing area one. Data: R's `faithful` dataset ([Härdle, 1991](https://doi.org/10.1007/978-1-4612-4432-5); [Azzalini and Bowman, 1990](https://doi.org/10.2307/2347385)).*
 
-The estimated density answers questions that a single predicted number cannot. The probability of waiting between 50 and 60 minutes is the area under $\hat p$ over that interval. The density has two peaks, near 54 and 80 minutes. The mean wait, 71 minutes, falls between them: only 17% of the recorded waits lie between 66 and 76 minutes, compared with 43% between 75 and 85. Conditioning on the length of the previous eruption separates the two groups. After a short eruption, 90% of the recorded waits lie between 46 and 64 minutes; after a long one, between 70 and 90 minutes. Estimating $p(w\mid\text{previous eruption length})$ is **conditional density estimation**. The eruption forecasts posted for visitors use the same relationship: the predicted wait depends on the length of the previous eruption.
+The estimated density answers questions that a single predicted number cannot. The probability of waiting between 50 and 60 minutes is the area under $`\hat p`$ over that interval. The density has two peaks, near 54 and 80 minutes. The mean wait, 71 minutes, falls between them: only 17% of the recorded waits lie between 66 and 76 minutes, compared with 43% between 75 and 85. Conditioning on the length of the previous eruption separates the two groups. After a short eruption, 90% of the recorded waits lie between 46 and 64 minutes; after a long one, between 70 and 90 minutes. Estimating $`p(w\mid\text{previous eruption length})`$ is **conditional density estimation**. The eruption forecasts posted for visitors use the same relationship: the predicted wait depends on the length of the previous eruption.
 
 Density estimation has other common uses:
 
 - **Anomaly detection.** Fit a density to observations from normal operation, then flag new observations to which it assigns very low density, such as unusual card transactions or sensor readings.
-- **Generating new examples.** A model of a distribution can be sampled. A language model is a density estimator for text: it assigns a probability $p(x_1,\ldots,x_T)=\prod_{t=1}^Tp(x_t\mid x_1,\ldots,x_{t-1})$ to a token sequence, and generating text means sampling from it.
-- **Classification through class-conditional densities.** Estimating $p(x\mid y)$ for each class and combining the estimates with Bayes' rule gives a classifier; this is the generative approach described under models below.
+- **Generating new examples.** A model of a distribution can be sampled. A language model is a density estimator for text: it assigns a probability $`p(x_1,\ldots,x_T)=\prod_{t=1}^Tp(x_t\mid x_1,\ldots,x_{t-1})`$ to a token sequence, and generating text means sampling from it.
+- **Classification through class-conditional densities.** Estimating $`p(x\mid y)`$ for each class and combining the estimates with Bayes' rule gives a classifier; this is the generative approach described under models below.
 
 Kernel density estimation is developed in Smoothing, Density Estimation, and Basis Expansions; density models for images and text are the subject of the Generative AI module.
 
 ### <a id="models-and-model-classes"></a>Models and model classes
 
-A **predictive model** represents a relationship between inputs and outputs. A prediction rule is a function $f:\mathcal X\to\widehat{\mathcal Y}$, where $\widehat{\mathcal Y}$ is the prediction space. This may differ from the target space $\mathcal Y$: a binary target lies in $\{0,1\}$, while a predicted probability lies in $[0,1]$. A probabilistic model can specify a conditional distribution $p_\theta(y\mid x)$. A [statistical model](https://en.wikipedia.org/wiki/Statistical_model) has the more specific meaning of a family of probability distributions together with assumptions about the data.
+A **predictive model** represents a relationship between inputs and outputs. A prediction rule is a function $`f:\mathcal X\to\widehat{\mathcal Y}`$, where $`\widehat{\mathcal Y}`$ is the prediction space. This may differ from the target space $`\mathcal Y`$: a binary target lies in $`\{0,1\}`$, while a predicted probability lies in $`[0,1]`$. A probabilistic model can specify a conditional distribution $`p_\theta(y\mid x)`$. A [statistical model](https://en.wikipedia.org/wiki/Statistical_model) has the more specific meaning of a family of probability distributions together with assumptions about the data.
 
-A **model class**, or hypothesis space, is the collection of candidate models considered by a learning procedure. Writing $\theta$ for the model parameters and $\Theta$ for their allowed values, a parameterized family is
+A **model class**, or hypothesis space, is the collection of candidate models considered by a learning procedure. Writing $`\theta`$ for the model parameters and $`\Theta`$ for their allowed values, a parameterized family is
 
 $$
 \mathcal H=\{f_\theta:\theta\in\Theta\}.
 $$
 
-For example, a one-feature linear model family is $f_{a,b}(x)=a+bx$, where $a$ is the intercept and $b$ is the slope. Specifying the family leaves $a$ and $b$ open. Fitting the model produces values $\hat a,\hat b$ and therefore a particular **trained model** $f_{\hat a,\hat b}$. With a vector input, the same idea becomes $f_\theta(x)=w^\top x+b_0$, with $\theta=(w,b_0)$. These are affine functions, conventionally included under linear models. The word model is often used for both the family and the fitted instance; the distinction matters when discussing what is chosen before training and what is learned from data.
+For example, a one-feature linear model family is $`f_{a,b}(x)=a+bx`$, where $`a`$ is the intercept and $`b`$ is the slope. Specifying the family leaves $`a`$ and $`b`$ open. Fitting the model produces values $`\hat a,\hat b`$ and therefore a particular **trained model** $`f_{\hat a,\hat b}`$. With a vector input, the same idea becomes $`f_\theta(x)=w^\top x+b_0`$, with $`\theta=(w,b_0)`$. These are affine functions, conventionally included under linear models. The word model is often used for both the family and the fitted instance; the distinction matters when discussing what is chosen before training and what is learned from data.
 
 In the apartment example above, each choice of intercept and slope gives a candidate line. The red line is the fitted member of this family; its coefficients were selected from the observations.
 
 #### <a id="parametric-and-nonparametric-models"></a>Parametric and nonparametric models
 
-A **parametric** model class is described by a finite number of parameters, and that number is fixed before any data are seen: in the notation above, $\Theta\subseteq\mathbb R^p$ for a fixed $p$. The line $f_{a,b}(x)=a+bx$ has two parameters whether it is fitted to 28 apartments or to 28,000. Logistic regression and a neural network with a fixed architecture are also parametric in this sense, even when the network has millions of weights.
+A **parametric** model class is described by a finite number of parameters, and that number is fixed before any data are seen: in the notation above, $`\Theta\subseteq\mathbb R^p`$ for a fixed $`p`$. The line $`f_{a,b}(x)=a+bx`$ has two parameters whether it is fitted to 28 apartments or to 28,000. Logistic regression and a neural network with a fixed architecture are also parametric in this sense, even when the network has millions of weights.
 
 A **nonparametric** model has no fixed-size parameter vector: its complexity can grow with the amount of data. A nearest-neighbor classifier stores the whole training set and consults it at prediction time. The kernel density estimate for Old Faithful places a small bump at every observation. A decision tree grown until its leaves are pure can add splits as observations accumulate; the iris tree above, limited to four leaves, has a fixed maximum size instead. *Nonparametric* does not mean “without parameters” or “without choices”: the number of neighbors, the kernel bandwidth, and a limit on tree size are hyperparameters, described next.
 
@@ -240,9 +240,9 @@ The network architecture specifies a model class; training selects values for it
 
 #### <a id="representation-learning"></a>Representation learning
 
-A **representation** is the collection of features used to describe an input. Representation learning fits a transformation $z=g_\phi(x)$ from data, where $\phi$ denotes its learned parameters and $z$ is the resulting feature vector. The representation can then be used for prediction, similarity comparisons, visualization, or another task. Choosing word counts by hand specifies features; fitting a transformation that discovers useful combinations of those counts learns a representation.
+A **representation** is the collection of features used to describe an input. Representation learning fits a transformation $`z=g_\phi(x)`$ from data, where $`\phi`$ denotes its learned parameters and $`z`$ is the resulting feature vector. The representation can then be used for prediction, similarity comparisons, visualization, or another task. Choosing word counts by hand specifies features; fitting a transformation that discovers useful combinations of those counts learns a representation.
 
-**Example: learning one coordinate from two measurements.** PCA learns directions of variation in observed data. If two centered measurements vary mostly along one line, a single coordinate along that line can retain much of their variation. With sample mean $\mu\in\mathbb R^2$ and learned unit direction $w\in\mathbb R^2$, the coordinate is $z=w^\top(x-\mu)\in\mathbb R$. Both $\mu$ and $w$ are obtained from the training observations.
+**Example: learning one coordinate from two measurements.** PCA learns directions of variation in observed data. If two centered measurements vary mostly along one line, a single coordinate along that line can retain much of their variation. With sample mean $`\mu\in\mathbb R^2`$ and learned unit direction $`w\in\mathbb R^2`$, the coordinate is $`z=w^\top(x-\mu)\in\mathbb R`$. Both $`\mu`$ and $`w`$ are obtained from the training observations.
 
 <img src="sources/images/terminology-representation-pca.png" alt="terminology-representation-pca" width="640">
 
@@ -252,7 +252,7 @@ This is a linear form of representation learning that needs neither class labels
 
 #### <a id="generative-and-discriminative-models"></a>Generative and discriminative models
 
-[Generative and discriminative models](https://en.wikipedia.org/wiki/Generative_model) describe another distinction. In classification, a generative approach can model the joint distribution $p(x,y)$, while a discriminative approach models $p(y\mid x)$ or a decision boundary directly. Generative modeling also includes learning distributions over observations from which new examples can be generated. Both approaches can support classification; this distinction is separate from the task and the online/offline setting.
+[Generative and discriminative models](https://en.wikipedia.org/wiki/Generative_model) describe another distinction. In classification, a generative approach can model the joint distribution $`p(x,y)`$, while a discriminative approach models $`p(y\mid x)`$ or a decision boundary directly. Generative modeling also includes learning distributions over observations from which new examples can be generated. Both approaches can support classification; this distinction is separate from the task and the online/offline setting.
 
 Generation can also be **conditional**: a model can represent a distribution over output sequences given a prompt, then generate a response from that distribution. This broader use of generative modeling should be distinguished from the classical joint-versus-conditional classifier comparison above. Translation is one example of conditional sequence generation: [Sutskever, Vinyals, and Le, *Sequence to Sequence Learning with Neural Networks*](https://arxiv.org/abs/1409.3215).
 
@@ -264,25 +264,25 @@ $$
 \mathcal A:D_{\mathrm{train}}\longmapsto\hat f\in\mathcal H.
 $$
 
-Here $D_{\mathrm{train}}$ contains the examples used for fitting. For a randomized algorithm, the output also depends on randomness, which this notation suppresses. The algorithm is the procedure that produces the fitted model. Applying that fitted model to an input is a further computation. Different training algorithms can fit the same model family, and a general optimization algorithm can be used with many different families.
+Here $`D_{\mathrm{train}}`$ contains the examples used for fitting. For a randomized algorithm, the output also depends on randomness, which this notation suppresses. The algorithm is the procedure that produces the fitted model. Applying that fitted model to an input is a further computation. Different training algorithms can fit the same model family, and a general optimization algorithm can be used with many different families.
 
 #### <a id="losses-and-objectives"></a>Losses and objectives
 
-A [loss function](https://en.wikipedia.org/wiki/Loss_function) assigns a cost to a target and a prediction. Here the **target is the first argument**: $\ell(y,\hat y)$. For numerical prediction, squared error is $\ell(y,\hat y)=(y-\hat y)^2$. Argument order is a convention, so it should be stated even when a particular loss is symmetric.
+A [loss function](https://en.wikipedia.org/wiki/Loss_function) assigns a cost to a target and a prediction. Here the **target is the first argument**: $`\ell(y,\hat y)`$. For numerical prediction, squared error is $`\ell(y,\hat y)=(y-\hat y)^2`$. Argument order is a convention, so it should be stated even when a particular loss is symmetric.
 
-For a population distribution $\mathcal D$ over input–target pairs, the corresponding **population risk** is
+For a population distribution $`\mathcal D`$ over input–target pairs, the corresponding **population risk** is
 
 $$
 R(f)=\mathbb E_{(x,y)\sim\mathcal D}\big[\ell(y,f(x))\big].
 $$
 
-For a nonempty index set $I\subseteq\{1,\ldots,n\}$, the **empirical risk** is the average loss on those examples:
+For a nonempty index set $`I\subseteq\{1,\ldots,n\}`$, the **empirical risk** is the average loss on those examples:
 
 $$
 \widehat R_I(f)=\frac{1}{|I|}\sum_{i\in I}\ell(y_i,f(x_i)).
 $$
 
-Taking $I=\{1,\ldots,n\}$ gives the average over all of $D$. For a training split, $\widehat R_{\mathrm{train}}$ is shorthand for $\widehat R_{I_{\mathrm{train}}}$; validation and test risk are defined similarly. The subscript records which examples are being evaluated.
+Taking $`I=\{1,\ldots,n\}`$ gives the average over all of $`D`$. For a training split, $`\widehat R_{\mathrm{train}}`$ is shorthand for $`\widehat R_{I_{\mathrm{train}}}`$; validation and test risk are defined similarly. The subscript records which examples are being evaluated.
 
 The [empirical risk minimization](https://en.wikipedia.org/wiki/Empirical_risk_minimization) principle selects a model with low average **training** loss within the chosen class. Its idealized formulation is
 
@@ -292,13 +292,13 @@ $$
 
 This defines an optimization objective; an actual algorithm determines how to seek its solution. Practical training may only approximate the minimum and may add regularization. Generalization concerns performance on new examples, which is not established merely by obtaining a small training loss.
 
-The finite dataset $D$ and the population distribution $\mathcal D$ are different objects. An alternative parameter-based notation uses $L(\theta;D)$ for an empirical objective and $\mathcal L(\theta)$ for population risk. For an unregularized average loss, $L(\theta;D)=\widehat R_{\{1,\ldots,n\}}(f_\theta)$ and $\mathcal L(\theta)=R(f_\theta)$. Here $\ell$ denotes the loss on one example throughout.
+The finite dataset $`D`$ and the population distribution $`\mathcal D`$ are different objects. An alternative parameter-based notation uses $`L(\theta;D)`$ for an empirical objective and $`\mathcal L(\theta)`$ for population risk. For an unregularized average loss, $`L(\theta;D)=\widehat R_{\{1,\ldots,n\}}(f_\theta)`$ and $`\mathcal L(\theta)=R(f_\theta)`$. Here $`\ell`$ denotes the loss on one example throughout.
 
 #### <a id="optimization-and-gradients"></a>Optimization and gradients
 
 Gradient descent is one optimization algorithm for differentiable objectives. It updates parameters in a direction intended to reduce the objective. In neural networks, [backpropagation](https://en.wikipedia.org/wiki/Backpropagation) computes the required derivatives efficiently; an optimizer uses those derivatives to update the parameters. The network architecture, training objective, derivative computation, and update rule therefore have distinct roles.
 
-The mathematical notes use **numerator-layout derivatives**. For $f:\mathbb R^d\to\mathbb R^m$, the Jacobian $J_f=\partial f/\partial x$ has entries $(J_f)_{ij}=\partial f_i/\partial x_j$ and shape $m\times d$. For a scalar objective $L$, the derivative $D_xL$ is a row, while its Euclidean gradient $\nabla_xL=(D_xL)^\top$ is a column. Thus $dL=(D_xL)\,dx=\nabla_xL^\top dx$, and a gradient update uses $\theta\leftarrow\theta-\eta\nabla_\theta L$. For a matrix parameter, the gradient is defined by the Frobenius inner product and is stored in the parameter's shape. Calculus and Optimization develops how these derivatives are evaluated; Numerical Computing with NumPy and PyTorch gives their implementation in arrays and tensors.
+The mathematical notes use **numerator-layout derivatives**. For $`f:\mathbb R^d\to\mathbb R^m`$, the Jacobian $`J_f=\partial f/\partial x`$ has entries $`(J_f)_{ij}=\partial f_i/\partial x_j`$ and shape $`m\times d`$. For a scalar objective $`L`$, the derivative $`D_xL`$ is a row, while its Euclidean gradient $`\nabla_xL=(D_xL)^\top`$ is a column. Thus $`dL=(D_xL)\,dx=\nabla_xL^\top dx`$, and a gradient update uses $`\theta\leftarrow\theta-\eta\nabla_\theta L`$. For a matrix parameter, the gradient is defined by the Frobenius inner product and is stored in the parameter's shape. Calculus and Optimization develops how these derivatives are evaluated; Numerical Computing with NumPy and PyTorch gives their implementation in arrays and tensors.
 
 #### <a id="training-validation-and-test-data"></a>Training, validation, and test data
 
@@ -310,11 +310,11 @@ A fitted model is one component of a system. Learning changes that component; pr
 
 ### <a id="learning"></a>Learning
 
-**Learning**, or training, changes a model using data or feedback. In the supervised notation above, the learning algorithm takes $D_{\mathrm{train}}$ and returns $\hat f$. For a neural network, this usually includes adjusting its weights. Learning can take place in a separate offline phase or through updates interleaved with use.
+**Learning**, or training, changes a model using data or feedback. In the supervised notation above, the learning algorithm takes $`D_{\mathrm{train}}`$ and returns $`\hat f`$. For a neural network, this usually includes adjusting its weights. Learning can take place in a separate offline phase or through updates interleaved with use.
 
 ### <a id="prediction-and-inference"></a>Prediction and inference
 
-**Prediction** applies the learned model to an input, for example $\hat y=\hat f(x)\in\widehat{\mathcal Y}$. A prediction need not concern the future: classifying an existing photograph is also prediction. Depending on the task, the output may be a category, a number, a probability distribution, or a structured object.
+**Prediction** applies the learned model to an input, for example $`\hat y=\hat f(x)\in\widehat{\mathcal Y}`$. A prediction need not concern the future: classifying an existing photograph is also prediction. Depending on the task, the output may be a category, a number, a probability distribution, or a structured object.
 
 In deployed ML systems, this use of a trained model is commonly called [inference](https://developers.google.com/machine-learning/glossary#inference). Computing an output need not update the model. Inference can be performed in advance for many inputs or on demand as requests arrive. An offline-trained model can therefore provide online, real-time predictions.
 
@@ -350,15 +350,15 @@ Suppose an email service trains [logistic regression](https://en.wikipedia.org/w
 | Abstract task | Binary classification |
 | Learning paradigm | Supervised learning from labeled emails |
 | Learning setting | Offline training on a collected dataset |
-| Input and target | Email features $x$ and label $y\in\{0,1\}$ |
+| Input and target | Email features $`x`$ and label $`y\in\{0,1\}`$ |
 | Model family | Logistic regression, representing a probability of spam |
 | Training objective | Average binary cross-entropy, optionally with regularization |
 | Training algorithm | For example, gradient descent on that objective |
 | Trained model | The fitted coefficients and the prediction rule they define |
-| Prediction | The fitted model outputs $\widehat p(x)=\hat f(x)=p_{\hat\theta}(y=1\mid x)$ |
+| Prediction | The fitted model outputs $`\widehat p(x)=\hat f(x)=p_{\hat\theta}(y=1\mid x)`$ |
 | Action | A decision rule uses that probability to flag or route the message |
 
-Here the observed target $y$ is a class label and the prediction $\widehat p(x)$ is a probability conditional on the message features. A threshold can convert $\widehat p(x)$ to a class label before the service decides what action to take.
+Here the observed target $`y`$ is a class label and the prediction $`\widehat p(x)`$ is a probability conditional on the message features. A threshold can convert $`\widehat p(x)`$ to a class label before the service decides what action to take.
 
 If later user corrections are incorporated through model updates as feedback arrives, the learning setting becomes online. Receiving and scoring new emails alone leaves the model unchanged. If corrections are accumulated for a separate nightly training run, each resulting deployed model can still be used in an offline-training workflow.
 
@@ -368,11 +368,11 @@ If later user corrections are incorporated through model updates as feedback arr
 <details>
 <summary><a id="block-terminology-appendix-a"></a><b>A. Digit recognition with and without deep networks</b></summary>
 
-Deep networks were not the only way to recognize digits, and on easy data they are not clearly better. On the $8\times8$ digits of [Deep learning](#deep-learning), with the same held-out quarter of 450 images, a 1-nearest-neighbor rule that simply returns the label of the most similar training image under Euclidean pixel distance is correct on 98.9% of test images. The network is correct on 98.0%, and a linear classifier (logistic regression) on 97.8%. The differences amount to four or five of 450 test images, well within what a different split or random seed could produce. Learning Problems and Nearest Neighbors develops the nearest-neighbor rule.
+Deep networks were not the only way to recognize digits, and on easy data they are not clearly better. On the $`8\times8`$ digits of [Deep learning](#deep-learning), with the same held-out quarter of 450 images, a 1-nearest-neighbor rule that simply returns the label of the most similar training image under Euclidean pixel distance is correct on 98.9% of test images. The network is correct on 98.0%, and a linear classifier (logistic regression) on 97.8%. The differences amount to four or five of 450 test images, well within what a different split or random seed could produce. Learning Problems and Nearest Neighbors develops the nearest-neighbor rule.
 
 Clustering alone does worse. Grouping the training images into 10 [k-means](https://en.wikipedia.org/wiki/K-means_clustering) clusters and naming each cluster by its most common training label classifies 78.4% of the test images correctly. Pixel similarity does not know which differences matter. In this run, one cluster contains mostly 9s but also many 8s, 5s, and 3s; another holds 1s and 8s in nearly equal numbers. Two clusters are named 1, so with only ten clusters one digit receives none: no cluster is named 8, and every 8 is misclassified. With 50 clusters, several per digit, the accuracy rises to 95.3%. Keeping every training image as its own prototype is the nearest-neighbor rule. Clustering develops these methods.
 
-The larger [MNIST benchmark](https://yann.lecun.com/exdb/mnist/) contains $28\times28$ grayscale digits: 60,000 training images and 10,000 test images written by different people. Published results tell a similar story. A linear classifier on the pixels misclassifies 12.0% of the test digits, k-nearest neighbors on raw pixels 5.0%, and the LeNet-5 convolutional network 0.95%. Clustering the images without labels matches only about 53% of them to the right digit. The table lists these and other approaches.
+The larger [MNIST benchmark](https://yann.lecun.com/exdb/mnist/) contains $`28\times28`$ grayscale digits: 60,000 training images and 10,000 test images written by different people. Published results tell a similar story. A linear classifier on the pixels misclassifies 12.0% of the test digits, k-nearest neighbors on raw pixels 5.0%, and the LeNet-5 convolutional network 0.95%. Clustering the images without labels matches only about 53% of them to the right digit. The table lists these and other approaches.
 
 | Method on MNIST | Error | Source |
 | --- | --- | --- |

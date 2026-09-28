@@ -14,13 +14,13 @@ The difficulty lies in how differently languages express the same meaning. Word 
 
 ### <a id="the-noisy-channel"></a>The noisy channel
 
-Statistical translation began with the noisy-channel model of chapter 2. To translate a foreign sentence $f$ into English, pretend that $f$ was produced by corrupting an English sentence $e$, and recover the most probable original:
+Statistical translation began with the noisy-channel model of chapter 2. To translate a foreign sentence $`f`$ into English, pretend that $`f`$ was produced by corrupting an English sentence $`e`$, and recover the most probable original:
 
 $$
 \hat e=\arg\max_eP(e\mid f)=\arg\max_eP(f\mid e)\,P(e).
 $$
 
-The decomposition divides the work. The **translation model** $P(f\mid e)$ ensures that the words of $e$ account for those of $f$, and it can be learned from translated sentence pairs; it does not need to produce fluent English, because the **language model** $P(e)$, learned from much larger amounts of English alone, rewards fluent candidates. The idea of combining a model of adequacy with a model of fluency, trained on different data, survived into later systems in other forms.
+The decomposition divides the work. The **translation model** $`P(f\mid e)`$ ensures that the words of $`e`$ account for those of $`f`$, and it can be learned from translated sentence pairs; it does not need to produce fluent English, because the **language model** $`P(e)`$, learned from much larger amounts of English alone, rewards fluent candidates. The idea of combining a model of adequacy with a model of fluency, trained on different data, survived into later systems in other forms.
 
 ## <a id="statistical-translation"></a>Statistical translation
 
@@ -30,7 +30,7 @@ A collection of sentences with their translations, a **parallel corpus**, does n
 
 ### <a id="ibm-model-1"></a>IBM Model 1
 
-The IBM models ([Brown et al., 1993](https://aclanthology.org/J93-2003/)) are a series of five translation models of increasing detail. The simplest, **Model 1**, generates a foreign sentence $f_1,\dots,f_m$ from an English sentence $e_1,\dots,e_l$ as follows: for each position $j$, choose an English position $a_j\in\{0,1,\dots,l\}$ uniformly, where position 0 is a special NULL word that accounts for foreign words with no counterpart, and generate $f_j$ with probability $t(f_j\mid e_{a_j})$. The only parameters are the word translation probabilities $t(f\mid e)$. Since each foreign word's alignment is chosen independently, the posterior over alignments factorizes over positions:
+The IBM models ([Brown et al., 1993](https://aclanthology.org/J93-2003/)) are a series of five translation models of increasing detail. The simplest, **Model 1**, generates a foreign sentence $`f_1,\dots,f_m`$ from an English sentence $`e_1,\dots,e_l`$ as follows: for each position $`j`$, choose an English position $`a_j\in\{0,1,\dots,l\}`$ uniformly, where position 0 is a special NULL word that accounts for foreign words with no counterpart, and generate $`f_j`$ with probability $`t(f_j\mid e_{a_j})`$. The only parameters are the word translation probabilities $`t(f\mid e)`$. Since each foreign word's alignment is chosen independently, the posterior over alignments factorizes over positions:
 
 $$
 P(a_j=i\mid e,f)=\frac{t(f_j\mid e_i)}{\sum_{i'=0}^{l}t(f_j\mid e_{i'})}.
@@ -113,25 +113,25 @@ Starting from uniform probabilities, EM learns that *house* translates as *casa*
 
 <img src="sources/images/nlp-mt-alignment.png" alt="nlp-mt-alignment" width="880">
 
-*Posterior alignment probabilities $P(a_j=i\mid e,f)$ for the pair "a red cat sees the big table" and "un gato rojo ve la mesa grande", after 1, 2, 4, and 15 EM updates on the 300-pair corpus of the code; each row sums to one, and values of at least 0.1 are printed. After one update the content words already lean toward their translations ($P$(gato ↔ cat) = 0.43), after four they are nearly certain (0.94), and after fifteen they are certain. The articles "un" and "la" remain split between their English articles and NULL (0.64 for la ↔ the), since NULL generates frequent function words in every sentence.*
+*Posterior alignment probabilities $`P(a_j=i\mid e,f)`$ for the pair "a red cat sees the big table" and "un gato rojo ve la mesa grande", after 1, 2, 4, and 15 EM updates on the 300-pair corpus of the code; each row sums to one, and values of at least 0.1 are printed. After one update the content words already lean toward their translations ($`P`$(gato ↔ cat) = 0.43), after four they are nearly certain (0.94), and after fifteen they are certain. The articles "un" and "la" remain split between their English articles and NULL (0.64 for la ↔ the), since NULL generates frequent function words in every sentence.*
 
-Model 1 is too crude for translation on its own. It assigns the same probability to every ordering of the foreign words, so it cannot distinguish a translation from a scrambled one; its log-likelihood is concave in $t$, which makes EM reach a global maximum, but not strictly concave, so the maximizing parameters need not be unique and the starting point still matters in practice ([Toutanova and Galley, 2011](https://aclanthology.org/P11-2081/)). The higher models add what it lacks: Model 2 makes the alignment depend on positions, Models 3 to 5 add **fertility**, the number of foreign words an English word produces, and a model of reordering; and the **HMM alignment model** ([Vogel, Ney, and Tillmann, 1996](https://aclanthology.org/C96-2141/)) makes each alignment depend on the previous one, favoring alignments that move in small jumps. Model 1 remained useful to initialize them, and the GIZA++ implementation of this cascade ([Och and Ney, 2003](https://aclanthology.org/J03-1002/)) was the standard word aligner for more than a decade.
+Model 1 is too crude for translation on its own. It assigns the same probability to every ordering of the foreign words, so it cannot distinguish a translation from a scrambled one; its log-likelihood is concave in $`t`$, which makes EM reach a global maximum, but not strictly concave, so the maximizing parameters need not be unique and the starting point still matters in practice ([Toutanova and Galley, 2011](https://aclanthology.org/P11-2081/)). The higher models add what it lacks: Model 2 makes the alignment depend on positions, Models 3 to 5 add **fertility**, the number of foreign words an English word produces, and a model of reordering; and the **HMM alignment model** ([Vogel, Ney, and Tillmann, 1996](https://aclanthology.org/C96-2141/)) makes each alignment depend on the previous one, favoring alignments that move in small jumps. Model 1 remained useful to initialize them, and the GIZA++ implementation of this cascade ([Och and Ney, 2003](https://aclanthology.org/J03-1002/)) was the standard word aligner for more than a decade.
 
 ### <a id="phrase-based-translation"></a>Phrase-based translation
 
-Translating word by word fails on idioms, on words that translate as several words, and on local reordering. **Phrase-based translation** ([Koehn, Och, and Marcu, 2003](https://aclanthology.org/N03-1017/)) translates contiguous sequences of words instead. Word alignments are computed in both directions and combined, and every pair of phrases consistent with them, meaning that no word inside either phrase is aligned to a word outside the other, is extracted into a **phrase table** with translation probabilities estimated by relative frequency. A translation is scored by a **log-linear model** that adds weighted feature scores: the phrase translation probabilities in both directions, the language model, a penalty or reward for reordering, and a count of words and phrases. The weights are tuned to maximize BLEU on held-out data, a procedure called **minimum error rate training** ([Och, 2003](https://aclanthology.org/P03-1021/)). The noisy channel is the special case with two features, $\log P(f\mid e)$ and $\log P(e)$, and unit weights. Decoding searches over segmentations, phrase translations, and orders with a beam search that builds the translation left to right and compares partial translations using an estimate of the cost of translating the rest of the sentence. Phrase-based systems, many built with the open-source Moses toolkit ([Koehn et al., 2007](https://aclanthology.org/P07-2045/)), were the state of the art from the mid-2000s until neural translation replaced them.
+Translating word by word fails on idioms, on words that translate as several words, and on local reordering. **Phrase-based translation** ([Koehn, Och, and Marcu, 2003](https://aclanthology.org/N03-1017/)) translates contiguous sequences of words instead. Word alignments are computed in both directions and combined, and every pair of phrases consistent with them, meaning that no word inside either phrase is aligned to a word outside the other, is extracted into a **phrase table** with translation probabilities estimated by relative frequency. A translation is scored by a **log-linear model** that adds weighted feature scores: the phrase translation probabilities in both directions, the language model, a penalty or reward for reordering, and a count of words and phrases. The weights are tuned to maximize BLEU on held-out data, a procedure called **minimum error rate training** ([Och, 2003](https://aclanthology.org/P03-1021/)). The noisy channel is the special case with two features, $`\log P(f\mid e)`$ and $`\log P(e)`$, and unit weights. Decoding searches over segmentations, phrase translations, and orders with a beam search that builds the translation left to right and compares partial translations using an estimate of the cost of translating the rest of the sentence. Phrase-based systems, many built with the open-source Moses toolkit ([Koehn et al., 2007](https://aclanthology.org/P07-2045/)), were the state of the art from the mid-2000s until neural translation replaced them.
 
 ## <a id="neural-machine-translation"></a>Neural machine translation
 
 ### <a id="encoderdecoder-translation"></a>Encoder–decoder translation
 
-Neural translation models $P(e\mid f)$ directly, generating the translation one token at a time from a representation of the source. The encoder–decoder architecture (DL chapter 8) was introduced for translation: [Sutskever, Vinyals, and Le (2014)](https://arxiv.org/abs/1409.3215) reached 34.8 BLEU on a standard English-to-French test set with an ensemble of deep LSTMs, above the 33.3 of a phrase-based system, and found that reversing the order of the source words helped markedly, because it placed the beginning of the source near the beginning of the output. Attention (DL chapter 9) removed the bottleneck of a single vector for the whole source and learned soft alignments like those of the IBM models without being told about them. Google's production system, an eight-layer LSTM encoder–decoder with attention, reduced translation errors by an average of 60% against its phrase-based system in side-by-side human evaluations on isolated simple sentences ([Wu et al., 2016](https://arxiv.org/abs/1609.08144)). The transformer was also introduced as a translation model: it reached 28.4 BLEU on English-to-German, more than 2 points above the best previous results, including ensembles, and 41.8 on English-to-French ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)).
+Neural translation models $`P(e\mid f)`$ directly, generating the translation one token at a time from a representation of the source. The encoder–decoder architecture (DL chapter 8) was introduced for translation: [Sutskever, Vinyals, and Le (2014)](https://arxiv.org/abs/1409.3215) reached 34.8 BLEU on a standard English-to-French test set with an ensemble of deep LSTMs, above the 33.3 of a phrase-based system, and found that reversing the order of the source words helped markedly, because it placed the beginning of the source near the beginning of the output. Attention (DL chapter 9) removed the bottleneck of a single vector for the whole source and learned soft alignments like those of the IBM models without being told about them. Google's production system, an eight-layer LSTM encoder–decoder with attention, reduced translation errors by an average of 60% against its phrase-based system in side-by-side human evaluations on isolated simple sentences ([Wu et al., 2016](https://arxiv.org/abs/1609.08144)). The transformer was also introduced as a translation model: it reached 28.4 BLEU on English-to-German, more than 2 points above the best previous results, including ensembles, and 41.8 on English-to-French ([Vaswani et al., 2017](https://arxiv.org/abs/1706.03762)).
 
 Several techniques now used throughout the field came from translation. Byte-pair encoding was introduced to translate rare words and names as sequences of subword units ([Sennrich, Haddow, and Birch, 2016](https://arxiv.org/abs/1508.07909); chapter 1). Beam search with length normalization became the standard decoder (chapter 8), and translation is the task on which it works best, since a translation is nearly determined by its source. [Koehn and Knowles (2017)](https://arxiv.org/abs/1706.03872) listed the weaknesses of early neural systems: poor performance outside the training domain and with little training data, rare words, long sentences, unreliable attention as an alignment, and translations that got worse with larger beams. Most have been reduced by scale, subwords, and better training, but low-resource translation remains hard.
 
 ### <a id="monolingual-data-and-back-translation"></a>Monolingual data and back-translation
 
-Parallel text is scarce compared with monolingual text, and the noisy channel's language model was the way statistical systems used the latter. Neural systems use it through **back-translation** ([Sennrich, Haddow, and Birch, 2016](https://arxiv.org/abs/1511.06709)): to improve translation from $f$ into $e$, translate monolingual text in $e$ into $f$ with a reverse model, and add the synthetic pairs, a machine-translated source with a human-written target, to the training data. The model learns to produce fluent human text from imperfect inputs, and the gains were 2.8 to 3.7 BLEU between English and German. How the synthetic sources are produced matters: sampling from the reverse model or adding noise to its beam-search outputs works better than beam search alone, except in low-resource settings, because the more varied sources carry a stronger training signal ([Edunov et al., 2018](https://arxiv.org/abs/1808.09381)). Iterating back-translation in both directions, starting from a word-by-word translation built from aligned embedding spaces and combined with training to reconstruct corrupted sentences, even yields translation systems from monolingual data alone, with no parallel text at all ([Lample et al., 2018](https://arxiv.org/abs/1711.00043); [Artetxe et al., 2018](https://arxiv.org/abs/1710.11041)).
+Parallel text is scarce compared with monolingual text, and the noisy channel's language model was the way statistical systems used the latter. Neural systems use it through **back-translation** ([Sennrich, Haddow, and Birch, 2016](https://arxiv.org/abs/1511.06709)): to improve translation from $`f`$ into $`e`$, translate monolingual text in $`e`$ into $`f`$ with a reverse model, and add the synthetic pairs, a machine-translated source with a human-written target, to the training data. The model learns to produce fluent human text from imperfect inputs, and the gains were 2.8 to 3.7 BLEU between English and German. How the synthetic sources are produced matters: sampling from the reverse model or adding noise to its beam-search outputs works better than beam search alone, except in low-resource settings, because the more varied sources carry a stronger training signal ([Edunov et al., 2018](https://arxiv.org/abs/1808.09381)). Iterating back-translation in both directions, starting from a word-by-word translation built from aligned embedding spaces and combined with training to reconstruct corrupted sentences, even yields translation systems from monolingual data alone, with no parallel text at all ([Lample et al., 2018](https://arxiv.org/abs/1711.00043); [Artetxe et al., 2018](https://arxiv.org/abs/1710.11041)).
 
 ### <a id="translation-by-language-models"></a>Translation by language models
 
@@ -141,7 +141,7 @@ General-purpose language models translate when asked, with no translation-specif
 
 ### <a id="bleu-and-chrf"></a>BLEU and chrF
 
-Human judgment of translations is slow and expensive, and progress in statistical translation came with an automatic metric that could be computed after every experiment. **BLEU** ([Papineni et al., 2002](https://aclanthology.org/P02-1040/)) compares a candidate translation with one or more reference translations by n-gram precision: for $n=1,\dots,4$, the fraction of the candidate's n-grams that also occur in a reference, with each n-gram's count **clipped** to the number of times it occurs in the reference, so that repeating a correct word does not help. It combines the four precisions by their geometric mean and multiplies by a **brevity penalty** for candidates shorter than the reference, since precision alone rewards saying little ([Appendix B](#block-nlp15-appendix-b)). Counts are pooled over a whole test set before the precisions are computed; BLEU is a corpus-level metric, and on single sentences it is noisy and often zero. **chrF** ([Popović, 2015](https://aclanthology.org/W15-3049/)) computes an F-score over character n-grams of lengths 1 to 6, which gives partial credit for words with the right stem and the wrong ending, important for languages with rich morphology. The code implements both and scores several candidates against one reference.
+Human judgment of translations is slow and expensive, and progress in statistical translation came with an automatic metric that could be computed after every experiment. **BLEU** ([Papineni et al., 2002](https://aclanthology.org/P02-1040/)) compares a candidate translation with one or more reference translations by n-gram precision: for $`n=1,\dots,4`$, the fraction of the candidate's n-grams that also occur in a reference, with each n-gram's count **clipped** to the number of times it occurs in the reference, so that repeating a correct word does not help. It combines the four precisions by their geometric mean and multiplies by a **brevity penalty** for candidates shorter than the reference, since precision alone rewards saying little ([Appendix B](#block-nlp15-appendix-b)). Counts are pooled over a whole test set before the precisions are computed; BLEU is a corpus-level metric, and on single sentences it is noisy and often zero. **chrF** ([Popović, 2015](https://aclanthology.org/W15-3049/)) computes an F-score over character n-grams of lengths 1 to 6, which gives partial credit for words with the right stem and the wrong ending, important for languages with rich morphology. The code implements both and scores several candidates against one reference.
 
 ```python
 import math
@@ -220,13 +220,13 @@ Pretrained encoders turned out to be multilingual in the same way. **Multilingua
 
 ### <a id="balancing-languages"></a>Balancing languages
 
-Web text is dominated by a few languages, so sampling training data in proportion to its availability would leave most languages nearly unseen. Multilingual models sample language $i$ with probability
+Web text is dominated by a few languages, so sampling training data in proportion to its availability would leave most languages nearly unseen. Multilingual models sample language $`i`$ with probability
 
 $$
 q_i=\frac{p_i^\alpha}{\sum_jp_j^\alpha},
 $$
 
-where $p_i$ is its share of the available data and $\alpha\in[0,1]$ interpolates between proportional sampling ($\alpha=1$) and uniform sampling ($\alpha=0$). XLM used $\alpha=0.5$ and XLM-R $\alpha=0.3$. Upsampling a small language means repeating its data, and repeated data is worth less than fresh data and eventually leads to memorization (chapter 6). The code computes the trade-off for eight languages whose data sizes span more than three orders of magnitude, with a training budget of about 1.8 passes over all the data.
+where $`p_i`$ is its share of the available data and $`\alpha\in[0,1]`$ interpolates between proportional sampling ($`\alpha=1`$) and uniform sampling ($`\alpha=0`$). XLM used $`\alpha=0.5`$ and XLM-R $`\alpha=0.3`$. Upsampling a small language means repeating its data, and repeated data is worth less than fresh data and eventually leads to memorization (chapter 6). The code computes the trade-off for eight languages whose data sizes span more than three orders of magnitude, with a training budget of about 1.8 passes over all the data.
 
 ```python
 import numpy as np
@@ -248,7 +248,7 @@ for alpha in [1.0, 0.7, 0.5, 0.3, 0.0]:
 #   0.0              12.5%                12.50%                   0.33                   1000.0
 ```
 
-Proportional sampling gives the smallest language 0.02% of training, about 180 MB of text seen, a negligible amount; $\alpha=0.3$ raises its share to 2.8% but shows its 100 MB some 224 times, far past the point where repetition helps, while the largest language is no longer seen even once in full. No single $\alpha$ suits every language. **UniMax** ([Chung et al., 2023](https://arxiv.org/abs/2304.09151)) instead caps the number of passes over each language's data and spreads the rest of the budget as evenly as possible across the languages that still have unseen data. Tokenization raises a related issue: a tokenizer trained on English-dominated data splits other languages into many more tokens, so multilingual models train tokenizers on rebalanced data with larger vocabularies (chapter 1).
+Proportional sampling gives the smallest language 0.02% of training, about 180 MB of text seen, a negligible amount; $`\alpha=0.3`$ raises its share to 2.8% but shows its 100 MB some 224 times, far past the point where repetition helps, while the largest language is no longer seen even once in full. No single $`\alpha`$ suits every language. **UniMax** ([Chung et al., 2023](https://arxiv.org/abs/2304.09151)) instead caps the number of passes over each language's data and spreads the rest of the budget as evenly as possible across the languages that still have unseen data. Tokenization raises a related issue: a tokenizer trained on English-dominated data splits other languages into many more tokens, so multilingual models train tokenizers on rebalanced data with larger vocabularies (chapter 1).
 
 ### <a id="the-curse-of-multilinguality"></a>The curse of multilinguality
 
@@ -265,22 +265,22 @@ Most of the world's roughly 7,000 languages have little digital text, and much o
 <summary><a id="block-nlp15-appendix-a"></a><b>A. EM for IBM Model 1</b></summary>
 
 
-For an English sentence $e=e_0e_1\dots e_l$, with $e_0$ the NULL word, and a foreign sentence $f=f_1\dots f_m$ of given length, Model 1 defines
+For an English sentence $`e=e_0e_1\dots e_l`$, with $`e_0`$ the NULL word, and a foreign sentence $`f=f_1\dots f_m`$ of given length, Model 1 defines
 
 $$
 P(f,a\mid e)=\prod_{j=1}^m\frac{t(f_j\mid e_{a_j})}{l+1},\qquad
 P(f\mid e)=\sum_a\prod_{j=1}^m\frac{t(f_j\mid e_{a_j})}{l+1}=\prod_{j=1}^m\frac1{l+1}\sum_{i=0}^lt(f_j\mid e_i).
 $$
 
-The sum over the $(l+1)^m$ alignments collapses into a product of sums because each term factorizes over $j$ and each $a_j$ ranges independently over $0,\dots,l$. For the same reason the posterior factorizes, $P(a\mid e,f)=\prod_jP(a_j\mid e,f)$ with $P(a_j=i\mid e,f)$ as in the text. The **E-step** computes, for every sentence pair $s$, word $f$, and word $e$, the expected number of times $e$ generated $f$:
+The sum over the $`(l+1)^m`$ alignments collapses into a product of sums because each term factorizes over $`j`$ and each $`a_j`$ ranges independently over $`0,\dots,l`$. For the same reason the posterior factorizes, $`P(a\mid e,f)=\prod_jP(a_j\mid e,f)`$ with $`P(a_j=i\mid e,f)`$ as in the text. The **E-step** computes, for every sentence pair $`s`$, word $`f`$, and word $`e`$, the expected number of times $`e`$ generated $`f`$:
 
 $$
 c(f\mid e)=\sum_s\sum_{j:f_j^{(s)}=f}\ \sum_{i:e_i^{(s)}=e}\frac{t(f\mid e)}{\sum_{i'}t(f\mid e_{i'}^{(s)})},
 $$
 
-in time proportional to $l\cdot m$ per pair. The **M-step** maximizes the expected complete-data log-likelihood $\sum_{f,e}c(f\mid e)\log t(f\mid e)$ subject to $\sum_ft(f\mid e)=1$ for each $e$, which by a Lagrange multiplier gives $t(f\mid e)=c(f\mid e)/\sum_{f'}c(f'\mid e)$, the normalized counts. As for any EM algorithm, the log-likelihood never decreases.
+in time proportional to $`l\cdot m`$ per pair. The **M-step** maximizes the expected complete-data log-likelihood $`\sum_{f,e}c(f\mid e)\log t(f\mid e)`$ subject to $`\sum_ft(f\mid e)=1`$ for each $`e`$, which by a Lagrange multiplier gives $`t(f\mid e)=c(f\mid e)/\sum_{f'}c(f'\mid e)`$, the normalized counts. As for any EM algorithm, the log-likelihood never decreases.
 
-The log-likelihood $\sum_s\sum_j\log\sum_it(f_j\mid e_i)$ is a sum of logarithms of linear functions of $t$, hence concave, and the constraints are linear, so every local maximum is global and EM converges to the optimal value. It is not strictly concave, so the set of maximizers can contain more than one point, and which one EM reaches depends on the initialization. Model 1 cannot represent word order, so it is used for alignment and as an initialization rather than as a translation model; Model 2 adds a distribution $P(a_j=i\mid j,l,m)$ over positions, and its E-step still factorizes.
+The log-likelihood $`\sum_s\sum_j\log\sum_it(f_j\mid e_i)`$ is a sum of logarithms of linear functions of $`t`$, hence concave, and the constraints are linear, so every local maximum is global and EM converges to the optimal value. It is not strictly concave, so the set of maximizers can contain more than one point, and which one EM reaches depends on the initialization. Model 1 cannot represent word order, so it is used for alignment and as an initialization rather than as a translation model; Model 2 adds a distribution $`P(a_j=i\mid j,l,m)`$ over positions, and its E-step still factorizes.
 
 </details>
 
@@ -290,27 +290,27 @@ The log-likelihood $\sum_s\sum_j\log\sum_it(f_j\mid e_i)$ is a sum of logarithms
 <summary><a id="block-nlp15-appendix-b"></a><b>B. BLEU and chrF</b></summary>
 
 
-For a candidate $c$ and reference $r$, let $\mathrm{count}_c(g)$ and $\mathrm{count}_r(g)$ be the counts of n-gram $g$. The clipped precision of order $n$, pooled over the sentences of a test set, is
+For a candidate $`c`$ and reference $`r`$, let $`\mathrm{count}_c(g)`$ and $`\mathrm{count}_r(g)`$ be the counts of n-gram $`g`$. The clipped precision of order $`n`$, pooled over the sentences of a test set, is
 
 $$
 p_n=\frac{\sum_{\text{sentences}}\sum_{g\in\text{n-grams}(c)}\min\bigl(\mathrm{count}_c(g),\max_r\mathrm{count}_r(g)\bigr)}{\sum_{\text{sentences}}\sum_{g\in\text{n-grams}(c)}\mathrm{count}_c(g)},
 $$
 
-where the maximum is over the references when there are several. With $C$ the total length of the candidates and $R$ the total length of the references, choosing for each sentence the reference closest in length, BLEU is
+where the maximum is over the references when there are several. With $`C`$ the total length of the candidates and $`R`$ the total length of the references, choosing for each sentence the reference closest in length, BLEU is
 
 $$
 \mathrm{BLEU}=\mathrm{BP}\cdot\exp\Bigl(\frac14\sum_{n=1}^4\log p_n\Bigr),\qquad\mathrm{BP}=\begin{cases}1&C>R,\\e^{1-R/C}&C\le R.\end{cases}
 $$
 
-The brevity penalty takes the place of recall, which is ill-defined with several references that differ in wording. Scores are usually reported multiplied by 100. Sentence-level BLEU adds smoothing, for example adding one to the numerator and denominator of $p_n$ for $n\ge2$, so that a missing 4-gram does not zero the score.
+The brevity penalty takes the place of recall, which is ill-defined with several references that differ in wording. Scores are usually reported multiplied by 100. Sentence-level BLEU adds smoothing, for example adding one to the numerator and denominator of $`p_n`$ for $`n\ge2`$, so that a missing 4-gram does not zero the score.
 
-chrF computes character n-gram precision $\mathrm{chrP}$ and recall $\mathrm{chrR}$, each averaged over $n=1,\dots,6$ with whitespace removed, and combines them as
+chrF computes character n-gram precision $`\mathrm{chrP}`$ and recall $`\mathrm{chrR}`$, each averaged over $`n=1,\dots,6`$ with whitespace removed, and combines them as
 
 $$
 \mathrm{chrF}_\beta=(1+\beta^2)\frac{\mathrm{chrP}\cdot\mathrm{chrR}}{\beta^2\,\mathrm{chrP}+\mathrm{chrR}},
 $$
 
-with $\beta=2$, which weights recall twice as much as precision. Unlike BLEU, it is defined and informative for single sentences.
+with $`\beta=2`$, which weights recall twice as much as precision. Unlike BLEU, it is defined and informative for single sentences.
 
 </details>
 
@@ -320,13 +320,13 @@ with $\beta=2$, which weights recall twice as much as precision. Unlike BLEU, it
 <summary><a id="block-nlp15-appendix-c"></a><b>C. Sampling languages with a temperature</b></summary>
 
 
-With data shares $p_i$ and sampling probabilities $q_i\propto p_i^\alpha$, the ratio of the probabilities of two languages is $q_i/q_j=(p_i/p_j)^\alpha$: the exponent compresses the ratio of their data sizes, so a language with 1,000 times less data is sampled about 8 times less often at $\alpha=0.3$. Writing $\alpha=1/T$ shows the analogy with softmax temperature (chapter 8) applied to log data sizes. The number of passes over language $i$'s data in a run that sees $B$ units of text in total is
+With data shares $`p_i`$ and sampling probabilities $`q_i\propto p_i^\alpha`$, the ratio of the probabilities of two languages is $`q_i/q_j=(p_i/p_j)^\alpha`$: the exponent compresses the ratio of their data sizes, so a language with 1,000 times less data is sampled about 8 times less often at $`\alpha=0.3`$. Writing $`\alpha=1/T`$ shows the analogy with softmax temperature (chapter 8) applied to log data sizes. The number of passes over language $`i`$'s data in a run that sees $`B`$ units of text in total is
 
 $$
 \text{passes}_i=\frac{Bq_i}{n_i}\propto\frac{p_i^{\alpha}}{p_i}=p_i^{\alpha-1},
 $$
 
-where $n_i$ is the size of language $i$'s data, so for $\alpha<1$ the smallest languages are repeated the most, by a factor $(p_{\max}/p_{\min})^{1-\alpha}$ relative to the largest. Since the value of repeated data decays with the number of repetitions (chapter 6, Appendix C), sampling beyond a few passes adds little for a small language while taking training away from the others, which bounds how far upsampling can help.
+where $`n_i`$ is the size of language $`i`$'s data, so for $`\alpha<1`$ the smallest languages are repeated the most, by a factor $`(p_{\max}/p_{\min})^{1-\alpha}`$ relative to the largest. Since the value of repeated data decays with the number of repetitions (chapter 6, Appendix C), sampling beyond a few passes adds little for a small language while taking training away from the others, which bounds how far upsampling can help.
 
 </details>
 

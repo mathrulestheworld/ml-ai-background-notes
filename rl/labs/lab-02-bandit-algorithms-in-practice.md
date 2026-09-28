@@ -8,14 +8,14 @@
 
 This lab turns chapter 3 and chapter 4 into working code: a small library of bandit algorithms with a common interface, stress tests that break the stochastic assumptions, a contextual bandit built from a real dataset, and off-policy evaluation of logged decisions.
 
-- **Data:** Bernoulli arms generated in the code, and the $8\times8$ handwritten digits bundled with scikit-learn, used as a 10-action contextual bandit.
+- **Data:** Bernoulli arms generated in the code, and the $`8\times8`$ handwritten digits bundled with scikit-learn, used as a 10-action contextual bandit.
 - **Prerequisites:** chapters 3–4; NumPy and scikit-learn.
 - **Reference solution:** [lab02_bandits.py](code/lab02_bandits.py), about a minute and a half on one core. Try each part yourself before reading it.
 
 ## <a id="part-1-a-bandit-library"></a>Part 1 — A bandit library
 
-1. Write a base class with `select(t)` and `update(a, r)` and implement ε-greedy, UCB1, KL-UCB, Thompson sampling with Beta posteriors, and Exp3 (loss-based, $\eta=\sqrt{2\ln k/(Tk)}$).
-2. Write a runner that takes a function giving the arms' means at each step, so that the same runner can simulate stationary and changing problems, and that measures the pseudo-regret $\sum_t(\mu^*_t-\mu_t(A_t))$.
+1. Write a base class with `select(t)` and `update(a, r)` and implement ε-greedy, UCB1, KL-UCB, Thompson sampling with Beta posteriors, and Exp3 (loss-based, $`\eta=\sqrt{2\ln k/(Tk)}`$).
+2. Write a runner that takes a function giving the arms' means at each step, so that the same runner can simulate stationary and changing problems, and that measures the pseudo-regret $`\sum_t(\mu^*_t-\mu_t(A_t))`$.
 3. On the five Bernoulli arms of chapter 3 (means 0.5, 0.45, 0.4, 0.3, 0.2), report the regret after 10,000 pulls as a mean with a 95% confidence interval over 20 seeds. Which differences between algorithms are statistically clear, and which are not?
 
 ## <a id="part-2-stress-tests"></a>Part 2 — Stress tests
@@ -28,7 +28,7 @@ This lab turns chapter 3 and chapter 4 into working code: a small library of ban
 Any classification dataset becomes a contextual bandit by revealing the input as the context, letting the actions be the labels, and giving reward 1 only when the chosen label is right, so the learner never sees the true label of a wrong guess.
 
 1. Reduce the digits to 20 principal components, add a bias feature, and sample contexts with replacement for 5,000 rounds.
-2. Implement the disjoint LinUCB of chapter 4 ($\alpha=0.5$), linear Thompson sampling, ε-greedy ($\varepsilon=0.05$), and greedy play on the ridge estimates, with Sherman–Morrison updates of each action's inverse Gram matrix. Add a context-free Thompson sampler as a baseline.
+2. Implement the disjoint LinUCB of chapter 4 ($`\alpha=0.5`$), linear Thompson sampling, ε-greedy ($`\varepsilon=0.05`$), and greedy play on the ridge estimates, with Sherman–Morrison updates of each action's inverse Gram matrix. Add a context-free Thompson sampler as a baseline.
 3. Compare their accuracy early and late with the accuracy of the same linear model trained with every label revealed.
 
 ## <a id="part-4-off-policy-evaluation"></a>Part 4 — Off-policy evaluation
@@ -85,7 +85,7 @@ Things to notice:
 2. **Frequent changes.** Make the two arms swap every 500 steps and tune the window and the discount factor. Plot the regret against the window length and explain the trade-off.
 3. **Replay evaluation.** Evaluate the whole LinUCB algorithm offline on uniformly logged data by the replay method of Li et al. (2011): step through the log, and whenever LinUCB's choice matches the logged action, feed it the reward; otherwise skip the round. Compare the accuracy it reaches with its online accuracy in part 3.
 4. **A neural-linear bandit.** Replace the PCA features by the last hidden layer of a small network trained on the rounds seen so far, retrained every 500 rounds, and keep linear Thompson sampling on top. Does it beat the linear model?
-5. **Gittins in practice.** For two Bernoulli arms with uniform priors and $\gamma=0.95$, compute Gittins indices with the chapter 4 code and compare the discounted reward of the index policy with Thompson sampling and with greedy play, averaged over the prior.
+5. **Gittins in practice.** For two Bernoulli arms with uniform priors and $`\gamma=0.95`$, compute Gittins indices with the chapter 4 code and compare the discounted reward of the index policy with Thompson sampling and with greedy play, averaged over the prior.
 
 ---
 

@@ -6,11 +6,11 @@
 
 ## <a id="inference-tasks"></a>Inference tasks
 
-A graphical model (chapter 8) is useful only if questions can be answered from it. For a distribution $P(x)=\frac1Z\prod_af_a(x_a)$ given as a product of factors, which covers Bayesian networks ($Z=1$, one factor per CPT) and Markov networks alike, the standard tasks are:
+A graphical model (chapter 8) is useful only if questions can be answered from it. For a distribution $`P(x)=\frac1Z\prod_af_a(x_a)`$ given as a product of factors, which covers Bayesian networks ($`Z=1`$, one factor per CPT) and Markov networks alike, the standard tasks are:
 
-- **Marginals and conditionals:** $P(X\mid e)$ for a query variable $X$ and evidence $e$. Diagnosis, filtering, and prediction are all of this form.
-- **The partition function** $Z$, or the probability of the evidence $P(e)$, which is the same computation with the evidence variables clamped. It is needed for learning and for comparing models.
-- **MAP inference**, or the **most probable explanation**: $\arg\max_xP(x\mid e)$, the single most likely joint assignment of all non-evidence variables. A **marginal MAP** query maximizes over some variables and sums over others, and is harder than both.
+- **Marginals and conditionals:** $`P(X\mid e)`$ for a query variable $`X`$ and evidence $`e`$. Diagnosis, filtering, and prediction are all of this form.
+- **The partition function** $`Z`$, or the probability of the evidence $`P(e)`$, which is the same computation with the evidence variables clamped. It is needed for learning and for comparing models.
+- **MAP inference**, or the **most probable explanation**: $`\arg\max_xP(x\mid e)`$, the single most likely joint assignment of all non-evidence variables. A **marginal MAP** query maximizes over some variables and sums over others, and is harder than both.
 
 All three are hard in general. Computing marginals in Bayesian networks is #P-hard ([Cooper, 1990](https://www.sciencedirect.com/science/article/pii/000437029090060D)), since counting the satisfying assignments of a formula reduces to it ([Appendix B](#block-ai09-appendix-b)), and even approximating a conditional probability to within a constant relative error is NP-hard ([Dagum and Luby, 1993](https://www.sciencedirect.com/science/article/pii/000437029390036B)). MAP inference is NP-hard, as it contains satisfiability. What makes inference tractable is structure: the algorithms of this chapter run in time exponential only in a measure of how far the graph is from a tree, and linear in its size. When that measure is too large, chapter 10 gives up exactness.
 
@@ -24,23 +24,23 @@ $$
 P(B\mid j,m)=\alpha\sum_e\sum_aP(B)\,P(e)\,P(a\mid B,e)\,P(j\mid a)\,P(m\mid a),
 $$
 
-a sum of $2\times2$ terms, each a product of five numbers, for each value of $B$. Enumeration recomputes the same subexpressions many times: $P(j\mid a)P(m\mid a)$ is the same for every value of $e$. Moving each sum as far right as it goes,
+a sum of $`2\times2`$ terms, each a product of five numbers, for each value of $`B`$. Enumeration recomputes the same subexpressions many times: $`P(j\mid a)P(m\mid a)`$ is the same for every value of $`e`$. Moving each sum as far right as it goes,
 
 $$
 P(B\mid j,m)=\alpha\,P(B)\sum_eP(e)\sum_aP(a\mid B,e)\,P(j\mid a)\,P(m\mid a),
 $$
 
-and evaluating from the inside out, storing each intermediate result, removes the repetition. This is dynamic programming, and on a network with $n$ variables it can turn an $O(2^n)$ sum into one that is linear in $n$.
+and evaluating from the inside out, storing each intermediate result, removes the repetition. This is dynamic programming, and on a network with $`n`$ variables it can turn an $`O(2^n)`$ sum into one that is linear in $`n`$.
 
 ### <a id="factors-and-their-operations"></a>Factors and their operations
 
 **Variable elimination** carries out this idea on tables. A **factor** is a function of a set of variables, stored as a table with one entry per joint value. Three operations suffice:
 
 - **restriction** fixes an evidence variable to its observed value, removing it from the factor;
-- **product** of two factors is a factor on the union of their variables, $h(x,y,z)=f(x,y)\,g(y,z)$, pointwise, like a database join;
-- **summing out** a variable from a factor, $h(x)=\sum_yf(x,y)$, marginalizes it.
+- **product** of two factors is a factor on the union of their variables, $`h(x,y,z)=f(x,y)\,g(y,z)`$, pointwise, like a database join;
+- **summing out** a variable from a factor, $`h(x)=\sum_yf(x,y)`$, marginalizes it.
 
-The algorithm restricts every factor to the evidence, then eliminates the hidden variables one at a time in some **elimination order**: to eliminate $Y$, multiply all factors that mention $Y$ and sum $Y$ out of the product, replacing those factors by the result. When only the query variable remains, the product of the remaining factors, normalized, is the answer. Two refinements matter in practice. Variables that are neither ancestors of the query nor of the evidence (**barren** nodes) can be removed before starting, since they sum to one. And with several queries on the same evidence, the work of elimination can be shared, which leads to the message-passing algorithms below.
+The algorithm restricts every factor to the evidence, then eliminates the hidden variables one at a time in some **elimination order**: to eliminate $`Y`$, multiply all factors that mention $`Y`$ and sum $`Y`$ out of the product, replacing those factors by the result. When only the query variable remains, the product of the remaining factors, normalized, is the answer. Two refinements matter in practice. Variables that are neither ancestors of the query nor of the evidence (**barren** nodes) can be removed before starting, since they sum to one. And with several queries on the same evidence, the work of elimination can be shared, which leads to the message-passing algorithms below.
 
 ```python
 import string
@@ -131,15 +131,15 @@ Elimination reproduces the burglary posterior of chapter 8 with no factor larger
 
 ### <a id="elimination-order-and-treewidth"></a>Elimination order and treewidth
 
-The cost of variable elimination is dominated by the largest factor it creates, and that depends on the order. Eliminating a variable connects all its neighbors, because their factors are multiplied together, so the process can be simulated on the undirected graph of the model (the moral graph, for a Bayesian network): eliminating a node joins its neighbors into a clique, adding **fill-in edges**, and removes it. The **induced width** of an order is the largest number of neighbors a node has when it is eliminated; the largest factor has one more variable than that, and with domains of size $d$ the total cost is $O(n\,d^{w+1})$ for induced width $w$. The minimum induced width over all orders is the **treewidth** of the graph, the same quantity that governs the tree decompositions of chapter 3 ([Appendix C](#block-ai09-appendix-c)).
+The cost of variable elimination is dominated by the largest factor it creates, and that depends on the order. Eliminating a variable connects all its neighbors, because their factors are multiplied together, so the process can be simulated on the undirected graph of the model (the moral graph, for a Bayesian network): eliminating a node joins its neighbors into a clique, adding **fill-in edges**, and removes it. The **induced width** of an order is the largest number of neighbors a node has when it is eliminated; the largest factor has one more variable than that, and with domains of size $`d`$ the total cost is $`O(n\,d^{w+1})`$ for induced width $`w`$. The minimum induced width over all orders is the **treewidth** of the graph, the same quantity that governs the tree decompositions of chapter 3 ([Appendix C](#block-ai09-appendix-c)).
 
 - Trees have treewidth 1, so inference on them is linear. Singly connected networks, **polytrees**, in which there is at most one undirected path between any two nodes, have treewidth equal to the largest number of parents, and inference is linear in the total size of the CPTs.
-- An $n\times n$ grid has treewidth $n$: inference on it costs $O(d^{n+1})$, exponential in the side length and not in the number of variables $n^2$.
+- An $`n\times n`$ grid has treewidth $`n`$: inference on it costs $`O(d^{n+1})`$, exponential in the side length and not in the number of variables $`n^2`$.
 - Finding an optimal order is NP-hard, and greedy heuristics are used: **min-degree** eliminates the node with fewest neighbors, and **min-fill** the one whose elimination adds the fewest edges. They are fast and usually good, but not optimal.
 
 <img src="sources/images/ai-inference-width.png" alt="ai-inference-width" width="880">
 
-*Left: the induced width of four elimination orders on $n\times n$ grids. Eliminating row by row achieves the treewidth, $n$; the greedy min-degree and min-fill heuristics, with ties broken by node name, are optimal up to side 6 but reach width 21 on the $15\times15$ grid; a random order reaches 73, which would need tables of $2^{74}$ entries for binary variables. Right: the total size of the factors created by variable elimination with the min-fill order, for random Bayesian networks in which each node has zero to three parents chosen at random among earlier nodes, against the $n2^n$ operations of enumeration. The median induced width grows from 3 at 10 variables to 42 at 320, so elimination also becomes exponential, but at 320 variables it needs about $2\times10^{13}$ entries against $7\times10^{98}$.*
+*Left: the induced width of four elimination orders on $`n\times n`$ grids. Eliminating row by row achieves the treewidth, $`n`$; the greedy min-degree and min-fill heuristics, with ties broken by node name, are optimal up to side 6 but reach width 21 on the $`15\times15`$ grid; a random order reaches 73, which would need tables of $`2^{74}`$ entries for binary variables. Right: the total size of the factors created by variable elimination with the min-fill order, for random Bayesian networks in which each node has zero to three parents chosen at random among earlier nodes, against the $`n2^n`$ operations of enumeration. The median induced width grows from 3 at 10 variables to 42 at 320, so elimination also becomes exponential, but at 320 variables it needs about $`2\times10^{13}`$ entries against $`7\times10^{98}`$.*
 
 Random networks with long-range connections have large treewidth, and exact inference on them is hopeless beyond a few hundred variables. Real networks built by experts, and the grids, chains, and trees of vision and speech, usually have more structure, and exact methods handle many of them.
 
@@ -147,19 +147,19 @@ Random networks with long-range connections have large treewidth, and exact infe
 
 ### <a id="sum-product"></a>Sum-product
 
-Variable elimination answers one query. On a tree, all marginals can be computed at twice the cost of one, by keeping the intermediate factors as **messages**. For a pairwise Markov network $P(x)\propto\prod_i\phi_i(x_i)\prod_{(i,j)}\psi_{ij}(x_i,x_j)$ on a tree, the message from node $i$ to its neighbor $j$ is
+Variable elimination answers one query. On a tree, all marginals can be computed at twice the cost of one, by keeping the intermediate factors as **messages**. For a pairwise Markov network $`P(x)\propto\prod_i\phi_i(x_i)\prod_{(i,j)}\psi_{ij}(x_i,x_j)`$ on a tree, the message from node $`i`$ to its neighbor $`j`$ is
 
 $$
 m_{i\to j}(x_j)=\sum_{x_i}\phi_i(x_i)\,\psi_{ij}(x_i,x_j)\prod_{k\in N(i)\setminus j}m_{k\to i}(x_i),
 $$
 
-the result of eliminating the whole subtree on $i$'s side of the edge, summarized as a function of $x_j$. The marginal of each node is proportional to its own potential times all incoming messages:
+the result of eliminating the whole subtree on $`i`$'s side of the edge, summarized as a function of $`x_j`$. The marginal of each node is proportional to its own potential times all incoming messages:
 
 $$
 P(x_i)\propto\phi_i(x_i)\prod_{k\in N(i)}m_{k\to i}(x_i).
 $$
 
-A message can be sent once its sender has heard from all its other neighbors. Choosing a root, an upward pass from the leaves and a downward pass from the root compute all $2(n-1)$ messages, after which every marginal is available ([Appendix A](#block-ai09-appendix-a)). On a factor graph (chapter 8), the same algorithm alternates two kinds of messages, variable-to-factor (the product of the other incoming messages) and factor-to-variable (the factor times the incoming messages, summed over all its other variables), and it is known as the **sum-product** algorithm ([Kschischang, Frey, and Loeliger, 2001](https://doi.org/10.1109/18.910572)). The forward–backward algorithm for hidden Markov models (chapter 11) and the Kalman smoother are sum-product on a chain.
+A message can be sent once its sender has heard from all its other neighbors. Choosing a root, an upward pass from the leaves and a downward pass from the root compute all $`2(n-1)`$ messages, after which every marginal is available ([Appendix A](#block-ai09-appendix-a)). On a factor graph (chapter 8), the same algorithm alternates two kinds of messages, variable-to-factor (the product of the other incoming messages) and factor-to-variable (the factor times the incoming messages, summed over all its other variables), and it is known as the **sum-product** algorithm ([Kschischang, Frey, and Loeliger, 2001](https://doi.org/10.1109/18.910572)). The forward–backward algorithm for hidden Markov models (chapter 11) and the Kalman smoother are sum-product on a chain.
 
 ### <a id="max-product-and-map-inference"></a>Max-product and MAP inference
 
@@ -265,17 +265,17 @@ Two further ideas extend exact inference. **Knowledge compilation** turns a netw
 <summary><a id="block-ai09-appendix-a"></a><b>A. Sum-product is exact on trees</b></summary>
 
 
-Root the tree at node $r$. For an edge from child $i$ to parent $j$, let $T_i$ be the subtree of $i$. **Claim:** the upward message satisfies
+Root the tree at node $`r`$. For an edge from child $`i`$ to parent $`j`$, let $`T_i`$ be the subtree of $`i`$. **Claim:** the upward message satisfies
 
 $$
 m_{i\to j}(x_j)=\sum_{x_{T_i}}\psi_{ij}(x_i,x_j)\prod_{u\in T_i}\phi_u(x_u)\prod_{(u,v)\in T_i}\psi_{uv}(x_u,x_v),
 $$
 
-the sum over all variables of the subtree of every factor that touches it. By induction on height: for a leaf, the message is $\sum_{x_i}\phi_i(x_i)\psi_{ij}(x_i,x_j)$, as claimed. For an internal node, the subtrees of its children are disjoint and share no factors, so the sum over $x_{T_i}$ factors into $\sum_{x_i}\phi_i\psi_{ij}$ times the product over children $k$ of the sums over their subtrees, which are the messages $m_{k\to i}(x_i)$ by the induction hypothesis. This is exactly the message formula.
+the sum over all variables of the subtree of every factor that touches it. By induction on height: for a leaf, the message is $`\sum_{x_i}\phi_i(x_i)\psi_{ij}(x_i,x_j)`$, as claimed. For an internal node, the subtrees of its children are disjoint and share no factors, so the sum over $`x_{T_i}`$ factors into $`\sum_{x_i}\phi_i\psi_{ij}`$ times the product over children $`k`$ of the sums over their subtrees, which are the messages $`m_{k\to i}(x_i)`$ by the induction hypothesis. This is exactly the message formula.
 
-At the root, $\phi_r(x_r)\prod_{i\in N(r)}m_{i\to r}(x_r)$ is then the sum of the unnormalized joint over all variables except $x_r$, which is $Z\,P(x_r)$. The same argument applies with any node as the root; the downward pass computes, for each node, the messages from the side of its parent, which are exactly the messages that node would receive if it were the root. Hence every belief is the exact marginal after normalization, and the sum of any node's unnormalized belief is $Z$.
+At the root, $`\phi_r(x_r)\prod_{i\in N(r)}m_{i\to r}(x_r)`$ is then the sum of the unnormalized joint over all variables except $`x_r`$, which is $`Z\,P(x_r)`$. The same argument applies with any node as the root; the downward pass computes, for each node, the messages from the side of its parent, which are exactly the messages that node would receive if it were the root. Hence every belief is the exact marginal after normalization, and the sum of any node's unnormalized belief is $`Z`$.
 
-Replacing sums by maxima throughout, the same induction shows that $m_{i\to j}(x_j)$ is the maximum over the subtree's variables, and the root's belief is the max-marginal $\max_{x_{-r}}\tilde P(x)$. The argument uses only that multiplication distributes over the aggregation, $a\max(b,c)=\max(ab,ac)$ for $a\ge0$ as for sums, so the algorithm works in any **commutative semiring**: sum-product for marginals, max-product for MAP, and Boolean or-and for constraint satisfaction, where it becomes the directed arc consistency of chapter 3.
+Replacing sums by maxima throughout, the same induction shows that $`m_{i\to j}(x_j)`$ is the maximum over the subtree's variables, and the root's belief is the max-marginal $`\max_{x_{-r}}\tilde P(x)`$. The argument uses only that multiplication distributes over the aggregation, $`a\max(b,c)=\max(ab,ac)`$ for $`a\ge0`$ as for sums, so the algorithm works in any **commutative semiring**: sum-product for marginals, max-product for MAP, and Boolean or-and for constraint satisfaction, where it becomes the directed arc consistency of chapter 3.
 
 </details>
 
@@ -285,7 +285,7 @@ Replacing sums by maxima throughout, the same induction shows that $m_{i\to j}(x
 <summary><a id="block-ai09-appendix-b"></a><b>B. Inference is #P-hard</b></summary>
 
 
-Given a 3-CNF formula with variables $U_1,\dots,U_n$ and clauses $C_1,\dots,C_m$, build a Bayesian network with root nodes $U_i$, each with $P(U_i=\text{true})=1/2$; a node $C_j$ for each clause, a deterministic OR of the literals it contains, with the three variables as parents; and a chain of deterministic AND nodes $A_1,\dots,A_m$, with $A_1=C_1$ and $A_j=A_{j-1}\wedge C_j$, so that each node has at most three parents. Then
+Given a 3-CNF formula with variables $`U_1,\dots,U_n`$ and clauses $`C_1,\dots,C_m`$, build a Bayesian network with root nodes $`U_i`$, each with $`P(U_i=\text{true})=1/2`$; a node $`C_j`$ for each clause, a deterministic OR of the literals it contains, with the three variables as parents; and a chain of deterministic AND nodes $`A_1,\dots,A_m`$, with $`A_1=C_1`$ and $`A_j=A_{j-1}\wedge C_j`$, so that each node has at most three parents. Then
 
 $$
 P(A_m=\text{true})=\frac{\#\{\text{satisfying assignments}\}}{2^n}.
@@ -301,9 +301,9 @@ The network has size polynomial in the formula, so computing this marginal exact
 <summary><a id="block-ai09-appendix-c"></a><b>C. Elimination orders, chordal graphs, and treewidth</b></summary>
 
 
-Eliminating the vertices of a graph $G$ in an order $\pi$ and adding all fill-in edges produces the **induced graph** $G_\pi$. It is **chordal**: every cycle of length four or more has a chord. (In any cycle, the first vertex eliminated has its two cycle neighbors joined by a fill-in edge, a chord.) Conversely, every chordal graph has a **perfect elimination order**, one that adds no fill-in edges: repeatedly eliminate a **simplicial** vertex, whose neighbors already form a clique, which every chordal graph has. So elimination orders correspond to **triangulations** of $G$, chordal supergraphs, and the largest clique of the triangulation has one vertex more than the induced width.
+Eliminating the vertices of a graph $`G`$ in an order $`\pi`$ and adding all fill-in edges produces the **induced graph** $`G_\pi`$. It is **chordal**: every cycle of length four or more has a chord. (In any cycle, the first vertex eliminated has its two cycle neighbors joined by a fill-in edge, a chord.) Conversely, every chordal graph has a **perfect elimination order**, one that adds no fill-in edges: repeatedly eliminate a **simplicial** vertex, whose neighbors already form a clique, which every chordal graph has. So elimination orders correspond to **triangulations** of $`G`$, chordal supergraphs, and the largest clique of the triangulation has one vertex more than the induced width.
 
-The maximal cliques of a chordal graph can be arranged in a tree with the running intersection property, a junction tree, for instance as a maximum-weight spanning tree of the clique graph with separator sizes as weights. The **treewidth** of $G$ is the minimum over triangulations of the largest clique size minus one, equivalently the minimum induced width over elimination orders, and equivalently the minimum width of a tree decomposition as defined in chapter 3. Computing it is NP-hard ([Arnborg, Corneil, and Proskurowski, 1987](https://doi.org/10.1137/0608024)), but it can be computed in linear time for any fixed bound on the width, and the greedy heuristics are usually close on sparse graphs.
+The maximal cliques of a chordal graph can be arranged in a tree with the running intersection property, a junction tree, for instance as a maximum-weight spanning tree of the clique graph with separator sizes as weights. The **treewidth** of $`G`$ is the minimum over triangulations of the largest clique size minus one, equivalently the minimum induced width over elimination orders, and equivalently the minimum width of a tree decomposition as defined in chapter 3. Computing it is NP-hard ([Arnborg, Corneil, and Proskurowski, 1987](https://doi.org/10.1137/0608024)), but it can be computed in linear time for any fixed bound on the width, and the greedy heuristics are usually close on sparse graphs.
 
 </details>
 

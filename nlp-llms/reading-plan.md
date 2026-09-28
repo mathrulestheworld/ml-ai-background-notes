@@ -51,7 +51,7 @@ Slide links are the courses' original PDFs; CS224N videos are the Spring 2024 re
 
 ## <a id="2-n-gram-language-models-and-perplexity"></a>2. N-gram language models and perplexity
 
-**Topics:** Language models and the chain rule; the Markov assumption; maximum-likelihood estimation; sparsity and smoothing: add-$k$, backoff, interpolation, and Kneser–Ney; perplexity and cross-entropy; the entropy of English; sampling from a language model; the noisy channel.
+**Topics:** Language models and the chain rule; the Markov assumption; maximum-likelihood estimation; sparsity and smoothing: add-$`k`$, backoff, interpolation, and Kneser–Ney; perplexity and cross-entropy; the entropy of English; sampling from a language model; the noisy channel.
 
 - **SLP3 chapter 3 and appendix C: N-gram language models, Kneser–Ney smoothing.** [Chapter 3 · PDF](https://web.stanford.edu/~jurafsky/slp3/3.pdf) · [Slides · PDF](https://web.stanford.edu/~jurafsky/slp3/slides/lm_jan25.pdf) · [Appendix C · PDF](https://web.stanford.edu/~jurafsky/slp3/C.pdf)
 - **CS224N lecture 5: Recurrent neural networks, first half on language models and n-grams.** [Slides · PDF](https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1246/slides/cs224n-spr2024-lecture05-rnnlm.pdf) · [Video](https://www.youtube.com/watch?v=fyc0Jzr74y4)
@@ -112,7 +112,7 @@ Slide links are the courses' original PDFs; CS224N videos are the Spring 2024 re
 
 ## <a id="8-decoding-and-text-generation"></a>8. Decoding and text generation
 
-**Topics:** Generation as search and as sampling; greedy and beam search; the likelihood trap and degenerate text; temperature, top-$k$, nucleus, and min-$p$ sampling; repetition penalties; constrained decoding and structured output; speculative decoding and why it is exact; the cost of generation: prefill and decode, batching, and paged key–value caches.
+**Topics:** Generation as search and as sampling; greedy and beam search; the likelihood trap and degenerate text; temperature, top-$`k`$, nucleus, and min-$`p`$ sampling; repetition penalties; constrained decoding and structured output; speculative decoding and why it is exact; the cost of generation: prefill and decode, batching, and paged key–value caches.
 
 - **CMU 11-711 lecture 9: Decoding algorithms.** [Slides · PDF](https://cmu-l3.github.io/anlp-fall2025/static_files/anlp-f2025-09-decoding.pdf)
 - **CS336 lecture 10: Inference.** [Executable lecture](http://cs336.stanford.edu/spring2025-lectures/?trace=var/traces/lecture_10.json) · [Video](https://www.youtube.com/watch?v=fcgPYo3OtV0)
@@ -140,7 +140,7 @@ Slide links are the courses' original PDFs; CS224N videos are the Spring 2024 re
 
 ## <a id="11-learning-from-human-preferences"></a>11. Learning from human preferences
 
-**Topics:** Why imitation is not enough; collecting preferences; the Bradley–Terry reward model; KL-regularized reward maximization and its optimal policy; RLHF with a policy-gradient optimizer; direct preference optimization and its variants; best-of-$n$ sampling; reward overoptimization; AI feedback and constitutional methods; what preference tuning changes in a model.
+**Topics:** Why imitation is not enough; collecting preferences; the Bradley–Terry reward model; KL-regularized reward maximization and its optimal policy; RLHF with a policy-gradient optimizer; direct preference optimization and its variants; best-of-$`n`$ sampling; reward overoptimization; AI feedback and constitutional methods; what preference tuning changes in a model.
 
 - **CS224N lecture 10: Post-training, second part on RLHF and DPO.** [Slides · PDF](https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1246/slides/cs224n-spr2024-lecture10-prompting-rlhf.pdf) · [Video](https://www.youtube.com/watch?v=35X6zlhoCy4)
 - **CS336 lecture 15: Alignment, SFT and RLHF.** [Slides · PDF](https://github.com/stanford-cs336/spring2025-lectures/blob/61eddac004df975466cff0329b615f2d24230069/nonexecutable/2025%20Lecture%2015%20-%20RLHF%20Alignment.pdf) · [Video](https://www.youtube.com/watch?v=Dfu7vC9jo4w)
@@ -150,7 +150,7 @@ Slide links are the courses' original PDFs; CS224N videos are the Spring 2024 re
 
 ## <a id="12-reasoning-and-test-time-compute"></a>12. Reasoning and test-time compute
 
-**Topics:** Chain-of-thought prompting and why intermediate tokens add computation; self-consistency and majority voting; best-of-$n$ with verifiers; outcome and process reward models; search over reasoning steps; reinforcement learning from verifiable rewards; test-time scaling; the limits and faithfulness of reasoning traces.
+**Topics:** Chain-of-thought prompting and why intermediate tokens add computation; self-consistency and majority voting; best-of-$`n`$ with verifiers; outcome and process reward models; search over reasoning steps; reinforcement learning from verifiable rewards; test-time scaling; the limits and faithfulness of reasoning traces.
 
 - **CS336 lecture 16: Alignment, reinforcement learning from verifiable rewards.** [Slides · PDF](https://github.com/stanford-cs336/spring2025-lectures/blob/e94e33f433985e57036b25215dff2a4292e67a4f/nonexecutable/2025%20Lecture%2016%20-%20RLVR.pdf) · [Video](https://www.youtube.com/watch?v=46f2QTDB08Q)
 - **CS336 lecture 17: Alignment, policy gradients for language models.** [Executable lecture](http://cs336.stanford.edu/spring2025-lectures/?trace=var/traces/lecture_17.json) · [Video](https://www.youtube.com/watch?v=JdGFdViaOJk)
@@ -172,13 +172,13 @@ Slide links are the courses' original PDFs; CS224N videos are the Spring 2024 re
 
 ## <a id="14-evaluating-language-models"></a>14. Evaluating language models
 
-**Topics:** Perplexity and bits per byte; kinds of benchmarks: multiple choice, free generation, and execution; the pass@$k$ estimator; contamination; human and model judges and their biases; pairwise comparisons and rating systems; the statistics of evaluation: standard errors, clustered questions, and paired comparisons; holistic evaluation; Goodhart's law and saturated benchmarks.
+**Topics:** Perplexity and bits per byte; kinds of benchmarks: multiple choice, free generation, and execution; the pass@$`k`$ estimator; contamination; human and model judges and their biases; pairwise comparisons and rating systems; the statistics of evaluation: standard errors, clustered questions, and paired comparisons; holistic evaluation; Goodhart's law and saturated benchmarks.
 
 - **CS224N lecture 11: Benchmarking and evaluation (Yann Dubois).** [Slides · PDF](https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1246/slides/cs224n-spr2024-lecture11-evaluation-yann.pdf) · [Video](https://www.youtube.com/watch?v=TO0CqzqiArM)
 - **CS336 lecture 12: Evaluation.** [Executable lecture](http://cs336.stanford.edu/spring2025-lectures/?trace=var/traces/lecture_12.json) · [Video](https://www.youtube.com/watch?v=x-R5l2HsXqM)
 - **CMU 11-711 lectures 13–14: Evaluation techniques, experimental design.** [Slides 13 · PDF](https://cmu-l3.github.io/anlp-fall2025/static_files/anlp-f2025-13-evaluation.pdf) · [Slides 14 · PDF](https://cmu-l3.github.io/anlp-fall2025/static_files/anlp-f2025-14-experimentation.pdf)
 
-**Further reading:** Miller, [Adding error bars to evals](https://arxiv.org/abs/2411.00640) (2024); Chen et al., [Evaluating large language models trained on code](https://arxiv.org/abs/2107.03374) (2021), which defines pass@$k$; Zheng et al., [Judging LLM-as-a-judge](https://arxiv.org/abs/2306.05685) (2023); Chiang et al., [Chatbot Arena](https://arxiv.org/abs/2403.04132) (2024); Biderman et al., [Lessons from the trenches on reproducible evaluation of language models](https://arxiv.org/abs/2405.14782) (2024).
+**Further reading:** Miller, [Adding error bars to evals](https://arxiv.org/abs/2411.00640) (2024); Chen et al., [Evaluating large language models trained on code](https://arxiv.org/abs/2107.03374) (2021), which defines pass@$`k`$; Zheng et al., [Judging LLM-as-a-judge](https://arxiv.org/abs/2306.05685) (2023); Chiang et al., [Chatbot Arena](https://arxiv.org/abs/2403.04132) (2024); Biderman et al., [Lessons from the trenches on reproducible evaluation of language models](https://arxiv.org/abs/2405.14782) (2024).
 
 ## <a id="15-machine-translation-and-multilingual-models-optional"></a>15. Machine translation and multilingual models — optional
 

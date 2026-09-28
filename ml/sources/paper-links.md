@@ -10,9 +10,9 @@ The notes link these works where their ideas arise. This index collects the orig
 
 | Work | Idea developed in the module |
 | --- | --- |
-| Cover and Hart, [*Nearest Neighbor Pattern Classification*](https://doi.org/10.1109/TIT.1967.1053964) (1967) | The asymptotic 1-NN error lies between $R^*$ and $2R^*(1-R^*)$ (chapter 1). |
-| Stone, [*Consistent Nonparametric Regression*](https://doi.org/10.1214/aos/1176343886) (1977) | Conditions under which local averaging rules, including $k$-NN, are universally consistent (chapter 1). |
-| Stone, [*Optimal Global Rates of Convergence for Nonparametric Regression*](https://doi.org/10.1214/aos/1176345969) (1982) | The minimax rate $n^{-2/(d+2)}$ for Lipschitz regression functions and its dependence on dimension (chapter 1). |
+| Cover and Hart, [*Nearest Neighbor Pattern Classification*](https://doi.org/10.1109/TIT.1967.1053964) (1967) | The asymptotic 1-NN error lies between $`R^*`$ and $`2R^*(1-R^*)`$ (chapter 1). |
+| Stone, [*Consistent Nonparametric Regression*](https://doi.org/10.1214/aos/1176343886) (1977) | Conditions under which local averaging rules, including $`k`$-NN, are universally consistent (chapter 1). |
+| Stone, [*Optimal Global Rates of Convergence for Nonparametric Regression*](https://doi.org/10.1214/aos/1176345969) (1982) | The minimax rate $`n^{-2/(d+2)}`$ for Lipschitz regression functions and its dependence on dimension (chapter 1). |
 | Beyer, Goldstein, Ramakrishnan, and Shaft, [*When Is "Nearest Neighbor" Meaningful?*](https://minds.wisconsin.edu/handle/1793/60174) (1999) | Concentration of distances in high dimension (chapter 1). |
 | Kpotufe, [*k-NN Regression Adapts to Local Intrinsic Dimension*](https://proceedings.neurips.cc/paper/2011/hash/05f971b5ec196b8c65b75d2ef8267331-Abstract.html) (2011) | Why nearest neighbors can work on high-dimensional data of low intrinsic dimension (chapter 1). |
 | Rosenblatt, [*The Perceptron: A Probabilistic Model for Information Storage and Organization in the Brain*](https://doi.org/10.1037/h0042519) (1958) | The perceptron (chapter 2). |
@@ -47,12 +47,12 @@ The notes link these works where their ideas arise. This index collects the orig
 | Cawley and Talbot, [*On Over-fitting in Model Selection and Subsequent Selection Bias in Performance Evaluation*](https://www.jmlr.org/papers/v11/cawley10a.html) (2010) | Selection bias and nested cross-validation (chapter 6). |
 | Kaufman, Rosset, Perlich, and Stitelman, [*Leakage in Data Mining: Formulation, Detection, and Avoidance*](https://dl.acm.org/doi/10.1145/2382577.2382579) (2012) | Data leakage (chapter 6). |
 | Fawcett, [*An Introduction to ROC Analysis*](https://www.sciencedirect.com/science/article/abs/pii/S016786550500303X) (2006) | ROC curves and AUC (chapter 6). |
-| Dietterich, [*Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms*](https://dl.acm.org/doi/10.1162/089976698300017197) (1998) | McNemar's test and the pitfalls of resampled $t$ tests (chapter 6). |
-| Nadeau and Bengio, [*Inference for the Generalization Error*](https://link.springer.com/article/10.1023/A:1024068626366) (2003) | The corrected resampled $t$ test (chapter 6). |
+| Dietterich, [*Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms*](https://dl.acm.org/doi/10.1162/089976698300017197) (1998) | McNemar's test and the pitfalls of resampled $`t`$ tests (chapter 6). |
+| Nadeau and Bengio, [*Inference for the Generalization Error*](https://link.springer.com/article/10.1023/A:1024068626366) (2003) | The corrected resampled $`t`$ test (chapter 6). |
 | Blumer, Ehrenfeucht, Haussler, and Warmuth, [*Learnability and the Vapnik–Chervonenkis Dimension*](https://dl.acm.org/doi/10.1145/76359.76371) (1989) | Finite VC dimension characterizes PAC learnability (chapter 7). |
 | Sauer, [*On the Density of Families of Sets*](https://www.sciencedirect.com/science/article/pii/0097316572900192) (1972) | Sauer's lemma (chapter 7). |
-| Ehrenfeucht, Haussler, Kearns, and Valiant, [*A General Lower Bound on the Number of Examples Needed for Learning*](https://www.sciencedirect.com/science/article/pii/0890540189900023) (1989) | The $\Omega(v/\varepsilon)$ realizable lower bound for VC dimension $v$ (chapter 7). |
-| Hanneke, [*The Optimal Sample Complexity of PAC Learning*](https://jmlr.org/papers/v17/15-389.html) (2016) | Removing the $\log(1/\varepsilon)$ factor from the realizable upper bound (chapter 7). |
+| Ehrenfeucht, Haussler, Kearns, and Valiant, [*A General Lower Bound on the Number of Examples Needed for Learning*](https://www.sciencedirect.com/science/article/pii/0890540189900023) (1989) | The $`\Omega(v/\varepsilon)`$ realizable lower bound for VC dimension $`v`$ (chapter 7). |
+| Hanneke, [*The Optimal Sample Complexity of PAC Learning*](https://jmlr.org/papers/v17/15-389.html) (2016) | Removing the $`\log(1/\varepsilon)`$ factor from the realizable upper bound (chapter 7). |
 | Pitt and Valiant, [*Computational Limitations on Learning from Examples*](https://dl.acm.org/doi/10.1145/48014.63140) (1988) | Representation-dependent hardness of learning (chapter 7). |
 | Littlestone, [*Learning Quickly When Irrelevant Attributes Abound: A New Linear-Threshold Algorithm*](https://link.springer.com/article/10.1023/A:1022869011914) (1988) | The mistake-bound model and the Littlestone dimension (chapter 7). |
 | Littlestone and Warmuth, [*The Weighted Majority Algorithm*](https://www.sciencedirect.com/science/article/pii/S0890540184710091) (1994) | Learning from expert advice (chapter 7). |
@@ -102,7 +102,7 @@ The notes link these works where their ideas arise. This index collects the orig
 | Jolliffe and Cadima, [*Principal Component Analysis: A Review and Recent Developments*](https://royalsocietypublishing.org/rsta/article/374/2065/20150202/115142/Principal-component-analysis-a-review-and-recent) (2016) | Survey (chapter 12). |
 | Kleinberg, [*An Impossibility Theorem for Clustering*](https://proceedings.neurips.cc/paper/2002/hash/43e4e6a6f341e00671e123714de019a8-Abstract.html) (2002) | No clustering function satisfies three natural axioms (chapter 13). |
 | Lloyd, [*Least Squares Quantization in PCM*](https://ieeexplore.ieee.org/document/1056489/) (1982) | Lloyd's algorithm (chapter 13). |
-| Arthur and Vassilvitskii, [*k-means++: The Advantages of Careful Seeding*](https://dl.acm.org/doi/10.5555/1283383.1283494) (2007) | $k$-means++ and its $O(\log k)$ guarantee (chapter 13). |
+| Arthur and Vassilvitskii, [*k-means++: The Advantages of Careful Seeding*](https://dl.acm.org/doi/10.5555/1283383.1283494) (2007) | $`k`$-means++ and its $`O(\log k)`$ guarantee (chapter 13). |
 | Ward, [*Hierarchical Grouping to Optimize an Objective Function*](https://www.tandfonline.com/doi/abs/10.1080/01621459.1963.10500845) (1963) | Ward linkage (chapter 13). |
 | Tibshirani, Walther, and Hastie, [*Estimating the Number of Clusters in a Data Set via the Gap Statistic*](https://academic.oup.com/jrsssb/article/63/2/411/7083348) (2001) | The gap statistic (chapter 13). |
 | Rousseeuw, [*Silhouettes: A Graphical Aid to the Interpretation and Validation of Cluster Analysis*](https://www.sciencedirect.com/science/article/pii/0377042787901257) (1987) | Silhouette widths (chapter 13). |
@@ -132,5 +132,5 @@ The notes link these works where their ideas arise. This index collects the orig
 | Settles, [*Active Learning Literature Survey*](https://burrsettles.com/pub/settles.activelearning.pdf) (2009) | Survey (chapter 16). |
 | Cleveland, [*Robust Locally Weighted Regression and Smoothing Scatterplots*](https://www.tandfonline.com/doi/abs/10.1080/01621459.1979.10481038) (1979) | LOESS (chapter 17). |
 | Hastie and Tibshirani, [*Generalized Additive Models*](https://projecteuclid.org/journals/statistical-science/volume-1/issue-3/Generalized-Additive-Models/10.1214/ss/1177013604.full) (1986) | Additive models and backfitting (chapter 17). |
-| Friedman, Bentley, and Finkel, [*An Algorithm for Finding Best Matches in Logarithmic Expected Time*](https://dl.acm.org/doi/10.1145/355744.355745) (1977) | $k$-d tree search (chapter 17). |
+| Friedman, Bentley, and Finkel, [*An Algorithm for Finding Best Matches in Logarithmic Expected Time*](https://dl.acm.org/doi/10.1145/355744.355745) (1977) | $`k`$-d tree search (chapter 17). |
 | Malkov and Yashunin, [*Efficient and Robust Approximate Nearest Neighbor Search Using Hierarchical Navigable Small World Graphs*](https://arxiv.org/abs/1603.09320) (2016) | Graph-based approximate search (chapter 17). |

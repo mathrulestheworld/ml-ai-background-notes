@@ -22,13 +22,13 @@ $$
 \delta_t=R_{t+1}+\gamma V(S_{t+1})-V(S_t),
 $$
 
-the difference between the **TD target** $R_{t+1}+\gamma V(S_{t+1})$ and the current estimate. Compare the three targets for $v_\pi(S_t)$:
+the difference between the **TD target** $`R_{t+1}+\gamma V(S_{t+1})`$ and the current estimate. Compare the three targets for $`v_\pi(S_t)`$:
 
-- **Monte Carlo** uses the sampled return $G_t$, an unbiased sample of $v_\pi(S_t)$ that is available only at the end of the episode.
-- **Dynamic programming** uses $\mathbb E_\pi[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t]$, an exact expectation computed from the model, with the current estimate standing in for $v_\pi$.
-- **TD** uses $R_{t+1}+\gamma V(S_{t+1})$, which **samples** the expectation, as Monte Carlo does, and **bootstraps** from the current estimate, as DP does.
+- **Monte Carlo** uses the sampled return $`G_t`$, an unbiased sample of $`v_\pi(S_t)`$ that is available only at the end of the episode.
+- **Dynamic programming** uses $`\mathbb E_\pi[R_{t+1}+\gamma v_\pi(S_{t+1})\mid S_t]`$, an exact expectation computed from the model, with the current estimate standing in for $`v_\pi`$.
+- **TD** uses $`R_{t+1}+\gamma V(S_{t+1})`$, which **samples** the expectation, as Monte Carlo does, and **bootstraps** from the current estimate, as DP does.
 
-The TD error is the error of an estimate made at time $t$, revealed at time $t+1$. If the estimates did not change during an episode, the Monte Carlo error would be exactly the discounted sum of the TD errors along the way,
+The TD error is the error of an estimate made at time $`t`$, revealed at time $`t+1`$. If the estimates did not change during an episode, the Monte Carlo error would be exactly the discounted sum of the TD errors along the way,
 
 $$
 G_t-V(S_t)=\sum_{k=0}^{T-t-1}\gamma^k\delta_{t+k}
@@ -44,7 +44,7 @@ Sutton and Barto illustrate the difference with a commute. Leaving the office, y
 
 ### <a id="the-random-walk"></a>The random walk
 
-Sutton and Barto's **random walk** is a Markov reward process with five states A to E in a row between two terminal states. Every episode starts in the middle state C and moves left or right with equal probability; reaching the right end gives reward 1, and every other reward is 0. With no discounting, the true value of each state is its probability of ending on the right, $1/6,2/6,\dots,5/6$. The code compares TD(0) with constant-α Monte Carlo, both starting from estimates of 0.5.
+Sutton and Barto's **random walk** is a Markov reward process with five states A to E in a row between two terminal states. Every episode starts in the middle state C and moves left or right with equal probability; reaching the right end gives reward 1, and every other reward is 0. With no discounting, the true value of each state is its probability of ending on the right, $`1/6,2/6,\dots,5/6`$. The code compares TD(0) with constant-α Monte Carlo, both starting from estimates of 0.5.
 
 ```python
 import numpy as np
@@ -97,7 +97,7 @@ for method, alphas in [("TD", [0.05, 0.1, 0.15]), ("MC", [0.01, 0.02, 0.03, 0.04
 #   MC alpha 0.04: 0.177 / 0.110
 ```
 
-TD learns faster than Monte Carlo at the step sizes tried: after 100 episodes its error with $\alpha=0.05$ is 0.038, less than half of the best Monte Carlo error. The table also shows the trade-off in the step size: larger steps learn faster at first but settle at a higher error, because a constant step keeps the estimates fluctuating with the most recent outcomes.
+TD learns faster than Monte Carlo at the step sizes tried: after 100 episodes its error with $`\alpha=0.05`$ is 0.038, less than half of the best Monte Carlo error. The table also shows the trade-off in the step size: larger steps learn faster at first but settle at a higher error, because a constant step keeps the estimates fluctuating with the most recent outcomes.
 
 <img src="sources/images/rl-td-randomwalk.png" alt="rl-td-randomwalk" width="880">
 
@@ -105,13 +105,13 @@ TD learns faster than Monte Carlo at the step sizes tried: after 100 episodes it
 
 ### <a id="bias-and-variance-of-the-targets"></a>Bias and variance of the targets
 
-The targets explain the result. The Monte Carlo target $G_t$ is unbiased but depends on every random transition until the end of the episode, so its variance grows with the episode's length. The TD target depends on one random transition, so its variance is much smaller, but it uses the current estimate $V(S_{t+1})$, which is wrong while learning is incomplete, so it is biased. As the estimates improve the bias shrinks, and TD's lower variance usually wins. The bias is not always harmless: with function approximation and off-policy data, bootstrapping from inaccurate estimates can make learning diverge (chapter 12), a failure Monte Carlo methods cannot suffer. The multi-step methods of chapter 8 trade between the two targets continuously.
+The targets explain the result. The Monte Carlo target $`G_t`$ is unbiased but depends on every random transition until the end of the episode, so its variance grows with the episode's length. The TD target depends on one random transition, so its variance is much smaller, but it uses the current estimate $`V(S_{t+1})`$, which is wrong while learning is incomplete, so it is biased. As the estimates improve the bias shrinks, and TD's lower variance usually wins. The bias is not always harmless: with function approximation and off-policy data, bootstrapping from inaccurate estimates can make learning diverge (chapter 12), a failure Monte Carlo methods cannot suffer. The multi-step methods of chapter 8 trade between the two targets continuously.
 
 ## <a id="batch-updating-and-certainty-equivalence"></a>Batch updating and certainty equivalence
 
 ### <a id="two-estimates-from-the-same-data"></a>Two estimates from the same data
 
-Suppose only a finite amount of experience is available, as when data are expensive. One can present the same episodes over and over, accumulating the increments over the whole batch and applying them together, until the estimates converge. For small enough $\alpha$, batch TD(0) and batch Monte Carlo both converge to single answers, independent of $\alpha$, but different ones. Sutton and Barto's Example 6.4 shows how. Eight episodes were observed: once, the agent went from A to B with reward 0 and then terminated with reward 0; six times it started in B and terminated with reward 1; once it started in B and terminated with reward 0.
+Suppose only a finite amount of experience is available, as when data are expensive. One can present the same episodes over and over, accumulating the increments over the whole batch and applying them together, until the estimates converge. For small enough $`\alpha`$, batch TD(0) and batch Monte Carlo both converge to single answers, independent of $`\alpha`$, but different ones. Sutton and Barto's Example 6.4 shows how. Eight episodes were observed: once, the agent went from A to B with reward 0 and then terminated with reward 0; six times it started in B and terminated with reward 1; once it started in B and terminated with reward 0.
 
 ```python
 import numpy as np
@@ -178,29 +178,29 @@ for name, e in err.items():
 # batch MC: RMS error after 10 / 30 / 100 episodes: 0.189 / 0.108 / 0.056
 ```
 
-Both methods agree that $V(B)=3/4$. For A, Monte Carlo gives 0, the only return observed from A. TD gives $3/4$: A was followed by B, B is worth $3/4$, so A must be worth $3/4$ too. Which is better? Batch Monte Carlo minimizes the squared error on the observed returns; for A it fits the single observed return exactly. Batch TD finds the value function of the **maximum-likelihood model** of the process: the Markov reward process whose transition probabilities and expected rewards are the observed frequencies and averages, here "A always goes to B". Its estimates are exactly right if that model is right, which is why it is called the **certainty-equivalence** estimate ([Appendix B](#block-rl06-appendix-b)). If the process is Markov, the TD answer should generalize better to new data: the single episode from A is weak evidence compared with the eight observations of B. On the random walk, batch TD has lower error than batch Monte Carlo at every batch size beyond the first, as the code and the right panel of the figure show.
+Both methods agree that $`V(B)=3/4`$. For A, Monte Carlo gives 0, the only return observed from A. TD gives $`3/4`$: A was followed by B, B is worth $`3/4`$, so A must be worth $`3/4`$ too. Which is better? Batch Monte Carlo minimizes the squared error on the observed returns; for A it fits the single observed return exactly. Batch TD finds the value function of the **maximum-likelihood model** of the process: the Markov reward process whose transition probabilities and expected rewards are the observed frequencies and averages, here "A always goes to B". Its estimates are exactly right if that model is right, which is why it is called the **certainty-equivalence** estimate ([Appendix B](#block-rl06-appendix-b)). If the process is Markov, the TD answer should generalize better to new data: the single episode from A is weak evidence compared with the eight observations of B. On the random walk, batch TD has lower error than batch Monte Carlo at every batch size beyond the first, as the code and the right panel of the figure show.
 
 ### <a id="why-td-is-often-faster"></a>Why TD is often faster
 
-TD exploits the Markov property: it propagates information between states along the observed transitions, so every observation of B improves the estimate of every state that leads to B. Monte Carlo treats each state's returns in isolation. Batch TD reaches the certainty-equivalence estimate without ever forming the model: forming the model can take $O(|\mathcal S|^2)$ memory and solving for its values $O(|\mathcal S|^3)$ computation by conventional methods, while TD needs $O(|\mathcal S|)$ memory and repeated passes over the data. Nonbatch TD moves roughly toward the same estimate, which helps explain its speed. The advantage depends on the Markov property; when the states are only partial observations of the environment, the certainty-equivalence model is wrong, and Monte Carlo's refusal to rely on it can be an advantage.
+TD exploits the Markov property: it propagates information between states along the observed transitions, so every observation of B improves the estimate of every state that leads to B. Monte Carlo treats each state's returns in isolation. Batch TD reaches the certainty-equivalence estimate without ever forming the model: forming the model can take $`O(|\mathcal S|^2)`$ memory and solving for its values $`O(|\mathcal S|^3)`$ computation by conventional methods, while TD needs $`O(|\mathcal S|)`$ memory and repeated passes over the data. Nonbatch TD moves roughly toward the same estimate, which helps explain its speed. The advantage depends on the Markov property; when the states are only partial observations of the environment, the certainty-equivalence model is wrong, and Monte Carlo's refusal to rely on it can be an advantage.
 
 ## <a id="convergence-of-td-0"></a>Convergence of TD(0)
 
 ### <a id="stochastic-approximation"></a>Stochastic approximation
 
-TD(0) is a **stochastic approximation** algorithm: each update moves the estimate a step toward a noisy sample of $(\mathcal T^\pi V)(S_t)$, where the Bellman operator $\mathcal T^\pi$ is a contraction. For a fixed policy, the expected TD update at a state $s$ is
+TD(0) is a **stochastic approximation** algorithm: each update moves the estimate a step toward a noisy sample of $`(\mathcal T^\pi V)(S_t)`$, where the Bellman operator $`\mathcal T^\pi`$ is a contraction. For a fixed policy, the expected TD update at a state $`s`$ is
 
 $$
 \mathbb E[\delta_t\mid S_t=s]=r^\pi(s)+\gamma\sum_{s'}P^\pi_{ss'}V(s')-V(s)=(\mathcal T^\pi V)(s)-V(s),
 $$
 
-so on average TD moves $V$ toward $\mathcal T^\pi V$, like iterative policy evaluation, but one sampled state at a time. Under the Robbins–Monro conditions on the step sizes of chapter 3, applied to each state's own sequence of updates, and if every state is visited infinitely often, tabular TD(0) converges to $v_\pi$ with probability one ([Dayan and Sejnowski, 1994](https://doi.org/10.1007/BF00993978); [Jaakkola, Jordan, and Singh, 1994](https://doi.org/10.1162/neco.1994.6.6.1185); [Tsitsiklis, 1994](https://doi.org/10.1007/BF00993306)). With a constant step size that is small enough, it converges in mean to $v_\pi$ and fluctuates around it with a variance of order $\alpha$. [Appendix A](#block-rl06-appendix-a) sketches the argument. Finite-time bounds on the error, including the linear function approximation of chapter 11, are more recent ([Bhandari, Russo, and Singal, 2018](https://arxiv.org/abs/1806.02450)).
+so on average TD moves $`V`$ toward $`\mathcal T^\pi V`$, like iterative policy evaluation, but one sampled state at a time. Under the Robbins–Monro conditions on the step sizes of chapter 3, applied to each state's own sequence of updates, and if every state is visited infinitely often, tabular TD(0) converges to $`v_\pi`$ with probability one ([Dayan and Sejnowski, 1994](https://doi.org/10.1007/BF00993978); [Jaakkola, Jordan, and Singh, 1994](https://doi.org/10.1162/neco.1994.6.6.1185); [Tsitsiklis, 1994](https://doi.org/10.1007/BF00993306)). With a constant step size that is small enough, it converges in mean to $`v_\pi`$ and fluctuates around it with a variance of order $`\alpha`$. [Appendix A](#block-rl06-appendix-a) sketches the argument. Finite-time bounds on the error, including the linear function approximation of chapter 11, are more recent ([Bhandari, Russo, and Singal, 2018](https://arxiv.org/abs/1806.02450)).
 
 Sutton and Barto note that no one has proved which of TD and Monte Carlo converges faster in general, or even settled how to state the question formally; empirically, TD is usually faster on stochastic tasks, as on the random walk.
 
 ### <a id="step-sizes-in-practice"></a>Step sizes in practice
 
-The theory asks for decreasing step sizes, and practice often uses constant ones, because the values being learned change: the policy changes during control, the environment may drift, and with function approximation every update changes many values. A constant step size leaves a noise floor, a mean squared error of order $\alpha$ (an RMS error of order $\sqrt\alpha$), as the random-walk curves show, and decaying it by a power of the visit count, such as $\alpha_n=n^{-0.7}$, satisfies the Robbins–Monro conditions while decaying more slowly than $1/n$ (exercise 6.4). Deep RL agents use constant or scheduled learning rates with optimizers such as Adam (chapter 16).
+The theory asks for decreasing step sizes, and practice often uses constant ones, because the values being learned change: the policy changes during control, the environment may drift, and with function approximation every update changes many values. A constant step size leaves a noise floor, a mean squared error of order $`\alpha`$ (an RMS error of order $`\sqrt\alpha`$), as the random-walk curves show, and decaying it by a power of the visit count, such as $`\alpha_n=n^{-0.7}`$, satisfies the Robbins–Monro conditions while decaying more slowly than $`1/n`$ (exercise 6.4). Deep RL agents use constant or scheduled learning rates with optimizers such as Adam (chapter 16).
 
 ## <a id="td-in-decision-problems-and-in-the-brain"></a>TD in decision problems and in the brain
 
@@ -252,11 +252,11 @@ print(f"learned value just after the cue: {V[0]:.3f} (the discounted reward, gam
 # learned value just after the cue: 0.681 (the discounted reward, gamma^19 = 0.681)
 ```
 
-On the first trial, the only surprise is the reward. After learning, the value just after the cue is the discounted value of the upcoming reward, 0.68, and the TD error occurs at the cue, which is unpredictable because it arrives at a random time; the reward itself is fully predicted and produces no error. Omitting the reward produces a negative error of $-1$ at the time it was due.
+On the first trial, the only surprise is the reward. After learning, the value just after the cue is the discounted value of the upcoming reward, 0.68, and the TD error occurs at the cue, which is unpredictable because it arrives at a random time; the reward itself is fully predicted and produces no error. Omitting the reward produces a negative error of $`-1`$ at the time it was due.
 
 <img src="sources/images/rl-td-dopamine.png" alt="rl-td-dopamine" width="880">
 
-*TD errors within a trial of the simulated conditioning experiment: a cue at step 10 and a reward of 1 at step 30, with $\gamma=0.98$ and a tapped-delay-line state that counts the steps since the cue. Left: during learning the error moves backward from the reward toward the cue, spreading out and shrinking as it goes, at roughly one step of the delay line per ten trials; it reaches the cue after about 200 trials. Middle: after learning, the error is at the cue only. Right: when the reward is omitted, the learned prediction produces a negative error at the time the reward was expected, the counterpart of the pause in dopamine firing.*
+*TD errors within a trial of the simulated conditioning experiment: a cue at step 10 and a reward of 1 at step 30, with $`\gamma=0.98`$ and a tapped-delay-line state that counts the steps since the cue. Left: during learning the error moves backward from the reward toward the cue, spreading out and shrinking as it goes, at roughly one step of the delay line per ten trials; it reaches the cue after about 200 trials. Middle: after learning, the error is at the cue only. Right: when the reward is omitted, the learned prediction produces a negative error at the time the reward was expected, the counterpart of the pause in dopamine firing.*
 
 The **reward prediction error hypothesis** of dopamine, that phasic dopamine activity signals a TD error which trains predictions and actions throughout the brain, is one of the most successful connections between machine learning and neuroscience, reviewed in chapter 15 of Sutton and Barto. It has since been refined in several directions, including the finding that different dopamine neurons weight positive and negative prediction errors differently and so appear to encode different expectiles of the reward distribution, from pessimistic to optimistic, much as the distributional TD methods of chapter 17 learn a set of quantiles or expectiles ([Dabney et al., 2020](https://www.nature.com/articles/s41586-019-1924-6)).
 
@@ -264,32 +264,32 @@ The **reward prediction error hypothesis** of dopamine, that phasic dopamine act
 
 ### <a id="exercise-6-1-monte-carlo-errors-as-sums-of-td-errors"></a>Exercise 6.1 — Monte Carlo errors as sums of TD errors
 
-(a) Show that if $V$ does not change during an episode, $G_t-V(S_t)=\sum_{k=0}^{T-t-1}\gamma^k\delta_{t+k}$. (b) If $V$ is updated by TD(0) during the episode, how does the identity change?
+(a) Show that if $`V`$ does not change during an episode, $`G_t-V(S_t)=\sum_{k=0}^{T-t-1}\gamma^k\delta_{t+k}`$. (b) If $`V`$ is updated by TD(0) during the episode, how does the identity change?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) With $V(S_T)=0$ at termination, $G_t-V(S_t)=R_{t+1}+\gamma G_{t+1}-V(S_t)=\delta_t+\gamma\bigl(G_{t+1}-V(S_{t+1})\bigr)$. Unrolling to the end gives the sum.
+(a) With $`V(S_T)=0`$ at termination, $`G_t-V(S_t)=R_{t+1}+\gamma G_{t+1}-V(S_t)=\delta_t+\gamma\bigl(G_{t+1}-V(S_{t+1})\bigr)`$. Unrolling to the end gives the sum.
 
-(b) Write $V_t$ for the estimates in use at time $t$. Then $\delta_t=R_{t+1}+\gamma V_t(S_{t+1})-V_t(S_t)$, and $G_t-V_t(S_t)=\delta_t+\gamma\bigl(G_{t+1}-V_{t+1}(S_{t+1})\bigr)+\gamma\bigl(V_{t+1}(S_{t+1})-V_t(S_{t+1})\bigr)$. The last term is nonzero only if $S_{t+1}=S_t$, since TD(0) changes only $V(S_t)$ at time $t$, and then it equals $\alpha\delta_t$. Unrolling gives the sum of discounted TD errors plus a correction $\sum_k\gamma^{k+1}\alpha\,\delta_{t+k}\mathbb 1[S_{t+k+1}=S_{t+k}]$, which is small for small $\alpha$. This identity underlies the forward and backward views of TD(λ) in chapter 8.
+(b) Write $`V_t`$ for the estimates in use at time $`t`$. Then $`\delta_t=R_{t+1}+\gamma V_t(S_{t+1})-V_t(S_t)`$, and $`G_t-V_t(S_t)=\delta_t+\gamma\bigl(G_{t+1}-V_{t+1}(S_{t+1})\bigr)+\gamma\bigl(V_{t+1}(S_{t+1})-V_t(S_{t+1})\bigr)`$. The last term is nonzero only if $`S_{t+1}=S_t`$, since TD(0) changes only $`V(S_t)`$ at time $`t`$, and then it equals $`\alpha\delta_t`$. Unrolling gives the sum of discounted TD errors plus a correction $`\sum_k\gamma^{k+1}\alpha\,\delta_{t+k}\mathbb 1[S_{t+k+1}=S_{t+k}]`$, which is small for small $`\alpha`$. This identity underlies the forward and backward views of TD(λ) in chapter 8.
 
 </details>
 
 
 ### <a id="exercise-6-2-the-random-walk"></a>Exercise 6.2 — The random walk
 
-(a) Derive the true values $1/6,\dots,5/6$ from the Bellman equations. (b) In the figure, the error of TD with $\alpha=0.15$ decreases and then increases slightly. Why? Would a different initialization change this?
+(a) Derive the true values $`1/6,\dots,5/6`$ from the Bellman equations. (b) In the figure, the error of TD with $`\alpha=0.15`$ decreases and then increases slightly. Why? Would a different initialization change this?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) With no discounting, $v(s)=\tfrac12v(s-1)+\tfrac12v(s+1)$ for $s=$ A to E, with $v(\text{left terminal})=0$ and the right transition from E worth $1+0$. So $v$ is linear in the position, $v(k)=k/6$ for $k=1,\dots,5$.
+(a) With no discounting, $`v(s)=\tfrac12v(s-1)+\tfrac12v(s+1)`$ for $`s=`$ A to E, with $`v(\text{left terminal})=0`$ and the right transition from E worth $`1+0`$. So $`v`$ is linear in the position, $`v(k)=k/6`$ for $`k=1,\dots,5`$.
 
-(b) Early on, the error falls because the estimates move from 0.5 toward the true values. The initial estimates are exactly right for C and closer for B and D than for A and E, so the early error is mostly in A and E. Once the estimates are near the truth, each update moves them by $\alpha\delta_t$ in a random direction, and with a large constant step size these fluctuations dominate: the error settles at a floor that is higher than the error at its minimum, which was reached while the systematic error was being removed faster than noise accumulated. With initial values far from the truth, for instance 0, the minimum would be less pronounced, since the systematic error would take longer to remove.
+(b) Early on, the error falls because the estimates move from 0.5 toward the true values. The initial estimates are exactly right for C and closer for B and D than for A and E, so the early error is mostly in A and E. Once the estimates are near the truth, each update moves them by $`\alpha\delta_t`$ in a random direction, and with a large constant step size these fluctuations dominate: the error settles at a floor that is higher than the error at its minimum, which was reached while the systematic error was being removed faster than noise accumulated. With initial values far from the truth, for instance 0, the minimum would be less pronounced, since the systematic error would take longer to remove.
 
 </details>
 
@@ -303,14 +303,14 @@ Show that batch TD(0) converges to the value function of the maximum-likelihood 
 <summary><b>Solution</b></summary>
 
 
-Let $n(s)$ be the number of visits to $s$ in the batch, $n(s,s')$ the number of observed transitions from $s$ to $s'$, and $\bar r(s)$ the average reward on leaving $s$. The batch increment to $V(s)$ is $\alpha\sum(\text{TD errors at }s)=\alpha\,n(s)\bigl[\bar r(s)+\gamma\sum_{s'}\hat p(s'\mid s)V(s')-V(s)\bigr]$, with $\hat p(s'\mid s)=n(s,s')/n(s)$. The increments vanish exactly when $V=\bar r+\gamma\hat PV$, the Bellman equation of the estimated process, whose unique solution is its value function. For small $\alpha$, the batch iteration is a damped version of iterative policy evaluation on the estimated process and converges to that solution ([Appendix B](#block-rl06-appendix-b)). In the A/B example, $\hat p(B\mid A)=1$, $\bar r(A)=0$, and $B$ terminates with average reward $6/8$, so $V(B)=3/4$ and $V(A)=0+V(B)=3/4$.
+Let $`n(s)`$ be the number of visits to $`s`$ in the batch, $`n(s,s')`$ the number of observed transitions from $`s`$ to $`s'`$, and $`\bar r(s)`$ the average reward on leaving $`s`$. The batch increment to $`V(s)`$ is $`\alpha\sum(\text{TD errors at }s)=\alpha\,n(s)\bigl[\bar r(s)+\gamma\sum_{s'}\hat p(s'\mid s)V(s')-V(s)\bigr]`$, with $`\hat p(s'\mid s)=n(s,s')/n(s)`$. The increments vanish exactly when $`V=\bar r+\gamma\hat PV`$, the Bellman equation of the estimated process, whose unique solution is its value function. For small $`\alpha`$, the batch iteration is a damped version of iterative policy evaluation on the estimated process and converges to that solution ([Appendix B](#block-rl06-appendix-b)). In the A/B example, $`\hat p(B\mid A)=1`$, $`\bar r(A)=0`$, and $`B`$ terminates with average reward $`6/8`$, so $`V(B)=3/4`$ and $`V(A)=0+V(B)=3/4`$.
 
 </details>
 
 
 ### <a id="exercise-6-4-td-on-the-gridworld"></a>Exercise 6.4 — TD on the gridworld
 
-Evaluate the random policy on the gridworld of chapter 1 with TD(0) from a single stream of 200,000 steps, using step sizes 0.1, 0.01, and $1/N(s)^{0.7}$, where $N(s)$ counts the visits to $s$. Compare the RMS error with the exact values.
+Evaluate the random policy on the gridworld of chapter 1 with TD(0) from a single stream of 200,000 steps, using step sizes 0.1, 0.01, and $`1/N(s)^{0.7}`$, where $`N(s)`$ counts the visits to $`s`$. Compare the RMS error with the exact values.
 
 
 <details>
@@ -364,21 +364,21 @@ for label, schedule in [("constant 0.1", lambda N: 0.1), ("constant 0.01", lambd
 # 1 / visits^0.7  RMS error averaged over steps 10k-20k: 0.177, over steps 190k-200k: 0.067
 ```
 
-A constant step size of 0.1 reaches its noise floor quickly and stays there, an RMS error of about 0.6: with $\gamma=0.9$ the targets vary a lot, especially near the teleporting cells, and each update moves the estimate a tenth of the way to a noisy target. A step size of 0.01 is slow at first but has a much lower floor, 0.13. The decaying schedule satisfies the Robbins–Monro conditions ($\sum n^{-0.7}=\infty$, $\sum n^{-1.4}<\infty$) and gives the best result at both times, since it takes large steps while the estimates are far off and small ones as they converge. With $1/N(s)$ exactly, the early steps would be large but the later ones would shrink too fast for the bootstrapped targets, which themselves improve slowly.
+A constant step size of 0.1 reaches its noise floor quickly and stays there, an RMS error of about 0.6: with $`\gamma=0.9`$ the targets vary a lot, especially near the teleporting cells, and each update moves the estimate a tenth of the way to a noisy target. A step size of 0.01 is slow at first but has a much lower floor, 0.13. The decaying schedule satisfies the Robbins–Monro conditions ($`\sum n^{-0.7}=\infty`$, $`\sum n^{-1.4}<\infty`$) and gives the best result at both times, since it takes large steps while the estimates are far off and small ones as they converge. With $`1/N(s)`$ exactly, the early steps would be large but the later ones would shrink too fast for the bootstrapped targets, which themselves improve slowly.
 
 </details>
 
 
 ### <a id="exercise-6-5-uncertain-rewards-and-dopamine"></a>Exercise 6.5 — Uncertain rewards and dopamine
 
-Modify the conditioning simulation so that the reward is delivered with probability $p$. Predict and then measure the average TD error at the cue, at a delivered reward, and at an omitted reward.
+Modify the conditioning simulation so that the reward is delivered with probability $`p`$. Predict and then measure the average TD error at the cue, at a delivered reward, and at an omitted reward.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-After learning, the value after the cue is $p$ times its value with a certain reward, so the error at the cue is about $0.668p$. At the time of the reward the prediction is $p$, so a delivered reward gives an error of $1-p$ and an omission $-p$.
+After learning, the value after the cue is $`p`$ times its value with a certain reward, so the error at the cue is about $`0.668p`$. At the time of the reward the prediction is $`p`$, so a delivered reward gives an error of $`1-p`$ and an omission $`-p`$.
 
 ```python
 import numpy as np
@@ -413,7 +413,7 @@ for p in [0.25, 0.5, 0.75, 1.0]:
 # p = 1.00: TD error at the cue +0.668, at a delivered reward +0.000, at an omitted reward    n/a
 ```
 
-The phasic responses of dopamine neurons show the same pattern: cue responses grow and reward responses shrink with the probability of reward ([Fiorillo, Tobler, and Schultz, 2003](https://doi.org/10.1126/science.1077349)). The same study found a second, slower signal that this TD model does not produce: a gradual rise in activity up to the time of a possible reward, largest at $p=0.5$, which tracks uncertainty rather than prediction error. The measured averages fluctuate around the predictions because a constant step size keeps the values tracking recent outcomes, which with random rewards is itself a noisy estimate of $p$.
+The phasic responses of dopamine neurons show the same pattern: cue responses grow and reward responses shrink with the probability of reward ([Fiorillo, Tobler, and Schultz, 2003](https://doi.org/10.1126/science.1077349)). The same study found a second, slower signal that this TD model does not produce: a gradual rise in activity up to the time of a possible reward, largest at $`p=0.5`$, which tracks uncertainty rather than prediction error. The measured averages fluctuate around the predictions because a constant step size keeps the values tracking recent outcomes, which with random rewards is itself a noisy estimate of $`p`$.
 
 </details>
 
@@ -469,11 +469,11 @@ Tic-tac-toe has 5,478 legal positions. The first player moves in 2,423 of them, 
 <summary><a id="block-rl06-appendix-a"></a><b>A. Convergence of tabular TD(0)</b></summary>
 
 
-Write the TD(0) update at the state $s=S_t$ as $V(s)\leftarrow V(s)+\alpha_t\bigl[(\mathcal T^\pi V)(s)-V(s)+w_t\bigr]$, where $w_t=\delta_t-\mathbb E[\delta_t\mid S_t,V]$ is zero-mean noise whose conditional variance is at most $A+B\|V\|_\infty^2$ when rewards have bounded variance. This is an **asynchronous stochastic approximation** of the fixed point of $\mathcal T^\pi$: at each step one component is moved toward a noisy evaluation of a max-norm contraction.
+Write the TD(0) update at the state $`s=S_t`$ as $`V(s)\leftarrow V(s)+\alpha_t\bigl[(\mathcal T^\pi V)(s)-V(s)+w_t\bigr]`$, where $`w_t=\delta_t-\mathbb E[\delta_t\mid S_t,V]`$ is zero-mean noise whose conditional variance is at most $`A+B\|V\|_\infty^2`$ when rewards have bounded variance. This is an **asynchronous stochastic approximation** of the fixed point of $`\mathcal T^\pi`$: at each step one component is moved toward a noisy evaluation of a max-norm contraction.
 
-The general theorem ([Tsitsiklis, 1994](https://doi.org/10.1007/BF00993306); [Jaakkola, Jordan, and Singh, 1994](https://doi.org/10.1162/neco.1994.6.6.1185)) says that such an iteration converges to the fixed point with probability one if (i) the mapping is a contraction in a weighted maximum norm, (ii) the noise is a martingale difference with conditional variance bounded by $A+B\|V\|^2$, and (iii) each component's step sizes satisfy $\sum_t\alpha_t(s)=\infty$ and $\sum_t\alpha_t(s)^2<\infty$, which requires every state to be updated infinitely often. For $\gamma<1$, $\mathcal T^\pi$ is a $\gamma$-contraction in the ordinary maximum norm; for episodic tasks with $\gamma=1$ and certain termination, it is a contraction in a weighted maximum norm. The proof idea is to compare the iterates with a deterministic, asynchronous version of value iteration: the noise averages out because the step sizes shrink, and the contraction pulls every component toward the fixed point as long as it keeps being updated. The same theorem, applied to the Bellman optimality operator, gives the convergence of Q-learning in chapter 7.
+The general theorem ([Tsitsiklis, 1994](https://doi.org/10.1007/BF00993306); [Jaakkola, Jordan, and Singh, 1994](https://doi.org/10.1162/neco.1994.6.6.1185)) says that such an iteration converges to the fixed point with probability one if (i) the mapping is a contraction in a weighted maximum norm, (ii) the noise is a martingale difference with conditional variance bounded by $`A+B\|V\|^2`$, and (iii) each component's step sizes satisfy $`\sum_t\alpha_t(s)=\infty`$ and $`\sum_t\alpha_t(s)^2<\infty`$, which requires every state to be updated infinitely often. For $`\gamma<1`$, $`\mathcal T^\pi`$ is a $`\gamma`$-contraction in the ordinary maximum norm; for episodic tasks with $`\gamma=1`$ and certain termination, it is a contraction in a weighted maximum norm. The proof idea is to compare the iterates with a deterministic, asynchronous version of value iteration: the noise averages out because the step sizes shrink, and the contraction pulls every component toward the fixed point as long as it keeps being updated. The same theorem, applied to the Bellman optimality operator, gives the convergence of Q-learning in chapter 7.
 
-With a small constant step size, the expected update is still a contraction toward $v_\pi$, so the mean of the estimates converges, but the noise $\alpha w_t$ does not vanish and the estimates keep a stationary spread of order $\sqrt\alpha$.
+With a small constant step size, the expected update is still a contraction toward $`v_\pi`$, so the mean of the estimates converges, but the noise $`\alpha w_t`$ does not vanish and the estimates keep a stationary spread of order $`\sqrt\alpha`$.
 
 </details>
 
@@ -483,9 +483,9 @@ With a small constant step size, the expected update is still a contraction towa
 <summary><a id="block-rl06-appendix-b"></a><b>B. Batch TD and certainty equivalence</b></summary>
 
 
-In batch TD(0) with step size $\alpha$, one pass over the batch changes $V$ by $\alpha N\bigl(\bar r+\gamma\hat PV-V\bigr)$, where $N$ is the diagonal matrix of visit counts, $\bar r$ the average rewards, and $\hat P$ the empirical transition matrix (exercise 6.3). This is the iteration $V\leftarrow(I-\alpha N)V+\alpha N(\bar r+\gamma\hat PV)$, whose fixed point is the unique solution of $V=\bar r+\gamma\hat PV$, the value function of the maximum-likelihood model. For $\alpha$ small enough that $\alpha\,n(s)\le1$ for every state, the iteration matrix $(I-\alpha N)+\alpha\gamma N\hat P$ has nonnegative entries and row sums at most $1-\alpha\,n(s)(1-\gamma)<1$ for $\gamma<1$, so the iteration is a max-norm contraction and converges. For episodic problems with $\gamma=1$, the row sum is 1 for every state with no observed transition to termination (A in the A/B example), so the iteration is not a one-step max-norm contraction; but every state in the batch has an observed path to termination, so the nonnegative, substochastic iteration matrix is transient, its spectral radius is below one (it is a contraction in a weighted maximum norm), and the iteration still converges.
+In batch TD(0) with step size $`\alpha`$, one pass over the batch changes $`V`$ by $`\alpha N\bigl(\bar r+\gamma\hat PV-V\bigr)`$, where $`N`$ is the diagonal matrix of visit counts, $`\bar r`$ the average rewards, and $`\hat P`$ the empirical transition matrix (exercise 6.3). This is the iteration $`V\leftarrow(I-\alpha N)V+\alpha N(\bar r+\gamma\hat PV)`$, whose fixed point is the unique solution of $`V=\bar r+\gamma\hat PV`$, the value function of the maximum-likelihood model. For $`\alpha`$ small enough that $`\alpha\,n(s)\le1`$ for every state, the iteration matrix $`(I-\alpha N)+\alpha\gamma N\hat P`$ has nonnegative entries and row sums at most $`1-\alpha\,n(s)(1-\gamma)<1`$ for $`\gamma<1`$, so the iteration is a max-norm contraction and converges. For episodic problems with $`\gamma=1`$, the row sum is 1 for every state with no observed transition to termination (A in the A/B example), so the iteration is not a one-step max-norm contraction; but every state in the batch has an observed path to termination, so the nonnegative, substochastic iteration matrix is transient, its spectral radius is below one (it is a contraction in a weighted maximum norm), and the iteration still converges.
 
-Batch Monte Carlo instead solves $\min_V\sum_i(G_i-V(S_i))^2$, whose solution is the average of the observed returns from each state. The two coincide when every state's returns are all the information the batch has about it, for example when no state occurs more than once in the batch; they differ when the Markov structure lets returns observed from one state inform another, as in the A/B example.
+Batch Monte Carlo instead solves $`\min_V\sum_i(G_i-V(S_i))^2`$, whose solution is the average of the observed returns from each state. The two coincide when every state's returns are all the information the batch has about it, for example when no state occurs more than once in the batch; they differ when the Markov structure lets returns observed from one state inform another, as in the A/B example.
 
 </details>
 

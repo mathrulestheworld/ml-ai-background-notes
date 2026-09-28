@@ -19,19 +19,19 @@ A fully connected network needs a fixed input size. A one-dimensional convolutio
 
 ### <a id="the-recurrent-update"></a>The recurrent update
 
-A simple (Elman) RNN ([Elman, 1990](https://doi.org/10.1207/s15516709cog1402_1)) computes, for inputs $x_1,\ldots,x_T$,
+A simple (Elman) RNN ([Elman, 1990](https://doi.org/10.1207/s15516709cog1402_1)) computes, for inputs $`x_1,\ldots,x_T`$,
 
 $$
 h_t=\tanh\bigl(W_{hh}h_{t-1}+W_{xh}x_t+b\bigr),\qquad\hat y_t=W_{hy}h_t+c,
 $$
 
-starting from a state $h_0$, usually zero. The hidden state $h_t\in\mathbb R^H$ is the network's memory. **Unrolling** the recurrence over the length of a particular sequence turns it into a deep feedforward network with one layer per time step, in which every layer shares the same weights.
+starting from a state $`h_0`$, usually zero. The hidden state $`h_t\in\mathbb R^H`$ is the network's memory. **Unrolling** the recurrence over the length of a particular sequence turns it into a deep feedforward network with one layer per time step, in which every layer shares the same weights.
 
 <img src="sources/images/dl-rnn-unrolled.png" alt="dl-rnn-unrolled" width="840">
 
-*A recurrent network, folded (left) and unrolled over a sequence of length $T$ (right). The unrolled network is a deep network whose depth is the sequence length, with the same weights in every step.*
+*A recurrent network, folded (left) and unrolled over a sequence of length $`T`$ (right). The unrolled network is a deep network whose depth is the sequence length, with the same weights in every step.*
 
-Weight sharing across time is to sequences what weight sharing across positions is to images: the number of parameters, $H(d_{\text{in}}+H)$ plus biases, does not depend on the sequence length, and a pattern learned at one position applies at every other. The code below writes the recurrence as a loop and checks it against PyTorch's `nn.RNN`.
+Weight sharing across time is to sequences what weight sharing across positions is to images: the number of parameters, $`H(d_{\text{in}}+H)`$ plus biases, does not depend on the sequence length, and a pattern learned at one position applies at every other. The code below writes the recurrence as a loop and checks it against PyTorch's `nn.RNN`.
 
 ```python
 import torch
@@ -72,23 +72,23 @@ print("product of Jacobians matches autograd:", torch.allclose(g @ J, auto, atol
 # product of Jacobians matches autograd: True
 ```
 
-(PyTorch keeps two bias vectors, one for each matrix, which is why the count has $2H$ rather than $H$; only their sum matters.)
+(PyTorch keeps two bias vectors, one for each matrix, which is why the count has $`2H`$ rather than $`H`$; only their sum matters.)
 
 ## <a id="backpropagation-through-time"></a>Backpropagation through time
 
 ### <a id="gradients-over-many-steps"></a>Gradients over many steps
 
-Training an RNN is ordinary backpropagation on the unrolled network, called **backpropagation through time** (BPTT; [Werbos, 1990](https://doi.org/10.1109/5.58337)). The loss is usually a sum over time steps, and because the weights are shared, the gradient of each weight matrix is a sum of contributions from every step. The contribution of an input at time $t$ to a loss at time $T$ passes through the chain of state Jacobians
+Training an RNN is ordinary backpropagation on the unrolled network, called **backpropagation through time** (BPTT; [Werbos, 1990](https://doi.org/10.1109/5.58337)). The loss is usually a sum over time steps, and because the weights are shared, the gradient of each weight matrix is a sum of contributions from every step. The contribution of an input at time $`t`$ to a loss at time $`T`$ passes through the chain of state Jacobians
 
 $$
 \frac{\partial h_T}{\partial h_t}=\prod_{k=t+1}^{T}\frac{\partial h_k}{\partial h_{k-1}}=\prod_{k=t+1}^{T}\operatorname{diag}\bigl(1-h_k^2\bigr)\,W_{hh},
 $$
 
-which the code above verifies. This is the product-of-Jacobians problem of chapter 2 with two aggravations: the same matrix $W_{hh}$ appears in every factor, and the depth equals the sequence length, often hundreds or thousands of steps. If the largest singular value of $W_{hh}$ times the largest activation derivative is below 1, the product shrinks geometrically in the lag $T-t$, and if the relevant eigenvalues exceed 1 it can grow geometrically ([Bengio, Simard, and Frasconi, 1994](https://doi.org/10.1109/72.279181); [Pascanu, Mikolov, and Bengio, 2013](https://arxiv.org/abs/1211.5063); [Appendix A](#block-dl8-appendix-a)).
+which the code above verifies. This is the product-of-Jacobians problem of chapter 2 with two aggravations: the same matrix $`W_{hh}`$ appears in every factor, and the depth equals the sequence length, often hundreds or thousands of steps. If the largest singular value of $`W_{hh}`$ times the largest activation derivative is below 1, the product shrinks geometrically in the lag $`T-t`$, and if the relevant eigenvalues exceed 1 it can grow geometrically ([Bengio, Simard, and Frasconi, 1994](https://doi.org/10.1109/72.279181); [Pascanu, Mikolov, and Bengio, 2013](https://arxiv.org/abs/1211.5063); [Appendix A](#block-dl8-appendix-a)).
 
 <img src="sources/images/dl-rnn-gradients.png" alt="dl-rnn-gradients" width="880">
 
-*Norm of $\partial h_T/\partial h_{T-k}$ applied to random unit vectors, for recurrences with 64 hidden units driven by random inputs. Left: a linear recurrence with orthogonal weights scaled by 0.9, 1.0, or 1.1 multiplies the gradient by exactly that factor per step. Right: a tanh RNN with orthogonal weights of scale 1 loses a factor of $10^{12}$ over 100 steps, because $\tanh'<1$; at scale 1.5 the saturation and the larger weights roughly balance; at scale 3 the gradient explodes. The cell state of an LSTM whose forget gates start near 1 passes gradients back almost unchanged.*
+*Norm of $`\partial h_T/\partial h_{T-k}`$ applied to random unit vectors, for recurrences with 64 hidden units driven by random inputs. Left: a linear recurrence with orthogonal weights scaled by 0.9, 1.0, or 1.1 multiplies the gradient by exactly that factor per step. Right: a tanh RNN with orthogonal weights of scale 1 loses a factor of $`10^{12}`$ over 100 steps, because $`\tanh'<1`$; at scale 1.5 the saturation and the larger weights roughly balance; at scale 3 the gradient explodes. The cell state of an LSTM whose forget gates start near 1 passes gradients back almost unchanged.*
 
 Vanishing gradients mean that the network cannot learn dependencies over long gaps: the signal linking an early input to a late error is buried under the contributions of recent steps. Exploding gradients produce sudden huge updates. The standard remedy for the second is **gradient clipping** (Foundations chapter 3), which rescales the gradient whenever its norm exceeds a threshold and was introduced for RNNs for this reason. The first requires a change of architecture.
 
@@ -100,7 +100,7 @@ For very long sequences, such as a text corpus treated as one stream, BPTT over 
 
 ### <a id="long-short-term-memory"></a>Long short-term memory
 
-The **long short-term memory** (LSTM) network of [Hochreiter and Schmidhuber (1997)](https://doi.org/10.1162/neco.1997.9.8.1735), with the forget gate added by [Gers, Schmidhuber, and Cummins (2000)](https://doi.org/10.1162/089976600300015015), adds a second state, the **cell** $c_t$, which is updated additively and controlled by multiplicative **gates**:
+The **long short-term memory** (LSTM) network of [Hochreiter and Schmidhuber (1997)](https://doi.org/10.1162/neco.1997.9.8.1735), with the forget gate added by [Gers, Schmidhuber, and Cummins (2000)](https://doi.org/10.1162/089976600300015015), adds a second state, the **cell** $`c_t`$, which is updated additively and controlled by multiplicative **gates**:
 
 $$
 \begin{aligned}
@@ -109,7 +109,7 @@ g_t&=\tanh(W_gx_t+U_gh_{t-1}+b_g), & c_t&=f_t\odot c_{t-1}+i_t\odot g_t, & h_t&=
 \end{aligned}
 $$
 
-The **input gate** $i_t$ decides how much of the candidate $g_t$ to write, the **forget gate** $f_t$ how much of the old cell to keep, and the **output gate** $o_t$ how much of the cell to expose. The key is the cell update. Its Jacobian with respect to the previous cell, along the direct path, is the diagonal matrix $\operatorname{diag}(f_t)$: when the forget gates are near 1, the gradient passes back through many steps without shrinking, just as through the identity path of a residual network (chapter 4). The network learns when to open and close this path. Initializing the forget-gate bias to a positive value, such as 1, makes remembering the default at the start of training ([Jozefowicz, Zaremba, and Sutskever, 2015](https://proceedings.mlr.press/v37/jozefowicz15.html)).
+The **input gate** $`i_t`$ decides how much of the candidate $`g_t`$ to write, the **forget gate** $`f_t`$ how much of the old cell to keep, and the **output gate** $`o_t`$ how much of the cell to expose. The key is the cell update. Its Jacobian with respect to the previous cell, along the direct path, is the diagonal matrix $`\operatorname{diag}(f_t)`$: when the forget gates are near 1, the gradient passes back through many steps without shrinking, just as through the identity path of a residual network (chapter 4). The network learns when to open and close this path. Initializing the forget-gate bias to a positive value, such as 1, makes remembering the default at the start of training ([Jozefowicz, Zaremba, and Sutskever, 2015](https://proceedings.mlr.press/v37/jozefowicz15.html)).
 
 ```python
 import torch
@@ -150,15 +150,15 @@ $$
 z_t=\sigma(W_zx_t+U_zh_{t-1}),\quad r_t=\sigma(W_rx_t+U_rh_{t-1}),\quad \tilde h_t=\tanh\bigl(W_hx_t+U_h(r_t\odot h_{t-1})\bigr),\quad h_t=(1-z_t)\odot h_{t-1}+z_t\odot\tilde h_t .
 $$
 
-The **update gate** $z_t$ interpolates between keeping the old state and writing the candidate, playing the roles of both the input and the forget gate; the **reset gate** $r_t$ controls how much of the old state enters the candidate. With three weight matrices instead of four, GRUs are cheaper, and large comparisons found no consistent winner between GRUs and LSTMs across tasks ([Chung et al., 2014](https://arxiv.org/abs/1412.3555); [Greff et al., 2017](https://arxiv.org/abs/1503.04069)).
+The **update gate** $`z_t`$ interpolates between keeping the old state and writing the candidate, playing the roles of both the input and the forget gate; the **reset gate** $`r_t`$ controls how much of the old state enters the candidate. With three weight matrices instead of four, GRUs are cheaper, and large comparisons found no consistent winner between GRUs and LSTMs across tasks ([Chung et al., 2014](https://arxiv.org/abs/1412.3555); [Greff et al., 2017](https://arxiv.org/abs/1503.04069)).
 
 ### <a id="learning-long-range-dependencies"></a>Learning long-range dependencies
 
-The **adding problem** ([Hochreiter and Schmidhuber, 1997](https://doi.org/10.1162/neco.1997.9.8.1735)) isolates long-range memory. Each input is a sequence of random numbers in $[0,1]$ with a second channel marking two positions, one in each half; the target is the sum of the two marked numbers. Predicting the constant 1 gives a squared error of $1/6$, the variance of the sum, so any error below that requires carrying a number across tens of steps.
+The **adding problem** ([Hochreiter and Schmidhuber, 1997](https://doi.org/10.1162/neco.1997.9.8.1735)) isolates long-range memory. Each input is a sequence of random numbers in $`[0,1]`$ with a second channel marking two positions, one in each half; the target is the sum of the two marked numbers. Predicting the constant 1 gives a squared error of $`1/6`$, the variance of the sum, so any error below that requires carrying a number across tens of steps.
 
 <img src="sources/images/dl-rnn-adding.png" alt="dl-rnn-adding" width="800">
 
-*Training on the adding problem with sequences of length 100, 64 hidden units, Adam, and gradient clipping. The vanilla RNN never leaves the plateau at $1/6$ in 4,000 steps. The GRU escapes after about 1,100 steps and reaches an error of 0.001. The LSTMs escape later, after 2,600 and 3,200 steps, and reach about 0.01. The escape from the plateau is abrupt, and its timing varies between runs and initializations.*
+*Training on the adding problem with sequences of length 100, 64 hidden units, Adam, and gradient clipping. The vanilla RNN never leaves the plateau at $`1/6`$ in 4,000 steps. The GRU escapes after about 1,100 steps and reaches an error of 0.001. The LSTMs escape later, after 2,600 and 3,200 steps, and reach about 0.01. The escape from the plateau is abrupt, and its timing varies between runs and initializations.*
 
 The long plateau is typical of long-range tasks: until the network happens to store the marked numbers, the gradient carries little information about how to do so, and progress then comes suddenly. Gated units make such learning possible within a practical budget, not easy.
 
@@ -185,7 +185,7 @@ Language modeling with RNNs, including character-level text generation ([Graves,
 
 Two alternatives avoid the sequential bottleneck. **Temporal convolutional networks** stack causal, dilated one-dimensional convolutions, so each output depends only on past inputs within a receptive field that doubles with each layer; they match or beat RNNs on many sequence benchmarks ([Bai, Kolter, and Koltun, 2018](https://arxiv.org/abs/1803.01271); [van den Oord et al., 2016](https://arxiv.org/abs/1609.03499)). Transformers replace recurrence with attention (chapter 9).
 
-A third line keeps recurrence but makes it **linear**. If the state update is $h_t=Ah_{t-1}+Bx_t$ with output $y_t=Ch_t$, the whole output is a causal convolution of the input with the kernel $K_k=CA^kB$, which can be computed in parallel over the sequence during training, while generation can still proceed step by step with constant memory. Because composing two affine updates gives another affine update, the states can also be computed by a **parallel prefix scan** in $O(\log T)$ sequential rounds ([Martin and Cundy, 2018](https://arxiv.org/abs/1709.04057)). **Structured state-space models** such as S4 ([Gu, Goel, and Ré, 2022](https://arxiv.org/abs/2111.00396)) parameterize $A$ so that long convolution kernels remain stable and cheap; **linear recurrent units** ([Orvieto et al., 2023](https://arxiv.org/abs/2303.06349)) show that a diagonal complex $A$ with eigenvalues near the unit circle suffices; and **Mamba** ([Gu and Dao, 2023](https://arxiv.org/abs/2312.00752)) makes $A$, $B$, and $C$ depend on the input, which restores the ability to select what to remember and makes these models competitive with transformers on language.
+A third line keeps recurrence but makes it **linear**. If the state update is $`h_t=Ah_{t-1}+Bx_t`$ with output $`y_t=Ch_t`$, the whole output is a causal convolution of the input with the kernel $`K_k=CA^kB`$, which can be computed in parallel over the sequence during training, while generation can still proceed step by step with constant memory. Because composing two affine updates gives another affine update, the states can also be computed by a **parallel prefix scan** in $`O(\log T)`$ sequential rounds ([Martin and Cundy, 2018](https://arxiv.org/abs/1709.04057)). **Structured state-space models** such as S4 ([Gu, Goel, and Ré, 2022](https://arxiv.org/abs/2111.00396)) parameterize $`A`$ so that long convolution kernels remain stable and cheap; **linear recurrent units** ([Orvieto et al., 2023](https://arxiv.org/abs/2303.06349)) show that a diagonal complex $`A`$ with eigenvalues near the unit circle suffices; and **Mamba** ([Gu and Dao, 2023](https://arxiv.org/abs/2312.00752)) makes $`A`$, $`B`$, and $`C`$ depend on the input, which restores the ability to select what to remember and makes these models competitive with transformers on language.
 
 ```python
 import torch
@@ -233,19 +233,19 @@ DLB chapter 10, UMich lecture 12, and UNIGE sections 12.1 and 12.2, listed in th
 <summary><a id="block-dl8-appendix-a"></a><b>A. Vanishing and exploding gradients in a simple RNN</b></summary>
 
 
-Let $D_k=\operatorname{diag}\bigl(\sigma'(z_k)\bigr)$ with $z_k=W_{hh}h_{k-1}+W_{xh}x_k+b$, so that $\partial h_k/\partial h_{k-1}=D_kW_{hh}$.
+Let $`D_k=\operatorname{diag}\bigl(\sigma'(z_k)\bigr)`$ with $`z_k=W_{hh}h_{k-1}+W_{xh}x_k+b`$, so that $`\partial h_k/\partial h_{k-1}=D_kW_{hh}`$.
 
-**Vanishing.** Suppose $|\sigma'|\le\gamma$ (for tanh, $\gamma=1$; for the logistic sigmoid, $\gamma=1/4$). Then $\|D_kW_{hh}\|_2\le\gamma\,s_{\max}(W_{hh})$, where $s_{\max}$ is the largest singular value, and by submultiplicativity
+**Vanishing.** Suppose $`|\sigma'|\le\gamma`$ (for tanh, $`\gamma=1`$; for the logistic sigmoid, $`\gamma=1/4`$). Then $`\|D_kW_{hh}\|_2\le\gamma\,s_{\max}(W_{hh})`$, where $`s_{\max}`$ is the largest singular value, and by submultiplicativity
 
 $$
 \Bigl\|\frac{\partial h_T}{\partial h_t}\Bigr\|_2\le\bigl(\gamma\,s_{\max}(W_{hh})\bigr)^{T-t}.
 $$
 
-If $\gamma\,s_{\max}(W_{hh})<1$, the gradient from time $T$ to time $t$ vanishes exponentially in the lag, whatever the inputs. This is the sufficient condition of [Pascanu, Mikolov, and Bengio (2013)](https://arxiv.org/abs/1211.5063).
+If $`\gamma\,s_{\max}(W_{hh})<1`$, the gradient from time $`T`$ to time $`t`$ vanishes exponentially in the lag, whatever the inputs. This is the sufficient condition of [Pascanu, Mikolov, and Bengio (2013)](https://arxiv.org/abs/1211.5063).
 
-**Exploding.** For a linear recurrence, $D_k=I$ and $\partial h_T/\partial h_t=W_{hh}^{T-t}$. If $W_{hh}$ has an eigenvalue $\lambda$ with $|\lambda|>1$ and the backpropagated vector has a component along the corresponding left eigenvector, that component grows like $|\lambda|^{T-t}$. For a nonlinear recurrence, a necessary condition for explosion is $\gamma\,s_{\max}(W_{hh})>1$; whether it happens depends on how often the units operate in their linear range.
+**Exploding.** For a linear recurrence, $`D_k=I`$ and $`\partial h_T/\partial h_t=W_{hh}^{T-t}`$. If $`W_{hh}`$ has an eigenvalue $`\lambda`$ with $`|\lambda|>1`$ and the backpropagated vector has a component along the corresponding left eigenvector, that component grows like $`|\lambda|^{T-t}`$. For a nonlinear recurrence, a necessary condition for explosion is $`\gamma\,s_{\max}(W_{hh})>1`$; whether it happens depends on how often the units operate in their linear range.
 
-**The LSTM cell path.** Along the direct path from $c_{t-1}$ to $c_t$, the Jacobian is $\operatorname{diag}(f_t)$, so $\prod_k\operatorname{diag}(f_k)$ multiplies the gradient on this path coordinate by coordinate. It neither explodes, since $0<f_k<1$, nor vanishes as long as the network keeps the relevant forget gates close to 1. The full Jacobian adds terms through the gates' dependence on $h_{t-1}$, but the direct path guarantees that long-range gradients can survive.
+**The LSTM cell path.** Along the direct path from $`c_{t-1}`$ to $`c_t`$, the Jacobian is $`\operatorname{diag}(f_t)`$, so $`\prod_k\operatorname{diag}(f_k)`$ multiplies the gradient on this path coordinate by coordinate. It neither explodes, since $`0<f_k<1`$, nor vanishes as long as the network keeps the relevant forget gates close to 1. The full Jacobian adds terms through the gates' dependence on $`h_{t-1}`$, but the direct path guarantees that long-range gradients can survive.
 
 </details>
 

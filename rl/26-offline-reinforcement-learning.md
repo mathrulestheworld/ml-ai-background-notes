@@ -8,11 +8,11 @@
 
 ### <a id="the-offline-setting"></a>The offline setting
 
-Every algorithm of the previous chapters learns by acting: it tries actions, observes the consequences, and corrects its mistakes with new data. In many applications acting is exactly what cannot be done freely: a clinical policy cannot be tested on patients, a recommender or a self-driving car cannot explore dangerous actions, and a robot's time is expensive. Yet such domains often have large logs of past behavior. **Offline reinforcement learning**, also called batch RL, learns a policy from a fixed data set of transitions $\mathcal D=\{(s,a,r,s')\}$ collected by some **behavior policy** $\pi_\beta$, without any further interaction ([Levine, Kumar, Tucker, and Fu, 2020](https://arxiv.org/abs/2005.01643)). Unlike imitation (chapter 25), it uses rewards, so it can improve on the behavior; unlike off-policy RL (chapter 9, chapter 16), it cannot collect the data that would correct its errors. That last difference turns out to be decisive.
+Every algorithm of the previous chapters learns by acting: it tries actions, observes the consequences, and corrects its mistakes with new data. In many applications acting is exactly what cannot be done freely: a clinical policy cannot be tested on patients, a recommender or a self-driving car cannot explore dangerous actions, and a robot's time is expensive. Yet such domains often have large logs of past behavior. **Offline reinforcement learning**, also called batch RL, learns a policy from a fixed data set of transitions $`\mathcal D=\{(s,a,r,s')\}`$ collected by some **behavior policy** $`\pi_\beta`$, without any further interaction ([Levine, Kumar, Tucker, and Fu, 2020](https://arxiv.org/abs/2005.01643)). Unlike imitation (chapter 25), it uses rewards, so it can improve on the behavior; unlike off-policy RL (chapter 9, chapter 16), it cannot collect the data that would correct its errors. That last difference turns out to be decisive.
 
 ### <a id="why-off-policy-algorithms-fail-offline"></a>Why off-policy algorithms fail offline
 
-An off-policy algorithm such as DQN or SAC can in principle learn from any data. In practice, trained on a fixed data set, even one collected by an expert, it often fails completely ([Fujimoto, Meger, and Precup, 2019](https://arxiv.org/abs/1812.02900)). The reason is **extrapolation error**. The Bellman target $r+\gamma\max_{a'}Q(s',a')$ evaluates the Q-function at actions $a'$ chosen to maximize it, which are often actions the data never contain in $s'$. There the Q-function is an extrapolation, arbitrary for a table and unpredictable for a network, and the maximization selects exactly the actions whose values happen to be overestimated. Online, the agent would try those actions, observe their true consequences, and correct the estimates; offline, nothing ever does, and the errors propagate backward through bootstrapping. The problem is the **distribution shift** between the behavior policy that produced the data and the learned policy, which queries actions outside it. The next code shows the effect on a tabular problem, where values of state–action pairs absent from the data simply stay at their initial value of zero, and compares four remedies.
+An off-policy algorithm such as DQN or SAC can in principle learn from any data. In practice, trained on a fixed data set, even one collected by an expert, it often fails completely ([Fujimoto, Meger, and Precup, 2019](https://arxiv.org/abs/1812.02900)). The reason is **extrapolation error**. The Bellman target $`r+\gamma\max_{a'}Q(s',a')`$ evaluates the Q-function at actions $`a'`$ chosen to maximize it, which are often actions the data never contain in $`s'`$. There the Q-function is an extrapolation, arbitrary for a table and unpredictable for a network, and the maximization selects exactly the actions whose values happen to be overestimated. Online, the agent would try those actions, observe their true consequences, and correct the estimates; offline, nothing ever does, and the errors propagate backward through bootstrapping. The problem is the **distribution shift** between the behavior policy that produced the data and the learned policy, which queries actions outside it. The next code shows the effect on a tabular problem, where values of state–action pairs absent from the data simply stay at their initial value of zero, and compares four remedies.
 
 ```python
 import numpy as np
@@ -130,7 +130,7 @@ for name, method in (("behavior cloning", "bc"), ("naive Q-learning", "naive"), 
 #    IQL                   -2.94                      -3.91          -2.94                      -6.47
 ```
 
-From the noisy expert's data, naive Q-learning, the off-policy algorithm used as is, fails: its values for unseen actions stay at zero, higher than the true values of the seen ones, which are negative because every step costs 1, so its greedy policy heads for unseen actions and wanders for the whole episode. Its predicted value at the start, $-1$, is wildly optimistic. Behavior cloning, which only copies, does fine on these good data. The mostly random data show what offline RL is for. Cloning a mostly random policy gives a mostly random policy, but the random episodes contain, piece by piece, every step of the good path, and a learner that uses the rewards can assemble them. The two conservative methods, CQL and IQL, find the optimal path of 12 steps from these data, although only one of the 60 episodes reached the goal at all, in 14 steps, while the naive learner still fails. The policy constraint, which allows only actions seen at least twice, protects itself from unseen actions but, with the sparse coverage of these data, cannot find a supported path around the pits; it walks into one, which its values correctly rank above wandering for the whole episode. The rest of the chapter develops these families.
+From the noisy expert's data, naive Q-learning, the off-policy algorithm used as is, fails: its values for unseen actions stay at zero, higher than the true values of the seen ones, which are negative because every step costs 1, so its greedy policy heads for unseen actions and wanders for the whole episode. Its predicted value at the start, $`-1`$, is wildly optimistic. Behavior cloning, which only copies, does fine on these good data. The mostly random data show what offline RL is for. Cloning a mostly random policy gives a mostly random policy, but the random episodes contain, piece by piece, every step of the good path, and a learner that uses the rewards can assemble them. The two conservative methods, CQL and IQL, find the optimal path of 12 steps from these data, although only one of the 60 episodes reached the goal at all, in 14 steps, while the naive learner still fails. The policy constraint, which allows only actions seen at least twice, protects itself from unseen actions but, with the sparse coverage of these data, cannot find a supported path around the pits; it walks into one, which its values correctly rank above wandering for the whole episode. The rest of the chapter develops these families.
 
 ## <a id="staying-close-to-the-data"></a>Staying close to the data
 
@@ -142,7 +142,7 @@ $$
 \max_{\pi}\ \mathbb E_{(s,a)\sim\mathcal D}\bigl[\lambda\,Q(s,\pi(s))-(\pi(s)-a)^2\bigr],\qquad\lambda=\frac{\alpha}{\frac1N\sum_{(s,a)}|Q(s,a)|},
 $$
 
-with $\alpha=2.5$ and the normalization making the balance between the two terms independent of the scale of the rewards (exercise 26.5). With normalized states and no other change, it matched the far more complex methods of its time on the standard benchmark.
+with $`\alpha=2.5`$ and the normalization making the balance between the two terms independent of the scale of the rewards (exercise 26.5). With normalized states and no other change, it matched the far more complex methods of its time on the standard benchmark.
 
 ### <a id="conservative-q-learning"></a>Conservative Q-learning
 
@@ -152,7 +152,7 @@ $$
 \min_Q\ \alpha\,\mathbb E_{s\sim\mathcal D}\Bigl[\ln\sum_a\exp Q(s,a)-\mathbb E_{a\sim\pi_\beta(\cdot\mid s)}Q(s,a)\Bigr]+\tfrac12\,\mathbb E_{(s,a,s')\sim\mathcal D}\Bigl[\bigl(Q(s,a)-\hat{\mathcal B}^\pi\hat Q(s,a)\bigr)^2\Bigr],
 $$
 
-where the log-sum-exp is a soft maximum over all actions. Kumar et al. proved that, with a large enough $\alpha$, the resulting values lower-bound the true values of the policy in expectation, so that a policy improved against them cannot exploit overestimated actions (exercise 26.2). CQL was the first offline method to perform well on the hardest data sets of its time, often two to five times better than earlier ones. The next code shows its effect on a neural Q-function fitted to data from a narrow behavior, in a one-step problem where actions far from the behavior's are dangerous.
+where the log-sum-exp is a soft maximum over all actions. Kumar et al. proved that, with a large enough $`\alpha`$, the resulting values lower-bound the true values of the policy in expectation, so that a policy improved against them cannot exploit overestimated actions (exercise 26.2). CQL was the first offline method to perform well on the hardest data sets of its time, often two to five times better than earlier ones. The next code shows its effect on a neural Q-function fitted to data from a narrow behavior, in a one-step problem where actions far from the behavior's are dangerous.
 
 ```python
 import numpy as np
@@ -222,13 +222,13 @@ The fitted network extrapolates smoothly beyond the data, and here that extrapol
 
 ### <a id="in-sample-learning-implicit-q-learning"></a>In-sample learning: implicit Q-learning
 
-Both families still evaluate the Q-function at actions the data may not contain, one to maximize it and the other to penalize it. **Implicit Q-learning** (IQL) ([Kostrikov, Nair, and Levine, 2022](https://arxiv.org/abs/2110.06169)) never does. It learns a state-value function $V$ by **expectile regression** on the Q-values of the data's own actions,
+Both families still evaluate the Q-function at actions the data may not contain, one to maximize it and the other to penalize it. **Implicit Q-learning** (IQL) ([Kostrikov, Nair, and Levine, 2022](https://arxiv.org/abs/2110.06169)) never does. It learns a state-value function $`V`$ by **expectile regression** on the Q-values of the data's own actions,
 
 $$
 \min_V\ \mathbb E_{(s,a)\sim\mathcal D}\Bigl[L^\tau_2\bigl(Q(s,a)-V(s)\bigr)\Bigr],\qquad L^\tau_2(u)=|\tau-\mathbb 1(u<0)|\,u^2,
 $$
 
-which for $\tau$ close to 1 approximates the maximum of $Q(s,a)$ over the actions the data contain in $s$ (exercise 26.3), and trains $Q$ on the targets $r+\gamma V(s')$, which involve only data. Its values thus approximate those of the best policy *supported by the data*, without ever querying an unseen action. The policy is extracted at the end by **advantage-weighted regression**, a behavior cloning that weights each data action by $\exp\bigl(\beta(Q(s,a)-V(s))\bigr)$: the solution of a KL-constrained policy improvement projected onto the policy class (exercise 26.4), as in AWR ([Peng, Kumar, Zhang, and Levine, 2019](https://arxiv.org/abs/1910.00177)) and AWAC ([Nair, Gupta, Dalal, and Levine, 2020](https://arxiv.org/abs/2006.09359)). IQL is simple, stable, and fast, and it became a standard baseline, especially on tasks that require stitching together parts of suboptimal trajectories, such as the navigation mazes of the D4RL benchmark.
+which for $`\tau`$ close to 1 approximates the maximum of $`Q(s,a)`$ over the actions the data contain in $`s`$ (exercise 26.3), and trains $`Q`$ on the targets $`r+\gamma V(s')`$, which involve only data. Its values thus approximate those of the best policy *supported by the data*, without ever querying an unseen action. The policy is extracted at the end by **advantage-weighted regression**, a behavior cloning that weights each data action by $`\exp\bigl(\beta(Q(s,a)-V(s))\bigr)`$: the solution of a KL-constrained policy improvement projected onto the policy class (exercise 26.4), as in AWR ([Peng, Kumar, Zhang, and Levine, 2019](https://arxiv.org/abs/1910.00177)) and AWAC ([Nair, Gupta, Dalal, and Levine, 2020](https://arxiv.org/abs/2006.09359)). IQL is simple, stable, and fast, and it became a standard baseline, especially on tasks that require stitching together parts of suboptimal trajectories, such as the navigation mazes of the D4RL benchmark.
 
 ## <a id="models-theory-and-sequence-models"></a>Models, theory, and sequence models
 
@@ -268,7 +268,7 @@ Lab 14 builds data sets of different quality with a trained agent and compares b
 
 ### <a id="exercise-26-1-extrapolation-error-in-a-table"></a>Exercise 26.1 — Extrapolation error in a table
 
-In the gridworld code, all Q-values start at 0 and every step costs $-1$. (a) Why does naive Q-learning prefer actions never seen in the data, and why does more data from the same noisy expert fix this only slowly? (b) Would initializing the unseen values to $-100$ fix the problem? What would be the analogous remedy with a neural network, and why is it harder?
+In the gridworld code, all Q-values start at 0 and every step costs $`-1`$. (a) Why does naive Q-learning prefer actions never seen in the data, and why does more data from the same noisy expert fix this only slowly? (b) Would initializing the unseen values to $`-100`$ fix the problem? What would be the analogous remedy with a neural network, and why is it harder?
 
 
 <details>
@@ -284,100 +284,100 @@ In the gridworld code, all Q-values start at 0 and every step costs $-1$. (a) Wh
 
 ### <a id="exercise-26-2-why-cql-is-conservative"></a>Exercise 26.2 — Why CQL is conservative
 
-In a tabular setting with exact Bellman backups, CQL's policy evaluation step minimizes $\alpha\,\mathbb E_{s}\bigl[\mathbb E_{a\sim\mu}Q(s,a)-\mathbb E_{a\sim\pi_\beta}Q(s,a)\bigr]+\frac12\mathbb E_{s,a\sim\pi_\beta}\bigl[(Q-\mathcal B^\pi\hat Q_k)^2\bigr]$ over $Q$, where $\mu$ is the distribution whose values are pushed down. (a) Setting the derivative to zero for each $(s,a)$, show that $\hat Q_{k+1}(s,a)=\mathcal B^\pi\hat Q_k(s,a)-\alpha\bigl(\mu(a\mid s)/\pi_\beta(a\mid s)-1\bigr)$. (b) Show that $\mathbb E_{a\sim\mu}\hat Q(s,a)$ at the fixed point is below its true value when $\mu=\pi$. (c) Why are individual Q-values not all lower bounds?
+In a tabular setting with exact Bellman backups, CQL's policy evaluation step minimizes $`\alpha\,\mathbb E_{s}\bigl[\mathbb E_{a\sim\mu}Q(s,a)-\mathbb E_{a\sim\pi_\beta}Q(s,a)\bigr]+\frac12\mathbb E_{s,a\sim\pi_\beta}\bigl[(Q-\mathcal B^\pi\hat Q_k)^2\bigr]`$ over $`Q`$, where $`\mu`$ is the distribution whose values are pushed down. (a) Setting the derivative to zero for each $`(s,a)`$, show that $`\hat Q_{k+1}(s,a)=\mathcal B^\pi\hat Q_k(s,a)-\alpha\bigl(\mu(a\mid s)/\pi_\beta(a\mid s)-1\bigr)`$. (b) Show that $`\mathbb E_{a\sim\mu}\hat Q(s,a)`$ at the fixed point is below its true value when $`\mu=\pi`$. (c) Why are individual Q-values not all lower bounds?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) With weights $d(s)$ on states, the objective's derivative with respect to $Q(s,a)$ is $d(s)\bigl[\alpha(\mu(a\mid s)-\pi_\beta(a\mid s))+\pi_\beta(a\mid s)(Q(s,a)-\mathcal B^\pi\hat Q_k(s,a))\bigr]$. Setting it to zero and dividing by $d(s)\pi_\beta(a\mid s)$ gives the update.
+(a) With weights $`d(s)`$ on states, the objective's derivative with respect to $`Q(s,a)`$ is $`d(s)\bigl[\alpha(\mu(a\mid s)-\pi_\beta(a\mid s))+\pi_\beta(a\mid s)(Q(s,a)-\mathcal B^\pi\hat Q_k(s,a))\bigr]`$. Setting it to zero and dividing by $`d(s)\pi_\beta(a\mid s)`$ gives the update.
 
-(b) Averaging the penalty over $a\sim\mu$: $\mathbb E_\mu[\mu/\pi_\beta-1]=\sum_a\mu^2/\pi_\beta-1\ge0$, by the Cauchy–Schwarz inequality ($(\sum_a\mu)^2\le\sum_a\mu^2/\pi_\beta\cdot\sum_a\pi_\beta$), with equality only when $\mu=\pi_\beta$. So, with $\mu=\pi$, each backup lowers the expected value of the policy's actions by a nonnegative amount, and at the fixed point $\mathbb E_\pi\hat Q\le\mathbb E_\pi Q^\pi$: the policy's value is underestimated. With sampling error, $\alpha$ must be large enough to dominate the error of the empirical backup, which is the condition in Kumar et al.'s theorem.
+(b) Averaging the penalty over $`a\sim\mu`$: $`\mathbb E_\mu[\mu/\pi_\beta-1]=\sum_a\mu^2/\pi_\beta-1\ge0`$, by the Cauchy–Schwarz inequality ($`(\sum_a\mu)^2\le\sum_a\mu^2/\pi_\beta\cdot\sum_a\pi_\beta`$), with equality only when $`\mu=\pi_\beta`$. So, with $`\mu=\pi`$, each backup lowers the expected value of the policy's actions by a nonnegative amount, and at the fixed point $`\mathbb E_\pi\hat Q\le\mathbb E_\pi Q^\pi`$: the policy's value is underestimated. With sampling error, $`\alpha`$ must be large enough to dominate the error of the empirical backup, which is the condition in Kumar et al.'s theorem.
 
-(c) The penalty $\mu/\pi_\beta-1$ is negative for actions that the behavior takes more often than $\mu$ does, so their values are pushed *up*. Only the expectation under $\mu$ is guaranteed to be low, which is enough to stop the policy from exploiting overestimates but means individual values, such as those of the data's own actions in the code, can be too high.
+(c) The penalty $`\mu/\pi_\beta-1`$ is negative for actions that the behavior takes more often than $`\mu`$ does, so their values are pushed *up*. Only the expectation under $`\mu`$ is guaranteed to be low, which is enough to stop the policy from exploiting overestimates but means individual values, such as those of the data's own actions in the code, can be too high.
 
 </details>
 
 
 ### <a id="exercise-26-3-expectiles"></a>Exercise 26.3 — Expectiles
 
-The $\tau$-expectile $m_\tau$ of a random variable $X$ minimizes $\mathbb E[L^\tau_2(X-m)]$ with $L^\tau_2(u)=|\tau-\mathbb 1(u<0)|u^2$. (a) Show that $m_{1/2}$ is the mean and that $m_\tau$ increases with $\tau$ toward the supremum of $X$'s support as $\tau\to1$. (b) Why does IQL use expectiles of $Q(s,a)$ over the data's actions, rather than their maximum?
+The $`\tau`$-expectile $`m_\tau`$ of a random variable $`X`$ minimizes $`\mathbb E[L^\tau_2(X-m)]`$ with $`L^\tau_2(u)=|\tau-\mathbb 1(u<0)|u^2`$. (a) Show that $`m_{1/2}`$ is the mean and that $`m_\tau`$ increases with $`\tau`$ toward the supremum of $`X`$'s support as $`\tau\to1`$. (b) Why does IQL use expectiles of $`Q(s,a)`$ over the data's actions, rather than their maximum?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) At $\tau=\frac12$, $L^\tau_2(u)=\frac12u^2$, whose minimizer is the mean. In general the minimizer satisfies $\tau\,\mathbb E[(X-m)^+]=(1-\tau)\,\mathbb E[(m-X)^+]$: the weighted mass above $m$ balances the weighted mass below. As $\tau$ grows, the weight on values above $m$ grows, so $m$ must rise to reduce $\mathbb E[(X-m)^+]$; as $\tau\to1$, the balance requires $\mathbb E[(X-m)^+]\to0$, that is, $m$ approaches the supremum of the support.
+(a) At $`\tau=\frac12`$, $`L^\tau_2(u)=\frac12u^2`$, whose minimizer is the mean. In general the minimizer satisfies $`\tau\,\mathbb E[(X-m)^+]=(1-\tau)\,\mathbb E[(m-X)^+]`$: the weighted mass above $`m`$ balances the weighted mass below. As $`\tau`$ grows, the weight on values above $`m`$ grows, so $`m`$ must rise to reduce $`\mathbb E[(X-m)^+]`$; as $`\tau\to1`$, the balance requires $`\mathbb E[(X-m)^+]\to0`$, that is, $`m`$ approaches the supremum of the support.
 
-(b) The maximum over the data's actions in a state is not observable: each state typically appears with one action in continuous spaces, and the maximum of noisy Q estimates is biased upward. The expectile is estimated by regression over all data, generalizes across similar states through the network, and $\tau$ trades off between the behavior's value ($\tau=\frac12$, SARSA-like) and the best supported action's ($\tau\to1$), with values of 0.7 to 0.9 typical. Crucially, it involves only actions that appear in the data.
+(b) The maximum over the data's actions in a state is not observable: each state typically appears with one action in continuous spaces, and the maximum of noisy Q estimates is biased upward. The expectile is estimated by regression over all data, generalizes across similar states through the network, and $`\tau`$ trades off between the behavior's value ($`\tau=\frac12`$, SARSA-like) and the best supported action's ($`\tau\to1`$), with values of 0.7 to 0.9 typical. Crucially, it involves only actions that appear in the data.
 
 </details>
 
 
 ### <a id="exercise-26-4-advantage-weighted-regression"></a>Exercise 26.4 — Advantage-weighted regression
 
-(a) Show that the policy maximizing $\mathbb E_{a\sim\pi}[A(s,a)]-\frac1\beta D_{\mathrm{KL}}(\pi(\cdot\mid s)\,\|\,\pi_\beta(\cdot\mid s))$ is $\pi^*(a\mid s)\propto\pi_\beta(a\mid s)\exp(\beta A(s,a))$. (b) Show that projecting it onto a parametric class by minimizing $D_{\mathrm{KL}}(\pi^*\,\|\,\pi_\theta)$ is a weighted maximum-likelihood regression on the data. (c) What does $\beta$ control?
+(a) Show that the policy maximizing $`\mathbb E_{a\sim\pi}[A(s,a)]-\frac1\beta D_{\mathrm{KL}}(\pi(\cdot\mid s)\,\|\,\pi_\beta(\cdot\mid s))`$ is $`\pi^*(a\mid s)\propto\pi_\beta(a\mid s)\exp(\beta A(s,a))`$. (b) Show that projecting it onto a parametric class by minimizing $`D_{\mathrm{KL}}(\pi^*\,\|\,\pi_\theta)`$ is a weighted maximum-likelihood regression on the data. (c) What does $`\beta`$ control?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) This is the mirror descent step of chapter 20 with the behavior as the reference: the Lagrangian's stationarity condition gives $\ln\pi(a\mid s)=\ln\pi_\beta(a\mid s)+\beta A(s,a)-\ln Z(s)$.
+(a) This is the mirror descent step of chapter 20 with the behavior as the reference: the Lagrangian's stationarity condition gives $`\ln\pi(a\mid s)=\ln\pi_\beta(a\mid s)+\beta A(s,a)-\ln Z(s)`$.
 
-(b) $D_{\mathrm{KL}}(\pi^*\|\pi_\theta)=\text{const}-\mathbb E_{a\sim\pi^*}\ln\pi_\theta(a\mid s)=\text{const}-\mathbb E_{a\sim\pi_\beta}\bigl[\frac{e^{\beta A(s,a)}}{Z(s)}\ln\pi_\theta(a\mid s)\bigr]$, an expectation over the data's actions: behavior cloning with weights $e^{\beta A}$ (the normalizer $Z(s)$ is usually dropped). The policy never needs the Q-function's values at unseen actions.
+(b) $`D_{\mathrm{KL}}(\pi^*\|\pi_\theta)=\text{const}-\mathbb E_{a\sim\pi^*}\ln\pi_\theta(a\mid s)=\text{const}-\mathbb E_{a\sim\pi_\beta}\bigl[\frac{e^{\beta A(s,a)}}{Z(s)}\ln\pi_\theta(a\mid s)\bigr]`$, an expectation over the data's actions: behavior cloning with weights $`e^{\beta A}`$ (the normalizer $`Z(s)`$ is usually dropped). The policy never needs the Q-function's values at unseen actions.
 
-(c) $\beta$ is the inverse temperature of the improvement: $\beta\to0$ gives behavior cloning, and $\beta\to\infty$ puts all weight on the best action in the data. Large $\beta$ improves more but uses fewer samples effectively, since a few actions dominate the weights, which is why the weights are usually clipped.
+(c) $`\beta`$ is the inverse temperature of the improvement: $`\beta\to0`$ gives behavior cloning, and $`\beta\to\infty`$ puts all weight on the best action in the data. Large $`\beta`$ improves more but uses fewer samples effectively, since a few actions dominate the weights, which is why the weights are usually clipped.
 
 </details>
 
 
 ### <a id="exercise-26-5-td3-bc-s-normalization"></a>Exercise 26.5 — TD3+BC's normalization
 
-TD3+BC's actor maximizes $\lambda Q(s,\pi(s))-(\pi(s)-a)^2$ with $\lambda=\alpha/\overline{|Q|}$. (a) Why divide by the average magnitude of the Q-values? (b) What happens with $\alpha\to0$ and $\alpha\to\infty$? (c) Why might a fixed trade-off be suboptimal across data sets?
+TD3+BC's actor maximizes $`\lambda Q(s,\pi(s))-(\pi(s)-a)^2`$ with $`\lambda=\alpha/\overline{|Q|}`$. (a) Why divide by the average magnitude of the Q-values? (b) What happens with $`\alpha\to0`$ and $`\alpha\to\infty`$? (c) Why might a fixed trade-off be suboptimal across data sets?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) The Q-values scale with the rewards and with $1/(1-\gamma)$, while the cloning term is bounded by the squared range of the actions. Without normalization, the same $\alpha$ would mean almost pure cloning on a task with small rewards and almost pure Q maximization on one with large rewards. Dividing by $\overline{|Q|}$, computed on each minibatch and treated as a constant, makes the gradient of the first term of order $\alpha$ in the Q-function's relative units, so one value of $\alpha$ transfers across tasks.
+(a) The Q-values scale with the rewards and with $`1/(1-\gamma)`$, while the cloning term is bounded by the squared range of the actions. Without normalization, the same $`\alpha`$ would mean almost pure cloning on a task with small rewards and almost pure Q maximization on one with large rewards. Dividing by $`\overline{|Q|}`$, computed on each minibatch and treated as a constant, makes the gradient of the first term of order $`\alpha`$ in the Q-function's relative units, so one value of $`\alpha`$ transfers across tasks.
 
-(b) With $\alpha\to0$ the actor clones the data; with $\alpha\to\infty$ it is TD3, with the extrapolation error that motivated the method.
+(b) With $`\alpha\to0`$ the actor clones the data; with $`\alpha\to\infty`$ it is TD3, with the extrapolation error that motivated the method.
 
-(c) The right amount of cloning depends on the data: expert data favor cloning and a small $\alpha$, random data need the Q-function and a large one. A fixed $\alpha$ is a compromise, which is why methods that adapt the constraint to the data's quality, or constrain the support rather than the distribution, can do better on mixed data sets.
+(c) The right amount of cloning depends on the data: expert data favor cloning and a small $`\alpha`$, random data need the Q-function and a large one. A fixed $`\alpha`$ is a compromise, which is why methods that adapt the constraint to the data's quality, or constrain the support rather than the distribution, can do better on mixed data sets.
 
 </details>
 
 
 ### <a id="exercise-26-6-pessimism-and-coverage"></a>Exercise 26.6 — Pessimism and coverage
 
-A tabular offline algorithm estimates $\hat Q(s,a)$ with confidence intervals of width $b(s,a)\propto1/\sqrt{n(s,a)}$. (a) Compare the policies that act greedily on $\hat Q$, on $\hat Q+b$, and on $\hat Q-b$ when some pairs have $n=0$. (b) Explain why the pessimistic policy needs the data to cover only the optimal policy's pairs, and what it does when the data come from an expert.
+A tabular offline algorithm estimates $`\hat Q(s,a)`$ with confidence intervals of width $`b(s,a)\propto1/\sqrt{n(s,a)}`$. (a) Compare the policies that act greedily on $`\hat Q`$, on $`\hat Q+b`$, and on $`\hat Q-b`$ when some pairs have $`n=0`$. (b) Explain why the pessimistic policy needs the data to cover only the optimal policy's pairs, and what it does when the data come from an expert.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Greedy on $\hat Q$ follows whatever arbitrary values the unseen pairs have. The optimistic $\hat Q+b$ is drawn to the unseen pairs, whose bonus is infinite, which is right online, where visiting them resolves the uncertainty, and disastrous offline, where it never does. The pessimistic $\hat Q-b$ avoids them, and more generally prefers actions whose values are both high and well estimated.
+(a) Greedy on $`\hat Q`$ follows whatever arbitrary values the unseen pairs have. The optimistic $`\hat Q+b`$ is drawn to the unseen pairs, whose bonus is infinite, which is right online, where visiting them resolves the uncertainty, and disastrous offline, where it never does. The pessimistic $`\hat Q-b`$ avoids them, and more generally prefers actions whose values are both high and well estimated.
 
-(b) Pessimism guarantees that the chosen policy's value is at least its lower confidence bound, which, by the choice of the maximizer, is at least the lower bound of the optimal policy's value, $V^*-O(\text{width along the optimal policy's trajectories})$. The suboptimality therefore depends only on how well the data cover the optimal policy's state–action pairs, the single-policy concentrability, and not on the coverage of other policies. With expert data, the expert's actions are the only well-covered ones, the lower bounds of the alternatives are poor, and the pessimistic policy picks the expert's actions: it reduces to imitation, as Rashidinejad et al. showed, and it improves on the data when they cover better actions.
+(b) Pessimism guarantees that the chosen policy's value is at least its lower confidence bound, which, by the choice of the maximizer, is at least the lower bound of the optimal policy's value, $`V^*-O(\text{width along the optimal policy's trajectories})`$. The suboptimality therefore depends only on how well the data cover the optimal policy's state–action pairs, the single-policy concentrability, and not on the coverage of other policies. With expert data, the expert's actions are the only well-covered ones, the lower bounds of the alternatives are poor, and the pessimistic policy picks the expert's actions: it reduces to imitation, as Rashidinejad et al. showed, and it improves on the data when they cover better actions.
 
 </details>
 
 
 ### <a id="exercise-26-7-when-return-conditioning-fails"></a>Exercise 26.7 — When return conditioning fails
 
-(a) Two data sets of trajectories share a middle state $M$: one goes from the start to $M$ and then fails, the other starts at $M$ and reaches the goal. Why can a return-conditioned policy not learn to go from the start to the goal, while Q-learning can? (b) In a stochastic environment, an action at the start leads to a jackpot with probability 0.1 and to nothing otherwise; another action gives a sure medium reward. Why does conditioning on the jackpot's return choose the wrong action?
+(a) Two data sets of trajectories share a middle state $`M`$: one goes from the start to $`M`$ and then fails, the other starts at $`M`$ and reaches the goal. Why can a return-conditioned policy not learn to go from the start to the goal, while Q-learning can? (b) In a stochastic environment, an action at the start leads to a jackpot with probability 0.1 and to nothing otherwise; another action gives a sure medium reward. Why does conditioning on the jackpot's return choose the wrong action?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Conditioned on a high return at the start, the policy imitates the actions of trajectories that obtained high returns *from the start*, and there are none: every trajectory through the start failed. Q-learning's backup combines the value of reaching $M$, learned from the first data set, with the value of continuing from $M$, learned from the second, and so values the path from the start to the goal although no single trajectory contains it: dynamic programming stitches.
+(a) Conditioned on a high return at the start, the policy imitates the actions of trajectories that obtained high returns *from the start*, and there are none: every trajectory through the start failed. Q-learning's backup combines the value of reaching $`M`$, learned from the first data set, with the value of continuing from $`M`$, learned from the second, and so values the path from the start to the goal although no single trajectory contains it: dynamic programming stitches.
 
 (b) The high-return trajectories in the data all took the risky action, since only it can produce the jackpot, so conditioning on that return selects it, although its expected return, 0.1 times the jackpot, may be lower than the sure reward. The conditioning treats a lucky outcome as if it were controllable; the returns-to-go are consistent targets only when the environment is (nearly) deterministic, which is one of Brandfonbrener et al.'s conditions, alongside coverage of the conditioned returns.
 
@@ -407,11 +407,11 @@ A CQL agent is fine-tuned online after offline training, and its performance fir
 <summary><a id="block-rl26-appendix-a"></a><b>A. Implicit Q-learning</b></summary>
 
 
-Networks: two Q-networks (use the minimum), their target copies, a value network $V$, and a policy.
+Networks: two Q-networks (use the minimum), their target copies, a value network $`V`$, and a policy.
 
-1. **Value:** minimize $\mathbb E_{(s,a)\sim\mathcal D}\bigl[L^\tau_2(\min_iQ^-_i(s,a)-V(s))\bigr]$ with $\tau=0.7$ (locomotion) to 0.9 (mazes).
-2. **Q:** minimize $\mathbb E_{(s,a,r,s')\sim\mathcal D}\bigl[(r+\gamma V(s')-Q_i(s,a))^2\bigr]$ for each $i$, and update the targets by Polyak averaging.
-3. **Policy:** maximize $\mathbb E_{(s,a)\sim\mathcal D}\bigl[\exp(\beta(\min_iQ^-_i(s,a)-V(s)))\ln\pi(a\mid s)\bigr]$ with the weights clipped (for example at 100), $\beta$ from 3 to 10; this step can run after, or alongside, the others, since they do not depend on the policy.
+1. **Value:** minimize $`\mathbb E_{(s,a)\sim\mathcal D}\bigl[L^\tau_2(\min_iQ^-_i(s,a)-V(s))\bigr]`$ with $`\tau=0.7`$ (locomotion) to 0.9 (mazes).
+2. **Q:** minimize $`\mathbb E_{(s,a,r,s')\sim\mathcal D}\bigl[(r+\gamma V(s')-Q_i(s,a))^2\bigr]`$ for each $`i`$, and update the targets by Polyak averaging.
+3. **Policy:** maximize $`\mathbb E_{(s,a)\sim\mathcal D}\bigl[\exp(\beta(\min_iQ^-_i(s,a)-V(s)))\ln\pi(a\mid s)\bigr]`$ with the weights clipped (for example at 100), $`\beta`$ from 3 to 10; this step can run after, or alongside, the others, since they do not depend on the policy.
 
 The steps alternate on minibatches from the data set for a million gradient steps in the original experiments; rewards are often normalized by the range of the data set's returns.
 
@@ -429,7 +429,7 @@ $$
 \alpha\Bigl(\ln\sum_{j}\exp Q(s,a_j)-Q(s,a_{\mathcal D})\Bigr),
 $$
 
-where the log-sum-exp over continuous actions is estimated by importance sampling with about 10 actions each from a uniform distribution and from the current policy at $s$ and at $s'$, each term corrected by its sampling density. Typical settings: $\alpha$ from 1 to 10, or tuned automatically by a Lagrangian to keep the gap $\ln\sum\exp Q-Q(s,a_{\mathcal D})$ near a threshold; a critic learning rate of $3\times10^{-4}$ and a smaller one for the actor; and a period of pure behavior cloning at the start. For discrete actions the log-sum-exp is computed exactly, and CQL is a one-line addition to DQN.
+where the log-sum-exp over continuous actions is estimated by importance sampling with about 10 actions each from a uniform distribution and from the current policy at $`s`$ and at $`s'`$, each term corrected by its sampling density. Typical settings: $`\alpha`$ from 1 to 10, or tuned automatically by a Lagrangian to keep the gap $`\ln\sum\exp Q-Q(s,a_{\mathcal D})`$ near a threshold; a critic learning rate of $`3\times10^{-4}`$ and a smaller one for the actor; and a period of pure behavior cloning at the start. For discrete actions the log-sum-exp is computed exactly, and CQL is a one-line addition to DQN.
 
 </details>
 

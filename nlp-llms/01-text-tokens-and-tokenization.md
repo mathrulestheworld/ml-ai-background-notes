@@ -10,7 +10,7 @@
 
 A language model reads and writes sequences of discrete symbols drawn from a fixed vocabulary, while text arrives as a string of characters in thousands of writing systems. **Tokenization** is the map between the two: it cuts text into units called **tokens**, assigns each an integer identifier, and must be inverted exactly when the model's output is turned back into text. Every later chapter inherits its choices. The vocabulary fixes the size of the embedding and output layers, the number of tokens per document fixes the sequence length and so the cost of attention, and the way a word is split determines what the model can easily learn about its spelling.
 
-Text is stored in **Unicode**, which assigns an integer **code point** to each of more than 150,000 characters, from Latin letters to Devanagari conjuncts, Chinese characters, and emoji, within a code space of $1{,}114{,}112$ values. Code points are stored as bytes by an encoding, almost always **UTF-8**, which uses one byte for the 128 ASCII characters, two for most other alphabetic scripts, three for the rest of the basic multilingual plane (including most Chinese, Japanese, and Indic text), and four for everything beyond it:
+Text is stored in **Unicode**, which assigns an integer **code point** to each of more than 150,000 characters, from Latin letters to Devanagari conjuncts, Chinese characters, and emoji, within a code space of $`1{,}114{,}112`$ values. Code points are stored as bytes by an encoding, almost always **UTF-8**, which uses one byte for the 128 ASCII characters, two for most other alphabetic scripts, three for the rest of the basic multilingual plane (including most Chinese, Japanese, and Indic text), and four for everything beyond it:
 
 ```python
 import unicodedata
@@ -47,9 +47,9 @@ Counting words distinguishes **tokens**, the running occurrences, from **types**
 
 <img src="sources/images/nlp-tok-zipf.png" alt="nlp-tok-zipf" width="880">
 
-*Word statistics of Tiny Shakespeare: 203,839 word tokens and 12,373 types. Left: frequency against rank on log–log axes; a line fitted to ranks 10–2000 has slope $-1.16$. Right: the number of distinct words seen after reading the first $N$ tokens grows like $N^{0.63}$ (fitted for $N\ge1000$). Of the 12,373 types, 5,519 (45%) occur exactly once.*
+*Word statistics of Tiny Shakespeare: 203,839 word tokens and 12,373 types. Left: frequency against rank on log–log axes; a line fitted to ranks 10–2000 has slope $`-1.16`$. Right: the number of distinct words seen after reading the first $`N`$ tokens grows like $`N^{0.63}`$ (fitted for $`N\ge1000`$). Of the 12,373 types, 5,519 (45%) occur exactly once.*
 
-Two empirical regularities describe these counts. **Zipf's law** says that the frequency of the word of rank $r$ falls as a power of the rank, $f(r)\propto r^{-\alpha}$ with $\alpha$ near 1: the most common word is about twice as frequent as the second and ten times as frequent as the tenth. **Heaps' law** says that the vocabulary seen after $N$ tokens grows as $V(N)\propto N^\beta$ with $\beta$ between about 0.4 and 0.7, so reading more text keeps producing new words, at a slowing rate but without end. The two are linked: if word probabilities follow a pure power law with exponent $\alpha>1$, then $\beta=1/\alpha$ in the limit of long texts ([Appendix A](#block-nlp01-appendix-a)). The exponents measured on a finite corpus satisfy this only roughly (here $1/1.16=0.86$ against a measured 0.63), because the rank–frequency curve steepens in its tail and the limit is approached slowly, but the qualitative conclusion holds for every language and corpus size: most types are rare, and any fixed word list leaves a steady stream of unseen words.
+Two empirical regularities describe these counts. **Zipf's law** says that the frequency of the word of rank $`r`$ falls as a power of the rank, $`f(r)\propto r^{-\alpha}`$ with $`\alpha`$ near 1: the most common word is about twice as frequent as the second and ten times as frequent as the tenth. **Heaps' law** says that the vocabulary seen after $`N`$ tokens grows as $`V(N)\propto N^\beta`$ with $`\beta`$ between about 0.4 and 0.7, so reading more text keeps producing new words, at a slowing rate but without end. The two are linked: if word probabilities follow a pure power law with exponent $`\alpha>1`$, then $`\beta=1/\alpha`$ in the limit of long texts ([Appendix A](#block-nlp01-appendix-a)). The exponents measured on a finite corpus satisfy this only roughly (here $`1/1.16=0.86`$ against a measured 0.63), because the rank–frequency curve steepens in its tail and the limit is approached slowly, but the qualitative conclusion holds for every language and corpus size: most types are rare, and any fixed word list leaves a steady stream of unseen words.
 
 For word-level models these facts are a problem. A vocabulary of the most frequent 50,000 English words still misses names, numbers, typos, technical terms, and new coinages, which older systems mapped to a single unknown-word symbol that the model could neither read nor produce. Morphology makes it worse: *play*, *plays*, *played*, *playing*, and *replayed* are unrelated symbols to a word-level model, so what it learns about one does not transfer to the others, and in languages with rich inflection or compounding, such as Finnish, Turkish, or German, the number of word forms grows much faster than in English.
 
@@ -173,16 +173,16 @@ a pointwise-mutual-information criterion (chapter 3) that favors pairs whose par
 
 ### <a id="the-unigram-language-model"></a>The unigram language model
 
-The **unigram language model** tokenizer ([Kudo, 2018](https://arxiv.org/abs/1804.10959)) works top down and treats segmentation probabilistically. It assumes that a word $w$ is produced by drawing pieces independently from a distribution $p$ over a vocabulary $\mathcal V$ and concatenating them. A segmentation $\mathbf s=(s_1,\dots,s_k)$ of $w$ has probability $\prod_ip(s_i)$, and the word's probability sums over all segmentations,
+The **unigram language model** tokenizer ([Kudo, 2018](https://arxiv.org/abs/1804.10959)) works top down and treats segmentation probabilistically. It assumes that a word $`w`$ is produced by drawing pieces independently from a distribution $`p`$ over a vocabulary $`\mathcal V`$ and concatenating them. A segmentation $`\mathbf s=(s_1,\dots,s_k)`$ of $`w`$ has probability $`\prod_ip(s_i)`$, and the word's probability sums over all segmentations,
 
 $$
 P(w)=\sum_{\mathbf s\in S(w)}\prod_{i=1}^{|\mathbf s|}p(s_i),
 $$
 
-where $S(w)$ is the set of ways to write $w$ as a concatenation of vocabulary pieces. Training maximizes $\sum_wc_w\log P(w)$ over the corpus word counts $c_w$ and prunes the vocabulary as it goes:
+where $`S(w)`$ is the set of ways to write $`w`$ as a concatenation of vocabulary pieces. Training maximizes $`\sum_wc_w\log P(w)`$ over the corpus word counts $`c_w`$ and prunes the vocabulary as it goes:
 
 1. Start from a large seed vocabulary, such as all frequent substrings, with probabilities proportional to their counts.
-2. Fit $p$ by **expectation–maximization** (ML chapter 14): the segmentation is the hidden variable, the E-step computes the expected number of times each piece is used, and the M-step sets $p(s)$ proportional to it. The expectations come from a forward–backward pass over the **segmentation lattice** of each word, whose nodes are character positions and whose edges are vocabulary pieces, the same dynamic program as for hidden Markov models (AI chapter 11; [Appendix B](#block-nlp01-appendix-b)).
+2. Fit $`p`$ by **expectation–maximization** (ML chapter 14): the segmentation is the hidden variable, the E-step computes the expected number of times each piece is used, and the M-step sets $`p(s)`$ proportional to it. The expectations come from a forward–backward pass over the **segmentation lattice** of each word, whose nodes are character positions and whose edges are vocabulary pieces, the same dynamic program as for hidden Markov models (AI chapter 11; [Appendix B](#block-nlp01-appendix-b)).
 3. Remove the pieces whose loss would least reduce the likelihood, typically keeping 80% of them per round, but never single characters, which guarantee that every word stays segmentable.
 4. Repeat until the vocabulary reaches the target size.
 
@@ -299,7 +299,7 @@ On this corpus the two algorithms compress almost identically at every vocabular
 
 ### <a id="vocabulary-size-and-cost"></a>Vocabulary size and cost
 
-A vocabulary of $V$ tokens and a model width of $d$ costs $Vd$ parameters for the input embeddings and, unless the two are tied, another $Vd$ for the output layer, whose softmax over $V$ entries is computed at every position (chapter 4). At $V=128{,}000$ and $d=4096$ that is 524 million parameters per matrix, a large share of a small model and a small share of a large one. A larger vocabulary shortens sequences, which saves computation in every layer, and reduces the number of steps needed to generate a given text; but each additional token is rarer, so its embedding is trained on fewer examples. These pressures balance at larger vocabularies for larger models and for multilingual ones, which is why vocabularies have grown from about 32,000 to 100,000–260,000 tokens as models have grown.
+A vocabulary of $`V`$ tokens and a model width of $`d`$ costs $`Vd`$ parameters for the input embeddings and, unless the two are tied, another $`Vd`$ for the output layer, whose softmax over $`V`$ entries is computed at every position (chapter 4). At $`V=128{,}000`$ and $`d=4096`$ that is 524 million parameters per matrix, a large share of a small model and a small share of a large one. A larger vocabulary shortens sequences, which saves computation in every layer, and reduces the number of steps needed to generate a given text; but each additional token is rarer, so its embedding is trained on fewer examples. These pressures balance at larger vocabularies for larger models and for multilingual ones, which is why vocabularies have grown from about 32,000 to 100,000–260,000 tokens as models have grown.
 
 ### <a id="numbers-spelling-and-code"></a>Numbers, spelling, and code
 
@@ -333,20 +333,20 @@ Tokenizers are trained separately from the model, frozen, and cannot adapt to a 
 <summary><a id="block-nlp01-appendix-a"></a><b>A. Zipf's law implies Heaps' law</b></summary>
 
 
-Suppose word types are drawn independently with probabilities $p_r=r^{-\alpha}/\zeta(\alpha)$ for ranks $r=1,2,\dots$, with $\alpha>1$ so that the probabilities sum to one ($\zeta$ is the Riemann zeta function). After $N$ draws, type $r$ has been seen with probability $1-(1-p_r)^N$, so the expected vocabulary is
+Suppose word types are drawn independently with probabilities $`p_r=r^{-\alpha}/\zeta(\alpha)`$ for ranks $`r=1,2,\dots`$, with $`\alpha>1`$ so that the probabilities sum to one ($`\zeta`$ is the Riemann zeta function). After $`N`$ draws, type $`r`$ has been seen with probability $`1-(1-p_r)^N`$, so the expected vocabulary is
 
 $$
 \mathbb E[V(N)]=\sum_{r\ge1}\bigl[1-(1-p_r)^N\bigr].
 $$
 
-The summand is close to 1 when $Np_r\gg1$ and close to $Np_r$ when $Np_r\ll1$; the transition happens at the rank $r^*$ where $Np_{r^*}=1$, that is, $r^*=(N/\zeta(\alpha))^{1/\alpha}$. Approximating the sum by an integral with $u=Np_r$, which changes variables through $r=(N/(\zeta(\alpha)u))^{1/\alpha}$ and $dr=-\frac1\alpha(N/\zeta(\alpha))^{1/\alpha}u^{-1/\alpha-1}du$, gives
+The summand is close to 1 when $`Np_r\gg1`$ and close to $`Np_r`$ when $`Np_r\ll1`$; the transition happens at the rank $`r^*`$ where $`Np_{r^*}=1`$, that is, $`r^*=(N/\zeta(\alpha))^{1/\alpha}`$. Approximating the sum by an integral with $`u=Np_r`$, which changes variables through $`r=(N/(\zeta(\alpha)u))^{1/\alpha}`$ and $`dr=-\frac1\alpha(N/\zeta(\alpha))^{1/\alpha}u^{-1/\alpha-1}du`$, gives
 
 $$
 \mathbb E[V(N)]\approx\Bigl(\frac N{\zeta(\alpha)}\Bigr)^{1/\alpha}\frac1\alpha\int_0^\infty\bigl(1-e^{-u}\bigr)u^{-1/\alpha-1}\,du
 =\Gamma\Bigl(1-\frac1\alpha\Bigr)\Bigl(\frac N{\zeta(\alpha)}\Bigr)^{1/\alpha},
 $$
 
-using $(1-p)^N\approx e^{-Np}$ for small $p$ and integrating by parts. The integral converges because $1/\alpha<1$. Hence $V(N)\propto N^{1/\alpha}$: Heaps' exponent is $\beta=1/\alpha$. For $\alpha\le1$ the probabilities cannot sum to one over infinitely many types, so a pure power law needs a finite vocabulary and the relation breaks down; this is one reason measured exponents on finite corpora match the formula only approximately.
+using $`(1-p)^N\approx e^{-Np}`$ for small $`p`$ and integrating by parts. The integral converges because $`1/\alpha<1`$. Hence $`V(N)\propto N^{1/\alpha}`$: Heaps' exponent is $`\beta=1/\alpha`$. For $`\alpha\le1`$ the probabilities cannot sum to one over infinitely many types, so a pure power law needs a finite vocabulary and the relation breaks down; this is one reason measured exponents on finite corpora match the formula only approximately.
 
 </details>
 
@@ -356,18 +356,18 @@ using $(1-p)^N\approx e^{-Np}$ for small $p$ and integrating by parts. The integ
 <summary><a id="block-nlp01-appendix-b"></a><b>B. Expectation–maximization for the unigram tokenizer</b></summary>
 
 
-For a word $w=w_1\cdots w_n$, let $A_i$ be the total probability of all segmentations of the prefix $w_{1:i}$ and $B_j$ that of the suffix $w_{j+1:n}$, with $A_0=B_n=1$. Every segmentation of $w$ either ends a piece at position $i$ or does not, so
+For a word $`w=w_1\cdots w_n`$, let $`A_i`$ be the total probability of all segmentations of the prefix $`w_{1:i}`$ and $`B_j`$ that of the suffix $`w_{j+1:n}`$, with $`A_0=B_n=1`$. Every segmentation of $`w`$ either ends a piece at position $`i`$ or does not, so
 
 $$
 A_i=\sum_{j<i:\ w_{j+1:i}\in\mathcal V}A_j\,p(w_{j+1:i}),\qquad
 B_j=\sum_{i>j:\ w_{j+1:i}\in\mathcal V}p(w_{j+1:i})\,B_i,
 $$
 
-and $P(w)=A_n=B_0$. The segmentations that use the piece $w_{j+1:i}$ at that position have total probability $A_j\,p(w_{j+1:i})\,B_i$, so the posterior probability of that edge of the lattice is $A_jp(w_{j+1:i})B_i/P(w)$.
+and $`P(w)=A_n=B_0`$. The segmentations that use the piece $`w_{j+1:i}`$ at that position have total probability $`A_j\,p(w_{j+1:i})\,B_i`$, so the posterior probability of that edge of the lattice is $`A_jp(w_{j+1:i})B_i/P(w)`$.
 
-The **E-step** sums these posteriors over all positions where a piece $s$ can occur, over all words, weighted by word counts, to obtain the expected count $\bar c(s)=\sum_wc_w\,\mathbb E[\#s\mid w]$. The **M-step** maximizes the expected complete-data log-likelihood $\sum_s\bar c(s)\log p(s)$ subject to $\sum_sp(s)=1$; a Lagrange multiplier gives $p(s)=\bar c(s)/\sum_{s'}\bar c(s')$. As for any EM algorithm, each iteration cannot decrease $\sum_wc_w\log P(w)$.
+The **E-step** sums these posteriors over all positions where a piece $`s`$ can occur, over all words, weighted by word counts, to obtain the expected count $`\bar c(s)=\sum_wc_w\,\mathbb E[\#s\mid w]`$. The **M-step** maximizes the expected complete-data log-likelihood $`\sum_s\bar c(s)\log p(s)`$ subject to $`\sum_sp(s)=1`$; a Lagrange multiplier gives $`p(s)=\bar c(s)/\sum_{s'}\bar c(s')`$. As for any EM algorithm, each iteration cannot decrease $`\sum_wc_w\log P(w)`$.
 
-The Viterbi segmentation replaces the sum in the recursion for $A_i$ by a maximum and keeps back pointers. Kudo's pruning step estimates, for each piece $s$, the loss $\sum_wc_w[\log P(w)-\log P_{-s}(w)]$ incurred by removing it, where $P_{-s}$ uses the best segmentation without $s$, and removes the pieces with the smallest loss. Both recursions cost $O(nL)$ per word for pieces of at most $L$ characters.
+The Viterbi segmentation replaces the sum in the recursion for $`A_i`$ by a maximum and keeps back pointers. Kudo's pruning step estimates, for each piece $`s`$, the loss $`\sum_wc_w[\log P(w)-\log P_{-s}(w)]`$ incurred by removing it, where $`P_{-s}`$ uses the best segmentation without $`s`$, and removes the pieces with the smallest loss. Both recursions cost $`O(nL)`$ per word for pieces of at most $`L`$ characters.
 
 </details>
 
@@ -377,13 +377,13 @@ The Viterbi segmentation replaces the sum in the recursion for $A_i$ by a maximu
 <summary><a id="block-nlp01-appendix-c"></a><b>C. Perplexity per token and bits per byte</b></summary>
 
 
-Let a text of $B$ bytes be tokenized into $T$ tokens, and let a model assign it total negative log-likelihood $\mathcal L=-\sum_{t=1}^T\log q(x_t\mid x_{<t})$ in nats. The per-token loss is $\mathcal L/T$ and the per-token perplexity is $\mathrm{PPL}_{\mathrm{tok}}=e^{\mathcal L/T}$. The total $\mathcal L$ is the ideal code length of the whole text, which does not depend on how it was cut into tokens, so the tokenizer-independent quantity is the code length per byte,
+Let a text of $`B`$ bytes be tokenized into $`T`$ tokens, and let a model assign it total negative log-likelihood $`\mathcal L=-\sum_{t=1}^T\log q(x_t\mid x_{<t})`$ in nats. The per-token loss is $`\mathcal L/T`$ and the per-token perplexity is $`\mathrm{PPL}_{\mathrm{tok}}=e^{\mathcal L/T}`$. The total $`\mathcal L`$ is the ideal code length of the whole text, which does not depend on how it was cut into tokens, so the tokenizer-independent quantity is the code length per byte,
 
 $$
 \mathrm{BPB}=\frac{\mathcal L}{B\ln2}=\frac TB\cdot\frac{\mathcal L/T}{\ln2}.
 $$
 
-Two models with tokenizers compressing at $B/T_1$ and $B/T_2$ bytes per token and equal bits per byte have per-token losses in the ratio $T_2/T_1$, and per-token perplexities related by $\mathrm{PPL}_1=\mathrm{PPL}_2^{\,T_2/T_1}$. A tokenizer twice as coarse therefore squares the per-token perplexity at equal quality. The identity assumes the model's probability of the text is computed from the canonical tokenization, as it is in practice.
+Two models with tokenizers compressing at $`B/T_1`$ and $`B/T_2`$ bytes per token and equal bits per byte have per-token losses in the ratio $`T_2/T_1`$, and per-token perplexities related by $`\mathrm{PPL}_1=\mathrm{PPL}_2^{\,T_2/T_1}`$. A tokenizer twice as coarse therefore squares the per-token perplexity at equal quality. The identity assumes the model's probability of the text is computed from the canonical tokenization, as it is in practice.
 
 </details>
 

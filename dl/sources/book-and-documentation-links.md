@@ -21,7 +21,7 @@ The chapter notes develop the module's main material. These books and official d
 | --- | --- |
 | Bronstein, Bruna, Cohen, and Veličković, [*Geometric Deep Learning: Grids, Groups, Graphs, Geodesics, and Gauges*](https://arxiv.org/abs/2104.13478) | Architectures derived from the symmetries of their domain: convolutional networks, transformers, and graph networks in one framework (chapters 6, 9, and 13). |
 | Hamilton, [*Graph Representation Learning*](https://www.cs.mcgill.ca/~wlh/grl_book/) | Graph neural networks, spectral methods, and the Weisfeiler–Lehman connection (chapter 13). |
-| Roberts, Yaida, and Hanin, [*The Principles of Deep Learning Theory*](https://arxiv.org/abs/2106.10165) | Signal propagation at initialization, the infinite-width limit, and its $1/n$ corrections (chapters 2 and 15). |
+| Roberts, Yaida, and Hanin, [*The Principles of Deep Learning Theory*](https://arxiv.org/abs/2106.10165) | Signal propagation at initialization, the infinite-width limit, and its $`1/n`$ corrections (chapters 2 and 15). |
 | Balestriero et al., [*A Cookbook of Self-Supervised Learning*](https://arxiv.org/abs/2304.12210) | The families of self-supervised methods and the training details that make them work (chapter 10). |
 | Phuong and Hutter, [*Formal Algorithms for Transformers*](https://arxiv.org/abs/2207.09238) | Precise pseudocode for every transformer variant (chapter 9). |
 | Nagel et al., [*A White Paper on Neural Network Quantization*](https://arxiv.org/abs/2106.08295) | Quantization schemes, post-training quantization, and quantization-aware training (chapter 11). |

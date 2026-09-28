@@ -12,29 +12,29 @@ In supervised learning, a gradient step that is too large costs a few iterations
 
 ### <a id="the-performance-difference-lemma"></a>The performance difference lemma
 
-How much better is a policy $\pi'$ than $\pi$? With $\rho_\pi(s)=\sum_t\gamma^t\Pr(S_t=s\mid\pi)$ the unnormalized discounted state visitation and $A_\pi$ the advantage function of $\pi$, the **performance difference lemma** ([Kakade and Langford, 2002](https://dl.acm.org/doi/10.5555/645531.656005)) states that
+How much better is a policy $`\pi'`$ than $`\pi`$? With $`\rho_\pi(s)=\sum_t\gamma^t\Pr(S_t=s\mid\pi)`$ the unnormalized discounted state visitation and $`A_\pi`$ the advantage function of $`\pi`$, the **performance difference lemma** ([Kakade and Langford, 2002](https://dl.acm.org/doi/10.5555/645531.656005)) states that
 
 $$
 J(\pi')-J(\pi)=\sum_s\rho_{\pi'}(s)\sum_a\pi'(a\mid s)A_\pi(s,a)
 $$
 
-(exercise 20.1). The improvement is the advantage of the new policy's actions, measured by the old policy's advantage function but averaged over the *new* policy's states. That makes it useless as it stands for choosing $\pi'$, since the new states are unknown until $\pi'$ has been run. Replacing $\rho_{\pi'}$ by $\rho_\pi$ gives the **surrogate objective**
+(exercise 20.1). The improvement is the advantage of the new policy's actions, measured by the old policy's advantage function but averaged over the *new* policy's states. That makes it useless as it stands for choosing $`\pi'`$, since the new states are unknown until $`\pi'`$ has been run. Replacing $`\rho_{\pi'}`$ by $`\rho_\pi`$ gives the **surrogate objective**
 
 $$
 L_\pi(\pi')=J(\pi)+\sum_s\rho_\pi(s)\sum_a\pi'(a\mid s)A_\pi(s,a)=J(\pi)+\mathbb E_{s,a\sim\pi}\Bigl[\frac{\pi'(a\mid s)}{\pi(a\mid s)}A_\pi(s,a)\Bigr],
 $$
 
-with the expectation over the unnormalized discounted visitation (total mass $1/(1-\gamma)$), which can be estimated from the data of $\pi$ with importance weights on the actions only. The surrogate matches $J$ to first order at $\pi'=\pi$, so its gradient there is the policy gradient (exercise 20.2), but it ignores the change of the state distribution, and it becomes unreliable as $\pi'$ moves away. Policy iteration maximizes it completely at every step, $\pi'(s)=\arg\max_aA_\pi(s,a)$, which is safe with exact advantages, since the greedy policy is at least as good in every state, but not with estimated ones.
+with the expectation over the unnormalized discounted visitation (total mass $`1/(1-\gamma)`$), which can be estimated from the data of $`\pi`$ with importance weights on the actions only. The surrogate matches $`J`$ to first order at $`\pi'=\pi`$, so its gradient there is the policy gradient (exercise 20.2), but it ignores the change of the state distribution, and it becomes unreliable as $`\pi'`$ moves away. Policy iteration maximizes it completely at every step, $`\pi'(s)=\arg\max_aA_\pi(s,a)`$, which is safe with exact advantages, since the greedy policy is at least as good in every state, but not with estimated ones.
 
 ### <a id="conservative-policy-iteration-and-monotonic-improvement"></a>Conservative policy iteration and monotonic improvement
 
-**Conservative policy iteration** ([Kakade and Langford, 2002](https://dl.acm.org/doi/10.5555/645531.656005)) moves only part of the way to the greedy policy, with the mixture $\pi_{\text{new}}=(1-\alpha)\pi+\alpha\pi'$, and proves a lower bound on the improvement: the surrogate's gain minus a penalty of order $\alpha^2\varepsilon\gamma/(1-\gamma)^2$, where $\varepsilon=\max_s|\mathbb E_{a\sim\pi'}A_\pi(s,a)|$ bounds the new policy's expected advantage. For small enough $\alpha$ the gain dominates and the policy improves monotonically. [Schulman et al. (2015)](https://arxiv.org/abs/1502.05477) extended the bound to arbitrary pairs of stochastic policies:
+**Conservative policy iteration** ([Kakade and Langford, 2002](https://dl.acm.org/doi/10.5555/645531.656005)) moves only part of the way to the greedy policy, with the mixture $`\pi_{\text{new}}=(1-\alpha)\pi+\alpha\pi'`$, and proves a lower bound on the improvement: the surrogate's gain minus a penalty of order $`\alpha^2\varepsilon\gamma/(1-\gamma)^2`$, where $`\varepsilon=\max_s|\mathbb E_{a\sim\pi'}A_\pi(s,a)|`$ bounds the new policy's expected advantage. For small enough $`\alpha`$ the gain dominates and the policy improves monotonically. [Schulman et al. (2015)](https://arxiv.org/abs/1502.05477) extended the bound to arbitrary pairs of stochastic policies:
 
 $$
 J(\pi')\ge L_\pi(\pi')-\frac{4\varepsilon\gamma}{(1-\gamma)^2}\max_sD_{\mathrm{KL}}\bigl(\pi(\cdot\mid s)\,\|\,\pi'(\cdot\mid s)\bigr),\qquad\varepsilon=\max_{s,a}|A_\pi(s,a)|.
 $$
 
-The right side equals $J(\pi)$ at $\pi'=\pi$ and is a lower bound everywhere, so maximizing it can only improve $J$: a **minorize–maximize** algorithm, like EM. In practice the penalty coefficient is far too large, since it is a worst case over all states and multiplied by $(1-\gamma)^{-2}$, and the steps it allows are tiny. TRPO keeps the structure and replaces the penalty by a constraint.
+The right side equals $`J(\pi)`$ at $`\pi'=\pi`$ and is a lower bound everywhere, so maximizing it can only improve $`J`$: a **minorize–maximize** algorithm, like EM. In practice the penalty coefficient is far too large, since it is a worst case over all states and multiplied by $`(1-\gamma)^{-2}`$, and the steps it allows are tiny. TRPO keeps the structure and replaces the penalty by a constraint.
 
 ## <a id="trust-region-policy-optimization"></a>Trust region policy optimization
 
@@ -46,17 +46,17 @@ $$
 \max_{\boldsymbol\theta}\ \hat{\mathbb E}_t\Bigl[\frac{\pi_{\boldsymbol\theta}(A_t\mid S_t)}{\pi_{\boldsymbol\theta_{\text{old}}}(A_t\mid S_t)}\hat A_t\Bigr]\quad\text{subject to}\quad\hat{\mathbb E}_t\Bigl[D_{\mathrm{KL}}\bigl(\pi_{\boldsymbol\theta_{\text{old}}}(\cdot\mid S_t)\,\|\,\pi_{\boldsymbol\theta}(\cdot\mid S_t)\bigr)\Bigr]\le\delta,
 $$
 
-with the expectations estimated from a batch collected by $\pi_{\boldsymbol\theta_{\text{old}}}$, the maximum KL of the theory replaced by the average over visited states, and the advantages estimated by Monte Carlo returns in the original paper and by GAE in later implementations (chapter 19). A typical $\delta$ is 0.01. The constraint makes the step size a statement about behavior: whatever the parameterization, the new policy's action distributions differ from the old ones by about $\delta$ nats on average.
+with the expectations estimated from a batch collected by $`\pi_{\boldsymbol\theta_{\text{old}}}`$, the maximum KL of the theory replaced by the average over visited states, and the advantages estimated by Monte Carlo returns in the original paper and by GAE in later implementations (chapter 19). A typical $`\delta`$ is 0.01. The constraint makes the step size a statement about behavior: whatever the parameterization, the new policy's action distributions differ from the old ones by about $`\delta`$ nats on average.
 
 ### <a id="the-natural-gradient-step"></a>The natural gradient step
 
-Near $\boldsymbol\theta_{\text{old}}$, the surrogate is linear to first order, with gradient $\mathbf g$, the policy gradient, and the average KL is quadratic to second order, with the **Fisher information matrix** $F$ as its Hessian (exercise 20.3):
+Near $`\boldsymbol\theta_{\text{old}}`$, the surrogate is linear to first order, with gradient $`\mathbf g`$, the policy gradient, and the average KL is quadratic to second order, with the **Fisher information matrix** $`F`$ as its Hessian (exercise 20.3):
 
 $$
 \hat{\mathbb E}[D_{\mathrm{KL}}]\approx\tfrac12\,\Delta\boldsymbol\theta^\top F\,\Delta\boldsymbol\theta,\qquad F=\hat{\mathbb E}_t\bigl[\nabla\ln\pi_{\boldsymbol\theta}(A_t\mid S_t)\,\nabla\ln\pi_{\boldsymbol\theta}(A_t\mid S_t)^\top\bigr].
 $$
 
-Maximizing $\mathbf g^\top\Delta\boldsymbol\theta$ subject to $\frac12\Delta\boldsymbol\theta^\top F\Delta\boldsymbol\theta\le\delta$ gives the **natural gradient** direction of chapter 13, scaled to the boundary of the trust region:
+Maximizing $`\mathbf g^\top\Delta\boldsymbol\theta`$ subject to $`\frac12\Delta\boldsymbol\theta^\top F\Delta\boldsymbol\theta\le\delta`$ gives the **natural gradient** direction of chapter 13, scaled to the boundary of the trust region:
 
 $$
 \Delta\boldsymbol\theta=\sqrt{\frac{2\delta}{\mathbf g^\top F^{-1}\mathbf g}}\;F^{-1}\mathbf g.
@@ -66,37 +66,37 @@ TRPO is thus a natural policy gradient method whose step size is set by the KL r
 
 ### <a id="conjugate-gradient-and-line-search"></a>Conjugate gradient and line search
 
-A network with a million parameters has a Fisher matrix with $10^{12}$ entries, which can be neither stored nor inverted. TRPO never forms it. **Conjugate gradient** solves $F\mathbf x=\mathbf g$ using only products $F\mathbf v$, and each product costs about two backward passes: differentiate the average KL, take the inner product of its gradient with $\mathbf v$, and differentiate again. Ten iterations are usually enough, since the step only needs a good direction, and a small multiple of the identity, **damping**, is added to $F$, whose many near-zero eigenvalues would otherwise make the solution explode along directions that barely change the policy. Finally, a **backtracking line search** shrinks the step until the actual average KL, not its quadratic model, is below $\delta$ and the surrogate has improved. Exercise 20.4 implements the whole computation. TRPO learned simulated swimming, hopping, and walking and played Atari games from pixels with little tuning of its hyperparameters; its cost is the second-order machinery, which does not combine easily with shared policy and value networks or with minibatch optimizers.
+A network with a million parameters has a Fisher matrix with $`10^{12}`$ entries, which can be neither stored nor inverted. TRPO never forms it. **Conjugate gradient** solves $`F\mathbf x=\mathbf g`$ using only products $`F\mathbf v`$, and each product costs about two backward passes: differentiate the average KL, take the inner product of its gradient with $`\mathbf v`$, and differentiate again. Ten iterations are usually enough, since the step only needs a good direction, and a small multiple of the identity, **damping**, is added to $`F`$, whose many near-zero eigenvalues would otherwise make the solution explode along directions that barely change the policy. Finally, a **backtracking line search** shrinks the step until the actual average KL, not its quadratic model, is below $`\delta`$ and the surrogate has improved. Exercise 20.4 implements the whole computation. TRPO learned simulated swimming, hopping, and walking and played Atari games from pixels with little tuning of its hyperparameters; its cost is the second-order machinery, which does not combine easily with shared policy and value networks or with minibatch optimizers.
 
 ## <a id="proximal-policy-optimization"></a>Proximal policy optimization
 
 ### <a id="the-clipped-objective"></a>The clipped objective
 
-**Proximal policy optimization** (PPO) ([Schulman, Wolski, Dhariwal, Radford, and Klimov, 2017](https://arxiv.org/abs/1707.06347)) keeps TRPO's goal and drops its machinery. With the probability ratio $r_t(\boldsymbol\theta)=\pi_{\boldsymbol\theta}(A_t\mid S_t)/\pi_{\boldsymbol\theta_{\text{old}}}(A_t\mid S_t)$, it maximizes the **clipped objective**
+**Proximal policy optimization** (PPO) ([Schulman, Wolski, Dhariwal, Radford, and Klimov, 2017](https://arxiv.org/abs/1707.06347)) keeps TRPO's goal and drops its machinery. With the probability ratio $`r_t(\boldsymbol\theta)=\pi_{\boldsymbol\theta}(A_t\mid S_t)/\pi_{\boldsymbol\theta_{\text{old}}}(A_t\mid S_t)`$, it maximizes the **clipped objective**
 
 $$
 L^{\mathrm{CLIP}}(\boldsymbol\theta)=\hat{\mathbb E}_t\Bigl[\min\Bigl(r_t(\boldsymbol\theta)\hat A_t,\ \operatorname{clip}\bigl(r_t(\boldsymbol\theta),1-\epsilon,1+\epsilon\bigr)\hat A_t\Bigr)\Bigr],\qquad\epsilon\approx0.2,
 $$
 
-with ordinary first-order optimizers. For a sample with a positive advantage, the objective rewards raising its probability only until the ratio reaches $1+\epsilon$; with a negative advantage, lowering it only until $1-\epsilon$. Beyond those points the sample contributes no gradient. The minimum with the unclipped term makes the objective a pessimistic bound: a change that makes a sample's contribution worse is never clipped away, so mistakes are always corrected (left and center panels of the figure; exercise 20.5). The paper's alternative, a penalty $-\beta\,\hat{\mathbb E}[D_{\mathrm{KL}}]$ whose coefficient doubles when the measured KL exceeds 1.5 times a target and halves when it falls below two thirds of it (exercise 20.6), performed somewhat worse and is less used.
+with ordinary first-order optimizers. For a sample with a positive advantage, the objective rewards raising its probability only until the ratio reaches $`1+\epsilon`$; with a negative advantage, lowering it only until $`1-\epsilon`$. Beyond those points the sample contributes no gradient. The minimum with the unclipped term makes the objective a pessimistic bound: a change that makes a sample's contribution worse is never clipped away, so mistakes are always corrected (left and center panels of the figure; exercise 20.5). The paper's alternative, a penalty $`-\beta\,\hat{\mathbb E}[D_{\mathrm{KL}}]`$ whose coefficient doubles when the measured KL exceeds 1.5 times a target and halves when it falls below two thirds of it (exercise 20.6), performed somewhat worse and is less used.
 
 <img src="sources/images/rl-ppo-clip.png" alt="rl-ppo-clip" width="880">
 
-*Left and center: PPO's objective for one sample as a function of its probability ratio, for a positive and a negative advantage, with $\epsilon=0.2$; in the shaded region, the sample contributes no gradient. Right: exact policy gradient, natural policy gradient (policy mirror descent), and policy iteration on a random MDP with 20 states and 4 actions, from a policy that puts 99.9% of its probability on the worst action in every state (the code in [the section on mirror descent](#policy-optimization-as-mirror-descent)). The policy gradient stays on the plateau of the nearly deterministic start for hundreds of iterations; the natural gradient, which updates the policy multiplicatively, leaves it at once.*
+*Left and center: PPO's objective for one sample as a function of its probability ratio, for a positive and a negative advantage, with $`\epsilon=0.2`$; in the shaded region, the sample contributes no gradient. Right: exact policy gradient, natural policy gradient (policy mirror descent), and policy iteration on a random MDP with 20 states and 4 actions, from a policy that puts 99.9% of its probability on the worst action in every state (the code in [the section on mirror descent](#policy-optimization-as-mirror-descent)). The policy gradient stays on the plateau of the nearly deterministic start for hundreds of iterations; the natural gradient, which updates the policy multiplicatively, leaves it at once.*
 
 ### <a id="the-algorithm"></a>The algorithm
 
-PPO is the synchronous actor–critic of chapter 19 with one change: it takes several **epochs** of minibatch updates on each batch instead of one step. Each iteration collects $T$ steps from each of $N$ environments, computes GAE advantages and TD(λ) value targets with the old networks, and then, for $K$ epochs, shuffles the $NT$ samples into minibatches and takes an optimizer step on each minibatch with the loss
+PPO is the synchronous actor–critic of chapter 19 with one change: it takes several **epochs** of minibatch updates on each batch instead of one step. Each iteration collects $`T`$ steps from each of $`N`$ environments, computes GAE advantages and TD(λ) value targets with the old networks, and then, for $`K`$ epochs, shuffles the $`NT`$ samples into minibatches and takes an optimizer step on each minibatch with the loss
 
 $$
 -L^{\mathrm{CLIP}}+c_v\,\hat{\mathbb E}\bigl[(\hat v_{\mathbf w}(S_t)-\hat G_t)^2\bigr]-\beta\,\hat{\mathbb E}\bigl[\mathcal H(\pi_{\boldsymbol\theta}(\cdot\mid S_t))\bigr].
 $$
 
-Reusing each batch for several epochs is where PPO's sample efficiency over A2C comes from, and the clipping is what makes the reuse safe. The original settings are still the usual starting points: for continuous control, one environment, $T=2048$, 10 epochs, minibatches of 64, Adam with step size $3\times10^{-4}$, $\gamma=0.99$, $\lambda=0.95$; for Atari, 8 environments, $T=128$, 3 epochs, $\epsilon=0.1$, and step size and $\epsilon$ both annealed to zero ([appendix B](#block-rl20-appendix-b)). With one epoch on the whole batch, the ratio is 1 when the gradient is computed, the clipping never activates, and PPO, with A2C's other settings (its optimizer, no advantage normalization or value clipping), reduces to A2C ([Huang et al., 2022](https://arxiv.org/abs/2205.09123)).
+Reusing each batch for several epochs is where PPO's sample efficiency over A2C comes from, and the clipping is what makes the reuse safe. The original settings are still the usual starting points: for continuous control, one environment, $`T=2048`$, 10 epochs, minibatches of 64, Adam with step size $`3\times10^{-4}`$, $`\gamma=0.99`$, $`\lambda=0.95`$; for Atari, 8 environments, $`T=128`$, 3 epochs, $`\epsilon=0.1`$, and step size and $`\epsilon`$ both annealed to zero ([appendix B](#block-rl20-appendix-b)). With one epoch on the whole batch, the ratio is 1 when the gradient is computed, the clipping never activates, and PPO, with A2C's other settings (its optimizer, no advantage normalization or value clipping), reduces to A2C ([Huang et al., 2022](https://arxiv.org/abs/2205.09123)).
 
 ### <a id="what-clipping-does-and-does-not-do"></a>What clipping does and does not do
 
-Clipping removes the incentive to move a sample's ratio beyond $1\pm\epsilon$, but it does not stop the ratio from getting there. The gradients of the samples still inside the range move the shared parameters, and those changes carry the others along. The next code measures this on a contextual bandit, with 10 epochs of minibatch updates on one batch.
+Clipping removes the incentive to move a sample's ratio beyond $`1\pm\epsilon`$, but it does not stop the ratio from getting there. The gradients of the samples still inside the range move the shared parameters, and those changes carry the others along. The next code measures this on a contextual bandit, with 10 epochs of minibatch updates on one batch.
 
 ```python
 import numpy as np
@@ -177,17 +177,17 @@ for name in ("no clipping", "clipped", "KL penalty"):
 #   improvement              0.112   0.126   0.092   0.102   0.101
 ```
 
-Without clipping, the policy runs away from the one that collected the data: after 10 epochs, the mean KL is 1.5 nats and some ratios reach 5. With clipping, the policy stops moving away after about two epochs: the mean KL peaks near 0.05 and then settles back to about 0.03, which is what makes the reuse of the batch safe. But the ratios are not confined to $[0.8,1.2]$: more than 40% of the samples end outside the range, and the largest ratio stays near 2. The KL penalty gives the tightest control. In this bandit, the surrogate is the true objective up to sampling noise, since there are no states to shift, so every constraint only costs improvement, and the unclipped policy improves the most. In an MDP the surrogate's error grows with the distance from the old policy, and the trust region is what keeps the step within the region where the surrogate can be trusted. The loose control of the ratios was observed in deep PPO agents too ([Wang, He, and Tan, 2019](https://arxiv.org/abs/1903.07940); [Engstrom et al., 2020](https://arxiv.org/abs/2005.12729)), and some implementations therefore stop the epochs early when the measured KL exceeds a threshold.
+Without clipping, the policy runs away from the one that collected the data: after 10 epochs, the mean KL is 1.5 nats and some ratios reach 5. With clipping, the policy stops moving away after about two epochs: the mean KL peaks near 0.05 and then settles back to about 0.03, which is what makes the reuse of the batch safe. But the ratios are not confined to $`[0.8,1.2]`$: more than 40% of the samples end outside the range, and the largest ratio stays near 2. The KL penalty gives the tightest control. In this bandit, the surrogate is the true objective up to sampling noise, since there are no states to shift, so every constraint only costs improvement, and the unclipped policy improves the most. In an MDP the surrogate's error grows with the distance from the old policy, and the trust region is what keeps the step within the region where the surrogate can be trusted. The loose control of the ratios was observed in deep PPO agents too ([Wang, He, and Tan, 2019](https://arxiv.org/abs/1903.07940); [Engstrom et al., 2020](https://arxiv.org/abs/2005.12729)), and some implementations therefore stop the epochs early when the measured KL exceeds a threshold.
 
 ### <a id="the-details-that-matter"></a>The details that matter
 
 PPO's reported results depend on more than its objective. [Engstrom et al. (2020)](https://arxiv.org/abs/2005.12729) showed that its code-level optimizations, which the paper mostly did not describe, account for most of its advantage over TRPO: without them, PPO performed about as well as TRPO, and its KL from the old policy grew steadily over training instead of peaking and then falling; with them, TRPO performed about as well as PPO. [Andrychowicz et al. (2021)](https://arxiv.org/abs/2006.05990) measured more than 50 such choices in more than 250,000 training runs, and [Huang et al. (2022)](https://iclr-blog-track.github.io/2022/03/25/ppo-implementation-details/) cataloged 37 details of the reference implementation. The most common ones (Andrychowicz et al. found several, such as per-minibatch advantage normalization, gradient clipping, and a state-independent standard deviation, to be of secondary importance):
 
 - **Normalization.** Observations normalized by running statistics; advantages normalized to zero mean and unit variance in each minibatch; rewards divided by a running estimate of the standard deviation of the discounted return, which keeps the value targets of order 1 without changing the optimal policy.
-- **Value function.** A separate value network, or a shared one with a tuned loss weight. PPO's reference implementation also clips the value update, $\max\bigl((\hat v-\hat G)^2,(\hat v_{\text{old}}+\operatorname{clip}(\hat v-\hat v_{\text{old}},-\epsilon,\epsilon)-\hat G)^2\bigr)$, by analogy with the policy, but Andrychowicz et al. found that it hurt performance whatever the clipping threshold (exercise 20.8).
+- **Value function.** A separate value network, or a shared one with a tuned loss weight. PPO's reference implementation also clips the value update, $`\max\bigl((\hat v-\hat G)^2,(\hat v_{\text{old}}+\operatorname{clip}(\hat v-\hat v_{\text{old}},-\epsilon,\epsilon)-\hat G)^2\bigr)`$, by analogy with the policy, but Andrychowicz et al. found that it hurt performance whatever the clipping threshold (exercise 20.8).
 - **Initialization and architecture.** Orthogonal initialization, a policy output layer with small weights, tanh activations for small continuous-control networks, and for Gaussian policies, a log standard deviation learned as a free parameter rather than as an output of the network.
 - **Optimization.** Adam with a step size annealed linearly to zero, gradient clipping to a global norm of 0.5, and a small number of epochs: more epochs reuse data more but move the policy further.
-- **Discounting and λ.** The discount is among the most sensitive settings and is worth tuning per task, with $\gamma=0.99$ a good default; λ between 0.9 and 0.95.
+- **Discounting and λ.** The discount is among the most sensitive settings and is worth tuning per task, with $`\gamma=0.99`$ a good default; λ between 0.9 and 0.95.
 
 Lab 10 implements PPO, measures the effect of several of these details, and trains agents on LunarLander and a MuJoCo locomotion task.
 
@@ -195,13 +195,13 @@ Lab 10 implements PPO, measures the effect of several of these details, and trai
 
 ### <a id="kl-regularized-policy-iteration"></a>KL-regularized policy iteration
 
-TRPO and PPO approximate a cleaner idea that the tabular case exposes. Replace the greedy step of policy iteration by a regularized one, which improves on $Q_{\pi_k}$ while staying close to $\pi_k$:
+TRPO and PPO approximate a cleaner idea that the tabular case exposes. Replace the greedy step of policy iteration by a regularized one, which improves on $`Q_{\pi_k}`$ while staying close to $`\pi_k`$:
 
 $$
 \pi_{k+1}(\cdot\mid s)=\arg\max_p\Bigl\{\eta\,\bigl\langle p,\,Q_{\pi_k}(s,\cdot)\bigr\rangle-D_{\mathrm{KL}}\bigl(p\,\|\,\pi_k(\cdot\mid s)\bigr)\Bigr\}\quad\Longrightarrow\quad\pi_{k+1}(a\mid s)\propto\pi_k(a\mid s)\,e^{\eta Q_{\pi_k}(s,a)}
 $$
 
-(exercise 20.7). This is **policy mirror descent**, the mirror descent of convex optimization with the KL divergence as its geometry, applied state by state. For tabular softmax policies it is exactly the natural policy gradient with step size $\eta(1-\gamma)$, since adding $\eta A$ to the logits multiplies the probabilities by $e^{\eta A}$ ([Kakade, 2001](https://papers.nips.cc/paper_files/paper/2001/hash/4b86abe48d358ecf194c56c69108433e-Abstract.html); [Agarwal, Kakade, Lee, and Mahajan, 2021](https://arxiv.org/abs/1908.00261)). Its step size interpolates between doing nothing ($\eta\to0$) and policy iteration ($\eta\to\infty$). Its theory is the strongest in policy optimization: with exact values, it converges to an optimal policy at rate $O(1/k)$ for any constant step size, with constants that do not depend on the number of states and grow only logarithmically as the initial policy becomes more deterministic, and linearly with geometrically increasing step sizes ([Lan, 2023](https://arxiv.org/abs/2102.00135); [Xiao, 2022](https://arxiv.org/abs/2201.07443)). The plain policy gradient has no such guarantee: its rate depends on how small the probabilities of good actions are, and it can take exponentially long to leave a plateau ([Mei, Xiao, Szepesvári, and Schuurmans, 2020](https://arxiv.org/abs/2005.06392); [Li et al., 2021](https://arxiv.org/abs/2102.11270)). The next code compares the three methods with exact values.
+(exercise 20.7). This is **policy mirror descent**, the mirror descent of convex optimization with the KL divergence as its geometry, applied state by state. For tabular softmax policies it is exactly the natural policy gradient with step size $`\eta(1-\gamma)`$, since adding $`\eta A`$ to the logits multiplies the probabilities by $`e^{\eta A}`$ ([Kakade, 2001](https://papers.nips.cc/paper_files/paper/2001/hash/4b86abe48d358ecf194c56c69108433e-Abstract.html); [Agarwal, Kakade, Lee, and Mahajan, 2021](https://arxiv.org/abs/1908.00261)). Its step size interpolates between doing nothing ($`\eta\to0`$) and policy iteration ($`\eta\to\infty`$). Its theory is the strongest in policy optimization: with exact values, it converges to an optimal policy at rate $`O(1/k)`$ for any constant step size, with constants that do not depend on the number of states and grow only logarithmically as the initial policy becomes more deterministic, and linearly with geometrically increasing step sizes ([Lan, 2023](https://arxiv.org/abs/2102.00135); [Xiao, 2022](https://arxiv.org/abs/2201.07443)). The plain policy gradient has no such guarantee: its rate depends on how small the probabilities of good actions are, and it can take exponentially long to leave a plateau ([Mei, Xiao, Szepesvári, and Schuurmans, 2020](https://arxiv.org/abs/2005.06392); [Li et al., 2021](https://arxiv.org/abs/2102.11270)). The next code compares the three methods with exact values.
 
 ```python
 import numpy as np
@@ -281,15 +281,15 @@ for start_name, theta0 in (("uniform", uniform), ("poor", bad)):
 #    policy iteration         poor      7.2e-02   < 1e-12   < 1e-12   < 1e-12   < 1e-12   < 1e-12
 ```
 
-From the uniform policy, all three methods converge: policy iteration within three steps, the natural gradient with $\eta=1$ to within about $10^{-3}$ in ten iterations (the last digits take hundreds more), and the policy gradient slowly. From a nearly deterministic poor policy, the policy gradient does not move in 1,000 iterations with step size 1, and needs hundreds with step size 10, while the natural gradient with $\eta=1$ escapes within three iterations (with $\eta=0.1$, within about 30): its multiplicative update changes a probability of 0.0003 as easily as one of 0.5. The right panel of the figure shows the same runs. This is the tabular core of the argument for trust regions: measure steps in the geometry of the policy, not of the parameters.
+From the uniform policy, all three methods converge: policy iteration within three steps, the natural gradient with $`\eta=1`$ to within about $`10^{-3}`$ in ten iterations (the last digits take hundreds more), and the policy gradient slowly. From a nearly deterministic poor policy, the policy gradient does not move in 1,000 iterations with step size 1, and needs hundreds with step size 10, while the natural gradient with $`\eta=1`$ escapes within three iterations (with $`\eta=0.1`$, within about 30): its multiplicative update changes a probability of 0.0003 as easily as one of 0.5. The right panel of the figure shows the same runs. This is the tabular core of the argument for trust regions: measure steps in the geometry of the policy, not of the parameters.
 
 ### <a id="maximum-a-posteriori-policy-optimization"></a>Maximum a posteriori policy optimization
 
-The mirror descent step can also be taken nonparametrically and then projected onto the network. **MPO** ([Abdolmaleki et al., 2018](https://arxiv.org/abs/1806.06920)) casts policy improvement as expectation maximization. Its E-step builds, for each state in a batch, the improved distribution $q(a\mid s)\propto\pi_{\text{old}}(a\mid s)\exp\bigl(Q(s,a)/\eta\bigr)$ over sampled actions, with the temperature $\eta$ chosen by minimizing a convex dual so that $D_{\mathrm{KL}}(q\,\|\,\pi_{\text{old}})\le\epsilon$; its M-step fits the network to $q$ by weighted maximum likelihood, within a second trust region that, for Gaussian policies, constrains the mean and the covariance separately. MPO learns an off-policy Q-function with Retrace, which makes it far more sample-efficient than PPO in continuous control, and its on-policy variant **V-MPO** ([Song et al., 2020](https://arxiv.org/abs/1909.12238)), with a state-value critic and advantages in place of $Q$, trained single agents on all of Atari-57 and DMLab-30. The same structure, an exponentiated-advantage target followed by a supervised fit, reappears in offline RL as advantage-weighted regression (chapter 26).
+The mirror descent step can also be taken nonparametrically and then projected onto the network. **MPO** ([Abdolmaleki et al., 2018](https://arxiv.org/abs/1806.06920)) casts policy improvement as expectation maximization. Its E-step builds, for each state in a batch, the improved distribution $`q(a\mid s)\propto\pi_{\text{old}}(a\mid s)\exp\bigl(Q(s,a)/\eta\bigr)`$ over sampled actions, with the temperature $`\eta`$ chosen by minimizing a convex dual so that $`D_{\mathrm{KL}}(q\,\|\,\pi_{\text{old}})\le\epsilon`$; its M-step fits the network to $`q`$ by weighted maximum likelihood, within a second trust region that, for Gaussian policies, constrains the mean and the covariance separately. MPO learns an off-policy Q-function with Retrace, which makes it far more sample-efficient than PPO in continuous control, and its on-policy variant **V-MPO** ([Song et al., 2020](https://arxiv.org/abs/1909.12238)), with a state-value critic and advantages in place of $`Q`$, trained single agents on all of Atari-57 and DMLab-30. The same structure, an exponentiated-advantage target followed by a supervised fit, reappears in offline RL as advantage-weighted regression (chapter 26).
 
 ### <a id="regularized-mdps"></a>Regularized MDPs
 
-Adding an entropy bonus to the reward changes the problem, not just the algorithm. In an **entropy-regularized MDP**, the objective is $\mathbb E\bigl[\sum_t\gamma^t(R_{t+1}+\tau\mathcal H(\pi(\cdot\mid S_t)))\bigr]$, the optimal policy is a softmax of the optimal soft action values, $\pi^*(a\mid s)\propto e^{Q^*_\tau(s,a)/\tau}$, and the Bellman operators become smooth ([Neu, Jonsson, and Gómez, 2017](https://arxiv.org/abs/1705.07798); [Geist, Scherrer, and Pietquin, 2019](https://arxiv.org/abs/1901.11275)). The regularization makes policy optimization better behaved: natural policy gradient on the regularized problem converges linearly, at a rate independent of the size of the state space ([Cen, Cheng, Chen, Wei, and Chi, 2022](https://arxiv.org/abs/2007.06558)). Mirror descent with a KL term toward the previous policy and an entropy term toward uniform covers TRPO, soft policy iteration, and the soft actor–critic of chapter 21 as special cases or approximations, and it gives them a common convergence theory ([Shani, Efroni, and Mannor, 2020](https://arxiv.org/abs/1909.02769); [Tomar, Shani, Efroni, and Ghavamzadeh, 2022](https://arxiv.org/abs/2005.09814)).
+Adding an entropy bonus to the reward changes the problem, not just the algorithm. In an **entropy-regularized MDP**, the objective is $`\mathbb E\bigl[\sum_t\gamma^t(R_{t+1}+\tau\mathcal H(\pi(\cdot\mid S_t)))\bigr]`$, the optimal policy is a softmax of the optimal soft action values, $`\pi^*(a\mid s)\propto e^{Q^*_\tau(s,a)/\tau}`$, and the Bellman operators become smooth ([Neu, Jonsson, and Gómez, 2017](https://arxiv.org/abs/1705.07798); [Geist, Scherrer, and Pietquin, 2019](https://arxiv.org/abs/1901.11275)). The regularization makes policy optimization better behaved: natural policy gradient on the regularized problem converges linearly, at a rate independent of the size of the state space ([Cen, Cheng, Chen, Wei, and Chi, 2022](https://arxiv.org/abs/2007.06558)). Mirror descent with a KL term toward the previous policy and an entropy term toward uniform covers TRPO, soft policy iteration, and the soft actor–critic of chapter 21 as special cases or approximations, and it gives them a common convergence theory ([Shani, Efroni, and Mannor, 2020](https://arxiv.org/abs/1909.02769); [Tomar, Shani, Efroni, and Ghavamzadeh, 2022](https://arxiv.org/abs/2005.09814)).
 
 ## <a id="ppo-in-practice"></a>PPO in practice
 
@@ -305,57 +305,57 @@ PPO's combination of simplicity, robustness to its hyperparameters, and compatib
 
 ### <a id="exercise-20-1-the-performance-difference-lemma"></a>Exercise 20.1 — The performance difference lemma
 
-Prove that $J(\pi')-J(\pi)=\mathbb E_{\tau\sim\pi'}\bigl[\sum_t\gamma^tA_\pi(S_t,A_t)\bigr]=\sum_s\rho_{\pi'}(s)\sum_a\pi'(a\mid s)A_\pi(s,a)$ for two policies with the same start distribution.
+Prove that $`J(\pi')-J(\pi)=\mathbb E_{\tau\sim\pi'}\bigl[\sum_t\gamma^tA_\pi(S_t,A_t)\bigr]=\sum_s\rho_{\pi'}(s)\sum_a\pi'(a\mid s)A_\pi(s,a)`$ for two policies with the same start distribution.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-Add and subtract $\gamma^{t+1}v_\pi(S_{t+1})$ along a trajectory of $\pi'$. The sum telescopes:
+Add and subtract $`\gamma^{t+1}v_\pi(S_{t+1})`$ along a trajectory of $`\pi'`$. The sum telescopes:
 
 $$
 \sum_t\gamma^tR_{t+1}=v_\pi(S_0)+\sum_t\gamma^t\bigl(R_{t+1}+\gamma v_\pi(S_{t+1})-v_\pi(S_t)\bigr).
 $$
 
-Take expectations under $\pi'$. The left side becomes $J(\pi')$ and $\mathbb E[v_\pi(S_0)]=J(\pi)$, since the start distribution is shared. Conditioning each term on $(S_t,A_t)$ turns $R_{t+1}+\gamma v_\pi(S_{t+1})$ into $q_\pi(S_t,A_t)$, because the environment's dynamics do not depend on the policy, so each term becomes $A_\pi(S_t,A_t)$. Collecting the terms by state gives the visitation form. The lemma holds for any pair of policies, with no approximation; all the difficulty lies in the fact that the expectation is over the new policy's trajectories.
+Take expectations under $`\pi'`$. The left side becomes $`J(\pi')`$ and $`\mathbb E[v_\pi(S_0)]=J(\pi)`$, since the start distribution is shared. Conditioning each term on $`(S_t,A_t)`$ turns $`R_{t+1}+\gamma v_\pi(S_{t+1})`$ into $`q_\pi(S_t,A_t)`$, because the environment's dynamics do not depend on the policy, so each term becomes $`A_\pi(S_t,A_t)`$. Collecting the terms by state gives the visitation form. The lemma holds for any pair of policies, with no approximation; all the difficulty lies in the fact that the expectation is over the new policy's trajectories.
 
 </details>
 
 
 ### <a id="exercise-20-2-the-surrogate-is-exact-to-first-order"></a>Exercise 20.2 — The surrogate is exact to first order
 
-Show that $L_\pi(\pi_{\boldsymbol\theta})$ and $J(\pi_{\boldsymbol\theta})$ have the same value and the same gradient at $\boldsymbol\theta=\boldsymbol\theta_{\text{old}}$, where $\pi=\pi_{\boldsymbol\theta_{\text{old}}}$.
+Show that $`L_\pi(\pi_{\boldsymbol\theta})`$ and $`J(\pi_{\boldsymbol\theta})`$ have the same value and the same gradient at $`\boldsymbol\theta=\boldsymbol\theta_{\text{old}}`$, where $`\pi=\pi_{\boldsymbol\theta_{\text{old}}}`$.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-At $\boldsymbol\theta_{\text{old}}$, $\sum_a\pi(a\mid s)A_\pi(s,a)=v_\pi(s)-v_\pi(s)=0$ in every state, so $L_\pi(\pi)=J(\pi)$. The gradient of the surrogate is $\sum_s\rho_\pi(s)\sum_a\nabla\pi_{\boldsymbol\theta}(a\mid s)A_\pi(s,a)$, since only the action probabilities depend on $\boldsymbol\theta$; at $\boldsymbol\theta_{\text{old}}$ this is the policy gradient theorem of chapter 13, with the advantage in place of the action value, which changes nothing because $\sum_a\nabla\pi(a\mid s)=0$. The two functions differ at second order, through the change of the state distribution, which is what the KL penalty or constraint bounds.
+At $`\boldsymbol\theta_{\text{old}}`$, $`\sum_a\pi(a\mid s)A_\pi(s,a)=v_\pi(s)-v_\pi(s)=0`$ in every state, so $`L_\pi(\pi)=J(\pi)`$. The gradient of the surrogate is $`\sum_s\rho_\pi(s)\sum_a\nabla\pi_{\boldsymbol\theta}(a\mid s)A_\pi(s,a)`$, since only the action probabilities depend on $`\boldsymbol\theta`$; at $`\boldsymbol\theta_{\text{old}}`$ this is the policy gradient theorem of chapter 13, with the advantage in place of the action value, which changes nothing because $`\sum_a\nabla\pi(a\mid s)=0`$. The two functions differ at second order, through the change of the state distribution, which is what the KL penalty or constraint bounds.
 
 </details>
 
 
 ### <a id="exercise-20-3-the-kl-divergence-and-the-fisher-matrix"></a>Exercise 20.3 — The KL divergence and the Fisher matrix
 
-(a) Show that $D_{\mathrm{KL}}(\pi_{\boldsymbol\theta_{\text{old}}}\|\pi_{\boldsymbol\theta})$ has zero gradient at $\boldsymbol\theta_{\text{old}}$ and Hessian $F=\mathbb E_{a\sim\pi}\bigl[\nabla\ln\pi\,\nabla\ln\pi^\top\bigr]$ there. (b) Derive the step that maximizes $\mathbf g^\top\Delta\boldsymbol\theta$ subject to $\frac12\Delta\boldsymbol\theta^\top F\Delta\boldsymbol\theta\le\delta$, and its predicted gain.
+(a) Show that $`D_{\mathrm{KL}}(\pi_{\boldsymbol\theta_{\text{old}}}\|\pi_{\boldsymbol\theta})`$ has zero gradient at $`\boldsymbol\theta_{\text{old}}`$ and Hessian $`F=\mathbb E_{a\sim\pi}\bigl[\nabla\ln\pi\,\nabla\ln\pi^\top\bigr]`$ there. (b) Derive the step that maximizes $`\mathbf g^\top\Delta\boldsymbol\theta`$ subject to $`\frac12\Delta\boldsymbol\theta^\top F\Delta\boldsymbol\theta\le\delta`$, and its predicted gain.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) $D_{\mathrm{KL}}=\sum_a\pi_{\text{old}}(a)\ln\pi_{\text{old}}(a)-\sum_a\pi_{\text{old}}(a)\ln\pi_{\boldsymbol\theta}(a)$. Its gradient at $\boldsymbol\theta_{\text{old}}$ is $-\sum_a\pi_{\text{old}}\nabla\ln\pi=-\sum_a\nabla\pi=0$. Its Hessian is $-\mathbb E_{\pi_{\text{old}}}[\nabla^2\ln\pi_{\boldsymbol\theta}]$, and differentiating $\sum_a\nabla\pi=0$ once more gives $\mathbb E[\nabla^2\ln\pi]+\mathbb E[\nabla\ln\pi\nabla\ln\pi^\top]=0$, the information identity, so the Hessian is $F$. Averaged over states, the same holds for the mean KL.
+(a) $`D_{\mathrm{KL}}=\sum_a\pi_{\text{old}}(a)\ln\pi_{\text{old}}(a)-\sum_a\pi_{\text{old}}(a)\ln\pi_{\boldsymbol\theta}(a)`$. Its gradient at $`\boldsymbol\theta_{\text{old}}`$ is $`-\sum_a\pi_{\text{old}}\nabla\ln\pi=-\sum_a\nabla\pi=0`$. Its Hessian is $`-\mathbb E_{\pi_{\text{old}}}[\nabla^2\ln\pi_{\boldsymbol\theta}]`$, and differentiating $`\sum_a\nabla\pi=0`$ once more gives $`\mathbb E[\nabla^2\ln\pi]+\mathbb E[\nabla\ln\pi\nabla\ln\pi^\top]=0`$, the information identity, so the Hessian is $`F`$. Averaged over states, the same holds for the mean KL.
 
-(b) The Lagrangian $\mathbf g^\top\Delta-\lambda(\frac12\Delta^\top F\Delta-\delta)$ is stationary at $\Delta=F^{-1}\mathbf g/\lambda$. The constraint is active at the optimum, so $\frac1{2\lambda^2}\mathbf g^\top F^{-1}\mathbf g=\delta$, which gives $\Delta=\sqrt{2\delta/(\mathbf g^\top F^{-1}\mathbf g)}\,F^{-1}\mathbf g$ and a predicted gain $\mathbf g^\top\Delta=\sqrt{2\delta\,\mathbf g^\top F^{-1}\mathbf g}$. Any other direction with the same quadratic KL gains less.
+(b) The Lagrangian $`\mathbf g^\top\Delta-\lambda(\frac12\Delta^\top F\Delta-\delta)`$ is stationary at $`\Delta=F^{-1}\mathbf g/\lambda`$. The constraint is active at the optimum, so $`\frac1{2\lambda^2}\mathbf g^\top F^{-1}\mathbf g=\delta`$, which gives $`\Delta=\sqrt{2\delta/(\mathbf g^\top F^{-1}\mathbf g)}\,F^{-1}\mathbf g`$ and a predicted gain $`\mathbf g^\top\Delta=\sqrt{2\delta\,\mathbf g^\top F^{-1}\mathbf g}`$. Any other direction with the same quadratic KL gains less.
 
 </details>
 
 
 ### <a id="exercise-20-4-trpo-s-step"></a>Exercise 20.4 — TRPO's step
 
-Run the next code, which computes TRPO's step for a small policy network with conjugate gradient and Fisher-vector products, and answer: (a) why does conjugate gradient converge in about ten iterations here, and why is the damping needed? (b) How do the natural and the vanilla steps compare at the same quadratic KL? (c) Why is the actual KL below $\delta$?
+Run the next code, which computes TRPO's step for a small policy network with conjugate gradient and Fisher-vector products, and answer: (a) why does conjugate gradient converge in about ten iterations here, and why is the damping needed? (b) How do the natural and the vanilla steps compare at the same quadratic KL? (c) Why is the actual KL below $`\delta`$?
 
 
 <details>
@@ -452,79 +452,79 @@ for name, step in steps.items():
 #   vanilla gradient                     predicted gain 0.0175, actual gain 0.0179, actual KL 0.0084
 ```
 
-(a) After $k$ iterations, conjugate gradient's error, measured in the norm defined by the matrix, is at most $2\bigl((\sqrt\kappa-1)/(\sqrt\kappa+1)\bigr)^k$ times its initial value, where $\kappa$ is the condition number; with the eigenvalues between 0.1 and 0.83, $\kappa\approx8$ and the factor is about 0.5, so ten iterations guarantee a reduction of about three orders of magnitude ($2\cdot0.485^{10}\approx1.4\times10^{-3}$), and in practice it does better, since the spectrum is clustered. Without damping, the Fisher matrix of a network has many eigenvalues near zero, one for every direction of the parameters that barely changes the policy on the sampled states. $\kappa$ would be huge, conjugate gradient would converge slowly, and the exact solution would take enormous steps along those directions, where the sampled KL says nothing about the policy's behavior on other states. The damping is a prior that keeps the step in parameter space moderate.
+(a) After $`k`$ iterations, conjugate gradient's error, measured in the norm defined by the matrix, is at most $`2\bigl((\sqrt\kappa-1)/(\sqrt\kappa+1)\bigr)^k`$ times its initial value, where $`\kappa`$ is the condition number; with the eigenvalues between 0.1 and 0.83, $`\kappa\approx8`$ and the factor is about 0.5, so ten iterations guarantee a reduction of about three orders of magnitude ($`2\cdot0.485^{10}\approx1.4\times10^{-3}`$), and in practice it does better, since the spectrum is clustered. Without damping, the Fisher matrix of a network has many eigenvalues near zero, one for every direction of the parameters that barely changes the policy on the sampled states. $`\kappa`$ would be huge, conjugate gradient would converge slowly, and the exact solution would take enormous steps along those directions, where the sampled KL says nothing about the policy's behavior on other states. The damping is a prior that keeps the step in parameter space moderate.
 
 (b) At the same quadratic KL, the natural step gains 0.0198 in the surrogate and the vanilla one 0.0179, and the natural step's actual KL is smaller. The gap is modest for this small, well-conditioned problem. It grows with the spread of the Fisher matrix's eigenvalues, that is, with how unevenly the parameters affect the policy, which is large for deep networks and for policies close to deterministic.
 
-(c) The step was sized for the damped matrix, whose quadratic form $\Delta^\top(F+0.1I)\Delta$ exceeds the true curvature $\Delta^\top F\Delta$. The line search accepts it at once. It halves the step only when the quadratic model underestimates the KL, which happens with larger $\delta$ or less damping, or when the surrogate fails to improve.
+(c) The step was sized for the damped matrix, whose quadratic form $`\Delta^\top(F+0.1I)\Delta`$ exceeds the true curvature $`\Delta^\top F\Delta`$. The line search accepts it at once. It halves the step only when the quadratic model underestimates the KL, which happens with larger $`\delta`$ or less damping, or when the surrogate fails to improve.
 
 </details>
 
 
 ### <a id="exercise-20-5-the-clipped-objective"></a>Exercise 20.5 — The clipped objective
 
-(a) For one sample, give the derivative of $\min(rA,\operatorname{clip}(r,1-\epsilon,1+\epsilon)A)$ with respect to $r$ in each region, for $A>0$ and $A<0$. (b) Show that the clipped objective never exceeds the unclipped one, and that they agree to first order at $r=1$. (c) A sample with $A>0$ has $r=0.5$ after a few minibatch steps. Does it still contribute a gradient? Why is this important?
+(a) For one sample, give the derivative of $`\min(rA,\operatorname{clip}(r,1-\epsilon,1+\epsilon)A)`$ with respect to $`r`$ in each region, for $`A>0`$ and $`A<0`$. (b) Show that the clipped objective never exceeds the unclipped one, and that they agree to first order at $`r=1`$. (c) A sample with $`A>0`$ has $`r=0.5`$ after a few minibatch steps. Does it still contribute a gradient? Why is this important?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) For $A>0$: $A$ for $r<1+\epsilon$ and 0 above. For $A<0$: $A$ for $r>1-\epsilon$ and 0 below.
+(a) For $`A>0`$: $`A`$ for $`r<1+\epsilon`$ and 0 above. For $`A<0`$: $`A`$ for $`r>1-\epsilon`$ and 0 below.
 
-(b) For $A>0$: if $r>1+\epsilon$, $\operatorname{clip}(r)A=(1+\epsilon)A<rA$, so the minimum is the clipped term; if $r<1-\epsilon$, $\operatorname{clip}(r)A=(1-\epsilon)A>rA$, so the minimum is $rA$. Either way the result is at most $rA$; the case $A<0$ is symmetric. Near $r=1$ nothing is clipped, so the two objectives, and their gradients at the old policy, coincide.
+(b) For $`A>0`$: if $`r>1+\epsilon`$, $`\operatorname{clip}(r)A=(1+\epsilon)A<rA`$, so the minimum is the clipped term; if $`r<1-\epsilon`$, $`\operatorname{clip}(r)A=(1-\epsilon)A>rA`$, so the minimum is $`rA`$. Either way the result is at most $`rA`$; the case $`A<0`$ is symmetric. Near $`r=1`$ nothing is clipped, so the two objectives, and their gradients at the old policy, coincide.
 
-(c) Yes: with $r<1-\epsilon$ and $A>0$ the minimum selects the unclipped term, whose derivative is $A$. The update has moved this sample's probability the wrong way, probably through the gradients of other samples, and the objective keeps pushing it back. PPO removes the incentive to exploit an advantage beyond the trust region, but never the incentive to undo damage, which is why the objective is a pessimistic bound rather than a simple truncation.
+(c) Yes: with $`r<1-\epsilon`$ and $`A>0`$ the minimum selects the unclipped term, whose derivative is $`A`$. The update has moved this sample's probability the wrong way, probably through the gradients of other samples, and the objective keeps pushing it back. PPO removes the incentive to exploit an advantage beyond the trust region, but never the incentive to undo damage, which is why the objective is a pessimistic bound rather than a simple truncation.
 
 </details>
 
 
 ### <a id="exercise-20-6-the-adaptive-kl-penalty"></a>Exercise 20.6 — The adaptive KL penalty
 
-PPO's penalty variant maximizes $\hat{\mathbb E}[r_t\hat A_t]-\beta\hat{\mathbb E}[D_{\mathrm{KL}}]$ and after each iteration halves $\beta$ if the measured KL was below $d_{\text{targ}}/1.5$ and doubles it if above $1.5\,d_{\text{targ}}$. (a) Why would a fixed $\beta$ be a poor choice over a whole run? (b) Why the dead zone between the thresholds?
+PPO's penalty variant maximizes $`\hat{\mathbb E}[r_t\hat A_t]-\beta\hat{\mathbb E}[D_{\mathrm{KL}}]`$ and after each iteration halves $`\beta`$ if the measured KL was below $`d_{\text{targ}}/1.5`$ and doubles it if above $`1.5\,d_{\text{targ}}`$. (a) Why would a fixed $`\beta`$ be a poor choice over a whole run? (b) Why the dead zone between the thresholds?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) The penalized step trades a gain proportional to the advantages against a KL cost. As training progresses, the scale of the advantages changes, typically shrinking as the policy approaches a local optimum, so a fixed $\beta$ that allowed reasonable steps early becomes a strong brake later, or one that was right later allows reckless steps early. Adapting $\beta$ to hold the KL near a target keeps the step size in policy space constant, which is what TRPO's constraint does exactly.
+(a) The penalized step trades a gain proportional to the advantages against a KL cost. As training progresses, the scale of the advantages changes, typically shrinking as the policy approaches a local optimum, so a fixed $`\beta`$ that allowed reasonable steps early becomes a strong brake later, or one that was right later allows reckless steps early. Adapting $`\beta`$ to hold the KL near a target keeps the step size in policy space constant, which is what TRPO's constraint does exactly.
 
-(b) The measured KL is noisy, and the effect of $\beta$ on it is delayed by one iteration. Updating on every deviation would make $\beta$ oscillate by factors of 2 in response to noise. The dead zone, a factor of 2.25 wide, changes $\beta$ only when the KL is clearly off target, and the multiplicative changes let it cover orders of magnitude in a few iterations when the scale of the problem changes.
+(b) The measured KL is noisy, and the effect of $`\beta`$ on it is delayed by one iteration. Updating on every deviation would make $`\beta`$ oscillate by factors of 2 in response to noise. The dead zone, a factor of 2.25 wide, changes $`\beta`$ only when the KL is clearly off target, and the multiplicative changes let it cover orders of magnitude in a few iterations when the scale of the problem changes.
 
 </details>
 
 
 ### <a id="exercise-20-7-mirror-descent-in-closed-form"></a>Exercise 20.7 — Mirror descent in closed form
 
-(a) Show that $\arg\max_p\{\eta\langle p,\mathbf q\rangle-D_{\mathrm{KL}}(p\,\|\,\pi_k)\}$ over distributions $p$ is $p(a)\propto\pi_k(a)e^{\eta q(a)}$. (b) For a tabular softmax policy, what update of the logits implements it, and what happens as $\eta\to0$ and $\eta\to\infty$? (c) Why does the update escape the plateau of the code's poor initial policy?
+(a) Show that $`\arg\max_p\{\eta\langle p,\mathbf q\rangle-D_{\mathrm{KL}}(p\,\|\,\pi_k)\}`$ over distributions $`p`$ is $`p(a)\propto\pi_k(a)e^{\eta q(a)}`$. (b) For a tabular softmax policy, what update of the logits implements it, and what happens as $`\eta\to0`$ and $`\eta\to\infty`$? (c) Why does the update escape the plateau of the code's poor initial policy?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) With a multiplier $\lambda$ for $\sum_ap(a)=1$, stationarity gives $\eta q(a)-\ln(p(a)/\pi_k(a))-1-\lambda=0$, so $p(a)=\pi_k(a)e^{\eta q(a)}e^{-1-\lambda}$, and the constant normalizes. The objective is strictly concave, so this is the maximum.
+(a) With a multiplier $`\lambda`$ for $`\sum_ap(a)=1`$, stationarity gives $`\eta q(a)-\ln(p(a)/\pi_k(a))-1-\lambda=0`$, so $`p(a)=\pi_k(a)e^{\eta q(a)}e^{-1-\lambda}`$, and the constant normalizes. The objective is strictly concave, so this is the maximum.
 
-(b) $\boldsymbol\theta(s,\cdot)\leftarrow\boldsymbol\theta(s,\cdot)+\eta Q_{\pi_k}(s,\cdot)$, or equivalently $+\eta A_{\pi_k}(s,\cdot)$, since adding a constant to the logits of a state does not change its softmax. As $\eta\to0$ the policy stays put; as $\eta\to\infty$ all the probability goes to the maximizing actions, which is the greedy step of policy iteration.
+(b) $`\boldsymbol\theta(s,\cdot)\leftarrow\boldsymbol\theta(s,\cdot)+\eta Q_{\pi_k}(s,\cdot)`$, or equivalently $`+\eta A_{\pi_k}(s,\cdot)`$, since adding a constant to the logits of a state does not change its softmax. As $`\eta\to0`$ the policy stays put; as $`\eta\to\infty`$ all the probability goes to the maximizing actions, which is the greedy step of policy iteration.
 
-(c) The update multiplies each probability by $e^{\eta A(s,a)}/Z(s)$, a factor that does not depend on the probability itself: an action with probability 0.0003 and a large advantage gains as fast, in relative terms, as one with probability 0.5. The plain policy gradient of a softmax changes the logits by $\eta\,d_\pi(s)\pi(a\mid s)A(s,a)/(1-\gamma)$, proportional to the action's current probability, so the good actions of a nearly deterministic poor policy barely move.
+(c) The update multiplies each probability by $`e^{\eta A(s,a)}/Z(s)`$, a factor that does not depend on the probability itself: an action with probability 0.0003 and a large advantage gains as fast, in relative terms, as one with probability 0.5. The plain policy gradient of a softmax changes the logits by $`\eta\,d_\pi(s)\pi(a\mid s)A(s,a)/(1-\gamma)`$, proportional to the action's current probability, so the good actions of a nearly deterministic poor policy barely move.
 
 </details>
 
 
 ### <a id="exercise-20-8-clipping-the-value-function"></a>Exercise 20.8 — Clipping the value function
 
-PPO's reference code minimizes $\max\bigl((\hat v-\hat G)^2,(\hat v_{\text{old}}+\operatorname{clip}(\hat v-\hat v_{\text{old}},-\epsilon,\epsilon)-\hat G)^2\bigr)$ for the critic. (a) When does this loss have zero gradient? (b) Why might it hurt?
+PPO's reference code minimizes $`\max\bigl((\hat v-\hat G)^2,(\hat v_{\text{old}}+\operatorname{clip}(\hat v-\hat v_{\text{old}},-\epsilon,\epsilon)-\hat G)^2\bigr)`$ for the critic. (a) When does this loss have zero gradient? (b) Why might it hurt?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) When the prediction has moved more than $\epsilon$ from its old value, the clipped term is a constant. The maximum selects it, and the gradient vanishes, when it is the larger error, that is, when the new prediction is closer to the target than the clipped one: the critic has moved toward its target by more than $\epsilon$ and is stopped there. If the prediction has moved away from the target, the unclipped term dominates and pulls it back. This is the logic of the policy's clipped objective, applied to the value.
+(a) When the prediction has moved more than $`\epsilon`$ from its old value, the clipped term is a constant. The maximum selects it, and the gradient vanishes, when it is the larger error, that is, when the new prediction is closer to the target than the clipped one: the critic has moved toward its target by more than $`\epsilon`$ and is stopped there. If the prediction has moved away from the target, the unclipped term dominates and pulls it back. This is the logic of the policy's clipped objective, applied to the value.
 
-(b) Unlike a ratio of probabilities, a value has the units of the rewards, so a fixed $\epsilon$ means different things in different tasks, and at different stages of one task. When the targets change by more than $\epsilon$ per iteration, as they do early in training or after the policy improves, the clipping slows the critic, and a stale critic gives poor advantages. Andrychowicz et al. found that it hurt performance whatever the clipping threshold; normalizing the rewards makes it less harmful, since it then limits changes to a fraction of the typical return.
+(b) Unlike a ratio of probabilities, a value has the units of the rewards, so a fixed $`\epsilon`$ means different things in different tasks, and at different stages of one task. When the targets change by more than $`\epsilon`$ per iteration, as they do early in training or after the policy improves, the clipping slows the critic, and a stale critic gives poor advantages. Andrychowicz et al. found that it hurt performance whatever the clipping threshold; normalizing the rewards makes it less harmful, since it then limits changes to a fraction of the typical return.
 
 </details>
 
@@ -538,11 +538,11 @@ PPO's reference code minimizes $\max\bigl((\hat v-\hat G)^2,(\hat v_{\text{old}}
 
 For each iteration:
 
-1. Collect a batch with $\pi_{\boldsymbol\theta_{\text{old}}}$ and compute advantages $\hat A_t$ with GAE; fit the value function (the GAE paper, by the same authors, used a trust region for it too).
-2. Compute the surrogate's gradient $\mathbf g$ at $\boldsymbol\theta_{\text{old}}$ by backpropagation.
-3. Run about 10 iterations of conjugate gradient on $(F+\lambda I)\mathbf x=\mathbf g$, with Fisher-vector products computed by differentiating $\nabla\hat{\mathbb E}[D_{\mathrm{KL}}]\cdot\mathbf v$; often only a subsample of the batch (for example 10%) is used for these products.
-4. Scale the direction to $\Delta=\sqrt{2\delta/(\mathbf x^\top F\mathbf x)}\,\mathbf x$.
-5. Backtracking line search: for $j=0,1,2,\dots$, try $\boldsymbol\theta_{\text{old}}+0.5^j\Delta$ and accept the first that satisfies the KL constraint and improves the surrogate; if none does within about 10 halvings, keep $\boldsymbol\theta_{\text{old}}$.
+1. Collect a batch with $`\pi_{\boldsymbol\theta_{\text{old}}}`$ and compute advantages $`\hat A_t`$ with GAE; fit the value function (the GAE paper, by the same authors, used a trust region for it too).
+2. Compute the surrogate's gradient $`\mathbf g`$ at $`\boldsymbol\theta_{\text{old}}`$ by backpropagation.
+3. Run about 10 iterations of conjugate gradient on $`(F+\lambda I)\mathbf x=\mathbf g`$, with Fisher-vector products computed by differentiating $`\nabla\hat{\mathbb E}[D_{\mathrm{KL}}]\cdot\mathbf v`$; often only a subsample of the batch (for example 10%) is used for these products.
+4. Scale the direction to $`\Delta=\sqrt{2\delta/(\mathbf x^\top F\mathbf x)}\,\mathbf x`$.
+5. Backtracking line search: for $`j=0,1,2,\dots`$, try $`\boldsymbol\theta_{\text{old}}+0.5^j\Delta`$ and accept the first that satisfies the KL constraint and improves the surrogate; if none does within about 10 halvings, keep $`\boldsymbol\theta_{\text{old}}`$.
 
 </details>
 
@@ -557,9 +557,9 @@ For each iteration:
 | Environments × steps per batch | 1 × 2,048 | 8 × 128 |
 | Epochs per batch | 10 | 3 |
 | Minibatch size | 64 | 256 (32 × 8) |
-| Adam step size | $3\times10^{-4}$ | $2.5\times10^{-4}$, annealed linearly to 0 |
-| Clipping $\epsilon$ | 0.2 | 0.1, annealed linearly to 0 |
-| Discount $\gamma$, GAE λ | 0.99, 0.95 | 0.99, 0.95 |
+| Adam step size | $`3\times10^{-4}`$ | $`2.5\times10^{-4}`$, annealed linearly to 0 |
+| Clipping $`\epsilon`$ | 0.2 | 0.1, annealed linearly to 0 |
+| Discount $`\gamma`$, GAE λ | 0.99, 0.95 | 0.99, 0.95 |
 | Value loss coefficient | (separate networks) | 1 |
 | Entropy coefficient | 0 | 0.01 |
 

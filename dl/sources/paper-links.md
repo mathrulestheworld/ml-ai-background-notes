@@ -25,7 +25,7 @@ The notes link several hundred papers where their ideas arise. This index collec
 | Goyal et al., [*Accurate, Large Minibatch SGD: Training ImageNet in 1 Hour*](https://arxiv.org/abs/1706.02677) (2017) | Linear learning-rate scaling with the batch size, and warmup (chapters 3 and 11). |
 | Shallue et al., [*Measuring the Effects of Data Parallelism on Neural Network Training*](https://jmlr.org/papers/v20/18-789.html) (2019) | Steps to a target as a function of the batch size, across workloads (chapter 3). |
 | Loshchilov and Hutter, [*SGDR: Stochastic Gradient Descent with Warm Restarts*](https://arxiv.org/abs/1608.03983) (2017) | Cosine learning-rate schedules (chapter 3). |
-| Cohen et al., [*Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability*](https://arxiv.org/abs/2103.00065) (2021) | Progressive sharpening and training at the stability threshold $2/\eta$ (chapter 3). |
+| Cohen et al., [*Gradient Descent on Neural Networks Typically Occurs at the Edge of Stability*](https://arxiv.org/abs/2103.00065) (2021) | Progressive sharpening and training at the stability threshold $`2/\eta`$ (chapter 3). |
 | Dauphin et al., [*Identifying and Attacking the Saddle Point Problem in High-Dimensional Non-Convex Optimization*](https://arxiv.org/abs/1406.2572) (2014) | Saddle points, rather than poor local minima, as the obstacle in high dimension (chapter 3). |
 | Garipov et al., [*Loss Surfaces, Mode Connectivity, and Fast Ensembling of DNNs*](https://arxiv.org/abs/1802.10026) (2018), and Entezari et al., [*The Role of Permutation Invariance in Linear Mode Connectivity of Neural Networks*](https://arxiv.org/abs/2110.06296) (2022) | Low-loss paths between minima and the role of permutation symmetry (chapter 3). |
 
@@ -56,7 +56,7 @@ The notes link several hundred papers where their ideas arise. This index collec
 | LeCun, Bottou, Bengio, and Haffner, [*Gradient-Based Learning Applied to Document Recognition*](https://doi.org/10.1109/5.726791) (1998) | LeNet-5 (chapter 7). |
 | Krizhevsky, Sutskever, and Hinton, [*ImageNet Classification with Deep Convolutional Neural Networks*](https://papers.nips.cc/paper/2012/hash/c399862d3b9d6b76c8436e924a68c45b-Abstract.html) (2012) | AlexNet: GPUs, ReLU, and dropout win ImageNet (chapters 1 and 7). |
 | Zhang, [*Making Convolutional Networks Shift-Invariant Again*](https://arxiv.org/abs/1904.11486) (2019) | Aliasing from strided layers and anti-aliased pooling (chapter 6). |
-| Simonyan and Zisserman, [*Very Deep Convolutional Networks for Large-Scale Image Recognition*](https://arxiv.org/abs/1409.1556) (2015) | Depth with $3\times3$ convolutions (chapter 7). |
+| Simonyan and Zisserman, [*Very Deep Convolutional Networks for Large-Scale Image Recognition*](https://arxiv.org/abs/1409.1556) (2015) | Depth with $`3\times3`$ convolutions (chapter 7). |
 | Howard et al., [*MobileNets*](https://arxiv.org/abs/1704.04861) (2017), and Sandler et al., [*MobileNetV2: Inverted Residuals and Linear Bottlenecks*](https://arxiv.org/abs/1801.04381) (2018) | Depthwise separable convolutions and inverted residual blocks (chapters 6 and 7). |
 | Tan and Le, [*EfficientNet: Rethinking Model Scaling for Convolutional Neural Networks*](https://arxiv.org/abs/1905.11946) (2019) | Compound scaling of depth, width, and resolution (chapter 7). |
 | Liu et al., [*A ConvNet for the 2020s*](https://arxiv.org/abs/2201.03545) (2022) | ConvNeXt: a convolutional network modernized step by step to match vision transformers (chapters 7 and 9). |
@@ -88,7 +88,7 @@ The notes link several hundred papers where their ideas arise. This index collec
 | Shoeybi et al., [*Megatron-LM: Training Multi-Billion Parameter Language Models Using Model Parallelism*](https://arxiv.org/abs/1909.08053) (2019) | Tensor parallelism for transformer layers (chapter 11). |
 | Huang et al., [*GPipe: Efficient Training of Giant Neural Networks Using Pipeline Parallelism*](https://arxiv.org/abs/1811.06965) (2019) | Pipeline parallelism with micro-batches (chapter 11). |
 | Chen, Xu, Zhang, and Guestrin, [*Training Deep Nets with Sublinear Memory Cost*](https://arxiv.org/abs/1604.06174) (2016) | Activation checkpointing (chapter 11). |
-| Kaplan et al., [*Scaling Laws for Neural Language Models*](https://arxiv.org/abs/2001.08361) (2020) | The $6N$ operations per token and the compute of transformers (chapters 9 and 11; developed in NLP and LLMs). |
+| Kaplan et al., [*Scaling Laws for Neural Language Models*](https://arxiv.org/abs/2001.08361) (2020) | The $`6N`$ operations per token and the compute of transformers (chapters 9 and 11; developed in NLP and LLMs). |
 | Jacob et al., [*Quantization and Training of Neural Networks for Efficient Integer-Arithmetic-Only Inference*](https://arxiv.org/abs/1712.05877) (2018) | Integer quantization of weights and activations (chapter 11). |
 | Frankle and Carbin, [*The Lottery Ticket Hypothesis: Finding Sparse, Trainable Neural Networks*](https://arxiv.org/abs/1803.03635) (2019) | Sparse subnetworks that train from their original initialization (chapter 11). |
 | Hinton, Vinyals, and Dean, [*Distilling the Knowledge in a Neural Network*](https://arxiv.org/abs/1503.02531) (2015) | Knowledge distillation with softened targets (chapter 11). |

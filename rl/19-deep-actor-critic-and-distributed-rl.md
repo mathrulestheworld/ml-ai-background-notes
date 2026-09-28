@@ -10,19 +10,19 @@ Chapter 13 derived the policy gradient and the actor–critic with linear functi
 
 ### <a id="the-advantage-actorcritic"></a>The advantage actor–critic
 
-An **advantage actor–critic** (A2C) agent has a policy network $\pi(a\mid s;\boldsymbol\theta)$ and a value network $\hat v(s;\mathbf w)$, often two heads on a shared torso. It runs $N$ environments for $T$ steps each, computes an advantage estimate $\hat A_{i,t}$ for each of the $NT$ transitions from the rewards and the critic's values ([below](#generalized-advantage-estimation)), and takes one gradient step on
+An **advantage actor–critic** (A2C) agent has a policy network $`\pi(a\mid s;\boldsymbol\theta)`$ and a value network $`\hat v(s;\mathbf w)`$, often two heads on a shared torso. It runs $`N`$ environments for $`T`$ steps each, computes an advantage estimate $`\hat A_{i,t}`$ for each of the $`NT`$ transitions from the rewards and the critic's values ([below](#generalized-advantage-estimation)), and takes one gradient step on
 
 $$
 \mathcal L(\boldsymbol\theta,\mathbf w)=\frac1{NT}\sum_{i,t}\Bigl[-\hat A_{i,t}\ln\pi(A_{i,t}\mid S_{i,t};\boldsymbol\theta)-\beta\,\mathcal H\bigl(\pi(\cdot\mid S_{i,t};\boldsymbol\theta)\bigr)+\frac{c_v}{2}\bigl(\hat v(S_{i,t};\mathbf w)-\hat G_{i,t}\bigr)^2\Bigr],
 $$
 
-where the advantages and the value targets $\hat G_{i,t}=\hat A_{i,t}+\hat v(S_{i,t};\mathbf w)$ are treated as constants. The first term is the policy gradient of chapter 13 with the critic as a baseline; the second, an **entropy bonus** with coefficient $\beta$, discourages the policy from becoming deterministic too early; the third trains the critic by regression on bootstrapped returns, with a weight $c_v$ that matters when the two share parameters. Then the environments continue from where they stopped, the new policy collects the next $T$ steps, and the old data are discarded.
+where the advantages and the value targets $`\hat G_{i,t}=\hat A_{i,t}+\hat v(S_{i,t};\mathbf w)`$ are treated as constants. The first term is the policy gradient of chapter 13 with the critic as a baseline; the second, an **entropy bonus** with coefficient $`\beta`$, discourages the policy from becoming deterministic too early; the third trains the critic by regression on bootstrapped returns, with a weight $`c_v`$ that matters when the two share parameters. Then the environments continue from where they stopped, the new policy collects the next $`T`$ steps, and the old data are discarded.
 
 ### <a id="parallel-environments-instead-of-replay"></a>Parallel environments instead of replay
 
-Replay serves DQN in two ways: it reuses data, and it breaks the correlation between consecutive samples, which would otherwise make each minibatch a narrow slice of experience. Parallel environments provide the second without the first: $N$ environments in different states give a batch as diverse as $N$ independent episodes. **A3C**, the asynchronous advantage actor–critic ([Mnih et al., 2016](https://arxiv.org/abs/1602.01783)), introduced the idea with 16 CPU threads, each running its own environment and a copy of the networks, computing gradients on its own rollouts of 5 steps, and applying them without locks to shared parameters, in the style of Hogwild ([Recht, Ré, Wright, and Niu, 2011](https://arxiv.org/abs/1106.5730)). It surpassed the state of the art on Atari while training for half the time on a single multicore CPU instead of a GPU, and it also learned 3D maze navigation and continuous control, all without replay.
+Replay serves DQN in two ways: it reuses data, and it breaks the correlation between consecutive samples, which would otherwise make each minibatch a narrow slice of experience. Parallel environments provide the second without the first: $`N`$ environments in different states give a batch as diverse as $`N`$ independent episodes. **A3C**, the asynchronous advantage actor–critic ([Mnih et al., 2016](https://arxiv.org/abs/1602.01783)), introduced the idea with 16 CPU threads, each running its own environment and a copy of the networks, computing gradients on its own rollouts of 5 steps, and applying them without locks to shared parameters, in the style of Hogwild ([Recht, Ré, Wright, and Niu, 2011](https://arxiv.org/abs/1106.5730)). It surpassed the state of the art on Atari while training for half the time on a single multicore CPU instead of a GPU, and it also learned 3D maze navigation and continuous control, all without replay.
 
-The asynchrony turned out to be inessential. **A2C**, the synchronous version, waits for all environments to finish their $T$ steps and makes one update on the combined batch; OpenAI found it performed better than their asynchronous implementation, with no sign that the noise of asynchrony helped, and it uses a GPU more efficiently, since the batch is large ([Wu et al., 2017](https://openai.com/index/openai-baselines-acktr-a2c/)). A2C is the skeleton of most on-policy agents today: PPO (chapter 20) is A2C with several epochs of clipped updates on minibatches of each batch, and with a single epoch on the whole batch, where its clipping never activates, and the remaining settings matched (optimizer, learning rate, rollout length, λ, and no advantage normalization or value clipping), it is A2C exactly ([Huang et al., 2022](https://arxiv.org/abs/2205.09123)).
+The asynchrony turned out to be inessential. **A2C**, the synchronous version, waits for all environments to finish their $`T`$ steps and makes one update on the combined batch; OpenAI found it performed better than their asynchronous implementation, with no sign that the noise of asynchrony helped, and it uses a GPU more efficiently, since the batch is large ([Wu et al., 2017](https://openai.com/index/openai-baselines-acktr-a2c/)). A2C is the skeleton of most on-policy agents today: PPO (chapter 20) is A2C with several epochs of clipped updates on minibatches of each batch, and with a single epoch on the whole batch, where its clipping never activates, and the remaining settings matched (optimizer, learning rate, rollout length, λ, and no advantage normalization or value clipping), it is A2C exactly ([Huang et al., 2022](https://arxiv.org/abs/2205.09123)).
 
 ### <a id="synchronous-and-asynchronous-collection"></a>Synchronous and asynchronous collection
 
@@ -32,25 +32,25 @@ Scaling data collection forces a choice. A synchronous system waits for its slow
 
 ### <a id="the-estimator"></a>The estimator
 
-The advantage estimate decides the bias and variance of the policy gradient. With the TD errors $\delta_t=R_{t+1}+\gamma\hat v(S_{t+1})-\hat v(S_t)$, the $n$-step estimates
+The advantage estimate decides the bias and variance of the policy gradient. With the TD errors $`\delta_t=R_{t+1}+\gamma\hat v(S_{t+1})-\hat v(S_t)`$, the $`n`$-step estimates
 
 $$
 \hat A^{(n)}_t=\sum_{l=0}^{n-1}\gamma^l\delta_{t+l}=\sum_{l=0}^{n-1}\gamma^lR_{t+l+1}+\gamma^n\hat v(S_{t+n})-\hat v(S_t)
 $$
 
-range from the one-step TD error, which has low variance but is biased whenever $\hat v$ is wrong, to the return minus the baseline, which is unbiased and noisy. The **generalized advantage estimate** ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)) averages them with the weights of the λ-return of chapter 8:
+range from the one-step TD error, which has low variance but is biased whenever $`\hat v`$ is wrong, to the return minus the baseline, which is unbiased and noisy. The **generalized advantage estimate** ([Schulman et al., 2016](https://arxiv.org/abs/1506.02438)) averages them with the weights of the λ-return of chapter 8:
 
 $$
 \hat A^{\mathrm{GAE}(\gamma,\lambda)}_t=(1-\lambda)\sum_{n\ge1}\lambda^{n-1}\hat A^{(n)}_t=\sum_{l\ge0}(\gamma\lambda)^l\delta_{t+l},
 $$
 
-computed backward over a rollout by $\hat A_t=\delta_t+\gamma\lambda\hat A_{t+1}$. It equals the λ-return minus the value, so the same computation gives the critic's targets, $\hat G_t=\hat A_t+\hat v(S_t)$, which are TD(λ) targets. GAE(γ, 0) is the one-step TD error and GAE(γ, 1) the discounted return minus the value.
+computed backward over a rollout by $`\hat A_t=\delta_t+\gamma\lambda\hat A_{t+1}`$. It equals the λ-return minus the value, so the same computation gives the critic's targets, $`\hat G_t=\hat A_t+\hat v(S_t)`$, which are TD(λ) targets. GAE(γ, 0) is the one-step TD error and GAE(γ, 1) the discounted return minus the value.
 
-The two parameters play different roles. The discount $\gamma$ changes what is estimated: even with exact values, GAE estimates the advantage of the discounted problem, which downweights rewards far in the future, and a smaller $\gamma$ reduces variance by downweighting delayed effects, at the price of bias. The parameter $\lambda$ introduces bias only through the critic's errors: with $\hat v=v_\pi$, every GAE(γ, λ) is an unbiased estimate of the discounted advantage (exercise 19.3). Schulman et al. found that intermediate values of λ, in the range 0.9 to 0.99, usually gave the best results (on their 3D biped, for example, $\gamma$ between 0.99 and 0.995 with λ between 0.96 and 0.99), and $\gamma=0.99$, $\lambda=0.95$ has become the default. Lab 6 measured the bias and variance of these estimates on the cart-pole with critics of different quality.
+The two parameters play different roles. The discount $`\gamma`$ changes what is estimated: even with exact values, GAE estimates the advantage of the discounted problem, which downweights rewards far in the future, and a smaller $`\gamma`$ reduces variance by downweighting delayed effects, at the price of bias. The parameter $`\lambda`$ introduces bias only through the critic's errors: with $`\hat v=v_\pi`$, every GAE(γ, λ) is an unbiased estimate of the discounted advantage (exercise 19.3). Schulman et al. found that intermediate values of λ, in the range 0.9 to 0.99, usually gave the best results (on their 3D biped, for example, $`\gamma`$ between 0.99 and 0.995 with λ between 0.96 and 0.99), and $`\gamma=0.99`$, $`\lambda=0.95`$ has become the default. Lab 6 measured the bias and variance of these estimates on the cart-pole with critics of different quality.
 
 ### <a id="rollouts-truncation-and-termination"></a>Rollouts, truncation, and termination
 
-Rollouts of $T$ steps from vectorized environments cut across episodes, and the implementation must distinguish three kinds of boundaries. At the end of a rollout the episode continues, so the last step bootstraps from the critic's value of the next state. At a **termination**, the episode has ended and nothing follows, so the value of the next state is zero. At a **truncation**, a time limit has cut the episode off, and what would have followed still has a value, so the step must bootstrap from the value of the true final state, which a vectorized environment that resets in the same step replaces by the first state of the next episode; Gymnasium therefore reports `terminated` and `truncated` separately and makes the final observation available, either by returning it and resetting on the next call to `step` (its default) or in `info` ([appendix A](#block-rl19-appendix-a)). At both kinds of episode ends, the recursion must not carry advantages from the next episode back into this one. The next code checks an implementation against the definition and measures the three usual mistakes.
+Rollouts of $`T`$ steps from vectorized environments cut across episodes, and the implementation must distinguish three kinds of boundaries. At the end of a rollout the episode continues, so the last step bootstraps from the critic's value of the next state. At a **termination**, the episode has ended and nothing follows, so the value of the next state is zero. At a **truncation**, a time limit has cut the episode off, and what would have followed still has a value, so the step must bootstrap from the value of the true final state, which a vectorized environment that resets in the same step replaces by the first state of the next episode; Gymnasium therefore reports `terminated` and `truncated` separately and makes the final observation available, either by returning it and resetting on the next call to `step` (its default) or in `info` ([appendix A](#block-rl19-appendix-a)). At both kinds of episode ends, the recursion must not carry advantages from the next episode back into this one. The next code checks an implementation against the definition and measures the three usual mistakes.
 
 ```python
 import numpy as np
@@ -130,33 +130,33 @@ The backward recursion agrees with the definition to rounding error. Each mistak
 
 Beyond the estimator, a handful of details decide whether a deep actor–critic learns, and large empirical studies have measured them ([Engstrom et al., 2020](https://arxiv.org/abs/2005.12729); [Andrychowicz et al., 2021](https://arxiv.org/abs/2006.05990)).
 
-- **Entropy regularization.** The entropy bonus, introduced by [Williams and Peng (1991)](https://doi.org/10.1080/09540099108946587) and used by A3C with $\beta=0.01$, keeps the policy stochastic until the advantages are informative enough to decide, and in some environments it smooths the optimization landscape ([Ahmed, Le Roux, Norouzi, and Schuurmans, 2019](https://arxiv.org/abs/1811.11214)). Its effect depends on its size relative to the advantages, which is one reason for the normalization below.
-- **Normalization.** Observations are usually normalized by running estimates of their mean and standard deviation, and the advantages of each batch to zero mean and unit variance. The value targets matter as much: with a reward of 1 per step and $\gamma=0.99$, the cart-pole's values approach 100, and a critic whose outputs start near 1 needs many updates to reach them, during which its advantages are poor baselines. In Lab 9, multiplying the critic's output by 10 is the difference between an agent that solves the task in one seed of six, the others stalling between 150 and 360 steps, and one that balances the pole for the full 500 steps in every seed. **PopArt** ([van Hasselt, Guez, Hessel, Mnih, and Silver, 2016](https://arxiv.org/abs/1602.07714)) automates this, normalizing the value targets by running estimates of their mean and standard deviation while rescaling the last layer so that the unnormalized predictions do not change (exercise 19.8); applied to each game separately, it let one IMPALA agent learn all 57 Atari games together and exceed the median human performance ([Hessel et al., 2019](https://arxiv.org/abs/1809.04474)).
+- **Entropy regularization.** The entropy bonus, introduced by [Williams and Peng (1991)](https://doi.org/10.1080/09540099108946587) and used by A3C with $`\beta=0.01`$, keeps the policy stochastic until the advantages are informative enough to decide, and in some environments it smooths the optimization landscape ([Ahmed, Le Roux, Norouzi, and Schuurmans, 2019](https://arxiv.org/abs/1811.11214)). Its effect depends on its size relative to the advantages, which is one reason for the normalization below.
+- **Normalization.** Observations are usually normalized by running estimates of their mean and standard deviation, and the advantages of each batch to zero mean and unit variance. The value targets matter as much: with a reward of 1 per step and $`\gamma=0.99`$, the cart-pole's values approach 100, and a critic whose outputs start near 1 needs many updates to reach them, during which its advantages are poor baselines. In Lab 9, multiplying the critic's output by 10 is the difference between an agent that solves the task in one seed of six, the others stalling between 150 and 360 steps, and one that balances the pole for the full 500 steps in every seed. **PopArt** ([van Hasselt, Guez, Hessel, Mnih, and Silver, 2016](https://arxiv.org/abs/1602.07714)) automates this, normalizing the value targets by running estimates of their mean and standard deviation while rescaling the last layer so that the unnormalized predictions do not change (exercise 19.8); applied to each game separately, it let one IMPALA agent learn all 57 Atari games together and exceed the median human performance ([Hessel et al., 2019](https://arxiv.org/abs/1809.04474)).
 - **Initialization.** A policy whose last layer starts with small weights starts close to uniform (for a Gaussian policy, with a mean near zero in every state), which avoids early commitment to arbitrary actions; Andrychowicz et al. found that the initial policy has a surprisingly large effect on performance and recommend last-layer weights 100 times smaller than usual.
-- **Shared or separate networks.** A shared torso saves computation and lets the value loss shape features for the policy, but the two losses interfere, and their relative weight $c_v$ becomes a sensitive hyperparameter. Andrychowicz et al. found separate networks better on continuous control; phasic policy gradient keeps the benefits of both by training them in separate phases (chapter 20).
+- **Shared or separate networks.** A shared torso saves computation and lets the value loss shape features for the policy, but the two losses interfere, and their relative weight $`c_v`$ becomes a sensitive hyperparameter. Andrychowicz et al. found separate networks better on continuous control; phasic policy gradient keeps the benefits of both by training them in separate phases (chapter 20).
 - **Optimization.** Clipping the gradient's global norm, typically to 0.5, and annealing the learning rate protect against rare large updates, which an on-policy method cannot undo by replaying old data.
 
 ## <a id="off-policy-correction-for-distributed-actors"></a>Off-policy correction for distributed actors
 
 ### <a id="policy-lag"></a>Policy lag
 
-Once acting and learning run on different machines, the data are off-policy. An actor copies the learner's parameters, generates a trajectory, and sends it back; by the time the learner uses it, it has made several updates, so the trajectory was generated by a **behavior policy** $\mu$, the policy of some updates ago, rather than by the current policy $\pi$. The same holds for trajectories that are replayed. There are three responses: ignore the difference, as A3C did with its small lag; correct for it with importance weights; or limit how far the current policy can move from the one that produced the data. The first is biased, the second has high variance unless the weights are truncated, and the third is the idea of chapter 20. **IMPALA** ([Espeholt et al., 2018](https://arxiv.org/abs/1802.01561)) introduced a truncated correction, V-trace, which has become the standard for actor–learner systems.
+Once acting and learning run on different machines, the data are off-policy. An actor copies the learner's parameters, generates a trajectory, and sends it back; by the time the learner uses it, it has made several updates, so the trajectory was generated by a **behavior policy** $`\mu`$, the policy of some updates ago, rather than by the current policy $`\pi`$. The same holds for trajectories that are replayed. There are three responses: ignore the difference, as A3C did with its small lag; correct for it with importance weights; or limit how far the current policy can move from the one that produced the data. The first is biased, the second has high variance unless the weights are truncated, and the third is the idea of chapter 20. **IMPALA** ([Espeholt et al., 2018](https://arxiv.org/abs/1802.01561)) introduced a truncated correction, V-trace, which has become the standard for actor–learner systems.
 
 ### <a id="v-trace"></a>V-trace
 
-Given a trajectory $(x_t,a_t,r_t)_{t=s}^{s+n}$ from $\mu$, with the truncated ratios $\rho_t=\min\bigl(\bar\rho,\pi(a_t\mid x_t)/\mu(a_t\mid x_t)\bigr)$ and $c_i=\min\bigl(\bar c,\pi(a_i\mid x_i)/\mu(a_i\mid x_i)\bigr)$, $\bar\rho\ge\bar c$, the **V-trace target** for $V(x_s)$ is
+Given a trajectory $`(x_t,a_t,r_t)_{t=s}^{s+n}`$ from $`\mu`$, with the truncated ratios $`\rho_t=\min\bigl(\bar\rho,\pi(a_t\mid x_t)/\mu(a_t\mid x_t)\bigr)`$ and $`c_i=\min\bigl(\bar c,\pi(a_i\mid x_i)/\mu(a_i\mid x_i)\bigr)`$, $`\bar\rho\ge\bar c`$, the **V-trace target** for $`V(x_s)`$ is
 
 $$
 v_s=V(x_s)+\sum_{t=s}^{s+n-1}\gamma^{t-s}\Bigl(\prod_{i=s}^{t-1}c_i\Bigr)\rho_t\bigl(r_t+\gamma V(x_{t+1})-V(x_t)\bigr),
 $$
 
-computed backward by $v_s-V(x_s)=\rho_s\delta_s+\gamma c_s\bigl(v_{s+1}-V(x_{s+1})\bigr)$. On-policy, with $\pi=\mu$ and $\bar c\ge1$, all the ratios are 1 and $v_s$ is the $n$-step return; a factor λ in the $c_i$ turns it into the λ-return. The two truncation levels play different roles. The traces $c_i$ are the truncated traces of Retrace (chapter 9): they cut the product of ratios, whose variance would otherwise grow with $n$, and they affect only how fast the targets converge. The ratio $\rho_t$ decides what they converge to: the fixed point is the value of the policy
+computed backward by $`v_s-V(x_s)=\rho_s\delta_s+\gamma c_s\bigl(v_{s+1}-V(x_{s+1})\bigr)`$. On-policy, with $`\pi=\mu`$ and $`\bar c\ge1`$, all the ratios are 1 and $`v_s`$ is the $`n`$-step return; a factor λ in the $`c_i`$ turns it into the λ-return. The two truncation levels play different roles. The traces $`c_i`$ are the truncated traces of Retrace (chapter 9): they cut the product of ratios, whose variance would otherwise grow with $`n`$, and they affect only how fast the targets converge. The ratio $`\rho_t`$ decides what they converge to: the fixed point is the value of the policy
 
 $$
 \pi_{\bar\rho}(a\mid x)=\frac{\min\bigl(\bar\rho\,\mu(a\mid x),\pi(a\mid x)\bigr)}{\sum_b\min\bigl(\bar\rho\,\mu(b\mid x),\pi(b\mid x)\bigr)},
 $$
 
-which is $\pi$ when $\bar\rho$ is infinite, $\mu$ as $\bar\rho\to0$, and in between for $\bar\rho=1$, the usual choice (appendix B). The critic regresses $V(x_s)$ toward $v_s$, and the actor follows
+which is $`\pi`$ when $`\bar\rho`$ is infinite, $`\mu`$ as $`\bar\rho\to0`$, and in between for $`\bar\rho=1`$, the usual choice (appendix B). The critic regresses $`V(x_s)`$ toward $`v_s`$, and the actor follows
 
 $$
 \rho_s\nabla_{\boldsymbol\theta}\ln\pi(a_s\mid x_s;\boldsymbol\theta)\bigl(r_s+\gamma v_{s+1}-V(x_s)\bigr),
@@ -266,15 +266,15 @@ print(f"\nsampled V-trace (rho_bar = c_bar = 1), 100,000 segments: |V - V(pi_1)|
 # sampled V-trace (rho_bar = c_bar = 1), 100,000 segments: |V - V(pi_1)| = 0.133, |V - V_pi| = 1.996
 ```
 
-The fixed point moves from the behavior's value toward the target's as $\bar\rho$ grows, and it is exactly the value of $\pi_{\bar\rho}$, to rounding error; with $\bar\rho=1$ it is still 2.1 away from $v_\pi$, since the two policies here differ a lot. The traces do not move it. Untruncated importance sampling reaches $v_\pi$ itself and contracts at rate $\gamma^n\approx0.59$, but the variance of its targets is more than a thousand times larger. Truncation makes the targets as quiet as one-step targets, at the price of slow contraction: each update moves $V(x)$ by roughly a fraction $\sum_a\min(\mu(a\mid x),\pi(a\mid x))$ of its error, which is small when the policies disagree. Both costs grow with the distance between $\mu$ and $\pi$, which is why distributed systems keep the lag short.
+The fixed point moves from the behavior's value toward the target's as $`\bar\rho`$ grows, and it is exactly the value of $`\pi_{\bar\rho}`$, to rounding error; with $`\bar\rho=1`$ it is still 2.1 away from $`v_\pi`$, since the two policies here differ a lot. The traces do not move it. Untruncated importance sampling reaches $`v_\pi`$ itself and contracts at rate $`\gamma^n\approx0.59`$, but the variance of its targets is more than a thousand times larger. Truncation makes the targets as quiet as one-step targets, at the price of slow contraction: each update moves $`V(x)`$ by roughly a fraction $`\sum_a\min(\mu(a\mid x),\pi(a\mid x))`$ of its error, which is small when the policies disagree. Both costs grow with the distance between $`\mu`$ and $`\pi`$, which is why distributed systems keep the lag short.
 
 ### <a id="stale-data-and-trust-regions"></a>Stale data and trust regions
 
 <img src="sources/images/rl-ac-lag.png" alt="rl-ac-lag" width="880">
 
-*Left: advantage actor–critic agents on the cart-pole whose actors act with the parameters of 32 updates earlier, a much larger lag than a real system would tolerate, with no correction, with V-trace ($\bar\rho=\bar c=1$, λ = 0.95), and with PPO's clipped objective (ratios clipped to $[0.8,1.2]$), against agents that act with the current parameters; 16 environments, rollouts of 16 steps, means of 6 seeds. Right: the fixed point of V-trace on a random MDP with 6 states, one line per state, as the truncation level varies; below the smallest ratio $\pi/\mu$ it is the behavior's value, above the largest it is the target's, and in between it can exceed both.*
+*Left: advantage actor–critic agents on the cart-pole whose actors act with the parameters of 32 updates earlier, a much larger lag than a real system would tolerate, with no correction, with V-trace ($`\bar\rho=\bar c=1`$, λ = 0.95), and with PPO's clipped objective (ratios clipped to $`[0.8,1.2]`$), against agents that act with the current parameters; 16 environments, rollouts of 16 steps, means of 6 seeds. Right: the fixed point of V-trace on a random MDP with 6 states, one line per state, as the truncation level varies; below the smallest ratio $`\pi/\mu`$ it is the behavior's value, above the largest it is the target's, and in between it can exceed both.*
 
-The left panel shows what stale data do to an actor–critic. Without correction, the agents learn quickly at first, and then half of them collapse, some to a deterministic policy that pushes the cart the same way at every step. V-trace does not prevent the collapse either: no V-trace seed recovered in this run, and in Lab 9's runs it saved one or two seeds of six. Once the policy has become nearly deterministic, truncated weights leave almost no gradient for the actions it has abandoned, like the current policy's own gradient, which vanishes there too (exercise 19.7). What prevents the collapse is not correcting the data but limiting how far the policy moves from the policy that generated them: with PPO's clipped objective, which stops the gradient of a sample once its ratio leaves $[0.8,1.2]$ in the direction its advantage favors, every seed learns to balance the pole despite the lag. With the short lags of a well-built system and small steps, V-trace works well, and IMPALA's ablations found it better than no correction and than cruder corrections, with the largest gains when the data were most off-policy. But the lesson of the figure has shaped later systems: many large distributed agents use PPO's clipped objective instead, sometimes with V-trace targets for the critic. Earlier off-policy actor–critics had combined the two ideas: ACER ([Wang et al., 2017](https://arxiv.org/abs/1611.01224)) learns action values with Retrace, truncates its importance weights with a bias correction, and constrains each update with a trust region.
+The left panel shows what stale data do to an actor–critic. Without correction, the agents learn quickly at first, and then half of them collapse, some to a deterministic policy that pushes the cart the same way at every step. V-trace does not prevent the collapse either: no V-trace seed recovered in this run, and in Lab 9's runs it saved one or two seeds of six. Once the policy has become nearly deterministic, truncated weights leave almost no gradient for the actions it has abandoned, like the current policy's own gradient, which vanishes there too (exercise 19.7). What prevents the collapse is not correcting the data but limiting how far the policy moves from the policy that generated them: with PPO's clipped objective, which stops the gradient of a sample once its ratio leaves $`[0.8,1.2]`$ in the direction its advantage favors, every seed learns to balance the pole despite the lag. With the short lags of a well-built system and small steps, V-trace works well, and IMPALA's ablations found it better than no correction and than cruder corrections, with the largest gains when the data were most off-policy. But the lesson of the figure has shaped later systems: many large distributed agents use PPO's clipped objective instead, sometimes with V-trace targets for the critic. Earlier off-policy actor–critics had combined the two ideas: ACER ([Wang et al., 2017](https://arxiv.org/abs/1611.01224)) learns action values with Retrace, truncates its importance weights with a bias correction, and constrains each update with a trust region.
 
 ## <a id="architectures-for-scale"></a>Architectures for scale
 
@@ -298,68 +298,68 @@ Lab 9 builds a batched A2C on the cart-pole, measures the effect of λ, the entr
 
 ### <a id="exercise-19-1-the-entropy-bonus-of-a-softmax-policy"></a>Exercise 19.1 — The entropy bonus of a softmax policy
 
-For a softmax policy with logits $\mathbf z$, $\pi_a=e^{z_a}/\sum_be^{z_b}$, and entropy $\mathcal H=-\sum_a\pi_a\ln\pi_a$: (a) show that $\partial\mathcal H/\partial z_b=-\pi_b(\ln\pi_b+\mathcal H)$ and describe the direction in which it pushes the logits. (b) Where does it vanish? (c) An agent's advantages are of order 10 and $\beta=0.01$. How strong is the entropy bonus compared with the policy gradient?
+For a softmax policy with logits $`\mathbf z`$, $`\pi_a=e^{z_a}/\sum_be^{z_b}`$, and entropy $`\mathcal H=-\sum_a\pi_a\ln\pi_a`$: (a) show that $`\partial\mathcal H/\partial z_b=-\pi_b(\ln\pi_b+\mathcal H)`$ and describe the direction in which it pushes the logits. (b) Where does it vanish? (c) An agent's advantages are of order 10 and $`\beta=0.01`$. How strong is the entropy bonus compared with the policy gradient?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) $\partial\pi_a/\partial z_b=\pi_a(\mathbb 1_{a=b}-\pi_b)$, so $\partial\mathcal H/\partial z_b=-\sum_a(\ln\pi_a+1)\pi_a(\mathbb 1_{a=b}-\pi_b)=-\pi_b(\ln\pi_b+1)+\pi_b\sum_a\pi_a(\ln\pi_a+1)=-\pi_b(\ln\pi_b+\mathcal H)$. It raises the logits of actions whose log-probability is below the average $-\mathcal H$ and lowers the others: it pulls the policy toward uniform.
+(a) $`\partial\pi_a/\partial z_b=\pi_a(\mathbb 1_{a=b}-\pi_b)`$, so $`\partial\mathcal H/\partial z_b=-\sum_a(\ln\pi_a+1)\pi_a(\mathbb 1_{a=b}-\pi_b)=-\pi_b(\ln\pi_b+1)+\pi_b\sum_a\pi_a(\ln\pi_a+1)=-\pi_b(\ln\pi_b+\mathcal H)`$. It raises the logits of actions whose log-probability is below the average $`-\mathcal H`$ and lowers the others: it pulls the policy toward uniform.
 
-(b) At the uniform policy, where $\ln\pi_b=-\mathcal H$ for every $b$, and in the limit of a deterministic policy, where every term $\pi_b(\ln\pi_b+\mathcal H)$ goes to 0 (for the rare actions because $\pi_b\ln\pi_b\to0$, for the dominant one because $\ln\pi_b$ and $\mathcal H$ both go to 0). Near a deterministic policy with $\pi_1=\varepsilon$ in a two-action problem, it changes the gap $z_1-z_0$ at the rate $2\varepsilon\ln(1/\varepsilon)$, slowly.
+(b) At the uniform policy, where $`\ln\pi_b=-\mathcal H`$ for every $`b`$, and in the limit of a deterministic policy, where every term $`\pi_b(\ln\pi_b+\mathcal H)`$ goes to 0 (for the rare actions because $`\pi_b\ln\pi_b\to0`$, for the dominant one because $`\ln\pi_b`$ and $`\mathcal H`$ both go to 0). Near a deterministic policy with $`\pi_1=\varepsilon`$ in a two-action problem, it changes the gap $`z_1-z_0`$ at the rate $`2\varepsilon\ln(1/\varepsilon)`$, slowly.
 
-(c) The policy-gradient term for a sampled action is $\hat A(\mathbf e_a-\boldsymbol\pi)$, of order 10, while the entropy term is $\beta$ times quantities of order 1: a thousand times weaker. The bonus then has an effect only where the advantages nearly cancel. This is why the coefficient is tuned together with the scale of the advantages, and why normalizing advantages per batch makes one value of $\beta$ work across tasks.
+(c) The policy-gradient term for a sampled action is $`\hat A(\mathbf e_a-\boldsymbol\pi)`$, of order 10, while the entropy term is $`\beta`$ times quantities of order 1: a thousand times weaker. The bonus then has an effect only where the advantages nearly cancel. This is why the coefficient is tuned together with the scale of the advantages, and why normalizing advantages per batch makes one value of $`\beta`$ work across tasks.
 
 </details>
 
 
 ### <a id="exercise-19-2-gae-is-the-return-minus-the-value"></a>Exercise 19.2 — GAE is the λ-return minus the value
 
-For an episode ending at time $T$, with $\delta_t=0$ for $t\ge T$ and $\hat v(S_T)=0$, show that $\sum_{l\ge0}(\gamma\lambda)^l\delta_{t+l}=G^\lambda_t-\hat v(S_t)$, where $G^\lambda_t$ is the λ-return built on $\hat v$. Deduce the cases λ = 0 and λ = 1.
+For an episode ending at time $`T`$, with $`\delta_t=0`$ for $`t\ge T`$ and $`\hat v(S_T)=0`$, show that $`\sum_{l\ge0}(\gamma\lambda)^l\delta_{t+l}=G^\lambda_t-\hat v(S_t)`$, where $`G^\lambda_t`$ is the λ-return built on $`\hat v`$. Deduce the cases λ = 0 and λ = 1.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-The λ-return satisfies the recursion $G^\lambda_t=R_{t+1}+\gamma\bigl((1-\lambda)\hat v(S_{t+1})+\lambda G^\lambda_{t+1}\bigr)$ of chapter 8, with $G^\lambda_T=0$. Subtracting $\hat v(S_t)$ and adding and subtracting $\gamma\lambda\hat v(S_{t+1})$,
+The λ-return satisfies the recursion $`G^\lambda_t=R_{t+1}+\gamma\bigl((1-\lambda)\hat v(S_{t+1})+\lambda G^\lambda_{t+1}\bigr)`$ of chapter 8, with $`G^\lambda_T=0`$. Subtracting $`\hat v(S_t)`$ and adding and subtracting $`\gamma\lambda\hat v(S_{t+1})`$,
 
 $$
 G^\lambda_t-\hat v(S_t)=\underbrace{R_{t+1}+\gamma\hat v(S_{t+1})-\hat v(S_t)}_{\delta_t}+\gamma\lambda\bigl(G^\lambda_{t+1}-\hat v(S_{t+1})\bigr),
 $$
 
-which is the recursion of GAE; the two agree at $T$, so they agree everywhere by backward induction. With λ = 0 only $\delta_t$ remains; with λ = 1, $G^1_t=G_t$ and the estimate is $G_t-\hat v(S_t)$: the sum of discounted TD errors telescopes to the return minus the value.
+which is the recursion of GAE; the two agree at $`T`$, so they agree everywhere by backward induction. With λ = 0 only $`\delta_t`$ remains; with λ = 1, $`G^1_t=G_t`$ and the estimate is $`G_t-\hat v(S_t)`$: the sum of discounted TD errors telescopes to the return minus the value.
 
 </details>
 
 
 ### <a id="exercise-19-3-when-gae-is-unbiased"></a>Exercise 19.3 — When GAE is unbiased
 
-(a) Show that if $\hat v=v_\pi$, then $\mathbb E[\hat A^{\mathrm{GAE}}_t\mid S_t,A_t]=q_\pi(S_t,A_t)-v_\pi(S_t)$ for every λ. (b) Now let $\hat v=v_\pi+e$. Show that the estimate's expectation is shifted by $-e(S_t)+(1-\lambda)\sum_{m\ge1}\gamma^m\lambda^{m-1}\mathbb E[e(S_{t+m})\mid S_t,A_t]$, and explain which part biases the policy gradient.
+(a) Show that if $`\hat v=v_\pi`$, then $`\mathbb E[\hat A^{\mathrm{GAE}}_t\mid S_t,A_t]=q_\pi(S_t,A_t)-v_\pi(S_t)`$ for every λ. (b) Now let $`\hat v=v_\pi+e`$. Show that the estimate's expectation is shifted by $`-e(S_t)+(1-\lambda)\sum_{m\ge1}\gamma^m\lambda^{m-1}\mathbb E[e(S_{t+m})\mid S_t,A_t]`$, and explain which part biases the policy gradient.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) $\mathbb E[\delta_t\mid S_t=s,A_t=a]=r(s,a)+\gamma\mathbb E[v_\pi(S_{t+1})\mid s,a]-v_\pi(s)=q_\pi(s,a)-v_\pi(s)$. For $l\ge1$, $\mathbb E[\delta_{t+l}\mid S_{t+l}]=\mathbb E_\pi[R_{t+l+1}+\gamma v_\pi(S_{t+l+1})\mid S_{t+l}]-v_\pi(S_{t+l})=0$ by the Bellman equation, since the actions after $A_t$ are drawn from $\pi$; by the tower rule these terms vanish given $(S_t,A_t)$ too.
+(a) $`\mathbb E[\delta_t\mid S_t=s,A_t=a]=r(s,a)+\gamma\mathbb E[v_\pi(S_{t+1})\mid s,a]-v_\pi(s)=q_\pi(s,a)-v_\pi(s)`$. For $`l\ge1`$, $`\mathbb E[\delta_{t+l}\mid S_{t+l}]=\mathbb E_\pi[R_{t+l+1}+\gamma v_\pi(S_{t+l+1})\mid S_{t+l}]-v_\pi(S_{t+l})=0`$ by the Bellman equation, since the actions after $`A_t`$ are drawn from $`\pi`$; by the tower rule these terms vanish given $`(S_t,A_t)`$ too.
 
-(b) With the error, $\delta_t=\delta^\pi_t+\gamma e(S_{t+1})-e(S_t)$, and the added terms sum to $\sum_l(\gamma\lambda)^l\bigl(\gamma e(S_{t+l+1})-e(S_{t+l})\bigr)=-e(S_t)+\sum_{m\ge1}\gamma^m\lambda^{m-1}(1-\lambda)e(S_{t+m})$ after regrouping the terms by the state. The first part depends only on $S_t$, so it acts as a baseline and does not bias the policy gradient: $\mathbb E[\nabla\ln\pi(A_t\mid S_t)e(S_t)]=0$. The second depends on the action through the future states and does bias it; it vanishes at λ = 1, and it is small when the critic's errors at the states that follow are small. This is the precise sense in which λ trades the critic's bias for variance.
+(b) With the error, $`\delta_t=\delta^\pi_t+\gamma e(S_{t+1})-e(S_t)`$, and the added terms sum to $`\sum_l(\gamma\lambda)^l\bigl(\gamma e(S_{t+l+1})-e(S_{t+l})\bigr)=-e(S_t)+\sum_{m\ge1}\gamma^m\lambda^{m-1}(1-\lambda)e(S_{t+m})`$ after regrouping the terms by the state. The first part depends only on $`S_t`$, so it acts as a baseline and does not bias the policy gradient: $`\mathbb E[\nabla\ln\pi(A_t\mid S_t)e(S_t)]=0`$. The second depends on the action through the future states and does bias it; it vanishes at λ = 1, and it is small when the critic's errors at the states that follow are small. This is the precise sense in which λ trades the critic's bias for variance.
 
 </details>
 
 
 ### <a id="exercise-19-4-time-limits"></a>Exercise 19.4 — Time limits
 
-The cart-pole ends episodes after 500 steps, and its state does not include the time. (a) If truncation is treated as termination, what targets does the critic see for the same state at step 10 and at step 499, with a policy that never drops the pole and $\gamma=0.99$? (b) Give two correct ways to handle the time limit, and say when each applies.
+The cart-pole ends episodes after 500 steps, and its state does not include the time. (a) If truncation is treated as termination, what targets does the critic see for the same state at step 10 and at step 499, with a policy that never drops the pole and $`\gamma=0.99`$? (b) Give two correct ways to handle the time limit, and say when each applies.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) At step 499 the target is $1+0=1$; at step 10, about $\sum_{k<490}0.99^k\approx99.3$. The critic cannot tell the two apart and fits something in between for every state, so its values are wrong everywhere, and the TD errors near the limit are large and negative for actions that were in fact good.
+(a) At step 499 the target is $`1+0=1`$; at step 10, about $`\sum_{k<490}0.99^k\approx99.3`$. The critic cannot tell the two apart and fits something in between for every state, so its values are wrong everywhere, and the TD errors near the limit are large and negative for actions that were in fact good.
 
 (b) If the limit is only a device for resetting data collection and the task is meant to continue, bootstrap from the value of the true final state at a truncation, as the code of this chapter does. If the limit is part of the task, so that the agent should behave differently with little time left, include the remaining time in the state, so that the critic can represent a value that depends on it ([Pardo, Tavakoli, Levdik, and Kormushev, 2018](https://arxiv.org/abs/1712.00378)).
 
@@ -368,7 +368,7 @@ The cart-pole ends episodes after 500 steps, and its state does not include the 
 
 ### <a id="exercise-19-5-stragglers-and-lag"></a>Exercise 19.5 — Stragglers and lag
 
-(a) Run the next code, which compares the throughput of synchronous and asynchronous data collection, and explain the trends. (b) An asynchronous system instead makes its data stale. If $N$ actors each take the same time to produce a trajectory, fetching parameters when they start it, and the learner consumes batches of $B$ trajectories as fast as they arrive, how many updates old is the policy that produced a typical trajectory?
+(a) Run the next code, which compares the throughput of synchronous and asynchronous data collection, and explain the trends. (b) An asynchronous system instead makes its data stale. If $`N`$ actors each take the same time to produce a trajectory, fetching parameters when they start it, and the learner consumes batches of $`B`$ trajectories as fast as they arrive, how many updates old is the policy that produced a typical trajectory?
 
 
 <details>
@@ -406,69 +406,69 @@ for N in (1, 8, 64, 512):
 #       512       0.05               0.62
 ```
 
-(a) In lockstep, every step costs the maximum of $N$ step times, which grows with $N$: for a lognormal with $\sigma=1$ the maximum of 64 draws is typically five to ten times the mean, and an occasional slow reset stalls everyone. Synchronizing once per rollout averages the step times over 128 steps before taking the maximum, so the slowest worker is only somewhat slower than the average one; resets, which are rare and slow, still make a few workers late in every rollout, so efficiency still falls slowly with $N$. Asynchronous collection wastes nothing, which is why IMPALA and Sample Factory are asynchronous, and why synchronous systems at scale stop stragglers early, as DD-PPO does.
+(a) In lockstep, every step costs the maximum of $`N`$ step times, which grows with $`N`$: for a lognormal with $`\sigma=1`$ the maximum of 64 draws is typically five to ten times the mean, and an occasional slow reset stalls everyone. Synchronizing once per rollout averages the step times over 128 steps before taking the maximum, so the slowest worker is only somewhat slower than the average one; resets, which are rare and slow, still make a few workers late in every rollout, so efficiency still falls slowly with $`N`$. Asynchronous collection wastes nothing, which is why IMPALA and Sample Factory are asynchronous, and why synchronous systems at scale stop stragglers early, as DD-PPO does.
 
-(b) While an actor produces one trajectory, all $N$ actors together produce $N$ trajectories, which the learner consumes in $N/B$ updates. A trajectory is therefore about $N/B$ updates old when it is used, plus any time spent waiting in a queue. With 512 actors and batches of 32, that is 16 updates: large enough that a correction, a trust region, or both are needed.
+(b) While an actor produces one trajectory, all $`N`$ actors together produce $`N`$ trajectories, which the learner consumes in $`N/B`$ updates. A trajectory is therefore about $`N/B`$ updates old when it is used, plus any time spent waiting in a queue. With 512 actors and batches of 32, that is 16 updates: large enough that a correction, a trust region, or both are needed.
 
 </details>
 
 
 ### <a id="exercise-19-6-two-properties-of-v-trace"></a>Exercise 19.6 — Two properties of V-trace
 
-(a) Show that when $\pi=\mu$ and $\bar\rho,\bar c\ge1$, the V-trace target is the $n$-step return. (b) Show that $V^{\pi_{\bar\rho}}$, the value of $\pi_{\bar\rho}\propto\min(\bar\rho\,\mu,\pi)$, is a fixed point of the expected V-trace operator, for any $\bar c$.
+(a) Show that when $`\pi=\mu`$ and $`\bar\rho,\bar c\ge1`$, the V-trace target is the $`n`$-step return. (b) Show that $`V^{\pi_{\bar\rho}}`$, the value of $`\pi_{\bar\rho}\propto\min(\bar\rho\,\mu,\pi)`$, is a fixed point of the expected V-trace operator, for any $`\bar c`$.
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) All the ratios are 1, so $\rho_t=c_i=1$ and $v_s=V(x_s)+\sum_{t=s}^{s+n-1}\gamma^{t-s}\bigl(r_t+\gamma V(x_{t+1})-V(x_t)\bigr)$. The sum telescopes: $v_s=\sum_{t=s}^{s+n-1}\gamma^{t-s}r_t+\gamma^nV(x_{s+n})$.
+(a) All the ratios are 1, so $`\rho_t=c_i=1`$ and $`v_s=V(x_s)+\sum_{t=s}^{s+n-1}\gamma^{t-s}\bigl(r_t+\gamma V(x_{t+1})-V(x_t)\bigr)`$. The sum telescopes: $`v_s=\sum_{t=s}^{s+n-1}\gamma^{t-s}r_t+\gamma^nV(x_{s+n})`$.
 
-(b) Condition on the history up to $x_t$. The factor $\gamma^{t-s}\prod_{i<t}c_i$ is then fixed, and the remaining expectation is
+(b) Condition on the history up to $`x_t`$. The factor $`\gamma^{t-s}\prod_{i<t}c_i`$ is then fixed, and the remaining expectation is
 
 $$
 \mathbb E_{a\sim\mu}\bigl[\rho_t\delta_t\mid x_t\bigr]=\sum_a\min\bigl(\bar\rho\,\mu(a\mid x_t),\pi(a\mid x_t)\bigr)\bigl(r(x_t,a)+\gamma\,\mathbb E[V(x_{t+1})\mid x_t,a]-V(x_t)\bigr)=Z(x_t)\bigl((\mathcal T^{\pi_{\bar\rho}}V)(x_t)-V(x_t)\bigr),
 $$
 
-with $Z(x)=\sum_b\min(\bar\rho\,\mu(b\mid x),\pi(b\mid x))$. At $V=V^{\pi_{\bar\rho}}$ the Bellman equation makes it 0 for every $x_t$, so every term of the sum has zero expectation and the operator leaves $V$ unchanged. The traces $c_i$ only weight these zero terms, which is why $\bar c$ cannot move the fixed point.
+with $`Z(x)=\sum_b\min(\bar\rho\,\mu(b\mid x),\pi(b\mid x))`$. At $`V=V^{\pi_{\bar\rho}}`$ the Bellman equation makes it 0 for every $`x_t`$, so every term of the sum has zero expectation and the operator leaves $`V`$ unchanged. The traces $`c_i`$ only weight these zero terms, which is why $`\bar c`$ cannot move the fixed point.
 
 </details>
 
 
 ### <a id="exercise-19-7-why-a-collapsed-policy-stays-collapsed"></a>Exercise 19.7 — Why a collapsed policy stays collapsed
 
-A two-action softmax policy has become nearly deterministic, $\pi=(1-\varepsilon,\varepsilon)$, although action 1 has the higher advantage, $A_1>A_0$. The data come from $\mu=(\frac12,\frac12)$. Compute the expected change of the logit gap $z_1-z_0$ per unit step for (a) the on-policy gradient $\sum_a\pi_aA_a(\mathbf e_a-\boldsymbol\pi)$, (b) the V-trace gradient with $\bar\rho=1$, whose weights are $\min(\mu_a,\pi_a)$, and (c) the uncorrected gradient, whose weights are $\mu_a$. What do the results say about the figure?
+A two-action softmax policy has become nearly deterministic, $`\pi=(1-\varepsilon,\varepsilon)`$, although action 1 has the higher advantage, $`A_1>A_0`$. The data come from $`\mu=(\frac12,\frac12)`$. Compute the expected change of the logit gap $`z_1-z_0`$ per unit step for (a) the on-policy gradient $`\sum_a\pi_aA_a(\mathbf e_a-\boldsymbol\pi)`$, (b) the V-trace gradient with $`\bar\rho=1`$, whose weights are $`\min(\mu_a,\pi_a)`$, and (c) the uncorrected gradient, whose weights are $`\mu_a`$. What do the results say about the figure?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-The gap component of $\mathbf e_a-\boldsymbol\pi$ is $-2\pi_1$ for $a=0$ and $2\pi_0$ for $a=1$.
+The gap component of $`\mathbf e_a-\boldsymbol\pi`$ is $`-2\pi_1`$ for $`a=0`$ and $`2\pi_0`$ for $`a=1`$.
 
-(a) $\pi_0A_0(-2\pi_1)+\pi_1A_1(2\pi_0)=2\varepsilon(1-\varepsilon)(A_1-A_0)$, of order $\varepsilon$.
+(a) $`\pi_0A_0(-2\pi_1)+\pi_1A_1(2\pi_0)=2\varepsilon(1-\varepsilon)(A_1-A_0)`$, of order $`\varepsilon`$.
 
-(b) The weights are $\min(\frac12,1-\varepsilon)=\frac12$ and $\min(\frac12,\varepsilon)=\varepsilon$: $-\varepsilon A_0+2\varepsilon(1-\varepsilon)A_1$, again of order $\varepsilon$.
+(b) The weights are $`\min(\frac12,1-\varepsilon)=\frac12`$ and $`\min(\frac12,\varepsilon)=\varepsilon`$: $`-\varepsilon A_0+2\varepsilon(1-\varepsilon)A_1`$, again of order $`\varepsilon`$.
 
-(c) $-\varepsilon A_0+(1-\varepsilon)A_1\to A_1$, of order 1.
+(c) $`-\varepsilon A_0+(1-\varepsilon)A_1\to A_1`$, of order 1.
 
-The true gradient vanishes at a deterministic softmax policy even when it is wrong, a plateau that can take policy-gradient methods very long to leave ([Mei, Xiao, Szepesvári, and Schuurmans, 2020](https://arxiv.org/abs/2005.06392)). V-trace's weights never exceed the current policy's probabilities, so like the true gradient it gives the abandoned action a weight of order $\varepsilon$ and inherits the plateau; the uncorrected update escapes only because it is biased toward the behavior's actions. Neither is a remedy: the policy must be kept from collapsing in the first place, by the entropy bonus (exercise 19.1, a force of order $\varepsilon\ln(1/\varepsilon)$ here) and by bounding each change, as the clipped objective does.
+The true gradient vanishes at a deterministic softmax policy even when it is wrong, a plateau that can take policy-gradient methods very long to leave ([Mei, Xiao, Szepesvári, and Schuurmans, 2020](https://arxiv.org/abs/2005.06392)). V-trace's weights never exceed the current policy's probabilities, so like the true gradient it gives the abandoned action a weight of order $`\varepsilon`$ and inherits the plateau; the uncorrected update escapes only because it is biased toward the behavior's actions. Neither is a remedy: the policy must be kept from collapsing in the first place, by the entropy bonus (exercise 19.1, a force of order $`\varepsilon\ln(1/\varepsilon)`$ here) and by bounding each change, as the clipped objective does.
 
 </details>
 
 
 ### <a id="exercise-19-8-preserving-outputs-while-normalizing"></a>Exercise 19.8 — Preserving outputs while normalizing
 
-PopArt predicts values as $\sigma\,n(x)+m$, where $n(x)=\mathbf w^\top\mathbf h(x)+b$ is the network's normalized output and $m,\sigma$ are running estimates of the mean and standard deviation of the targets. (a) When the statistics change to $m',\sigma'$, how must $\mathbf w$ and $b$ change so that the predictions stay the same for every input? (b) What is the network trained on, and why do both parts matter?
+PopArt predicts values as $`\sigma\,n(x)+m`$, where $`n(x)=\mathbf w^\top\mathbf h(x)+b`$ is the network's normalized output and $`m,\sigma`$ are running estimates of the mean and standard deviation of the targets. (a) When the statistics change to $`m',\sigma'`$, how must $`\mathbf w`$ and $`b`$ change so that the predictions stay the same for every input? (b) What is the network trained on, and why do both parts matter?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) Require $\sigma'(\mathbf w'^\top\mathbf h+b')+m'=\sigma(\mathbf w^\top\mathbf h+b)+m$ for all $\mathbf h$: $\mathbf w'=\sigma\mathbf w/\sigma'$ and $b'=(\sigma b+m-m')/\sigma'$.
+(a) Require $`\sigma'(\mathbf w'^\top\mathbf h+b')+m'=\sigma(\mathbf w^\top\mathbf h+b)+m`$ for all $`\mathbf h`$: $`\mathbf w'=\sigma\mathbf w/\sigma'`$ and $`b'=(\sigma b+m-m')/\sigma'`$.
 
-(b) On normalized targets, $(G-m')/\sigma'$, so the magnitude of the regression errors, and of their gradients, stays of order 1 whatever the scale of the rewards, and one learning rate works for every task and every stage of training. Normalizing alone would change every prediction whenever the statistics moved, disturbing the policy's advantages and every bootstrapped target; preserving the outputs makes the normalization invisible to the rest of the agent. Only the last layer needs the correction, since the features $\mathbf h$ are unchanged.
+(b) On normalized targets, $`(G-m')/\sigma'`$, so the magnitude of the regression errors, and of their gradients, stays of order 1 whatever the scale of the rewards, and one learning rate works for every task and every stage of training. Normalizing alone would change every prediction whenever the statistics moved, disturbing the policy's advantages and every bootstrapped target; preserving the outputs makes the normalization invisible to the rest of the agent. Only the last layer needs the correction, since the features $`\mathbf h`$ are unchanged.
 
 </details>
 
@@ -480,12 +480,12 @@ PopArt predicts values as $\sigma\,n(x)+m$, where $n(x)=\mathbf w^\top\mathbf h(
 <summary><a id="block-rl19-appendix-a"></a><b>A. A synchronous actor–critic update, with shapes</b></summary>
 
 
-With $N$ environments, rollouts of $T$ steps, and observations of dimension $d$:
+With $`N`$ environments, rollouts of $`T`$ steps, and observations of dimension $`d`$:
 
-1. **Collect.** For $t=0,\dots,T-1$: compute the logits and values of the current observations, $(N,|\mathcal A|)$ and $(N)$; sample actions; step all environments; store observations $(N,d)$, actions, log-probabilities, rewards, `terminated` and `truncated` flags $(N)$, and, where an episode ended, the true final observation.
-2. **Bootstrap.** Compute the values of the next states, $(N,T)$: the next stored observation within an episode, the final observation at a truncation, zero at a termination, and the value of the observation after the last step at the end of the rollout.
-3. **Advantages.** Run the GAE recursion backward over $t$, resetting at every episode end, to get $\hat A$ and $\hat G=\hat A+\hat v$, both $(N,T)$; normalize $\hat A$ over the batch.
-4. **Update.** Evaluate the loss of the chapter on the $NT$ transitions, clip the gradient's norm, and take one optimizer step (PPO instead takes several epochs of minibatch steps on the same data with its clipped objective).
+1. **Collect.** For $`t=0,\dots,T-1`$: compute the logits and values of the current observations, $`(N,|\mathcal A|)`$ and $`(N)`$; sample actions; step all environments; store observations $`(N,d)`$, actions, log-probabilities, rewards, `terminated` and `truncated` flags $`(N)`$, and, where an episode ended, the true final observation.
+2. **Bootstrap.** Compute the values of the next states, $`(N,T)`$: the next stored observation within an episode, the final observation at a truncation, zero at a termination, and the value of the observation after the last step at the end of the rollout.
+3. **Advantages.** Run the GAE recursion backward over $`t`$, resetting at every episode end, to get $`\hat A`$ and $`\hat G=\hat A+\hat v`$, both $`(N,T)`$; normalize $`\hat A`$ over the batch.
+4. **Update.** Evaluate the loss of the chapter on the $`NT`$ transitions, clip the gradient's norm, and take one optimizer step (PPO instead takes several epochs of minibatch steps on the same data with its clipped objective).
 
 The flags need care with library conventions. Gymnasium 1.x vector environments by default reset a finished sub-environment on the *next* call to `step`, whose action is ignored, so the observation returned when the episode ends is the true final one, and the transition produced by the resetting call must be excluded from training; other libraries, and Gymnasium's alternative mode, reset in the same step and return the final observation separately.
 
@@ -497,13 +497,13 @@ The flags need care with library conventions. Gymnasium 1.x vector environments 
 <summary><a id="block-rl19-appendix-b"></a><b>B. The V-trace operator</b></summary>
 
 
-For a fixed trajectory length $n$, the expected V-trace update defines an operator
+For a fixed trajectory length $`n`$, the expected V-trace update defines an operator
 
 $$
 \mathcal RV(x)=V(x)+\mathbb E_\mu\Bigl[\sum_{t=0}^{n-1}\gamma^t\Bigl(\prod_{i<t}c_i\Bigr)\rho_t\bigl(r_t+\gamma V(x_{t+1})-V(x_t)\bigr)\Bigm|x_0=x\Bigr].
 $$
 
-Exercise 19.6 shows that $V^{\pi_{\bar\rho}}$ is a fixed point. [Espeholt et al. (2018)](https://arxiv.org/abs/1802.01561) show, for the infinite-horizon operator (the $n$-step case is similar), that it is the only one: if $\bar\rho\ge\bar c$ and every state has $\mathbb E_\mu[\rho_0\mid x]\ge\beta>0$, then $\mathcal R$ is a contraction in the maximum norm with modulus at most $1-(1-\gamma)\beta$. The bound explains the slow contraction in this chapter's code: $\mathbb E_\mu[\rho_0\mid x]=\sum_a\min(\bar\rho\,\mu(a\mid x),\pi(a\mid x))$ is small when the two policies disagree, and the modulus approaches 1. In the tabular case, the operator is affine, $\mathcal RV=MV+\mathbf b$ with $M=I+K(\gamma P_\rho-D_\rho)$, where $K=\sum_{t<n}(\gamma M_c)^t$, $M_c$ is the transition matrix under $\mu$ weighted by the traces, $P_\rho$ the one weighted by the ratios, and $D_\rho$ the diagonal of $\mathbb E_\mu[\rho_0\mid x]$; the code computes it this way. The requirement $\bar\rho\ge\bar c$ makes every trace $c_i$ at most the corresponding ratio $\rho_i$, so the traces are cut at least as much as the ratios, which keeps the coefficients of the operator nonnegative, as the contraction argument needs. With $\bar\rho=\infty$, V-trace becomes the $n$-step off-policy estimator with per-decision importance sampling of chapter 9, with traces truncated at $\bar c$, like Retrace applied to state values.
+Exercise 19.6 shows that $`V^{\pi_{\bar\rho}}`$ is a fixed point. [Espeholt et al. (2018)](https://arxiv.org/abs/1802.01561) show, for the infinite-horizon operator (the $`n`$-step case is similar), that it is the only one: if $`\bar\rho\ge\bar c`$ and every state has $`\mathbb E_\mu[\rho_0\mid x]\ge\beta>0`$, then $`\mathcal R`$ is a contraction in the maximum norm with modulus at most $`1-(1-\gamma)\beta`$. The bound explains the slow contraction in this chapter's code: $`\mathbb E_\mu[\rho_0\mid x]=\sum_a\min(\bar\rho\,\mu(a\mid x),\pi(a\mid x))`$ is small when the two policies disagree, and the modulus approaches 1. In the tabular case, the operator is affine, $`\mathcal RV=MV+\mathbf b`$ with $`M=I+K(\gamma P_\rho-D_\rho)`$, where $`K=\sum_{t<n}(\gamma M_c)^t`$, $`M_c`$ is the transition matrix under $`\mu`$ weighted by the traces, $`P_\rho`$ the one weighted by the ratios, and $`D_\rho`$ the diagonal of $`\mathbb E_\mu[\rho_0\mid x]`$; the code computes it this way. The requirement $`\bar\rho\ge\bar c`$ makes every trace $`c_i`$ at most the corresponding ratio $`\rho_i`$, so the traces are cut at least as much as the ratios, which keeps the coefficients of the operator nonnegative, as the contraction argument needs. With $`\bar\rho=\infty`$, V-trace becomes the $`n`$-step off-policy estimator with per-decision importance sampling of chapter 9, with traces truncated at $`\bar c`$, like Retrace applied to state values.
 
 </details>
 

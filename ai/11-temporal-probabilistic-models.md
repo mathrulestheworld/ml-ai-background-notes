@@ -8,12 +8,12 @@
 
 ### <a id="states-observations-and-the-markov-assumption"></a>States, observations, and the Markov assumption
 
-An agent in a changing, partially observable world must track a state it cannot see: the position of a robot from noisy range readings, the words behind a speech signal, the health of a patient from daily measurements. Time is discretized into **slices** $t=0,1,2,\dots$; each slice has unobservable **state variables** $X_t$ and observable **evidence variables** $E_t$, and $x_{a:b}$ denotes the values from slice $a$ to slice $b$. Two assumptions make the problem tractable:
+An agent in a changing, partially observable world must track a state it cannot see: the position of a robot from noisy range readings, the words behind a speech signal, the health of a patient from daily measurements. Time is discretized into **slices** $`t=0,1,2,\dots`$; each slice has unobservable **state variables** $`X_t`$ and observable **evidence variables** $`E_t`$, and $`x_{a:b}`$ denotes the values from slice $`a`$ to slice $`b`$. Two assumptions make the problem tractable:
 
-- the **Markov assumption**: the current state depends on the past only through the previous state, $P(X_t\mid X_{0:t-1})=P(X_t\mid X_{t-1})$, the **transition model**;
-- the **sensor Markov assumption**: the evidence depends only on the current state, $P(E_t\mid X_{0:t},E_{1:t-1})=P(E_t\mid X_t)$, the **sensor model**.
+- the **Markov assumption**: the current state depends on the past only through the previous state, $`P(X_t\mid X_{0:t-1})=P(X_t\mid X_{t-1})`$, the **transition model**;
+- the **sensor Markov assumption**: the evidence depends only on the current state, $`P(E_t\mid X_{0:t},E_{1:t-1})=P(E_t\mid X_t)`$, the **sensor model**.
 
-With **stationary** models, the same in every slice, the whole process is specified by a prior $P(X_0)$ and the two conditional distributions, and the joint distribution factors as
+With **stationary** models, the same in every slice, the whole process is specified by a prior $`P(X_0)`$ and the two conditional distributions, and the joint distribution factors as
 
 $$
 P(X_{0:t},E_{1:t})=P(X_0)\prod_{i=1}^tP(X_i\mid X_{i-1})\,P(E_i\mid X_i),
@@ -23,43 +23,43 @@ a Bayesian network (chapter 8) unrolled in time. If the first-order Markov assum
 
 ### <a id="markov-chains"></a>Markov chains
 
-Without evidence, the states form a **Markov chain**. For a discrete state with transition matrix $T_{ij}=P(X_{t+1}=j\mid X_t=i)$, a distribution $p_t$ over states evolves as $p_{t+1}^\top=p_t^\top T$. An irreducible, aperiodic chain on finitely many states has a unique **stationary distribution** $\pi^\top=\pi^\top T$, and $p_t\to\pi$ from any start at a geometric rate set by the second-largest eigenvalue modulus of $T$: the chain forgets its initial state. MCMC (chapter 10) exploits this convergence, and PageRank is the stationary distribution of a random surfer's chain on the web graph. The same fact limits prediction: forecasts far ahead converge to the stationary distribution and carry no information about the present.
+Without evidence, the states form a **Markov chain**. For a discrete state with transition matrix $`T_{ij}=P(X_{t+1}=j\mid X_t=i)`$, a distribution $`p_t`$ over states evolves as $`p_{t+1}^\top=p_t^\top T`$. An irreducible, aperiodic chain on finitely many states has a unique **stationary distribution** $`\pi^\top=\pi^\top T`$, and $`p_t\to\pi`$ from any start at a geometric rate set by the second-largest eigenvalue modulus of $`T`$: the chain forgets its initial state. MCMC (chapter 10) exploits this convergence, and PageRank is the stationary distribution of a random surfer's chain on the web graph. The same fact limits prediction: forecasts far ahead converge to the stationary distribution and carry no information about the present.
 
 ## <a id="hidden-markov-models"></a>Hidden Markov models
 
 ### <a id="the-model"></a>The model
 
-A **hidden Markov model** (HMM) has a single discrete state variable, with transition matrix $T$ and, for each possible observation $e$, a diagonal **sensor matrix** $O_e$ with entries $P(e\mid X_t=i)$. The standard toy example is the **umbrella world**: a security guard in an underground installation wants to know whether it is raining and sees only whether the director arrives with an umbrella. Rain persists from one day to the next with probability 0.7; the umbrella appears with probability 0.9 on rainy days and 0.2 on dry ones. A more useful example, the **occasionally dishonest casino** ([Durbin et al., 1998](https://doi.org/10.1017/CBO9780511790492)), switches between a fair die and a loaded one that shows a six half the time, and the task is to infer from the rolls when the loaded die was in use.
+A **hidden Markov model** (HMM) has a single discrete state variable, with transition matrix $`T`$ and, for each possible observation $`e`$, a diagonal **sensor matrix** $`O_e`$ with entries $`P(e\mid X_t=i)`$. The standard toy example is the **umbrella world**: a security guard in an underground installation wants to know whether it is raining and sees only whether the director arrives with an umbrella. Rain persists from one day to the next with probability 0.7; the umbrella appears with probability 0.9 on rainy days and 0.2 on dry ones. A more useful example, the **occasionally dishonest casino** ([Durbin et al., 1998](https://doi.org/10.1017/CBO9780511790492)), switches between a fair die and a loaded one that shows a six half the time, and the task is to infer from the rolls when the loaded die was in use.
 
 ### <a id="filtering"></a>Filtering
 
-**Filtering**, or **state estimation**, computes the belief state $P(X_t\mid e_{1:t})$ from all evidence so far. It is done recursively: predict the next state from the current belief, then condition on the new evidence,
+**Filtering**, or **state estimation**, computes the belief state $`P(X_t\mid e_{1:t})`$ from all evidence so far. It is done recursively: predict the next state from the current belief, then condition on the new evidence,
 
 $$
 P(X_{t+1}\mid e_{1:t+1})=\alpha\,P(e_{t+1}\mid X_{t+1})\sum_{x_t}P(X_{t+1}\mid x_t)\,P(x_t\mid e_{1:t}),
 $$
 
-or in matrix form $f_{t+1}=\alpha\,O_{e_{t+1}}T^\top f_t$ for the **forward message** $f_t$. Each step costs $O(S^2)$ for $S$ states, independent of $t$, so an agent can track its world indefinitely with constant memory ([Appendix A](#block-ai11-appendix-a)). The normalizing constants give the likelihood of the evidence, $P(e_{1:t})=\prod_s1/\alpha_s$, which is how HMMs are compared and trained. **Prediction** runs the transition step without evidence and converges to the stationary distribution.
+or in matrix form $`f_{t+1}=\alpha\,O_{e_{t+1}}T^\top f_t`$ for the **forward message** $`f_t`$. Each step costs $`O(S^2)`$ for $`S`$ states, independent of $`t`$, so an agent can track its world indefinitely with constant memory ([Appendix A](#block-ai11-appendix-a)). The normalizing constants give the likelihood of the evidence, $`P(e_{1:t})=\prod_s1/\alpha_s`$, which is how HMMs are compared and trained. **Prediction** runs the transition step without evidence and converges to the stationary distribution.
 
 ### <a id="smoothing"></a>Smoothing
 
-**Smoothing** computes $P(X_k\mid e_{1:t})$ for a past slice $k<t$, using evidence that arrived later, which usually sharpens the estimate. It combines the forward message with a **backward message** $b_k(x)=P(e_{k+1:t}\mid X_k=x)$, computed by a recursion running back from $b_t=\mathbf 1$:
+**Smoothing** computes $`P(X_k\mid e_{1:t})`$ for a past slice $`k<t`$, using evidence that arrived later, which usually sharpens the estimate. It combines the forward message with a **backward message** $`b_k(x)=P(e_{k+1:t}\mid X_k=x)`$, computed by a recursion running back from $`b_t=\mathbf 1`$:
 
 $$
 b_k=T\,O_{e_{k+1}}\,b_{k+1},\qquad P(X_k\mid e_{1:t})=\alpha\,f_k\odot b_k.
 $$
 
-The **forward–backward algorithm** computes all smoothed estimates in $O(S^2t)$ time; it is the sum-product algorithm of chapter 9 on a chain.
+The **forward–backward algorithm** computes all smoothed estimates in $`O(S^2t)`$ time; it is the sum-product algorithm of chapter 9 on a chain.
 
 ### <a id="the-most-likely-sequence"></a>The most likely sequence
 
-**Decoding** asks for the most likely sequence of states, $\arg\max_{x_{1:t}}P(x_{1:t}\mid e_{1:t})$, which is not the sequence of individually most likely states: the latter can even be an impossible sequence under the transition model. The **Viterbi algorithm** ([Viterbi, 1967](https://doi.org/10.1109/TIT.1967.1054010)) replaces the sum in the forward recursion by a maximum,
+**Decoding** asks for the most likely sequence of states, $`\arg\max_{x_{1:t}}P(x_{1:t}\mid e_{1:t})`$, which is not the sequence of individually most likely states: the latter can even be an impossible sequence under the transition model. The **Viterbi algorithm** ([Viterbi, 1967](https://doi.org/10.1109/TIT.1967.1054010)) replaces the sum in the forward recursion by a maximum,
 
 $$
 m_{t+1}(x_{t+1})=P(e_{t+1}\mid x_{t+1})\max_{x_t}P(x_{t+1}\mid x_t)\,m_t(x_t),
 $$
 
-keeps a back pointer to the maximizing $x_t$ for every state, and follows the pointers back from the best final state ([Appendix B](#block-ai11-appendix-b)). It is max-product on a chain, run in log space to avoid underflow, and it is the decoder of speech recognizers, gene finders, and convolutional error-correcting codes.
+keeps a back pointer to the maximizing $`x_t`$ for every state, and follows the pointers back from the best final state ([Appendix B](#block-ai11-appendix-b)). It is max-product on a chain, run in log space to avoid underflow, and it is the decoder of speech recognizers, gene finders, and convolutional error-correcting codes.
 
 ```python
 import numpy as np
@@ -200,14 +200,14 @@ $$
 x_{t+1}=Fx_t+w_t,\quad w_t\sim\mathcal N(0,Q),\qquad z_t=Hx_t+v_t,\quad v_t\sim\mathcal N(0,R).
 $$
 
-Because linear maps and conditioning preserve Gaussianity (Foundations chapter 4), the belief state stays Gaussian, $\mathcal N(\mu_t,\Sigma_t)$, and filtering reduces to updating a mean and a covariance.
+Because linear maps and conditioning preserve Gaussianity (Foundations chapter 4), the belief state stays Gaussian, $`\mathcal N(\mu_t,\Sigma_t)`$, and filtering reduces to updating a mean and a covariance.
 
 ### <a id="the-kalman-filter"></a>The Kalman filter
 
 The **Kalman filter** ([Kalman, 1960](https://doi.org/10.1115/1.3662552)) alternates two steps:
 
-- **predict:** $\mu^-=F\mu_t$ and $\Sigma^-=F\Sigma_tF^\top+Q$; the motion model moves the estimate and the process noise inflates its uncertainty;
-- **update:** with the **Kalman gain** $K=\Sigma^-H^\top(H\Sigma^-H^\top+R)^{-1}$, set $\mu_{t+1}=\mu^-+K(z_{t+1}-H\mu^-)$ and $\Sigma_{t+1}=(I-KH)\Sigma^-$; the estimate moves toward the observation in proportion to the relative confidence in prediction and measurement.
+- **predict:** $`\mu^-=F\mu_t`$ and $`\Sigma^-=F\Sigma_tF^\top+Q`$; the motion model moves the estimate and the process noise inflates its uncertainty;
+- **update:** with the **Kalman gain** $`K=\Sigma^-H^\top(H\Sigma^-H^\top+R)^{-1}`$, set $`\mu_{t+1}=\mu^-+K(z_{t+1}-H\mu^-)`$ and $`\Sigma_{t+1}=(I-KH)\Sigma^-`$; the estimate moves toward the observation in proportion to the relative confidence in prediction and measurement.
 
 For a one-dimensional random walk observed with noise, the update is the precision-weighted average of prediction and observation, and the variance converges to a fixed point:
 
@@ -253,19 +253,19 @@ When the dynamics or the sensor are nonlinear, the belief state is no longer Gau
 
 ### <a id="factored-state"></a>Factored state
 
-A **dynamic Bayesian network** (DBN) represents the state of each slice by several variables, with arcs within a slice and from one slice to the next ([Dean and Kanazawa, 1989](https://doi.org/10.1111/j.1467-8640.1989.tb00324.x)). Every HMM is a DBN with one state variable, and every discrete DBN can be converted into an HMM whose state is the tuple of all its state variables, but the conversion is exponential: a DBN with 20 Boolean state variables, each with three parents in the previous slice, needs $20\times2^3=160$ transition parameters, while the equivalent HMM has a transition matrix with $2^{20}\times2^{20}\approx10^{12}$ entries. Kalman filters are DBNs with linear-Gaussian conditionals, and switching models, factorial HMMs, and the models of robot localization are DBNs.
+A **dynamic Bayesian network** (DBN) represents the state of each slice by several variables, with arcs within a slice and from one slice to the next ([Dean and Kanazawa, 1989](https://doi.org/10.1111/j.1467-8640.1989.tb00324.x)). Every HMM is a DBN with one state variable, and every discrete DBN can be converted into an HMM whose state is the tuple of all its state variables, but the conversion is exponential: a DBN with 20 Boolean state variables, each with three parents in the previous slice, needs $`20\times2^3=160`$ transition parameters, while the equivalent HMM has a transition matrix with $`2^{20}\times2^{20}\approx10^{12}`$ entries. Kalman filters are DBNs with linear-Gaussian conditionals, and switching models, factorial HMMs, and the models of robot localization are DBNs.
 
 Compact representation does not bring compact inference. Exact filtering in a DBN, by unrolling it and eliminating the variables of past slices, soon makes all state variables of a slice dependent on each other, because they share ancestors in the past. The forward message then needs the full joint of the state variables, exponential in their number, and approximate inference is the rule.
 
 ### <a id="particle-filtering"></a>Particle filtering
 
-**Particle filtering**, or sequential Monte Carlo ([Gordon, Salmond, and Smith, 1993](https://doi.org/10.1049/ip-f-2.1993.0015)), represents the belief state by $N$ samples, **particles**, and repeats three steps each time slice:
+**Particle filtering**, or sequential Monte Carlo ([Gordon, Salmond, and Smith, 1993](https://doi.org/10.1049/ip-f-2.1993.0015)), represents the belief state by $`N`$ samples, **particles**, and repeats three steps each time slice:
 
-1. **propagate:** move each particle forward by sampling from the transition model, $x^{(i)}_{t+1}\sim P(X_{t+1}\mid x^{(i)}_t)$;
-2. **weight:** give each particle the likelihood of the new evidence, $w^{(i)}=P(e_{t+1}\mid x^{(i)}_{t+1})$;
-3. **resample:** draw $N$ new particles from the current ones with probabilities proportional to the weights.
+1. **propagate:** move each particle forward by sampling from the transition model, $`x^{(i)}_{t+1}\sim P(X_{t+1}\mid x^{(i)}_t)`$;
+2. **weight:** give each particle the likelihood of the new evidence, $`w^{(i)}=P(e_{t+1}\mid x^{(i)}_{t+1})`$;
+3. **resample:** draw $`N`$ new particles from the current ones with probabilities proportional to the weights.
 
-Propagation and weighting are the likelihood weighting of chapter 10 applied one slice at a time; resampling is what keeps the method from degenerating, by discarding particles in regions the evidence has made improbable and duplicating those in probable regions, so that the population concentrates where the posterior mass is. The particle approximation is consistent as $N\to\infty$ for each fixed horizon, and it handles nonlinear models, discrete and continuous variables, and multimodal beliefs, which is why **Monte Carlo localization** with particle filters is the standard way for mobile robots to track their position on a map ([Thrun, Burgard, and Fox, 2005](https://mitpress.mit.edu/9780262201629/probabilistic-robotics/)). Its weaknesses are high-dimensional states, where exponentially many particles are needed to cover the posterior, and very informative observations, which leave almost all particles with negligible weight; better proposals that look at the new evidence, and **Rao–Blackwellization**, which handles some variables exactly and samples only the rest, address both.
+Propagation and weighting are the likelihood weighting of chapter 10 applied one slice at a time; resampling is what keeps the method from degenerating, by discarding particles in regions the evidence has made improbable and duplicating those in probable regions, so that the population concentrates where the posterior mass is. The particle approximation is consistent as $`N\to\infty`$ for each fixed horizon, and it handles nonlinear models, discrete and continuous variables, and multimodal beliefs, which is why **Monte Carlo localization** with particle filters is the standard way for mobile robots to track their position on a map ([Thrun, Burgard, and Fox, 2005](https://mitpress.mit.edu/9780262201629/probabilistic-robotics/)). Its weaknesses are high-dimensional states, where exponentially many particles are needed to cover the posterior, and very informative observations, which leave almost all particles with negligible weight; better proposals that look at the new evidence, and **Rao–Blackwellization**, which handles some variables exactly and samples only the rest, address both.
 
 ## <a id="appendices"></a>Appendices
 
@@ -280,19 +280,19 @@ $$
 P(X_{t+1}\mid e_{1:t+1})=\alpha\,P(e_{t+1}\mid X_{t+1},e_{1:t})\,P(X_{t+1}\mid e_{1:t})=\alpha\,P(e_{t+1}\mid X_{t+1})\,P(X_{t+1}\mid e_{1:t}).
 $$
 
-The one-step prediction sums over the current state, using the Markov assumption $P(X_{t+1}\mid x_t,e_{1:t})=P(X_{t+1}\mid x_t)$:
+The one-step prediction sums over the current state, using the Markov assumption $`P(X_{t+1}\mid x_t,e_{1:t})=P(X_{t+1}\mid x_t)`$:
 
 $$
 P(X_{t+1}\mid e_{1:t})=\sum_{x_t}P(X_{t+1}\mid x_t)\,P(x_t\mid e_{1:t}).
 $$
 
-**Backward.** For $k<t$, conditioning on $X_{k+1}$ and using the conditional independence of $e_{k+1}$ and $e_{k+2:t}$ given $X_{k+1}$,
+**Backward.** For $`k<t`$, conditioning on $`X_{k+1}`$ and using the conditional independence of $`e_{k+1}`$ and $`e_{k+2:t}`$ given $`X_{k+1}`$,
 
 $$
 P(e_{k+1:t}\mid X_k)=\sum_{x_{k+1}}P(x_{k+1}\mid X_k)\,P(e_{k+1}\mid x_{k+1})\,P(e_{k+2:t}\mid x_{k+1}),
 $$
 
-which is $b_k=TO_{e_{k+1}}b_{k+1}$ in matrix form. Finally, since $e_{k+1:t}$ is independent of $e_{1:k}$ given $X_k$, Bayes' rule gives $P(X_k\mid e_{1:t})=\alpha\,P(X_k\mid e_{1:k})\,P(e_{k+1:t}\mid X_k)=\alpha\,f_k\odot b_k$.
+which is $`b_k=TO_{e_{k+1}}b_{k+1}`$ in matrix form. Finally, since $`e_{k+1:t}`$ is independent of $`e_{1:k}`$ given $`X_k`$, Bayes' rule gives $`P(X_k\mid e_{1:t})=\alpha\,P(X_k\mid e_{1:k})\,P(e_{k+1:t}\mid X_k)=\alpha\,f_k\odot b_k`$.
 
 </details>
 
@@ -302,13 +302,13 @@ which is $b_k=TO_{e_{k+1}}b_{k+1}$ in matrix form. Finally, since $e_{k+1:t}$ is
 <summary><a id="block-ai11-appendix-b"></a><b>B. Correctness of the Viterbi algorithm</b></summary>
 
 
-Define $m_t(x)=\max_{x_{1:t-1}}P(x_{1:t-1},X_t=x,e_{1:t})$, the probability of the best path that ends in state $x$ at time $t$, jointly with the evidence. By the factorization of the joint,
+Define $`m_t(x)=\max_{x_{1:t-1}}P(x_{1:t-1},X_t=x,e_{1:t})`$, the probability of the best path that ends in state $`x`$ at time $`t`$, jointly with the evidence. By the factorization of the joint,
 
 $$
 m_{t+1}(x')=\max_{x}\;\max_{x_{1:t-1}}P(x_{1:t-1},X_t=x,e_{1:t})\,P(x'\mid x)\,P(e_{t+1}\mid x')=P(e_{t+1}\mid x')\max_xP(x'\mid x)\,m_t(x),
 $$
 
-because the new factors depend on the past only through $x$. This is the **principle of optimality** of dynamic programming: the best path to $x'$ at time $t+1$ extends the best path to some $x$ at time $t$. Recording the maximizing $x$ for each $x'$ and following these pointers back from $\arg\max_xm_t(x)$ reconstructs a most probable sequence, since $\max_{x_{1:t}}P(x_{1:t}\mid e_{1:t})\propto\max_xm_t(x)$. The cost is $O(S^2t)$ time and $O(St)$ memory for the pointers; the memory can be reduced when only a delayed decision is needed.
+because the new factors depend on the past only through $`x`$. This is the **principle of optimality** of dynamic programming: the best path to $`x'`$ at time $`t+1`$ extends the best path to some $`x`$ at time $`t`$. Recording the maximizing $`x`$ for each $`x'`$ and following these pointers back from $`\arg\max_xm_t(x)`$ reconstructs a most probable sequence, since $`\max_{x_{1:t}}P(x_{1:t}\mid e_{1:t})\propto\max_xm_t(x)`$. The cost is $`O(S^2t)`$ time and $`O(St)`$ memory for the pointers; the memory can be reduced when only a delayed decision is needed.
 
 </details>
 
@@ -318,13 +318,13 @@ because the new factors depend on the past only through $x$. This is the **princ
 <summary><a id="block-ai11-appendix-c"></a><b>C. The Kalman update as Bayesian conditioning</b></summary>
 
 
-Given the prediction $x\sim\mathcal N(\mu^-,\Sigma^-)$ and the observation model $z=Hx+v$ with $v\sim\mathcal N(0,R)$, the pair $(x,z)$ is jointly Gaussian with
+Given the prediction $`x\sim\mathcal N(\mu^-,\Sigma^-)`$ and the observation model $`z=Hx+v`$ with $`v\sim\mathcal N(0,R)`$, the pair $`(x,z)`$ is jointly Gaussian with
 
 $$
 \mathbb E\begin{bmatrix}x\\z\end{bmatrix}=\begin{bmatrix}\mu^-\\H\mu^-\end{bmatrix},\qquad\mathrm{Cov}\begin{bmatrix}x\\z\end{bmatrix}=\begin{bmatrix}\Sigma^-&\Sigma^-H^\top\\H\Sigma^-&H\Sigma^-H^\top+R\end{bmatrix}.
 $$
 
-Gaussian conditioning gives $\mathbb E[x\mid z]=\mu^-+\Sigma^-H^\top(H\Sigma^-H^\top+R)^{-1}(z-H\mu^-)$ and $\mathrm{Cov}[x\mid z]=\Sigma^--\Sigma^-H^\top(H\Sigma^-H^\top+R)^{-1}H\Sigma^-$, which are the update equations with the gain $K$. In one dimension with $H=1$, the posterior precision is the sum of the prior and measurement precisions, $1/\sigma^2=1/\sigma_-^2+1/r$, and the mean is their precision-weighted average; the gain $K=\sigma_-^2/(\sigma_-^2+r)$ is the fraction of the weight given to the measurement. For the random walk of the text, the fixed point of $\sigma^2=(\sigma^2+q)r/(\sigma^2+q+r)$ solves $\sigma^4+q\sigma^2-qr=0$.
+Gaussian conditioning gives $`\mathbb E[x\mid z]=\mu^-+\Sigma^-H^\top(H\Sigma^-H^\top+R)^{-1}(z-H\mu^-)`$ and $`\mathrm{Cov}[x\mid z]=\Sigma^--\Sigma^-H^\top(H\Sigma^-H^\top+R)^{-1}H\Sigma^-`$, which are the update equations with the gain $`K`$. In one dimension with $`H=1`$, the posterior precision is the sum of the prior and measurement precisions, $`1/\sigma^2=1/\sigma_-^2+1/r`$, and the mean is their precision-weighted average; the gain $`K=\sigma_-^2/(\sigma_-^2+r)`$ is the fraction of the weight given to the measurement. For the random walk of the text, the fixed point of $`\sigma^2=(\sigma^2+q)r/(\sigma^2+q+r)`$ solves $`\sigma^4+q\sigma^2-qr=0`$.
 
 </details>
 

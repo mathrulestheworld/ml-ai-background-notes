@@ -28,10 +28,10 @@ Chapters 1–5 treat the deep feedforward network as a trainable object: what it
 
 ## <a id="shared-conventions"></a>Shared conventions
 
-- A network $f(x;\theta)$ maps an input $x$ to an output with parameters $\theta$; a layer computes $h^{(l+1)}=\phi\bigl(W^{(l)}h^{(l)}+b^{(l)}\bigr)$ with activation $\phi$. Widths are $n$ or $d$, the depth is $L$, and a batch has $B$ examples. Data follow the conventions of ML.
-- In code, tensors put the batch first: $(B,d)$ for vectors, $(B,C,H,W)$ for images, and $(B,T,d)$ for sequences, as PyTorch's `batch_first=True` layers expect; a sequence written as a matrix $X\in\mathbb R^{T\times d}$ has one token per row.
+- A network $`f(x;\theta)`$ maps an input $`x`$ to an output with parameters $`\theta`$; a layer computes $`h^{(l+1)}=\phi\bigl(W^{(l)}h^{(l)}+b^{(l)}\bigr)`$ with activation $`\phi`$. Widths are $`n`$ or $`d`$, the depth is $`L`$, and a batch has $`B`$ examples. Data follow the conventions of ML.
+- In code, tensors put the batch first: $`(B,d)`$ for vectors, $`(B,C,H,W)`$ for images, and $`(B,T,d)`$ for sequences, as PyTorch's `batch_first=True` layers expect; a sequence written as a matrix $`X\in\mathbb R^{T\times d}`$ has one token per row.
 - Losses are averaged over the examples of a batch unless stated otherwise, and cross-entropy is computed from logits. Learning rates refer to the optimizer named alongside them.
-- Logarithms are natural. Vectors are columns in the mathematics, and $\|\cdot\|$ without a subscript is the Euclidean norm (the Frobenius norm for matrices).
+- Logarithms are natural. Vectors are columns in the mathematics, and $`\|\cdot\|`$ without a subscript is the Euclidean norm (the Frobenius norm for matrices).
 - Each code block runs on its own on a CPU. Seeds are fixed, and the comment lines at the end of a block record what it printed in the environment described in the computing setup. Experiments use the scikit-learn digits, synthetic data, or small bundled graphs and images, so that each finishes in seconds or minutes; their results illustrate the chapters' claims and are not benchmarks.
 
 ## <a id="examples-and-supporting-resources"></a>Examples and supporting resources

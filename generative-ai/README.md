@@ -28,12 +28,12 @@ Chapter 1 sets out what generative models are asked to do and how their training
 
 ## <a id="shared-conventions"></a>Shared conventions
 
-- Data are $x$, drawn from $p_{\text{data}}$, and a model with parameters $\theta$ has density or distribution $p_\theta$. For latent-variable models, $z$ is the latent, $q_\phi(z\mid x)$ the encoder, and $p_\theta(x\mid z)$ the decoder.
-- In the diffusion chapters, $x_0$ is clean data and $x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon$ its noisy version at step or time $t$, with $\epsilon\sim\mathcal N(0,I)$ and signal-to-noise ratio $\operatorname{SNR}(t)=\bar\alpha_t/(1-\bar\alpha_t)$; in the form of Karras et al., $x_\sigma=x_0+\sigma\epsilon$ at noise level $\sigma$, and $D(x;\sigma)$ is the denoiser. Time runs from data at $t=0$ to noise at $t=T$ or $t=1$.
-- In the flow-matching chapter, time runs the other way, as in its literature: $x_0$ is noise at $t=0$, $x_1$ is data at $t=1$, and $v_t(x)$ is a velocity field. Chapter 9 relates the two conventions.
-- The score is $\nabla_x\log p(x)$, written $s_\theta$ when learned; $\epsilon_\theta$ predicts noise, $\hat x_0$ a clean image, and $v$ a velocity.
-- Likelihoods are in nats with $\log$ and in bits with $\log_2$; bits per dimension divide the negative log-likelihood in bits by the number of pixels or subpixels.
-- Each code block runs on its own on a CPU with PyTorch, NumPy, SciPy, and scikit-learn, and implements its method from scratch. Blocks use the $8\times8$ digits of scikit-learn with a fixed split, or synthetic distributions whose exact answers are known (data sources). Seeds are fixed, and the comment lines at the end of a block record what it printed in the environment described in the computing setup. Models have at most about a million parameters, so results illustrate the chapters' claims and are not benchmarks.
+- Data are $`x`$, drawn from $`p_{\text{data}}`$, and a model with parameters $`\theta`$ has density or distribution $`p_\theta`$. For latent-variable models, $`z`$ is the latent, $`q_\phi(z\mid x)`$ the encoder, and $`p_\theta(x\mid z)`$ the decoder.
+- In the diffusion chapters, $`x_0`$ is clean data and $`x_t=\sqrt{\bar\alpha_t}\,x_0+\sqrt{1-\bar\alpha_t}\,\epsilon`$ its noisy version at step or time $`t`$, with $`\epsilon\sim\mathcal N(0,I)`$ and signal-to-noise ratio $`\operatorname{SNR}(t)=\bar\alpha_t/(1-\bar\alpha_t)`$; in the form of Karras et al., $`x_\sigma=x_0+\sigma\epsilon`$ at noise level $`\sigma`$, and $`D(x;\sigma)`$ is the denoiser. Time runs from data at $`t=0`$ to noise at $`t=T`$ or $`t=1`$.
+- In the flow-matching chapter, time runs the other way, as in its literature: $`x_0`$ is noise at $`t=0`$, $`x_1`$ is data at $`t=1`$, and $`v_t(x)`$ is a velocity field. Chapter 9 relates the two conventions.
+- The score is $`\nabla_x\log p(x)`$, written $`s_\theta`$ when learned; $`\epsilon_\theta`$ predicts noise, $`\hat x_0`$ a clean image, and $`v`$ a velocity.
+- Likelihoods are in nats with $`\log`$ and in bits with $`\log_2`$; bits per dimension divide the negative log-likelihood in bits by the number of pixels or subpixels.
+- Each code block runs on its own on a CPU with PyTorch, NumPy, SciPy, and scikit-learn, and implements its method from scratch. Blocks use the $`8\times8`$ digits of scikit-learn with a fixed split, or synthetic distributions whose exact answers are known (data sources). Seeds are fixed, and the comment lines at the end of a block record what it printed in the environment described in the computing setup. Models have at most about a million parameters, so results illustrate the chapters' claims and are not benchmarks.
 
 ## <a id="examples-and-supporting-resources"></a>Examples and supporting resources
 

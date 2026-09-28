@@ -19,11 +19,11 @@ Additional proofs and specialized results appear in collapsed appendices. Chapte
 
 ## <a id="shared-conventions"></a>Shared conventions
 
-- An individual vector is a column. A data matrix stores observations in rows, so a linear map $x\mapsto Wx+b$ becomes $XW^\top+\mathbf1b^\top$ for a batch. Array shape is stated separately from its mathematical interpretation.
-- Derivatives use numerator layout: for $f:\mathbb R^d\to\mathbb R^m$, the Jacobian $J_f$ has shape $m\times d$. A scalar derivative is a row, its Euclidean gradient is a column, and a matrix parameter gradient has the parameter's shape.
-- $D$ denotes a dataset. $P_\ast$ denotes its underlying population law in the probability and learning-theory chapters; the terminology chapter also uses $\mathcal D$ for that law. Sample size is written $n$ or $N$ where defined; $B$ denotes a batch size in the computing chapter.
-- A mathematical prediction loss is written with the target first, $\ell(y,\widehat y)$. A loss viewed as a function of a rule or its parameters is defined locally. Library argument order is specified where it differs.
-- Information and Learning Theory measures information in bits, with $\log=\log_2$, and uses $\ln$ and nats only where the constant $e$ is intrinsic to a result. The other chapters, like NumPy and PyTorch, use natural logarithms, so log losses there are in nats. A displayed convergence or generalization guarantee includes the assumptions on the objective, observations, or hypothesis class that make it valid.
+- An individual vector is a column. A data matrix stores observations in rows, so a linear map $`x\mapsto Wx+b`$ becomes $`XW^\top+\mathbf1b^\top`$ for a batch. Array shape is stated separately from its mathematical interpretation.
+- Derivatives use numerator layout: for $`f:\mathbb R^d\to\mathbb R^m`$, the Jacobian $`J_f`$ has shape $`m\times d`$. A scalar derivative is a row, its Euclidean gradient is a column, and a matrix parameter gradient has the parameter's shape.
+- $`D`$ denotes a dataset. $`P_\ast`$ denotes its underlying population law in the probability and learning-theory chapters; the terminology chapter also uses $`\mathcal D`$ for that law. Sample size is written $`n`$ or $`N`$ where defined; $`B`$ denotes a batch size in the computing chapter.
+- A mathematical prediction loss is written with the target first, $`\ell(y,\widehat y)`$. A loss viewed as a function of a rule or its parameters is defined locally. Library argument order is specified where it differs.
+- Information and Learning Theory measures information in bits, with $`\log=\log_2`$, and uses $`\ln`$ and nats only where the constant $`e`$ is intrinsic to a result. The other chapters, like NumPy and PyTorch, use natural logarithms, so log losses there are in nats. A displayed convergence or generalization guarantee includes the assumptions on the objective, observations, or hypothesis class that make it valid.
 
 ## <a id="examples-and-supporting-resources"></a>Examples and supporting resources
 

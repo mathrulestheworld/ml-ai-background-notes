@@ -8,7 +8,7 @@
 
 ### <a id="sharing-statistical-strength"></a>Sharing statistical strength
 
-A count-based model learns nothing about one context from another unless they match exactly (chapter 2). The **neural probabilistic language model** of [Bengio et al. (2003)](https://www.jmlr.org/papers/v3/bengio03a.html) removed this limitation. It kept the Markov window of an n-gram model but mapped each of the previous $n-1$ words to a learned embedding (chapter 3), concatenated the embeddings, passed them through a hidden layer, and produced the next-word distribution with a softmax:
+A count-based model learns nothing about one context from another unless they match exactly (chapter 2). The **neural probabilistic language model** of [Bengio et al. (2003)](https://www.jmlr.org/papers/v3/bengio03a.html) removed this limitation. It kept the Markov window of an n-gram model but mapped each of the previous $`n-1`$ words to a learned embedding (chapter 3), concatenated the embeddings, passed them through a hidden layer, and produced the next-word distribution with a softmax:
 
 $$
 P(w_t\mid w_{t-n+1:t-1})=\operatorname{softmax}\bigl(U\tanh(H[e_{w_{t-n+1}};\dots;e_{w_{t-1}}]+b)+c\bigr)_{w_t}.
@@ -22,25 +22,25 @@ A recurrent network (DL chapter 8) removes the fixed window: its hidden state su
 
 ### <a id="transformer-language-models"></a>Transformer language models
 
-A **decoder-only transformer** (DL chapter 9) computes the representation of every position from all earlier positions through causal self-attention. Because the causal mask hides the future, a single forward pass over a sequence of $T$ tokens produces all $T$ next-token predictions at once, each conditioned only on its own prefix, and training parallelizes across positions as well as across sequences. OpenAI's **GPT** ([Radford et al., 2018](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)) pretrained a 12-layer model on books and fine-tuned it for downstream tasks; **GPT-2** ([Radford et al., 2019](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)) scaled to 1.5 billion parameters and 40 GB of web text and performed some tasks without fine-tuning; **GPT-3** ([Brown et al., 2020](https://arxiv.org/abs/2005.14165)) scaled to 175 billion parameters and 300 billion tokens and learned tasks from examples in its prompt (chapter 9). Almost every large language model since has the same basic design. This chapter treats what is specific to language modeling; the attention block, position encodings, the key–value cache, and the counting of parameters and operations are in DL chapters 9 and 11.
+A **decoder-only transformer** (DL chapter 9) computes the representation of every position from all earlier positions through causal self-attention. Because the causal mask hides the future, a single forward pass over a sequence of $`T`$ tokens produces all $`T`$ next-token predictions at once, each conditioned only on its own prefix, and training parallelizes across positions as well as across sequences. OpenAI's **GPT** ([Radford et al., 2018](https://cdn.openai.com/research-covers/language-unsupervised/language_understanding_paper.pdf)) pretrained a 12-layer model on books and fine-tuned it for downstream tasks; **GPT-2** ([Radford et al., 2019](https://cdn.openai.com/better-language-models/language_models_are_unsupervised_multitask_learners.pdf)) scaled to 1.5 billion parameters and 40 GB of web text and performed some tasks without fine-tuning; **GPT-3** ([Brown et al., 2020](https://arxiv.org/abs/2005.14165)) scaled to 175 billion parameters and 300 billion tokens and learned tasks from examples in its prompt (chapter 9). Almost every large language model since has the same basic design. This chapter treats what is specific to language modeling; the attention block, position encodings, the key–value cache, and the counting of parameters and operations are in DL chapters 9 and 11.
 
 ## <a id="training-a-language-model"></a>Training a language model
 
 ### <a id="the-objective"></a>The objective
 
-A language model with parameters $\theta$ is trained by maximum likelihood: over a corpus of sequences, it minimizes the average negative log-probability of each token given the tokens before it,
+A language model with parameters $`\theta`$ is trained by maximum likelihood: over a corpus of sequences, it minimizes the average negative log-probability of each token given the tokens before it,
 
 $$
 \mathcal L(\theta)=-\frac1N\sum_{\text{sequences }x}\ \sum_{t=1}^{|x|}\log p_\theta(x_t\mid x_{<t}),
 $$
 
-with $N$ the total number of predicted tokens. Every position of every sequence is a training example with a classification target, the next token, and the loss is the cross-entropy of ML chapter 5 over a vocabulary of $V$ classes. The conditioning prefix is always the true text, never the model's own output, which is called **teacher forcing**. At generation time the model conditions on its own samples instead, a mismatch known as **exposure bias**: an early mistake produces a prefix unlike anything seen in training. Methods that train on the model's own samples ([Bengio et al., 2015](https://arxiv.org/abs/1506.03099); [Ranzato et al., 2016](https://arxiv.org/abs/1511.06732)) were proposed to close the gap, but at scale teacher forcing works well, and the effects of the mismatch are mostly addressed at decoding time (chapter 8).
+with $`N`$ the total number of predicted tokens. Every position of every sequence is a training example with a classification target, the next token, and the loss is the cross-entropy of ML chapter 5 over a vocabulary of $`V`$ classes. The conditioning prefix is always the true text, never the model's own output, which is called **teacher forcing**. At generation time the model conditions on its own samples instead, a mismatch known as **exposure bias**: an early mistake produces a prefix unlike anything seen in training. Methods that train on the model's own samples ([Bengio et al., 2015](https://arxiv.org/abs/1506.03099); [Ranzato et al., 2016](https://arxiv.org/abs/1511.06732)) were proposed to close the gap, but at scale teacher forcing works well, and the effects of the mismatch are mostly addressed at decoding time (chapter 8).
 
-A useful check follows from the objective. At initialization, when all logits are near zero, the model predicts the uniform distribution and the loss is $\ln V$; a model that starts much higher has an initialization problem, such as an output layer with too large a scale.
+A useful check follows from the objective. At initialization, when all logits are near zero, the model predicts the uniform distribution and the loss is $`\ln V`$; a model that starts much higher has an initialization problem, such as an output layer with too large a scale.
 
 ### <a id="preparing-the-data"></a>Preparing the data
 
-The training corpus is tokenized once (chapter 1), the documents are concatenated with an end-of-text token between them, and the stream is cut into blocks of the context length $T$. Batches are drawn from these blocks in random order. A block can span the end of one document and the start of another; for short contexts the model simply learns that the end-of-text token resets the topic, and for long-context training the attention mask is often modified so that tokens attend only within their own document, as in Llama 3 ([Llama Team, 2024](https://arxiv.org/abs/2407.21783)). Large models see most of their data once or a few times, so pretraining is closer to one pass over a stream than to many epochs over a dataset, and overfitting in the classical sense is rare (chapter 6).
+The training corpus is tokenized once (chapter 1), the documents are concatenated with an end-of-text token between them, and the stream is cut into blocks of the context length $`T`$. Batches are drawn from these blocks in random order. A block can span the end of one document and the start of another; for short contexts the model simply learns that the end-of-text token resets the topic, and for long-context training the attention mask is often modified so that tokens attend only within their own document, as in Llama 3 ([Llama Team, 2024](https://arxiv.org/abs/2407.21783)). Large models see most of their data once or a few times, so pretraining is closer to one pass over a stream than to many epochs over a dataset, and overfitting in the classical sense is rare (chapter 6).
 
 ### <a id="a-small-character-model"></a>A small character model
 
@@ -133,7 +133,7 @@ print("".join(chars[i] for i in ctx[0].tolist()))
 # My
 ```
 
-The loss starts at 4.137 nats, close to $\ln65=4.174$, and falls to 2.63 bits per character in 1,500 steps. The sample has the layout of a play (speaker names in capitals, line breaks, punctuation) and many real words, with little sense. The figure shows a larger model, with 818,000 parameters, four layers of width 128, and a context of 128 characters, trained for 4,000 steps.
+The loss starts at 4.137 nats, close to $`\ln65=4.174`$, and falls to 2.63 bits per character in 1,500 steps. The sample has the layout of a play (speaker names in capitals, line breaks, punctuation) and many real words, with little sense. The figure shows a larger model, with 818,000 parameters, four layers of width 128, and a context of 128 characters, trained for 4,000 steps.
 
 <img src="sources/images/nlp-lm-training.png" alt="nlp-lm-training" width="880">
 
@@ -149,11 +149,11 @@ The right panel shows how the loss depends on the amount of context. Both models
 
 ### <a id="logits-and-weight-tying"></a>Logits and weight tying
 
-The final hidden state $h_t\in\mathbb R^d$ is mapped to a vector of **logits** $z_t=W_Uh_t\in\mathbb R^V$ by the **unembedding** matrix $W_U$, and the softmax turns logits into probabilities. The input embedding $E\in\mathbb R^{V\times d}$ and the unembedding have the same shape, and **weight tying** sets $W_U=E$ ([Press and Wolf, 2017](https://arxiv.org/abs/1608.05859); [Inan, Khosravi, and Socher, 2017](https://arxiv.org/abs/1611.01462)). Tying saves $Vd$ parameters and regularizes: each token's input vector also receives gradient from every prediction of that token. It is standard in small models and common in large ones (GPT-2 and Gemma tie; Llama does not), where the embeddings are a small share of the parameters.
+The final hidden state $`h_t\in\mathbb R^d`$ is mapped to a vector of **logits** $`z_t=W_Uh_t\in\mathbb R^V`$ by the **unembedding** matrix $`W_U`$, and the softmax turns logits into probabilities. The input embedding $`E\in\mathbb R^{V\times d}`$ and the unembedding have the same shape, and **weight tying** sets $`W_U=E`$ ([Press and Wolf, 2017](https://arxiv.org/abs/1608.05859); [Inan, Khosravi, and Socher, 2017](https://arxiv.org/abs/1611.01462)). Tying saves $`Vd`$ parameters and regularizes: each token's input vector also receives gradient from every prediction of that token. It is standard in small models and common in large ones (GPT-2 and Gemma tie; Llama does not), where the embeddings are a small share of the parameters.
 
 ### <a id="the-softmax-bottleneck"></a>The softmax bottleneck
 
-The log-probabilities of a softmax model are $\log p(x\mid c)=h_c^\top w_x-\log Z_c$, a dot product minus a normalizer. Stacked over many contexts $c$ and all tokens $x$, they form a matrix of rank at most $d+1$ ([Appendix A](#block-nlp04-appendix-a)). If the true conditional distributions of language, arranged the same way, had a log-probability matrix of higher rank, no choice of parameters could represent them exactly, however large the network before the output layer. [Yang et al. (2018)](https://arxiv.org/abs/1711.03953) called this the **softmax bottleneck** and removed it with a mixture of several softmaxes, which lowered perplexity substantially for the LSTM models of the time. For large transformers with $d$ in the thousands the bottleneck matters less, but it resurfaces in small models with large vocabularies and in the observation that some distributions, such as a uniform choice among a few specific tokens, are hard for a single softmax to express.
+The log-probabilities of a softmax model are $`\log p(x\mid c)=h_c^\top w_x-\log Z_c`$, a dot product minus a normalizer. Stacked over many contexts $`c`$ and all tokens $`x`$, they form a matrix of rank at most $`d+1`$ ([Appendix A](#block-nlp04-appendix-a)). If the true conditional distributions of language, arranged the same way, had a log-probability matrix of higher rank, no choice of parameters could represent them exactly, however large the network before the output layer. [Yang et al. (2018)](https://arxiv.org/abs/1711.03953) called this the **softmax bottleneck** and removed it with a mixture of several softmaxes, which lowered perplexity substantially for the LSTM models of the time. For large transformers with $`d`$ in the thousands the bottleneck matters less, but it resurfaces in small models with large vocabularies and in the observation that some distributions, such as a uniform choice among a few specific tokens, are hard for a single softmax to express.
 
 ### <a id="calibration"></a>Calibration
 
@@ -235,7 +235,7 @@ Over the whole validation text the model needs 2.19 bits per character. Its prob
 
 Published large models agree closely on their proportions.
 
-| Model | Parameters | Layers | Width $d$ | Heads (key–value heads) | MLP width | Vocabulary | Context | Training tokens |
+| Model | Parameters | Layers | Width $`d`$ | Heads (key–value heads) | MLP width | Vocabulary | Context | Training tokens |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | GPT-3 ([Brown et al., 2020](https://arxiv.org/abs/2005.14165)) | 175B | 96 | 12,288 | 96 | 49,152 | 50,257 | 2,048 | 300B |
 | Llama 2 70B ([Touvron et al., 2023](https://arxiv.org/abs/2307.09288)) | 70B | 80 | 8,192 | 64 (8) | 28,672 | 32,000 | 4,096 | 2T |
@@ -246,19 +246,19 @@ All four use attention heads of dimension 128, a ratio of width to depth between
 
 ### <a id="training-recipes"></a>Training recipes
 
-Recipes have also converged: AdamW with $\beta_2=0.95$, weight decay 0.1, gradient clipping at norm 1, no dropout, a short linear warmup, and a learning rate that decays by a factor of about ten, following a cosine or, increasingly, a **warmup–stable–decay** schedule that holds the rate constant and decays it quickly at the end, which lets one run be extended and still end with a decayed checkpoint ([Hu et al., 2024](https://arxiv.org/abs/2404.06395)). The largest runs still suffer **loss spikes**, sudden jumps in loss that sometimes do not recover. The remedies of DL chapter 9, normalizing queries and keys and penalizing the output normalizer, reduce them, and PaLM's training restarted from a checkpoint before each spike and skipped the few hundred batches that preceded it ([Chowdhery et al., 2022](https://arxiv.org/abs/2204.02311)). Learning rates and initializations tuned on a small model transfer to a large one only with an appropriate parameterization, a question taken up with scaling laws in chapter 7.
+Recipes have also converged: AdamW with $`\beta_2=0.95`$, weight decay 0.1, gradient clipping at norm 1, no dropout, a short linear warmup, and a learning rate that decays by a factor of about ten, following a cosine or, increasingly, a **warmup–stable–decay** schedule that holds the rate constant and decays it quickly at the end, which lets one run be extended and still end with a decayed checkpoint ([Hu et al., 2024](https://arxiv.org/abs/2404.06395)). The largest runs still suffer **loss spikes**, sudden jumps in loss that sometimes do not recover. The remedies of DL chapter 9, normalizing queries and keys and penalizing the output normalizer, reduce them, and PaLM's training restarted from a checkpoint before each spike and skipped the few hundred batches that preceded it ([Chowdhery et al., 2022](https://arxiv.org/abs/2204.02311)). Learning rates and initializations tuned on a small model transfer to a large one only with an appropriate parameterization, a question taken up with scaling laws in chapter 7.
 
 ## <a id="mixture-of-experts"></a>Mixture of experts
 
 ### <a id="sparse-expert-layers"></a>Sparse expert layers
 
-A dense model uses all its parameters for every token, so its cost per token grows with its size. A **mixture-of-experts** (MoE) layer replaces the MLP of a block by $E$ expert MLPs and a **router** that sends each token to only $k$ of them ([Shazeer et al., 2017](https://arxiv.org/abs/1701.06538)). For a token with hidden state $x$, the router computes probabilities $p=\operatorname{softmax}(W_rx)$ over experts, selects the set $\mathcal T$ of the $k$ largest, and outputs the gated sum of their outputs,
+A dense model uses all its parameters for every token, so its cost per token grows with its size. A **mixture-of-experts** (MoE) layer replaces the MLP of a block by $`E`$ expert MLPs and a **router** that sends each token to only $`k`$ of them ([Shazeer et al., 2017](https://arxiv.org/abs/1701.06538)). For a token with hidden state $`x`$, the router computes probabilities $`p=\operatorname{softmax}(W_rx)`$ over experts, selects the set $`\mathcal T`$ of the $`k`$ largest, and outputs the gated sum of their outputs,
 
 $$
 y=\sum_{i\in\mathcal T}g_i\,\mathrm{MLP}_i(x),
 $$
 
-with gates $g_i$ equal to $p_i$ or to $p_i$ renormalized over $\mathcal T$. The model then has many more parameters than it uses for any one token: Mixtral 8x7B has eight experts per layer, routes each token to two, and uses 13 billion of its 47 billion parameters per token ([Jiang et al., 2024](https://arxiv.org/abs/2401.04088)); DeepSeek-V3 routes each token to 8 of 256 small experts plus one shared expert that every token uses, and activates 37 of 671 billion parameters ([DeepSeek-AI, 2024](https://arxiv.org/abs/2412.19437)). Only the MLPs are sparse; attention remains dense.
+with gates $`g_i`$ equal to $`p_i`$ or to $`p_i`$ renormalized over $`\mathcal T`$. The model then has many more parameters than it uses for any one token: Mixtral 8x7B has eight experts per layer, routes each token to two, and uses 13 billion of its 47 billion parameters per token ([Jiang et al., 2024](https://arxiv.org/abs/2401.04088)); DeepSeek-V3 routes each token to 8 of 256 small experts plus one shared expert that every token uses, and activates 37 of 671 billion parameters ([DeepSeek-AI, 2024](https://arxiv.org/abs/2412.19437)). Only the MLPs are sparse; attention remains dense.
 
 ### <a id="balancing-the-load"></a>Balancing the load
 
@@ -268,7 +268,7 @@ $$
 \mathcal L_{\mathrm{bal}}=\alpha\,E\sum_{i=1}^Ef_i\,P_i,
 $$
 
-where $f_i$ is the fraction of tokens in the batch routed to expert $i$ and $P_i$ is the mean router probability of expert $i$. The fraction $f_i$ is not differentiable, but $P_i$ is, and the gradient lowers the router probabilities of the busiest experts; the loss equals $\alpha$ at uniform routing, its minimum when the router's choices and probabilities agree ([Appendix B](#block-nlp04-appendix-b)). The code trains a top-1 mixture of eight linear experts on a regression task with eight clusters of inputs, each needing its own linear map, with and without the balancing loss.
+where $`f_i`$ is the fraction of tokens in the batch routed to expert $`i`$ and $`P_i`$ is the mean router probability of expert $`i`$. The fraction $`f_i`$ is not differentiable, but $`P_i`$ is, and the gradient lowers the router probabilities of the busiest experts; the loss equals $`\alpha`$ at uniform routing, its minimum when the router's choices and probabilities agree ([Appendix B](#block-nlp04-appendix-b)). The code trains a top-1 mixture of eight linear experts on a regression task with eight clusters of inputs, each needing its own linear map, with and without the balancing loss.
 
 ```python
 import torch
@@ -335,10 +335,10 @@ At a fixed compute budget per token, sparse models reach a lower loss than dense
 
 ### <a id="extending-the-context-window"></a>Extending the context window
 
-Context windows have grown from 1,024 tokens in GPT-2 to 128,000 or more. Training at full length throughout is wasteful, because attention costs grow with the square of the length and most training documents are short, so models are pretrained at a moderate length and then trained briefly on long documents. With rotary position embeddings (DL chapter 9), the extension has to deal with rotation angles the model never saw. Each coordinate pair $j$ of a head of dimension $d$ rotates by $\theta_j=b^{-2j/d}$ radians per position for a base $b$ (10,000 originally). High-frequency pairs complete many turns within the training length, so every angle has been seen; low-frequency pairs complete less than one turn, and positions beyond the training length give them angles never seen in training. Three remedies are common.
+Context windows have grown from 1,024 tokens in GPT-2 to 128,000 or more. Training at full length throughout is wasteful, because attention costs grow with the square of the length and most training documents are short, so models are pretrained at a moderate length and then trained briefly on long documents. With rotary position embeddings (DL chapter 9), the extension has to deal with rotation angles the model never saw. Each coordinate pair $`j`$ of a head of dimension $`d`$ rotates by $`\theta_j=b^{-2j/d}`$ radians per position for a base $`b`$ (10,000 originally). High-frequency pairs complete many turns within the training length, so every angle has been seen; low-frequency pairs complete less than one turn, and positions beyond the training length give them angles never seen in training. Three remedies are common.
 
-- **Position interpolation** ([Chen et al., 2023](https://arxiv.org/abs/2306.15595)) divides every position by the extension factor $s$, so all angles stay within the trained range, but neighboring tokens become $s$ times closer in angle, which blurs the high frequencies that encode local order.
-- **Changing the base.** Enlarging $b$ slows all rotations, the low frequencies most, while the highest frequency stays fixed. The "NTK-aware" choice $b'=b\,s^{d/(d-2)}$ interpolates the lowest frequency exactly by $s$ and leaves the highest unchanged ([Appendix C](#block-nlp04-appendix-c)). Llama 3 trains with a base of 500,000 from the start.
+- **Position interpolation** ([Chen et al., 2023](https://arxiv.org/abs/2306.15595)) divides every position by the extension factor $`s`$, so all angles stay within the trained range, but neighboring tokens become $`s`$ times closer in angle, which blurs the high frequencies that encode local order.
+- **Changing the base.** Enlarging $`b`$ slows all rotations, the low frequencies most, while the highest frequency stays fixed. The "NTK-aware" choice $`b'=b\,s^{d/(d-2)}`$ interpolates the lowest frequency exactly by $`s`$ and leaves the highest unchanged ([Appendix C](#block-nlp04-appendix-c)). Llama 3 trains with a base of 500,000 from the start.
 - **YaRN** ([Peng et al., 2023](https://arxiv.org/abs/2309.00071)) interpolates each frequency by a different amount, not at all for pairs that complete many turns and fully for those that complete less than one, and slightly sharpens the attention softmax to compensate for longer contexts.
 
 All three need only a small amount of training at the new length, on the order of a thousand steps. The code compares the angles each scheme produces for a model trained on 4,096 positions and extended four times.
@@ -389,13 +389,13 @@ The cost of long contexts lies mostly in the key–value cache, which grows line
 <summary><a id="block-nlp04-appendix-a"></a><b>A. The rank of a softmax model's log-probabilities</b></summary>
 
 
-Consider $M$ contexts with final hidden states $h_1,\dots,h_M\in\mathbb R^d$, stacked as rows of $H\in\mathbb R^{M\times d}$, and an output matrix $W\in\mathbb R^{V\times d}$ with rows $w_x$. The model's log-probabilities form the $M\times V$ matrix
+Consider $`M`$ contexts with final hidden states $`h_1,\dots,h_M\in\mathbb R^d`$, stacked as rows of $`H\in\mathbb R^{M\times d}`$, and an output matrix $`W\in\mathbb R^{V\times d}`$ with rows $`w_x`$. The model's log-probabilities form the $`M\times V`$ matrix
 
 $$
 A=HW^\top-\ell\,\mathbf 1^\top,\qquad \ell_c=\log\sum_x\exp(h_c^\top w_x).
 $$
 
-The first term has rank at most $d$ and the second rank at most one, so $\operatorname{rank}A\le d+1$. Now let $A^*$ be the matrix of true log-probabilities $\log P^*(x\mid c)$. A softmax model represents $P^*$ exactly only if $A^*=HW^\top-\ell\mathbf 1^\top$ for some $H$, $W$, and $\ell$, and adding any vector to the normalizers changes nothing about the probabilities, so the question is whether some matrix of the form $A^*+\ell'\mathbf 1^\top$ has rank at most $d$. If every such matrix has rank greater than $d$, no network before the output layer, however expressive, can produce hidden states that fit all $M$ contexts exactly. A mixture of $K$ softmaxes, $p(x\mid c)=\sum_k\pi_{c,k}\operatorname{softmax}(W h_{c,k})_x$, is not of this form: the log of a sum is not low-rank in general, which is why it escapes the bound.
+The first term has rank at most $`d`$ and the second rank at most one, so $`\operatorname{rank}A\le d+1`$. Now let $`A^*`$ be the matrix of true log-probabilities $`\log P^*(x\mid c)`$. A softmax model represents $`P^*`$ exactly only if $`A^*=HW^\top-\ell\mathbf 1^\top`$ for some $`H`$, $`W`$, and $`\ell`$, and adding any vector to the normalizers changes nothing about the probabilities, so the question is whether some matrix of the form $`A^*+\ell'\mathbf 1^\top`$ has rank at most $`d`$. If every such matrix has rank greater than $`d`$, no network before the output layer, however expressive, can produce hidden states that fit all $`M`$ contexts exactly. A mixture of $`K`$ softmaxes, $`p(x\mid c)=\sum_k\pi_{c,k}\operatorname{softmax}(W h_{c,k})_x`$, is not of this form: the log of a sum is not low-rank in general, which is why it escapes the bound.
 
 </details>
 
@@ -405,13 +405,13 @@ The first term has rank at most $d$ and the second rank at most one, so $\operat
 <summary><a id="block-nlp04-appendix-b"></a><b>B. The load-balancing loss is smallest for uniform routing</b></summary>
 
 
-Let $f_i\ge0$ be the fractions of tokens routed to each of $E$ experts and $P_i\ge0$ the mean router probabilities, with $\sum_if_i=\sum_iP_i=1$. With top-1 routing, a token goes to the expert with the largest router probability, so experts that receive many tokens also tend to have large mean probabilities, and $f$ and $P$ are similarly ordered. If they are equal, $f=P$, then
+Let $`f_i\ge0`$ be the fractions of tokens routed to each of $`E`$ experts and $`P_i\ge0`$ the mean router probabilities, with $`\sum_if_i=\sum_iP_i=1`$. With top-1 routing, a token goes to the expert with the largest router probability, so experts that receive many tokens also tend to have large mean probabilities, and $`f`$ and $`P`$ are similarly ordered. If they are equal, $`f=P`$, then
 
 $$
 E\sum_if_iP_i=E\sum_iP_i^2\ge E\cdot\frac1E\Bigl(\sum_iP_i\Bigr)^2=1
 $$
 
-by the Cauchy–Schwarz inequality, with equality exactly when $P_i=1/E$ for all $i$. So among consistent routings the uniform one minimizes the loss, at the value 1 (or $\alpha$ with the weight). A collapsed routing that sends everything to one expert with probability near one has $f_1\approx P_1\approx1$ and loss $\approx E$. The loss is not minimized by uniform routing when $f$ and $P$ disagree, for instance $E\sum_if_iP_i$ can be pushed below 1 by making the router probabilities of the busiest expert small without changing where tokens go; in practice top-1 routing ties the two together, because lowering the probability of the busiest expert eventually changes the routing. The gradient flows only through $P$: $\partial\mathcal L_{\mathrm{bal}}/\partial P_i=\alpha Ef_i$, so each expert's router probability is pushed down in proportion to its current load.
+by the Cauchy–Schwarz inequality, with equality exactly when $`P_i=1/E`$ for all $`i`$. So among consistent routings the uniform one minimizes the loss, at the value 1 (or $`\alpha`$ with the weight). A collapsed routing that sends everything to one expert with probability near one has $`f_1\approx P_1\approx1`$ and loss $`\approx E`$. The loss is not minimized by uniform routing when $`f`$ and $`P`$ disagree, for instance $`E\sum_if_iP_i`$ can be pushed below 1 by making the router probabilities of the busiest expert small without changing where tokens go; in practice top-1 routing ties the two together, because lowering the probability of the busiest expert eventually changes the routing. The gradient flows only through $`P`$: $`\partial\mathcal L_{\mathrm{bal}}/\partial P_i=\alpha Ef_i`$, so each expert's router probability is pushed down in proportion to its current load.
 
 </details>
 
@@ -421,15 +421,15 @@ by the Cauchy–Schwarz inequality, with equality exactly when $P_i=1/E$ for all
 <summary><a id="block-nlp04-appendix-c"></a><b>C. Interpolation and base scaling for rotary embeddings</b></summary>
 
 
-A rotary embedding rotates coordinate pair $j=0,\dots,d/2-1$ of queries and keys at position $m$ by the angle $m\theta_j$ with $\theta_j=b^{-2j/d}$. Over a training length $L$, pair $j$ covers angles in $[0,L\theta_j]$, a full turn if $L\theta_j\ge2\pi$, that is, if its wavelength $2\pi/\theta_j$ is at most $L$. With $d=128$, $b=10{,}000$, and $L=4{,}096$, the wavelength $2\pi b^{2j/d}$ exceeds $L$ when $j>\frac d2\log_b(L/2\pi)\approx45.0$, so pairs 46 to 63, eighteen in all, never complete a turn.
+A rotary embedding rotates coordinate pair $`j=0,\dots,d/2-1`$ of queries and keys at position $`m`$ by the angle $`m\theta_j`$ with $`\theta_j=b^{-2j/d}`$. Over a training length $`L`$, pair $`j`$ covers angles in $`[0,L\theta_j]`$, a full turn if $`L\theta_j\ge2\pi`$, that is, if its wavelength $`2\pi/\theta_j`$ is at most $`L`$. With $`d=128`$, $`b=10{,}000`$, and $`L=4{,}096`$, the wavelength $`2\pi b^{2j/d}`$ exceeds $`L`$ when $`j>\frac d2\log_b(L/2\pi)\approx45.0`$, so pairs 46 to 63, eighteen in all, never complete a turn.
 
-To run at length $sL$, **position interpolation** uses angles $m\theta_j/s$, so position $sL$ receives the angles that position $L$ had in training for every $j$; adjacent positions differ by $\theta_j/s$ instead of $\theta_j$. **Base scaling** replaces $b$ by $b'=b\kappa$, which gives $\theta'_j=\theta_j\kappa^{-2j/d}$. The highest frequency, $j=0$, is unchanged for any $\kappa$. Requiring the lowest frequency, $j=d/2-1$, to be interpolated exactly, $\theta'_{d/2-1}=\theta_{d/2-1}/s$, gives $\kappa^{(d-2)/d}=s$, that is,
+To run at length $`sL`$, **position interpolation** uses angles $`m\theta_j/s`$, so position $`sL`$ receives the angles that position $`L`$ had in training for every $`j`$; adjacent positions differ by $`\theta_j/s`$ instead of $`\theta_j`$. **Base scaling** replaces $`b`$ by $`b'=b\kappa`$, which gives $`\theta'_j=\theta_j\kappa^{-2j/d}`$. The highest frequency, $`j=0`$, is unchanged for any $`\kappa`$. Requiring the lowest frequency, $`j=d/2-1`$, to be interpolated exactly, $`\theta'_{d/2-1}=\theta_{d/2-1}/s`$, gives $`\kappa^{(d-2)/d}=s`$, that is,
 
 $$
 b'=b\,s^{d/(d-2)}.
 $$
 
-In between, pair $j$ is slowed by the factor $s^{2j/(d-2)}$, which rises smoothly from 1 to $s$. A pair of middle frequency is therefore slowed by less than the factor $s$ it would need, and its angles at length $sL$ go beyond the range seen in training whenever its wavelength exceeds $L$ but the slowdown is less than $s$. YaRN chooses the factor per pair from its number of turns over $L$ instead: no interpolation for pairs with many turns, full interpolation for pairs with less than about one, and a linear ramp between.
+In between, pair $`j`$ is slowed by the factor $`s^{2j/(d-2)}`$, which rises smoothly from 1 to $`s`$. A pair of middle frequency is therefore slowed by less than the factor $`s`$ it would need, and its angles at length $`sL`$ go beyond the range seen in training whenever its wavelength exceeds $`L`$ but the slowdown is less than $`s`$. YaRN chooses the factor per pair from its number of turns over $`L`$ instead: no interpolation for pairs with many turns, full interpolation for pairs with less than about one, and a linear ramp between.
 
 </details>
 

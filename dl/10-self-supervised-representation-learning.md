@@ -8,7 +8,7 @@
 
 ### <a id="representations-and-pretext-tasks"></a>Representations and pretext tasks
 
-Labeled data are expensive and unlabeled data are abundant. The networks of the previous chapters learned features as a by-product of supervised training, and chapter 7 showed that those features transfer: an ImageNet classifier's penultimate layer is a good input for many other tasks. **Self-supervised learning** asks whether such features can be learned without labels, by training on a **pretext task** whose targets are computed from the data themselves. The pretext task is not the goal. The goal is an encoder $f$ whose output $h=f(x)$, the **representation**, makes the tasks that matter easy to learn from few labels.
+Labeled data are expensive and unlabeled data are abundant. The networks of the previous chapters learned features as a by-product of supervised training, and chapter 7 showed that those features transfer: an ImageNet classifier's penultimate layer is a good input for many other tasks. **Self-supervised learning** asks whether such features can be learned without labels, by training on a **pretext task** whose targets are computed from the data themselves. The pretext task is not the goal. The goal is an encoder $`f`$ whose output $`h=f(x)`$, the **representation**, makes the tasks that matter easy to learn from few labels.
 
 Early pretext tasks were designed by hand. A network was trained to predict the relative position of two patches of an image ([Doersch, Gupta, and Efros, 2015](https://arxiv.org/abs/1505.05192)), to solve a jigsaw puzzle of shuffled patches ([Noroozi and Favaro, 2016](https://arxiv.org/abs/1603.09246)), to color a grayscale image ([Zhang, Isola, and Efros, 2016](https://arxiv.org/abs/1603.08511)), to fill in a missing region ([Pathak et al., 2016](https://arxiv.org/abs/1604.07379)), or to recognize which of four rotations had been applied ([Gidaris, Singh, and Komodakis, 2018](https://arxiv.org/abs/1803.07728)). Each task can only be solved by understanding something about objects, and each produced useful features, but the features also specialized to the pretext task: the best layer for transfer was often in the middle of the network rather than at the end, especially in architectures without skip connections ([Kolesnikov, Zhai, and Beyer, 2019](https://arxiv.org/abs/1901.09005)). In text, predicting a word from its neighbors gave word embeddings ([Mikolov et al., 2013](https://arxiv.org/abs/1301.3781)), and predicting masked or next words became the pretraining of language models, developed in the NLP and LLMs module.
 
@@ -23,7 +23,7 @@ Three general families have since replaced the hand-designed tasks, and this cha
 A representation is judged by how well it serves downstream tasks, under one of a few standard protocols:
 
 - **Linear probe**: freeze the encoder and fit a linear classifier on its outputs. This measures how much class information is linearly accessible and is cheap enough to compare many encoders.
-- **$k$-nearest-neighbor classification** in the representation space, with no training at all (ML chapter 1).
+- **$`k`$-nearest-neighbor classification** in the representation space, with no training at all (ML chapter 1).
 - **Fine-tuning**: train the whole network on the downstream task, starting from the pretrained weights (chapter 7). It usually gives the best accuracy and can rank encoders differently from a linear probe.
 - **Low-shot evaluation**: any of the above with only a few labeled examples per class, which is where pretraining matters most.
 
@@ -33,13 +33,13 @@ A good representation is invariant to what the downstream tasks ignore, such as 
 
 ### <a id="undercomplete-autoencoders"></a>Undercomplete autoencoders
 
-An **autoencoder** trains an encoder $f$ and a decoder $g$ to reconstruct the input through a bottleneck,
+An **autoencoder** trains an encoder $`f`$ and a decoder $`g`$ to reconstruct the input through a bottleneck,
 
 $$
 \min_{f,g}\ \mathbb E\,\bigl\|x-g\bigl(f(x)\bigr)\bigr\|^2,
 $$
 
-where $h=f(x)$ has fewer dimensions than $x$, so the network cannot copy its input and must keep the directions that matter most for reconstruction. With linear maps and squared error, the optimal encoder–decoder pair projects onto the principal subspace of the data, the subspace spanned by the top $k$ principal components ([Baldi and Hornik, 1989](https://www.sciencedirect.com/science/article/pii/0893608089900142); ML chapter 12; [Appendix B](#block-dl10-appendix-b)). The code below trains a linear autoencoder by gradient descent on the digits and compares it with PCA.
+where $`h=f(x)`$ has fewer dimensions than $`x`$, so the network cannot copy its input and must keep the directions that matter most for reconstruction. With linear maps and squared error, the optimal encoder–decoder pair projects onto the principal subspace of the data, the subspace spanned by the top $`k`$ principal components ([Baldi and Hornik, 1989](https://www.sciencedirect.com/science/article/pii/0893608089900142); ML chapter 12; [Appendix B](#block-dl10-appendix-b)). The code below trains a linear autoencoder by gradient descent on the digits and compares it with PCA.
 
 ```python
 import numpy as np
@@ -82,9 +82,9 @@ The autoencoder finds the same subspace as PCA, but not the principal directions
 
 ### <a id="denoising-and-other-regularized-autoencoders"></a>Denoising and other regularized autoencoders
 
-Instead of a bottleneck, an autoencoder can be prevented from learning the identity by other constraints: a sparsity penalty on the code, a penalty on the Jacobian of the encoder that makes the code insensitive to small input changes (**contractive** autoencoders; [Rifai et al., 2011](https://icml.cc/2011/papers/455_icmlpaper.pdf)), or corruption of the input. A **denoising autoencoder** ([Vincent et al., 2008](https://doi.org/10.1145/1390156.1390294)) receives a corrupted input $\tilde x$, for example with Gaussian noise added or some pixels set to zero, and must reconstruct the clean $x$. To do so it must learn how clean data look.
+Instead of a bottleneck, an autoencoder can be prevented from learning the identity by other constraints: a sparsity penalty on the code, a penalty on the Jacobian of the encoder that makes the code insensitive to small input changes (**contractive** autoencoders; [Rifai et al., 2011](https://icml.cc/2011/papers/455_icmlpaper.pdf)), or corruption of the input. A **denoising autoencoder** ([Vincent et al., 2008](https://doi.org/10.1145/1390156.1390294)) receives a corrupted input $`\tilde x`$, for example with Gaussian noise added or some pixels set to zero, and must reconstruct the clean $`x`$. To do so it must learn how clean data look.
 
-For small Gaussian noise of variance $\sigma^2$, the optimal denoiser moves a noisy point toward regions of higher data density: $r(\tilde x)-\tilde x\approx\sigma^2\nabla_{\tilde x}\log p(\tilde x)$, the **score** of the noise-smoothed data distribution ([Vincent, 2011](https://doi.org/10.1162/NECO_a_00142); [Alain and Bengio, 2014](https://arxiv.org/abs/1211.4246)). Denoising at many noise levels is the training objective of diffusion models (Generative AI chapter 7), and the variational autoencoder turns the autoencoder into a probabilistic generative model (Generative AI chapter 3). Masked autoencoders, later in this chapter, are denoising autoencoders whose corruption removes whole patches.
+For small Gaussian noise of variance $`\sigma^2`$, the optimal denoiser moves a noisy point toward regions of higher data density: $`r(\tilde x)-\tilde x\approx\sigma^2\nabla_{\tilde x}\log p(\tilde x)`$, the **score** of the noise-smoothed data distribution ([Vincent, 2011](https://doi.org/10.1162/NECO_a_00142); [Alain and Bengio, 2014](https://arxiv.org/abs/1211.4246)). Denoising at many noise levels is the training objective of diffusion models (Generative AI chapter 7), and the variational autoencoder turns the autoencoder into a probabilistic generative model (Generative AI chapter 3). Masked autoencoders, later in this chapter, are denoising autoencoders whose corruption removes whole patches.
 
 ## <a id="contrastive-learning"></a>Contrastive learning
 
@@ -92,18 +92,18 @@ For small Gaussian noise of variance $\sigma^2$, the optimal denoiser moves a no
 
 Contrastive methods learn by comparison. Two random **augmentations** of the same image form a **positive pair**; views of different images are **negatives**. The encoder is trained so that each view's embedding is closer to its partner than to the negatives. Treating every image as its own class, this is **instance discrimination** ([Wu et al., 2018](https://arxiv.org/abs/1805.01978)).
 
-**SimCLR** ([Chen et al., 2020](https://arxiv.org/abs/2002.05709)) gives the standard recipe. A batch of $N$ images yields $2N$ views; each passes through the encoder $f$ and a small **projection head** $g$ to an embedding $z$, normalized to unit length. For a positive pair $(i,j)$, the loss is
+**SimCLR** ([Chen et al., 2020](https://arxiv.org/abs/2002.05709)) gives the standard recipe. A batch of $`N`$ images yields $`2N`$ views; each passes through the encoder $`f`$ and a small **projection head** $`g`$ to an embedding $`z`$, normalized to unit length. For a positive pair $`(i,j)`$, the loss is
 
 $$
 \ell_{ij}=-\log\frac{\exp(z_i^\top z_j/\tau)}{\sum_{k\ne i}\exp(z_i^\top z_k/\tau)},
 $$
 
-averaged over all $2N$ views. This is a cross-entropy: each view must classify which of the other $2N-1$ views is its partner, with cosine similarities divided by a **temperature** $\tau$ as logits. The loss comes from noise-contrastive estimation ([Gutmann and Hyvärinen, 2010](https://proceedings.mlr.press/v9/gutmann10a.html)) and was named **InfoNCE** by [van den Oord, Li, and Vinyals (2018)](https://arxiv.org/abs/1807.03748), who used it to predict future segments of audio, text, and images from past ones.
+averaged over all $`2N`$ views. This is a cross-entropy: each view must classify which of the other $`2N-1`$ views is its partner, with cosine similarities divided by a **temperature** $`\tau`$ as logits. The loss comes from noise-contrastive estimation ([Gutmann and Hyvärinen, 2010](https://proceedings.mlr.press/v9/gutmann10a.html)) and was named **InfoNCE** by [van den Oord, Li, and Vinyals (2018)](https://arxiv.org/abs/1807.03748), who used it to predict future segments of audio, text, and images from past ones.
 
 Several details of SimCLR turned out to matter:
 
 - **Strong augmentation.** Random cropping combined with color distortion was essential. Without color distortion, two crops of the same image can be matched by their color histograms alone, and the network learns nothing else.
-- **A projection head.** The loss is applied to $z=g(h)$, but the representation used downstream is $h$. The head absorbs the invariances the loss enforces, such as invariance to color, which may be useful information downstream; $h$ was 10 percentage points better than $z$ under a linear probe.
+- **A projection head.** The loss is applied to $`z=g(h)`$, but the representation used downstream is $`h`$. The head absorbs the invariances the loss enforces, such as invariance to color, which may be useful information downstream; $`h`$ was 10 percentage points better than $`z`$ under a linear probe.
 - **Many negatives.** Larger batches helped, up to 8,192 images. **MoCo** ([He et al., 2020](https://arxiv.org/abs/1911.05722)) decouples the number of negatives from the batch size by keeping a queue of embeddings from recent batches, computed by a **momentum encoder** whose weights are an exponential moving average of the trained encoder's, so that the queued embeddings stay consistent.
 - **A low temperature**, around 0.1 to 0.5, which concentrates the gradient on the hardest negatives.
 
@@ -111,13 +111,13 @@ With a ResNet-50, a linear probe on SimCLR features reached 69.3% top-1 accuracy
 
 ### <a id="what-the-loss-measures"></a>What the loss measures
 
-InfoNCE is a lower bound on the **mutual information** between the two views (Foundations chapter 5). If a critic $f(x,y)$ scores how likely $y$ is to be the partner of $x$, and the loss $\mathcal L$ is the cross-entropy of picking the true partner among $N$ candidates, then
+InfoNCE is a lower bound on the **mutual information** between the two views (Foundations chapter 5). If a critic $`f(x,y)`$ scores how likely $`y`$ is to be the partner of $`x`$, and the loss $`\mathcal L`$ is the cross-entropy of picking the true partner among $`N`$ candidates, then
 
 $$
 I(X;Y)\ \ge\ \log N-\mathcal L ,
 $$
 
-with near equality for the optimal critic $f^*(x,y)=\log p(y\mid x)/p(y)$ when $I(X;Y)$ is small compared with $\log N$ ([Poole et al., 2019](https://arxiv.org/abs/1905.06922); [Appendix A](#block-dl10-appendix-a)). Because $\mathcal L\ge0$, the estimate can never exceed $\log N$. The code below uses the optimal critic for correlated Gaussians, whose mutual information is known, to show both properties.
+with near equality for the optimal critic $`f^*(x,y)=\log p(y\mid x)/p(y)`$ when $`I(X;Y)`$ is small compared with $`\log N`$ ([Poole et al., 2019](https://arxiv.org/abs/1905.06922); [Appendix A](#block-dl10-appendix-a)). Because $`\mathcal L\ge0`$, the estimate can never exceed $`\log N`$. The code below uses the optimal critic for correlated Gaussians, whose mutual information is known, to show both properties.
 
 ```python
 import math
@@ -150,7 +150,7 @@ for mi in (1, 2, 4, 8, 16):                                   # true mutual info
 
 Mutual information is not, however, what makes the representations good. Two views of an image share a great deal of information, most of it useless for recognition, and invertible encoders preserve all of it; bounds with fewer negatives or estimators that track mutual information more closely do not give better features ([Tschannen et al., 2020](https://arxiv.org/abs/1907.13625); [McAllester and Stratos, 2020](https://arxiv.org/abs/1811.04251)). The architecture of the encoder, the augmentations, and the critic's form decide what is learned.
 
-[Wang and Isola (2020)](https://arxiv.org/abs/2005.10242) give a more useful description. As the number of negatives grows, the InfoNCE loss minus $\log N$ approaches the sum of two terms ([Appendix C](#block-dl10-appendix-c)):
+[Wang and Isola (2020)](https://arxiv.org/abs/2005.10242) give a more useful description. As the number of negatives grows, the InfoNCE loss minus $`\log N`$ approaches the sum of two terms ([Appendix C](#block-dl10-appendix-c)):
 
 $$
 \underbrace{-\frac1\tau\,\mathbb E\bigl[z_a^\top z_b\bigr]}_{\text{alignment}}\;+\;\underbrace{\mathbb E_x\log\mathbb E_{x'}\exp\bigl(z(x)^\top z(x')/\tau\bigr)}_{\text{uniformity}} .
@@ -164,7 +164,7 @@ The augmentations define the invariances. Whatever differs between two views is 
 
 <img src="sources/images/dl-ssl-views.png" alt="dl-ssl-views" width="640">
 
-*Random views of three digits used in the experiments of this chapter: rotations of up to 17 degrees, rescaling by up to 15%, shifts of up to one pixel, and pixel noise. At a resolution of $8\times8$ every transformation also blurs the digit.*
+*Random views of three digits used in the experiments of this chapter: rotations of up to 17 degrees, rescaling by up to 15%, shifts of up to one pixel, and pixel noise. At a resolution of $`8\times8`$ every transformation also blurs the digit.*
 
 This view-centered picture has a theoretical counterpart. Define a graph whose vertices are all possible augmented images, with edges weighted by the probability that two of them are views of the same image. Minimizing a contrastive loss is then close to computing the top eigenvectors of this graph's normalized adjacency matrix, a spectral embedding in the sense of ML chapter 13, and if classes are rarely connected by augmentations, a linear probe on the embedding classifies well ([HaoChen et al., 2021](https://arxiv.org/abs/2106.04156); [Arora et al., 2019](https://arxiv.org/abs/1902.09229)).
 
@@ -221,7 +221,7 @@ The purely attractive loss prefers the collapsed batch; InfoNCE and VICReg penal
 
 ### <a id="asymmetric-architectures"></a>Asymmetric architectures
 
-**BYOL** ([Grill et al., 2020](https://arxiv.org/abs/2006.07733)) trains an online network to predict, through an extra **predictor** MLP $q$, the embedding that a **target network** produces for the other view. The target network is not trained by gradient descent; its weights are an exponential moving average of the online weights. The loss, a negative cosine similarity, has collapsed solutions, yet BYOL does not collapse in practice, and it reached 74.3% under a ResNet-50 linear probe, above the contrastive methods of the time. **SimSiam** ([Chen and He, 2021](https://arxiv.org/abs/2011.10566)) showed that the moving average is not essential: the same network can produce the target, as long as no gradient flows through it (a **stop-gradient**) and a predictor is present. Removing either the stop-gradient or the predictor collapses the representation.
+**BYOL** ([Grill et al., 2020](https://arxiv.org/abs/2006.07733)) trains an online network to predict, through an extra **predictor** MLP $`q`$, the embedding that a **target network** produces for the other view. The target network is not trained by gradient descent; its weights are an exponential moving average of the online weights. The loss, a negative cosine similarity, has collapsed solutions, yet BYOL does not collapse in practice, and it reached 74.3% under a ResNet-50 linear probe, above the contrastive methods of the time. **SimSiam** ([Chen and He, 2021](https://arxiv.org/abs/2011.10566)) showed that the moving average is not essential: the same network can produce the target, as long as no gradient flows through it (a **stop-gradient**) and a predictor is present. Removing either the stop-gradient or the predictor collapses the representation.
 
 Why this works is only partly understood. [Tian, Chen, and Ganguli (2021)](https://arxiv.org/abs/2102.06810) analyzed the learning dynamics of linear networks: with the stop-gradient and the predictor, collapse remains a solution, but under common conditions the dynamics move away from it, and the predictor aligns with the eigenspaces of the correlation matrix of the representations, so that directions of large variance are reinforced rather than suppressed. Batch normalization in the heads also plays a role, since it couples the examples of a batch much as negatives do.
 
@@ -233,11 +233,11 @@ A second approach penalizes collapse directly. **Barlow Twins** ([Zbontar et al.
 
 ### <a id="an-experiment-on-digits"></a>An experiment on digits
 
-The figure below trains the same encoder, a three-layer MLP with a 128-dimensional output, with five objectives on the 1,078 training digits, using the views shown earlier. Collapse is measured by the **effective rank** of the representation, the exponential of the entropy of its normalized singular values ([Roy and Vetterli, 2007](https://www.eurasip.org/Proceedings/Eusipco/Eusipco2007/Papers/a5p-h05.pdf); [Garrido et al., 2023](https://arxiv.org/abs/2210.02885)), which equals $r$ for $r$ equal singular values and 1 for a representation that varies along one direction.
+The figure below trains the same encoder, a three-layer MLP with a 128-dimensional output, with five objectives on the 1,078 training digits, using the views shown earlier. Collapse is measured by the **effective rank** of the representation, the exponential of the entropy of its normalized singular values ([Roy and Vetterli, 2007](https://www.eurasip.org/Proceedings/Eusipco/Eusipco2007/Papers/a5p-h05.pdf); [Garrido et al., 2023](https://arxiv.org/abs/2210.02885)), which equals $`r`$ for $`r`$ equal singular values and 1 for a representation that varies along one direction.
 
 <img src="sources/images/dl-ssl-collapse.png" alt="dl-ssl-collapse" width="880">
 
-*Left: effective rank of the representation over 3,000 steps of training. With only an attractive loss it falls from 75 at initialization to 2.5. SimSiam without the stop-gradient partly collapses, to 18. SimSiam, SimCLR, and VICReg level off between 23 and 33. Right: test accuracy of a standardized linear probe fit on $k$ labeled training digits per class, averaged over 10 random draws of the labeled examples. With one label per class, raw pixels give 57%, a randomly initialized encoder 62%, the collapsed representation 16%, SimCLR, SimSiam, and VICReg between 74% and 79%, and the masked autoencoder 77%. With 50 labels per class, SimCLR, SimSiam, and VICReg exceed 97%, the masked autoencoder reaches 96.5%, and raw pixels 95%.*
+*Left: effective rank of the representation over 3,000 steps of training. With only an attractive loss it falls from 75 at initialization to 2.5. SimSiam without the stop-gradient partly collapses, to 18. SimSiam, SimCLR, and VICReg level off between 23 and 33. Right: test accuracy of a standardized linear probe fit on $`k`$ labeled training digits per class, averaged over 10 random draws of the labeled examples. With one label per class, raw pixels give 57%, a randomly initialized encoder 62%, the collapsed representation 16%, SimCLR, SimSiam, and VICReg between 74% and 79%, and the masked autoencoder 77%. With 50 labels per class, SimCLR, SimSiam, and VICReg exceed 97%, the masked autoencoder reaches 96.5%, and raw pixels 95%.*
 
 Two observations generalize. The benefit of pretraining is largest when labels are scarce and shrinks as they become plentiful. And a representation can lose most of its effective dimensions while retaining information in directions of tiny variance: after standardization, the linear probe recovers 87% accuracy from the collapsed representation with 50 labels per class, but with one label per class it has too little signal to find those directions.
 
@@ -255,7 +255,7 @@ After pretraining, the decoder is discarded. MAE features are best used by fine-
 
 <img src="sources/images/dl-ssl-mae.png" alt="dl-ssl-mae" width="800">
 
-*A small masked autoencoder on test digits. Each $8\times8$ digit is cut into 16 patches of $2\times2$ pixels, half are hidden (tinted), and a three-layer transformer encoder with a one-layer decoder, trained for 4,000 steps on the training digits, fills them in. The squared error per hidden pixel on these ten digits is 0.038, against a pixel variance of 0.142.*
+*A small masked autoencoder on test digits. Each $`8\times8`$ digit is cut into 16 patches of $`2\times2`$ pixels, half are hidden (tinted), and a three-layer transformer encoder with a one-layer decoder, trained for 4,000 steps on the training digits, fills them in. The squared error per hidden pixel on these ten digits is 0.038, against a pixel variance of 0.142.*
 
 ### <a id="predicting-representations-instead-of-pixels"></a>Predicting representations instead of pixels
 
@@ -272,27 +272,27 @@ UNIGE sections 7.2 and 7.3 and the *Cookbook of Self-Supervised Learning* of [Ba
 <summary><a id="block-dl10-appendix-a"></a><b>A. InfoNCE is a lower bound on mutual information</b></summary>
 
 
-Let $(X,Y)\sim p(x,y)$, and form $N$ candidates $Y_1,\ldots,Y_N$ by placing the true partner $Y$ at a uniformly random position $K$ and filling the other positions with independent draws from $p(y)$. A critic $f$ defines a guess for the position,
+Let $`(X,Y)\sim p(x,y)`$, and form $`N`$ candidates $`Y_1,\ldots,Y_N`$ by placing the true partner $`Y`$ at a uniformly random position $`K`$ and filling the other positions with independent draws from $`p(y)`$. A critic $`f`$ defines a guess for the position,
 
 $$
 q(k\mid X,Y_{1:N})=\frac{e^{f(X,Y_k)}}{\sum_{j=1}^Ne^{f(X,Y_j)}},
 $$
 
-and the InfoNCE loss is $\mathcal L=-\mathbb E\log q(K\mid X,Y_{1:N})$.
+and the InfoNCE loss is $`\mathcal L=-\mathbb E\log q(K\mid X,Y_{1:N})`$.
 
-**Step 1: a cross-entropy bounds an entropy.** For any conditional distribution $q$, $-\mathbb E\log q(K\mid X,Y_{1:N})\ge H(K\mid X,Y_{1:N})$, because the difference is an expected Kullback–Leibler divergence (Foundations chapter 5). Hence
+**Step 1: a cross-entropy bounds an entropy.** For any conditional distribution $`q`$, $`-\mathbb E\log q(K\mid X,Y_{1:N})\ge H(K\mid X,Y_{1:N})`$, because the difference is an expected Kullback–Leibler divergence (Foundations chapter 5). Hence
 
 $$
 \log N-\mathcal L\le\log N-H(K\mid X,Y_{1:N})=H(K)-H(K\mid X,Y_{1:N})=I(K;X,Y_{1:N}).
 $$
 
-**Step 2: the position carries at most $I(X;Y)$.** The candidates alone reveal nothing about $K$, since marginally they are $N$ independent draws from $p(y)$ whatever $K$ is; so $I(K;X,Y_{1:N})=I(K;X\mid Y_{1:N})$. By the chain rule, $I(X;K,Y_{1:N})=I(X;Y_{1:N})+I(X;K\mid Y_{1:N})\ge I(K;X\mid Y_{1:N})$. And $X$ depends on $(K,Y_{1:N})$ only through the true partner $Y_K$, so $I(X;K,Y_{1:N})=I(X;Y)$. Combining,
+**Step 2: the position carries at most $`I(X;Y)`$.** The candidates alone reveal nothing about $`K`$, since marginally they are $`N`$ independent draws from $`p(y)`$ whatever $`K`$ is; so $`I(K;X,Y_{1:N})=I(K;X\mid Y_{1:N})`$. By the chain rule, $`I(X;K,Y_{1:N})=I(X;Y_{1:N})+I(X;K\mid Y_{1:N})\ge I(K;X\mid Y_{1:N})`$. And $`X`$ depends on $`(K,Y_{1:N})`$ only through the true partner $`Y_K`$, so $`I(X;K,Y_{1:N})=I(X;Y)`$. Combining,
 
 $$
 \log N-\mathcal L\ \le\ I(X;Y).
 $$
 
-**The optimal critic.** The posterior of the position is $p(k\mid x,y_{1:N})\propto p(y_k\mid x)\prod_{j\ne k}p(y_j)\propto p(y_k\mid x)/p(y_k)$, which is $q$ with $f^*(x,y)=\log p(y\mid x)/p(y)$ plus any function of $x$. With this critic Step 1 is an equality, and the only gap is Step 2, which is small when $I(X;Y)\ll\log N$. Since $\mathcal L\ge0$, the estimate never exceeds $\log N$: measuring large mutual information requires exponentially many negatives ([McAllester and Stratos, 2020](https://arxiv.org/abs/1811.04251)).
+**The optimal critic.** The posterior of the position is $`p(k\mid x,y_{1:N})\propto p(y_k\mid x)\prod_{j\ne k}p(y_j)\propto p(y_k\mid x)/p(y_k)`$, which is $`q`$ with $`f^*(x,y)=\log p(y\mid x)/p(y)`$ plus any function of $`x`$. With this critic Step 1 is an equality, and the only gap is Step 2, which is small when $`I(X;Y)\ll\log N`$. Since $`\mathcal L\ge0`$, the estimate never exceeds $`\log N`$: measuring large mutual information requires exponentially many negatives ([McAllester and Stratos, 2020](https://arxiv.org/abs/1811.04251)).
 
 </details>
 
@@ -302,9 +302,9 @@ $$
 <summary><a id="block-dl10-appendix-b"></a><b>B. Linear autoencoders and principal components</b></summary>
 
 
-Let the centered data matrix $X\in\mathbb R^{n\times p}$ have singular value decomposition $X=USV^\top$, and consider an encoder $E\in\mathbb R^{k\times p}$ and a decoder $D\in\mathbb R^{p\times k}$. The reconstruction $XE^\top D^\top$ has rank at most $k$, so by the Eckart–Young theorem its squared error is at least $\sum_{i>k}s_i^2$, the error of projecting onto the top $k$ right singular vectors $V_k$ (Foundations chapter 2). The minimum is attained whenever $D E=V_kV_k^\top$, for example by $E=A^{-1}V_k^\top$ and $D=V_kA$ for any invertible $k\times k$ matrix $A$. The decoder's columns then span the principal subspace, but they are orthonormal principal directions only if $A$ is orthogonal and ordered, which gradient descent has no reason to produce; the code above finds exactly this.
+Let the centered data matrix $`X\in\mathbb R^{n\times p}`$ have singular value decomposition $`X=USV^\top`$, and consider an encoder $`E\in\mathbb R^{k\times p}`$ and a decoder $`D\in\mathbb R^{p\times k}`$. The reconstruction $`XE^\top D^\top`$ has rank at most $`k`$, so by the Eckart–Young theorem its squared error is at least $`\sum_{i>k}s_i^2`$, the error of projecting onto the top $`k`$ right singular vectors $`V_k`$ (Foundations chapter 2). The minimum is attained whenever $`D E=V_kV_k^\top`$, for example by $`E=A^{-1}V_k^\top`$ and $`D=V_kA`$ for any invertible $`k\times k`$ matrix $`A`$. The decoder's columns then span the principal subspace, but they are orthonormal principal directions only if $`A`$ is orthogonal and ordered, which gradient descent has no reason to produce; the code above finds exactly this.
 
-[Baldi and Hornik (1989)](https://www.sciencedirect.com/science/article/pii/0893608089900142) also showed that this loss has no spurious local minima: every critical point other than the global minima projects onto a subspace spanned by some other set of $k$ eigenvectors and is a saddle point, so gradient descent from a generic starting point reaches the principal subspace.
+[Baldi and Hornik (1989)](https://www.sciencedirect.com/science/article/pii/0893608089900142) also showed that this loss has no spurious local minima: every critical point other than the global minima projects onto a subspace spanned by some other set of $`k`$ eigenvectors and is a saddle point, so gradient descent from a generic starting point reaches the principal subspace.
 
 </details>
 
@@ -314,19 +314,19 @@ Let the centered data matrix $X\in\mathbb R^{n\times p}$ have singular value dec
 <summary><a id="block-dl10-appendix-c"></a><b>C. Alignment and uniformity</b></summary>
 
 
-Write the InfoNCE loss for a view $x$ with positive $x^+$ and $M$ negatives $x_1^-,\ldots,x_M^-$, with unit-norm embeddings $z$:
+Write the InfoNCE loss for a view $`x`$ with positive $`x^+`$ and $`M`$ negatives $`x_1^-,\ldots,x_M^-`$, with unit-norm embeddings $`z`$:
 
 $$
 \mathcal L_M=-\frac1\tau\,\mathbb E\bigl[z(x)^\top z(x^+)\bigr]+\mathbb E\log\Bigl(e^{z(x)^\top z(x^+)/\tau}+\sum_{i=1}^Me^{z(x)^\top z(x_i^-)/\tau}\Bigr).
 $$
 
-Subtract $\log M$. Inside the second logarithm, $\frac1M\sum_ie^{z(x)^\top z(x_i^-)/\tau}$ converges to $\mathbb E_{x'}e^{z(x)^\top z(x')/\tau}$ by the law of large numbers, and the single positive term, bounded by $e^{1/\tau}$, becomes negligible after division by $M$. Hence
+Subtract $`\log M`$. Inside the second logarithm, $`\frac1M\sum_ie^{z(x)^\top z(x_i^-)/\tau}`$ converges to $`\mathbb E_{x'}e^{z(x)^\top z(x')/\tau}`$ by the law of large numbers, and the single positive term, bounded by $`e^{1/\tau}`$, becomes negligible after division by $`M`$. Hence
 
 $$
 \lim_{M\to\infty}\bigl(\mathcal L_M-\log M\bigr)=-\frac1\tau\,\mathbb E\bigl[z(x)^\top z(x^+)\bigr]+\mathbb E_x\log\mathbb E_{x'}e^{z(x)^\top z(x')/\tau}.
 $$
 
-The first term is minimized when positive pairs coincide. The second is a log-partition function over the negatives; by Jensen's inequality it is at least $\frac1\tau\mathbb E_{x,x'}[z(x)^\top z(x')]=\frac1\tau\bigl\|\mathbb E\,z\bigr\|^2$, which is minimized when the mean embedding is zero, and [Wang and Isola (2020)](https://arxiv.org/abs/2005.10242) show that its minimizers are uniform distributions on the sphere when these exist. A collapsed encoder makes the second term $1/\tau$, its maximum.
+The first term is minimized when positive pairs coincide. The second is a log-partition function over the negatives; by Jensen's inequality it is at least $`\frac1\tau\mathbb E_{x,x'}[z(x)^\top z(x')]=\frac1\tau\bigl\|\mathbb E\,z\bigr\|^2`$, which is minimized when the mean embedding is zero, and [Wang and Isola (2020)](https://arxiv.org/abs/2005.10242) show that its minimizers are uniform distributions on the sphere when these exist. A collapsed encoder makes the second term $`1/\tau`$, its maximum.
 
 </details>
 

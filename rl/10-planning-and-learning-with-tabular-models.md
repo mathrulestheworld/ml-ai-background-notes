@@ -10,7 +10,7 @@
 
 Dynamic programming (chapter 2) computes values from a known model; Monte Carlo and TD methods (chapters 5–9) learn them from experience without one. This chapter unifies the two. An agent can learn a model from its experience and then use the model to generate further, simulated experience, from which the same learning methods improve its values. Learning and planning become two sources of updates to one value function.
 
-A **model** is anything the agent can use to predict how the environment will respond to its actions. A **distribution model** gives the probabilities of all next states and rewards, $p(s',r\mid s,a)$, as dynamic programming requires. A **sample model** produces one possible outcome, drawn with those probabilities, as a simulator does. Distribution models are strictly more informative, since they can generate samples, but samples are often much easier to obtain: writing a program that deals a blackjack hand is easy, while listing the probabilities of all outcomes of a hand, as exercise 5.6 did, takes care.
+A **model** is anything the agent can use to predict how the environment will respond to its actions. A **distribution model** gives the probabilities of all next states and rewards, $`p(s',r\mid s,a)`$, as dynamic programming requires. A **sample model** produces one possible outcome, drawn with those probabilities, as a simulator does. Distribution models are strictly more informative, since they can generate samples, but samples are often much easier to obtain: writing a program that deals a blackjack hand is easy, while listing the probabilities of all outcomes of a hand, as exercise 5.6 did, takes care.
 
 **Planning** is any computation that takes a model as input and produces or improves a policy. In artificial intelligence, planning usually means searching through plans, as in the automated planning of AI chapter 7; in reinforcement learning, it usually means **state-space planning**, which computes value functions by updates that back up values from future states along simulated transitions. Every state-space planning method has the same structure as a learning method: a model produces simulated experience, and backups of that experience improve the values, which improve the policy. Only the source of the experience differs.
 
@@ -24,14 +24,14 @@ Planning with a learned model makes each real transition count many times: it is
 
 ### <a id="integrating-learning-planning-and-acting"></a>Integrating learning, planning, and acting
 
-**Dyna** ([Sutton, 1990](https://doi.org/10.1016/B978-1-55860-141-3.50030-4); [Sutton, 1991](https://doi.org/10.1145/122344.122377)) is an architecture in which one agent does all three at once. Real experience is used for two things: **direct reinforcement learning**, which improves the values directly, and **model learning**, which improves the model. The model then supplies simulated experience for **planning**, which improves the same values with the same update. In **Dyna-Q**, the direct update and the planning update are both one-step Q-learning, and the model is a table that records, for each state–action pair tried, the last reward and next state observed, which is exact if the environment is deterministic. After every real step, Dyna-Q performs $n$ planning updates, each on a previously experienced pair chosen at random:
+**Dyna** ([Sutton, 1990](https://doi.org/10.1016/B978-1-55860-141-3.50030-4); [Sutton, 1991](https://doi.org/10.1145/122344.122377)) is an architecture in which one agent does all three at once. Real experience is used for two things: **direct reinforcement learning**, which improves the values directly, and **model learning**, which improves the model. The model then supplies simulated experience for **planning**, which improves the same values with the same update. In **Dyna-Q**, the direct update and the planning update are both one-step Q-learning, and the model is a table that records, for each state–action pair tried, the last reward and next state observed, which is exact if the environment is deterministic. After every real step, Dyna-Q performs $`n`$ planning updates, each on a previously experienced pair chosen at random:
 
-1. In state $S$, choose $A$ ε-greedily with respect to $Q$; take it, and observe $R$ and $S'$.
-2. Update $Q(S,A)$ by Q-learning toward $R+\gamma\max_aQ(S',a)$.
-3. Record $\text{Model}(S,A)\leftarrow(R,S')$.
-4. Repeat $n$ times: pick a pair $(s,a)$ previously experienced, look up $(r,s')=\text{Model}(s,a)$, and update $Q(s,a)$ toward $r+\gamma\max_{a'}Q(s',a')$.
+1. In state $`S`$, choose $`A`$ ε-greedily with respect to $`Q`$; take it, and observe $`R`$ and $`S'`$.
+2. Update $`Q(S,A)`$ by Q-learning toward $`R+\gamma\max_aQ(S',a)`$.
+3. Record $`\text{Model}(S,A)\leftarrow(R,S')`$.
+4. Repeat $`n`$ times: pick a pair $`(s,a)`$ previously experienced, look up $`(r,s')=\text{Model}(s,a)`$, and update $`Q(s,a)`$ toward $`r+\gamma\max_{a'}Q(s',a')`$.
 
-The code runs Dyna-Q in Sutton and Barto's $6\times9$ maze, where the only reward is 1 on reaching the goal, with $n=0$ (plain Q-learning), 5, and 50 planning steps.
+The code runs Dyna-Q in Sutton and Barto's $`6\times9`$ maze, where the only reward is 1 on reaching the goal, with $`n=0`$ (plain Q-learning), 5, and 50 planning steps.
 
 ```python
 import numpy as np
@@ -85,7 +85,7 @@ for n in [0, 5, 50]:
 # n = 50 planning steps: episode 1   776 steps, episode 2    38, episode 3   18, episodes 41-50  16.4 (shortest path 14)
 ```
 
-The first episode is a random search for every $n$: until the goal is reached, every reward in the model is 0, and planning has nothing to propagate. Its length varies from about 770 to 980 steps only through the random numbers. The second episode shows the effect of planning. Without it, the first episode taught the agent only the value of the last step before the goal, and the second episode is again long. With 50 planning steps per real step, the one reward in the model is propagated back through the whole maze during the second episode, and by the third episode the agent follows a near-shortest path. All three settings end at about the same length, 16 to 18 steps, the shortest path of 14 plus the detours of ε-greedy exploration.
+The first episode is a random search for every $`n`$: until the goal is reached, every reward in the model is 0, and planning has nothing to propagate. Its length varies from about 770 to 980 steps only through the random numbers. The second episode shows the effect of planning. Without it, the first episode taught the agent only the value of the last step before the goal, and the second episode is again long. With 50 planning steps per real step, the one reward in the model is propagated back through the whole maze during the second episode, and by the third episode the agent follows a near-shortest path. All three settings end at about the same length, 16 to 18 steps, the shortest path of 14 plus the detours of ε-greedy exploration.
 
 <img src="sources/images/rl-planning-dyna.png" alt="rl-planning-dyna" width="880">
 
@@ -95,7 +95,7 @@ The first episode is a random search for every $n$: until the goal is reached, e
 
 A learned model can be wrong, and planning with a wrong model produces a policy that is optimal for the model rather than for the world. Some errors correct themselves: if the model is optimistic, predicting more reward than the world gives, the planned policy exploits the error, visits the states where it lies, and experience corrects the model. Errors in the other direction are more dangerous. If the world improves after the model was learned, the planned policy has no reason to visit the states where the model is now pessimistic, and the error can persist forever.
 
-Sutton and Barto's two changing mazes illustrate both cases. In the **blocking maze**, a wall across the grid has a gap at its right end, and after 1,000 steps the gap moves to the left end, so the learned route is blocked and a longer route, 16 steps instead of 10, must be found. In the **shortcut maze**, the only gap is at the left end, and after 3,000 steps a second gap opens at the right, creating a shorter route, 10 steps instead of 16. **Dyna-Q+** addresses the problem with an exploration bonus in planning. It records how long it has been since each pair was last tried in the real world, $\tau$, and plans with the reward $r+\kappa\sqrt\tau$ instead of $r$, so that pairs not tried for a long time look increasingly attractive until the agent tests them. It also lets planning consider actions never tried from visited states, modeled as leaving the agent in place with zero reward.
+Sutton and Barto's two changing mazes illustrate both cases. In the **blocking maze**, a wall across the grid has a gap at its right end, and after 1,000 steps the gap moves to the left end, so the learned route is blocked and a longer route, 16 steps instead of 10, must be found. In the **shortcut maze**, the only gap is at the left end, and after 3,000 steps a second gap opens at the right, creating a shorter route, 10 steps instead of 16. **Dyna-Q+** addresses the problem with an exploration bonus in planning. It records how long it has been since each pair was last tried in the real world, $`\tau`$, and plans with the reward $`r+\kappa\sqrt\tau`$ instead of $`r`$, so that pairs not tried for a long time look increasingly attractive until the agent tests them. It also lets planning consider actions never tried from visited states, modeled as leaving the agent in place with zero reward.
 
 ```python
 import numpy as np
@@ -162,7 +162,7 @@ In the blocking maze, both agents first find the right-hand route, and Dyna-Q+ f
 
 <img src="sources/images/rl-planning-changing.png" alt="rl-planning-changing" width="880">
 
-*Cumulative reward of Dyna-Q and Dyna-Q+ (10 planning steps, $\kappa=10^{-3}$) in the two changing mazes, averaged over 20 runs. Left: after the gap moves at step 1,000, both agents stall, and Dyna-Q+ recovers much faster. Right: after the shortcut opens at step 3,000, only Dyna-Q+ finds it, and the slope of its curve, the rate of reward, increases.*
+*Cumulative reward of Dyna-Q and Dyna-Q+ (10 planning steps, $`\kappa=10^{-3}`$) in the two changing mazes, averaged over 20 runs. Left: after the gap moves at step 1,000, both agents stall, and Dyna-Q+ recovers much faster. Right: after the shortcut opens at step 3,000, only Dyna-Q+ finds it, and the slope of its curve, the rate of reward, increases.*
 
 The trade-off is the exploration–exploitation dilemma of chapter 3 applied to the model: exploration tests the model and exploitation uses it. The bonus in Dyna-Q+ is a heuristic, which costs a little reward when the world does not change; principled versions that account for the uncertainty of a learned model, such as the optimistic model-based methods of chapter 22 and chapter 30, formalize the same idea.
 
@@ -172,9 +172,9 @@ The trade-off is the exploration–exploitation dilemma of chapter 3 applied to 
 
 Dyna-Q chooses the pairs it updates uniformly at random, and most of these updates do nothing: in the maze after the first episode, only the pairs leading into the goal have values that can change, and the rest are updated from zeros to zeros. Planning is more efficient if it works backward from the states whose values have changed. When the value of a state changes, the values of its **predecessors**, the pairs that lead to it, are likely to change too, and among them the ones whose values would change the most should be updated first.
 
-**Prioritized sweeping** ([Moore and Atkeson, 1993](https://doi.org/10.1007/BF00993104); [Peng and Williams, 1993](https://doi.org/10.1177/105971239300100403)) maintains a priority queue of state–action pairs ordered by the size of their pending update, $|R+\gamma\max_aQ(S',a)-Q(S,A)|$. After a real transition, the pair is inserted if its priority exceeds a small threshold. Each planning step removes the pair with the largest priority, updates it, and then computes the priorities of all its predecessors in the model, inserting those above the threshold. Changes propagate backward from where they occur, largest first, and planning stops when the queue is empty.
+**Prioritized sweeping** ([Moore and Atkeson, 1993](https://doi.org/10.1007/BF00993104); [Peng and Williams, 1993](https://doi.org/10.1177/105971239300100403)) maintains a priority queue of state–action pairs ordered by the size of their pending update, $`|R+\gamma\max_aQ(S',a)-Q(S,A)|`$. After a real transition, the pair is inserted if its priority exceeds a small threshold. Each planning step removes the pair with the largest priority, updates it, and then computes the priorities of all its predecessors in the model, inserting those above the threshold. Changes propagate backward from where they occur, largest first, and planning stops when the queue is empty.
 
-The code compares Dyna-Q and prioritized sweeping on the maze at three resolutions, with each cell divided into a $k\times k$ block, counting the updates, real and planned, until the greedy policy follows a shortest path.
+The code compares Dyna-Q and prioritized sweeping on the maze at three resolutions, with each cell divided into a $`k\times k`$ block, counting the updates, real and planned, until the greedy policy follows a shortest path.
 
 ```python
 import heapq
@@ -274,25 +274,25 @@ Prioritized sweeping finds the optimal path with 2.5 to 14 times fewer updates, 
 
 ### <a id="the-cost-of-an-update"></a>The cost of an update
 
-Planning updates can differ along three dimensions: whether they update state values or action values, whether they estimate the values of a given policy or the optimal ones, and whether they use an **expected update**, which averages over all possible next states with a distribution model, or a **sample update**, which uses one sampled next state. The first two dimensions give the familiar methods; the third is new. The expected Q-learning update is the value-iteration backup, $Q(s,a)\leftarrow\sum_{s',r}p(s',r\mid s,a)[r+\gamma\max_{a'}Q(s',a')]$; the sample update is the Q-learning update, $Q(s,a)\leftarrow Q(s,a)+\alpha[r+\gamma\max_{a'}Q(s',a')-Q(s,a)]$ with a sampled $(r,s')$.
+Planning updates can differ along three dimensions: whether they update state values or action values, whether they estimate the values of a given policy or the optimal ones, and whether they use an **expected update**, which averages over all possible next states with a distribution model, or a **sample update**, which uses one sampled next state. The first two dimensions give the familiar methods; the third is new. The expected Q-learning update is the value-iteration backup, $`Q(s,a)\leftarrow\sum_{s',r}p(s',r\mid s,a)[r+\gamma\max_{a'}Q(s',a')]`$; the sample update is the Q-learning update, $`Q(s,a)\leftarrow Q(s,a)+\alpha[r+\gamma\max_{a'}Q(s',a')-Q(s,a)]`$ with a sampled $`(r,s')`$.
 
-An expected update is exact but costs about $b$ times as much as a sample update, where the **branching factor** $b$ is the number of possible next states. When the successors are equally likely and their values are correct, a sample update that averages its targets with step size $1/t$ reduces the error of the estimate as
+An expected update is exact but costs about $`b`$ times as much as a sample update, where the **branching factor** $`b`$ is the number of possible next states. When the successors are equally likely and their values are correct, a sample update that averages its targets with step size $`1/t`$ reduces the error of the estimate as
 
 $$
 \text{error after }t\text{ sample updates}\approx\sigma\sqrt{\frac{b-1}{bt}},
 $$
 
-where $\sigma^2$ measures the spread of the successors' values (exercise 10.4). The expected update achieves zero error, but only after $b$ computations; in that time, $b$ sample updates reduce the error to about $\sigma/\sqrt b$, which is already small when $b$ is large. For large $b$ most of the benefit of an expected update is available at a small fraction of its cost, and in problems where the successors' values are themselves being learned, the sample updates, which let those improvements propagate sooner, do even better. Expected updates are preferable when the branching factor is small or when the computation is cheap relative to the value of exactness.
+where $`\sigma^2`$ measures the spread of the successors' values (exercise 10.4). The expected update achieves zero error, but only after $`b`$ computations; in that time, $`b`$ sample updates reduce the error to about $`\sigma/\sqrt b`$, which is already small when $`b`$ is large. For large $`b`$ most of the benefit of an expected update is available at a small fraction of its cost, and in problems where the successors' values are themselves being learned, the sample updates, which let those improvements propagate sooner, do even better. Expected updates are preferable when the branching factor is small or when the computation is cheap relative to the value of exactness.
 
 <img src="sources/images/rl-planning-updates.png" alt="rl-planning-updates" width="880">
 
-*Left: the RMS error of an estimate of a state–action value from sample updates, as a function of the computation spent, in units of one expected update ($b$ evaluations of successors), for branching factors from 2 to 10,000, with the successors' values known and scaled to standard deviation 1, so that one sample update has error 1 and $t$ of them have error about $1/\sqrt t$; the dashed line is the expected update, which removes the whole error after $b$ evaluations. Right: the value of the start state under the greedy policy, as planning proceeds with expected updates in random tasks with 1,000 states, 2 actions, and $b$ successors per pair, averaged over 30 tasks. Updates distributed along simulated on-policy trajectories (solid) help faster at first; uniform sweeps through all pairs (dashed) catch up after about one sweep and end higher, and the early advantage of trajectory sampling lasts longest for $b=1$.*
+*Left: the RMS error of an estimate of a state–action value from sample updates, as a function of the computation spent, in units of one expected update ($`b`$ evaluations of successors), for branching factors from 2 to 10,000, with the successors' values known and scaled to standard deviation 1, so that one sample update has error 1 and $`t`$ of them have error about $`1/\sqrt t`$; the dashed line is the expected update, which removes the whole error after $`b`$ evaluations. Right: the value of the start state under the greedy policy, as planning proceeds with expected updates in random tasks with 1,000 states, 2 actions, and $`b`$ successors per pair, averaged over 30 tasks. Updates distributed along simulated on-policy trajectories (solid) help faster at first; uniform sweeps through all pairs (dashed) catch up after about one sweep and end higher, and the early advantage of trajectory sampling lasts longest for $`b=1`$.*
 
 ### <a id="trajectory-sampling"></a>Trajectory sampling
 
 The second question is how to distribute updates over states. Dynamic programming sweeps the whole state space, giving every state equal attention. The alternative is **trajectory sampling**: simulate trajectories with the current policy and update the states and actions encountered, which distributes the updates according to the **on-policy distribution**. It ignores the parts of the state space the policy does not visit, which is good if they are irrelevant and bad if they are not.
 
-The code repeats Sutton and Barto's experiment on random tasks with 1,000 states, two actions, and $b$ equally likely successors per pair, in which each transition ends the episode with probability 0.1. Both methods make expected updates; "uniform" cycles through all pairs, and "on-policy" updates the pairs met along ε-greedy trajectories from the start state.
+The code repeats Sutton and Barto's experiment on random tasks with 1,000 states, two actions, and $`b`$ equally likely successors per pair, in which each transition ends the episode with probability 0.1. Both methods make expected updates; "uniform" cycles through all pairs, and "on-policy" updates the pairs met along ε-greedy trajectories from the start state.
 
 ```python
 import numpy as np
@@ -448,7 +448,7 @@ Everything so far has been **background planning**: planning that improves a val
 
 ### <a id="rollout-algorithms"></a>Rollout algorithms
 
-A **rollout algorithm** estimates the value of each action in the current state by simulating many trajectories that start with that action and then follow a fixed **base policy** and chooses the action with the highest average ([Tesauro and Galperin, 1996](https://papers.nips.cc/paper_files/paper/1996/hash/996009f2374006606f4c0b0fda878af1-Abstract.html); [Bertsekas, Tsitsiklis, and Wu, 1997](https://doi.org/10.1023/A:1009635226865)). With exact estimates, the rollout policy is the greedy policy with respect to $q_{\text{base}}$, and by the policy improvement theorem of chapter 2 it is at least as good as the base policy: rollout performs one step of policy iteration online, at the states actually encountered, without ever storing a value function (exercise 10.5). The code applies it to blackjack, with a base policy that sticks only on 20 or 21.
+A **rollout algorithm** estimates the value of each action in the current state by simulating many trajectories that start with that action and then follow a fixed **base policy** and chooses the action with the highest average ([Tesauro and Galperin, 1996](https://papers.nips.cc/paper_files/paper/1996/hash/996009f2374006606f4c0b0fda878af1-Abstract.html); [Bertsekas, Tsitsiklis, and Wu, 1997](https://doi.org/10.1023/A:1009635226865)). With exact estimates, the rollout policy is the greedy policy with respect to $`q_{\text{base}}`$, and by the policy improvement theorem of chapter 2 it is at least as good as the base policy: rollout performs one step of policy iteration online, at the states actually encountered, without ever storing a value function (exercise 10.5). The code applies it to blackjack, with a base policy that sticks only on 20 or 21.
 
 ```python
 import gymnasium as gym
@@ -525,7 +525,7 @@ The base policy loses about 34 cents per dollar. Rollout, which simulates only 1
 
 ### <a id="sparse-sampling"></a>Sparse sampling
 
-For an MDP with an enormous or continuous state space, [Kearns, Mansour, and Ng (2002)](https://doi.org/10.1023/A:1017932429737) showed that near-optimal decision-time planning is possible with a computation that does not depend on the number of states. **Sparse sampling** builds a lookahead tree from the current state: for each action it draws $C$ next states from the sample model, and recursively does the same from each of them to a depth $H$, then backs up values with the Bellman optimality equation. With $C$ and $H$ polynomial in $1/\varepsilon$ and $1/(1-\gamma)$, the policy that runs sparse sampling at every state is $\varepsilon$-optimal, and the number of simulator calls, $(|\mathcal A|C)^H$, is independent of $|\mathcal S|$ (exercise 10.8). The price is exponential dependence on the horizon, which makes the algorithm impractical as it stands, but it established that the size of the state space is not what makes planning hard, and it motivates the selective trees of Monte Carlo tree search.
+For an MDP with an enormous or continuous state space, [Kearns, Mansour, and Ng (2002)](https://doi.org/10.1023/A:1017932429737) showed that near-optimal decision-time planning is possible with a computation that does not depend on the number of states. **Sparse sampling** builds a lookahead tree from the current state: for each action it draws $`C`$ next states from the sample model, and recursively does the same from each of them to a depth $`H`$, then backs up values with the Bellman optimality equation. With $`C`$ and $`H`$ polynomial in $`1/\varepsilon`$ and $`1/(1-\gamma)`$, the policy that runs sparse sampling at every state is $`\varepsilon`$-optimal, and the number of simulator calls, $`(|\mathcal A|C)^H`$, is independent of $`|\mathcal S|`$ (exercise 10.8). The price is exponential dependence on the horizon, which makes the algorithm impractical as it stands, but it established that the size of the state space is not what makes planning hard, and it motivates the selective trees of Monte Carlo tree search.
 
 ### <a id="monte-carlo-tree-search"></a>Monte Carlo tree search
 
@@ -535,13 +535,13 @@ For an MDP with an enormous or continuous state space, [Kearns, Mansour, and Ng 
 
 The distinctions of this chapter reappear in deep reinforcement learning. A replay buffer is a nonparametric sample model of the environment: replaying a stored transition is a Dyna planning update with a model that remembers exactly what happened, and prioritized experience replay is prioritized sweeping without predecessors (chapter 16, chapter 18). [van Hasselt, Hessel, and Aslanides (2019)](https://arxiv.org/abs/1906.05243) argued that when a model only generates transitions from states already observed, for an update that is otherwise model-free, replay is often as good as a parametric model and safer, since it cannot invent transitions that never happen; parametric models earn their keep when they plan forward from the current state, even one never seen before, choose actions rather than just train values, or plan backward for credit assignment. Those are the uses developed in chapter 23 and chapter 24.
 
-Lab 4 compares Q-learning, Dyna-Q, and prioritized sweeping on Taxi, plans with a learned stochastic model on an $8\times8$ FrozenLake, compares rollout with UCT in blackjack, and runs RTDP on a large lake.
+Lab 4 compares Q-learning, Dyna-Q, and prioritized sweeping on Taxi, plans with a learned stochastic model on an $`8\times8`$ FrozenLake, compares rollout with UCT in blackjack, and runs RTDP on a large lake.
 
 ## <a id="exercises"></a>Exercises
 
 ### <a id="exercise-10-1-where-to-put-the-exploration-bonus"></a>Exercise 10.1 — Where to put the exploration bonus
 
-Dyna-Q+ adds its bonus $\kappa\sqrt\tau$ to the rewards used in planning. A variant adds it only when choosing actions, acting greedily with respect to $Q(S,a)+\kappa\sqrt{\tau(S,a)}$, and plans with the plain rewards. Compare the two on the shortcut maze. Which finds the shortcut, and why?
+Dyna-Q+ adds its bonus $`\kappa\sqrt\tau`$ to the rewards used in planning. A variant adds it only when choosing actions, acting greedily with respect to $`Q(S,a)+\kappa\sqrt{\tau(S,a)}`$, and plans with the plain rewards. Compare the two on the shortcut maze. Which finds the shortcut, and why?
 
 
 <details>
@@ -609,7 +609,7 @@ In the blocking maze, Dyna-Q+ collects more reward than Dyna-Q even before the g
 <summary><b>Solution</b></summary>
 
 
-In the first phase, the task is to find the goal and then a short route to it. Dyna-Q explores only through ε-greedy randomness, so it finds the goal by a random walk and its model covers only the pairs it happened to try. Dyna-Q+ plans with bonuses for pairs not tried recently and, at every visited state, for actions never tried there, which it models as staying in place; planning then assigns high value to reaching those pairs, and the agent explores the maze systematically, the way optimistic initialization does. It finds the goal sooner and discovers the right-hand route sooner. The bonus also has a cost, which appears later, when the world is stable and fully explored: Dyna-Q+ keeps making occasional detours to test old pairs, and with a large $\kappa$ it would lose reward relative to Dyna-Q.
+In the first phase, the task is to find the goal and then a short route to it. Dyna-Q explores only through ε-greedy randomness, so it finds the goal by a random walk and its model covers only the pairs it happened to try. Dyna-Q+ plans with bonuses for pairs not tried recently and, at every visited state, for actions never tried there, which it models as staying in place; planning then assigns high value to reaching those pairs, and the agent explores the maze systematically, the way optimistic initialization does. It finds the goal sooner and discovers the right-hand route sooner. The bonus also has a cost, which appears later, when the world is stable and fully explored: Dyna-Q+ keeps making occasional detours to test old pairs, and with a large $`\kappa`$ it would lose reward relative to Dyna-Q.
 
 </details>
 
@@ -698,36 +698,36 @@ The last-outcome model is wrong in a stochastic world: it replaces the distribut
 
 ### <a id="exercise-10-4-the-error-of-sample-updates"></a>Exercise 10.4 — The error of sample updates
 
-Let a state–action pair have $b$ equally likely successors with values $v_1,\dots,v_b$, known exactly, and let the target be their mean $\bar v$. A sample update with step size $1/t$ averages $t$ values drawn with replacement. (a) Show that its RMS error after $t$ updates is $s/\sqrt t$, where $s^2=\frac1b\sum_i(v_i-\bar v)^2$. (b) With $s^2$ written as $\frac{b-1}{b}\sigma^2$ in terms of the unbiased sample variance $\sigma^2$ of the $v_i$, recover the formula of the chapter. (c) How many sample updates reduce the error by a factor of 10, and how does that compare with $b$?
+Let a state–action pair have $`b`$ equally likely successors with values $`v_1,\dots,v_b`$, known exactly, and let the target be their mean $`\bar v`$. A sample update with step size $`1/t`$ averages $`t`$ values drawn with replacement. (a) Show that its RMS error after $`t`$ updates is $`s/\sqrt t`$, where $`s^2=\frac1b\sum_i(v_i-\bar v)^2`$. (b) With $`s^2`$ written as $`\frac{b-1}{b}\sigma^2`$ in terms of the unbiased sample variance $`\sigma^2`$ of the $`v_i`$, recover the formula of the chapter. (c) How many sample updates reduce the error by a factor of 10, and how does that compare with $`b`$?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) The average of $t$ independent draws from the uniform distribution on $\{v_i\}$ has mean $\bar v$ and variance $s^2/t$, where $s^2$ is the variance of one draw, $\frac1b\sum_i(v_i-\bar v)^2$. The RMS error is its standard deviation, $s/\sqrt t$.
+(a) The average of $`t`$ independent draws from the uniform distribution on $`\{v_i\}`$ has mean $`\bar v`$ and variance $`s^2/t`$, where $`s^2`$ is the variance of one draw, $`\frac1b\sum_i(v_i-\bar v)^2`$. The RMS error is its standard deviation, $`s/\sqrt t`$.
 
-(b) With $\sigma^2=\frac1{b-1}\sum_i(v_i-\bar v)^2$, $s^2=\frac{b-1}b\sigma^2$, and the error is $\sigma\sqrt{(b-1)/(bt)}$.
+(b) With $`\sigma^2=\frac1{b-1}\sum_i(v_i-\bar v)^2`$, $`s^2=\frac{b-1}b\sigma^2`$, and the error is $`\sigma\sqrt{(b-1)/(bt)}`$.
 
-(c) The error falls by a factor of 10 after $t=100$ updates relative to one, whatever $b$ is. For $b\ge1{,}000$, a hundred sample updates cost a tenth or less of one expected update and already remove 90% of the error; for $b=10$ they cost ten expected updates, and the expected update is far better. This is the regime argument of the chapter: sample updates win when branching factors are large, which is the usual case in large problems.
+(c) The error falls by a factor of 10 after $`t=100`$ updates relative to one, whatever $`b`$ is. For $`b\ge1{,}000`$, a hundred sample updates cost a tenth or less of one expected update and already remove 90% of the error; for $`b=10`$ they cost ten expected updates, and the expected update is far better. This is the regime argument of the chapter: sample updates win when branching factors are large, which is the usual case in large problems.
 
 </details>
 
 
 ### <a id="exercise-10-5-rollout-improves-the-base-policy"></a>Exercise 10.5 — Rollout improves the base policy
 
-Let $\pi_b$ be a base policy and $\pi_r$ the rollout policy that, in every state, takes an action maximizing $q_{\pi_b}(s,a)$, computed exactly. (a) Prove that $v_{\pi_r}(s)\ge v_{\pi_b}(s)$ for all $s$. (b) With estimated values from $m$ rollouts per action, when can the rollout policy be worse than the base policy? (c) What does repeating rollout, with $\pi_r$ as the new base policy, compute?
+Let $`\pi_b`$ be a base policy and $`\pi_r`$ the rollout policy that, in every state, takes an action maximizing $`q_{\pi_b}(s,a)`$, computed exactly. (a) Prove that $`v_{\pi_r}(s)\ge v_{\pi_b}(s)`$ for all $`s`$. (b) With estimated values from $`m`$ rollouts per action, when can the rollout policy be worse than the base policy? (c) What does repeating rollout, with $`\pi_r`$ as the new base policy, compute?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) By construction, $q_{\pi_b}(s,\pi_r(s))=\max_aq_{\pi_b}(s,a)\ge\sum_a\pi_b(a\mid s)q_{\pi_b}(s,a)=v_{\pi_b}(s)$ for every state. This is the hypothesis of the policy improvement theorem (chapter 2), which gives $v_{\pi_r}\ge v_{\pi_b}$.
+(a) By construction, $`q_{\pi_b}(s,\pi_r(s))=\max_aq_{\pi_b}(s,a)\ge\sum_a\pi_b(a\mid s)q_{\pi_b}(s,a)=v_{\pi_b}(s)`$ for every state. This is the hypothesis of the policy improvement theorem (chapter 2), which gives $`v_{\pi_r}\ge v_{\pi_b}`$.
 
-(b) With finite rollouts, the estimates are noisy, and the rollout policy can choose an action whose estimate is high by chance and whose true value is below $v_{\pi_b}(s)$. The risk is largest when the actions' values are close and $m$ is small, and it is the maximization bias of chapter 7 at decision time. In the blackjack experiment, even $m=10$ improved enormously on the base policy, because the base policy's mistakes were large; where the base policy is already good, the noise can erase the gain.
+(b) With finite rollouts, the estimates are noisy, and the rollout policy can choose an action whose estimate is high by chance and whose true value is below $`v_{\pi_b}(s)`$. The risk is largest when the actions' values are close and $`m`$ is small, and it is the maximization bias of chapter 7 at decision time. In the blackjack experiment, even $`m=10`$ improved enormously on the base policy, because the base policy's mistakes were large; where the base policy is already good, the noise can erase the gain.
 
-(c) Repeating rollout performs policy iteration: each round is one improvement step, applied online. But evaluating the new base policy $\pi_r$ requires running rollouts of rollouts: every step of every trajectory simulated under $\pi_r$ needs its own $|\mathcal A|m$ rollouts of $\pi_b$, so a decision costs on the order of $(|\mathcal A|mL)^k$ simulated steps for $k$ rounds, where $L$ is the length of a trajectory. Monte Carlo tree search avoids this blow-up by reusing simulations: the tree stores estimates of the improved policy's values near the root, and each simulation both evaluates and improves.
+(c) Repeating rollout performs policy iteration: each round is one improvement step, applied online. But evaluating the new base policy $`\pi_r`$ requires running rollouts of rollouts: every step of every trajectory simulated under $`\pi_r`$ needs its own $`|\mathcal A|m`$ rollouts of $`\pi_b`$, so a decision costs on the order of $`(|\mathcal A|mL)^k`$ simulated steps for $`k`$ rounds, where $`L`$ is the length of a trajectory. Monte Carlo tree search avoids this blow-up by reusing simulations: the tree stores estimates of the improved policy's values near the root, and each simulation both evaluates and improves.
 
 </details>
 
@@ -741,7 +741,7 @@ How should prioritized sweeping be modified when the environment is stochastic? 
 <summary><b>Solution</b></summary>
 
 
-The model stores counts of outcomes, from which it estimates $\hat p(s',r\mid s,a)$. The planning update is the expected update $Q(s,a)\leftarrow\sum_{s',r}\hat p(s',r\mid s,a)[r+\gamma\max_{a'}Q(s',a')]$, and the priority of a pair is the size of the change this update would make, $\bigl|\sum_{s',r}\hat p(s',r\mid s,a)[r+\gamma\max_{a'}Q(s',a')]-Q(s,a)\bigr|$. When a state's value changes by $\Delta$, the priority of a predecessor pair changes by about $\gamma\hat p(s\mid\bar s,\bar a)\Delta$, which is how it is recomputed. With only the last outcome, the priority would measure the change toward one random outcome, which is large whenever the outcomes differ, even if the pair's expected value is already correct, and planning would spend its effort chasing noise, as the last-outcome model in exercise 10.3 does. Prioritized sweeping with expected updates spends computation on low-probability transitions as readily as on likely ones. **Small backups** ([van Seijen and Sutton, 2013](https://proceedings.mlr.press/v28/vanseijen13.html)) reduce the cost of each update to that of a sample update, without its variance, by updating a pair from the change in one successor's value at a time.
+The model stores counts of outcomes, from which it estimates $`\hat p(s',r\mid s,a)`$. The planning update is the expected update $`Q(s,a)\leftarrow\sum_{s',r}\hat p(s',r\mid s,a)[r+\gamma\max_{a'}Q(s',a')]`$, and the priority of a pair is the size of the change this update would make, $`\bigl|\sum_{s',r}\hat p(s',r\mid s,a)[r+\gamma\max_{a'}Q(s',a')]-Q(s,a)\bigr|`$. When a state's value changes by $`\Delta`$, the priority of a predecessor pair changes by about $`\gamma\hat p(s\mid\bar s,\bar a)\Delta`$, which is how it is recomputed. With only the last outcome, the priority would measure the change toward one random outcome, which is large whenever the outcomes differ, even if the pair's expected value is already correct, and planning would spend its effort chasing noise, as the last-outcome model in exercise 10.3 does. Prioritized sweeping with expected updates spends computation on low-probability transitions as readily as on likely ones. **Small backups** ([van Seijen and Sutton, 2013](https://proceedings.mlr.press/v28/vanseijen13.html)) reduce the cost of each update to that of a sample update, without its variance, by updating a pair from the change in one successor's value at a time.
 
 </details>
 
@@ -810,25 +810,25 @@ for budget in [50, 200, 1000, 5000]:
 # budget  5000 simulations: flat Monte Carlo chooses right in   0.0% of trials, UCT in  67.0%
 ```
 
-Flat Monte Carlo never chooses right: under random play, the right action is worth $1/32\approx0.03$, far below 0.4, and more simulations only make it more certain. It evaluates the base policy, not the optimal one, which is the limitation of rollout algorithms with a bad base policy. UCT improves its policy within the tree and eventually finds the rewarding path, but slowly: even with 5,000 simulations for a tree with 64 leaves, it recommends the right action in only about two thirds of the trials. Its exploration of the right subtree is driven by the root's bonus $\sqrt{\ln N/N(\text{right})}$, which grows only logarithmically while the right action looks worse by 0.4, so the right subtree receives few simulations until the rewarding path has been stumbled upon. [Coquelin and Munos (2007)](https://arxiv.org/abs/1408.2028) constructed trees on which UCT needs a number of simulations that grows as a tower of exponentials in the depth. Modern MCTS mitigates the problem with learned priors that direct the search toward promising actions, as in AlphaZero's PUCT rule, which works when the priors are good and inherits their blind spots when they are not.
+Flat Monte Carlo never chooses right: under random play, the right action is worth $`1/32\approx0.03`$, far below 0.4, and more simulations only make it more certain. It evaluates the base policy, not the optimal one, which is the limitation of rollout algorithms with a bad base policy. UCT improves its policy within the tree and eventually finds the rewarding path, but slowly: even with 5,000 simulations for a tree with 64 leaves, it recommends the right action in only about two thirds of the trials. Its exploration of the right subtree is driven by the root's bonus $`\sqrt{\ln N/N(\text{right})}`$, which grows only logarithmically while the right action looks worse by 0.4, so the right subtree receives few simulations until the rewarding path has been stumbled upon. [Coquelin and Munos (2007)](https://arxiv.org/abs/1408.2028) constructed trees on which UCT needs a number of simulations that grows as a tower of exponentials in the depth. Modern MCTS mitigates the problem with learned priors that direct the search toward promising actions, as in AlphaZero's PUCT rule, which works when the priors are good and inherits their blind spots when they are not.
 
 </details>
 
 
 ### <a id="exercise-10-8-the-cost-of-sparse-sampling"></a>Exercise 10.8 — The cost of sparse sampling
 
-(a) Count the simulator calls made by sparse sampling with $|\mathcal A|$ actions, $C$ samples per action, and depth $H$. (b) Evaluate it for $|\mathcal A|=2$, $C=10$, $H=10$. (c) Why is the count independent of $|\mathcal S|$, and why does that matter?
+(a) Count the simulator calls made by sparse sampling with $`|\mathcal A|`$ actions, $`C`$ samples per action, and depth $`H`$. (b) Evaluate it for $`|\mathcal A|=2`$, $`C=10`$, $`H=10`$. (c) Why is the count independent of $`|\mathcal S|`$, and why does that matter?
 
 
 <details>
 <summary><b>Solution</b></summary>
 
 
-(a) The root makes $|\mathcal A|C$ calls, each of the resulting $|\mathcal A|C$ nodes makes $|\mathcal A|C$ more, and so on for $H$ levels: $\sum_{h=1}^H(|\mathcal A|C)^h\approx(|\mathcal A|C)^H$ calls in total.
+(a) The root makes $`|\mathcal A|C`$ calls, each of the resulting $`|\mathcal A|C`$ nodes makes $`|\mathcal A|C`$ more, and so on for $`H`$ levels: $`\sum_{h=1}^H(|\mathcal A|C)^h\approx(|\mathcal A|C)^H`$ calls in total.
 
-(b) $(2\cdot10)^{10}\approx10^{13}$ calls for one decision, which is far beyond practical use, even though the problem is tiny in every dimension except the horizon.
+(b) $`(2\cdot10)^{10}\approx10^{13}`$ calls for one decision, which is far beyond practical use, even though the problem is tiny in every dimension except the horizon.
 
-(c) The tree samples next states instead of enumerating them, so its size depends on the number of samples, not on the number of possible states; the Bellman backups on the tree use sample averages whose accuracy, by concentration inequalities, depends on $C$ and not on $|\mathcal S|$. This shows that planning in an MDP with an astronomically large or continuous state space is possible with a simulator, at a cost exponential in the effective horizon $1/(1-\gamma)$ instead. MCTS keeps the idea of sampling the successors and replaces the uniform tree by a selective one.
+(c) The tree samples next states instead of enumerating them, so its size depends on the number of samples, not on the number of possible states; the Bellman backups on the tree use sample averages whose accuracy, by concentration inequalities, depends on $`C`$ and not on $`|\mathcal S|`$. This shows that planning in an MDP with an astronomically large or continuous state space is possible with a simulator, at a cost exponential in the effective horizon $`1/(1-\gamma)`$ instead. MCTS keeps the idea of sampling the successors and replaces the uniform tree by a selective one.
 
 </details>
 
@@ -842,7 +842,7 @@ Flat Monte Carlo never chooses right: under random play, the right action is wor
 
 **Dyna-Q.** In a deterministic environment, the model of Dyna-Q is exact for every pair it has tried, and its planning updates are Q-learning updates on transitions that the environment would produce. Real and planned updates together are an asynchronous stochastic approximation of the Bellman optimality operator, restricted to the pairs in the model, so Q-learning's convergence theorem (chapter 7) applies as long as every pair is tried in the real environment infinitely often and the step sizes satisfy the Robbins–Monro conditions. With a stochastic environment and a last-outcome model, the planned updates use a model that jumps to whichever outcome occurred last, and the values chase that outcome instead of its expectation (exercise 10.3); with a model that samples from the empirical distribution, the model converges to the true one as each pair is tried more often, and so do the values.
 
-**RTDP.** Consider a stochastic shortest-path problem in which every step from a nongoal state has positive cost, some policy reaches the goal with probability one from every state, improper policies have infinite expected cost from some state, and the initial values are admissible, $V_0\le v_*$, with value zero at the goal. [Barto, Bradtke, and Singh (1995)](https://doi.org/10.1016/0004-3702%2894%2900011-O) proved that with repeated trials from the start state, RTDP converges with probability one to the optimal values on the set of states relevant to the start, the states reachable from it under some optimal policy, and its greedy policy becomes optimal from the start. The argument has two parts. Admissibility is preserved: if $V\le v_*$, then $\mathcal TV\le\mathcal Tv_*=v_*$, so each update keeps the values optimistic. And optimism drives exploration: if the values at some relevant state are too low, the greedy policy is drawn toward it, and the updates there raise its value until it is correct. States that no optimal policy visits may keep wrong values, which is the source of the savings.
+**RTDP.** Consider a stochastic shortest-path problem in which every step from a nongoal state has positive cost, some policy reaches the goal with probability one from every state, improper policies have infinite expected cost from some state, and the initial values are admissible, $`V_0\le v_*`$, with value zero at the goal. [Barto, Bradtke, and Singh (1995)](https://doi.org/10.1016/0004-3702%2894%2900011-O) proved that with repeated trials from the start state, RTDP converges with probability one to the optimal values on the set of states relevant to the start, the states reachable from it under some optimal policy, and its greedy policy becomes optimal from the start. The argument has two parts. Admissibility is preserved: if $`V\le v_*`$, then $`\mathcal TV\le\mathcal Tv_*=v_*`$, so each update keeps the values optimistic. And optimism drives exploration: if the values at some relevant state are too low, the greedy policy is drawn toward it, and the updates there raise its value until it is correct. States that no optimal policy visits may keep wrong values, which is the source of the savings.
 
 </details>
 
@@ -852,7 +852,7 @@ Flat Monte Carlo never chooses right: under random play, the right action is wor
 <summary><a id="block-rl10-appendix-b"></a><b>B. The value of trajectory sampling</b></summary>
 
 
-Trajectory sampling can be understood through the error it minimizes. Let $\mu$ be the distribution of states visited by the current policy from the start, and consider the error of the start state's value, which is what performance from the start depends on. The error of $v(s_0)$ is a discounted sum of the errors of the Bellman backups along the trajectories from $s_0$, weighted by how often each state is visited: $v_\pi(s_0)-V(s_0)=\sum_t\gamma^t\,\mathbb E_\pi\bigl[(\mathcal T^\pi V)(S_t)-V(S_t)\bigm|S_0=s_0\bigr]$, a telescoping identity closely related to the performance difference lemma of chapter 1. Updates at states with large on-policy weight therefore reduce the start-state error the most. This is why on-policy sampling helps quickly, and why it stalls: the weights are those of the current policy, and a state whose value is wrong enough to change the greedy policy may have little weight until the policy changes. Uniform sweeps pay for all states, relevant or not, and do not have this blind spot. RTDP's optimism combines the two: its trajectories follow the on-policy distribution, and its admissible values make the unexplored states look attractive until they have been checked.
+Trajectory sampling can be understood through the error it minimizes. Let $`\mu`$ be the distribution of states visited by the current policy from the start, and consider the error of the start state's value, which is what performance from the start depends on. The error of $`v(s_0)`$ is a discounted sum of the errors of the Bellman backups along the trajectories from $`s_0`$, weighted by how often each state is visited: $`v_\pi(s_0)-V(s_0)=\sum_t\gamma^t\,\mathbb E_\pi\bigl[(\mathcal T^\pi V)(S_t)-V(S_t)\bigm|S_0=s_0\bigr]`$, a telescoping identity closely related to the performance difference lemma of chapter 1. Updates at states with large on-policy weight therefore reduce the start-state error the most. This is why on-policy sampling helps quickly, and why it stalls: the weights are those of the current policy, and a state whose value is wrong enough to change the greedy policy may have little weight until the policy changes. Uniform sweeps pay for all states, relevant or not, and do not have this blind spot. RTDP's optimism combines the two: its trajectories follow the on-policy distribution, and its admissible values make the unexplored states look attractive until they have been checked.
 
 </details>
 

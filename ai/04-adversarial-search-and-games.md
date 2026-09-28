@@ -10,12 +10,12 @@
 
 In the search problems of chapters 1–3 the agent alone decides what happens. In a game, another agent decides some of the moves and wants a different outcome. The classic setting of AI game playing is the **two-player, zero-sum, deterministic game of perfect information**: chess, checkers, Go, Othello, tic-tac-toe. The players, MAX and MIN, alternate moves, both see the whole state, and one player's gain is the other's loss. Such a game is defined by
 
-- an initial state $s_0$ and a function $\mathrm{ToMove}(s)$ naming the player whose turn it is;
-- the legal moves $\mathrm{Actions}(s)$ and the transition model $\mathrm{Result}(s,a)$;
-- a **terminal test** $\mathrm{IsTerminal}(s)$ that is true when the game is over;
-- a **utility function** $\mathrm{Utility}(s,p)$ giving the final payoff of terminal state $s$ to player $p$, such as $+1$, $0$, or $-1$ for a win, draw, or loss.
+- an initial state $`s_0`$ and a function $`\mathrm{ToMove}(s)`$ naming the player whose turn it is;
+- the legal moves $`\mathrm{Actions}(s)`$ and the transition model $`\mathrm{Result}(s,a)`$;
+- a **terminal test** $`\mathrm{IsTerminal}(s)`$ that is true when the game is over;
+- a **utility function** $`\mathrm{Utility}(s,p)`$ giving the final payoff of terminal state $`s`$ to player $`p`$, such as $`+1`$, $`0`$, or $`-1`$ for a win, draw, or loss.
 
-"Zero-sum" means that the two utilities add to a constant, so a single number, the utility for MAX, describes each outcome: MAX wants it high and MIN wants it low. The states and moves form a **game tree** whose levels alternate between the players; a level is a **ply**, a move by one player. Game trees are enormous: tic-tac-toe, with at most nine moves, already has 549,946 nodes, although only 5,478 distinct positions; chess has an average branching factor of about 35, and games often last 80 plies, so its tree has on the order of $35^{80}\approx10^{123}$ nodes. Games are therefore the clearest example of problems that must be solved with bounded computation, and they have served as a benchmark for AI since the 1950s.
+"Zero-sum" means that the two utilities add to a constant, so a single number, the utility for MAX, describes each outcome: MAX wants it high and MIN wants it low. The states and moves form a **game tree** whose levels alternate between the players; a level is a **ply**, a move by one player. Game trees are enormous: tic-tac-toe, with at most nine moves, already has 549,946 nodes, although only 5,478 distinct positions; chess has an average branching factor of about 35, and games often last 80 plies, so its tree has on the order of $`35^{80}\approx10^{123}`$ nodes. Games are therefore the clearest example of problems that must be solved with bounded computation, and they have served as a benchmark for AI since the 1950s.
 
 ### <a id="minimax"></a>Minimax
 
@@ -25,7 +25,7 @@ $$
 \mathrm{Minimax}(s)=\begin{cases}\mathrm{Utility}(s,\mathrm{MAX}) & \text{if }\mathrm{IsTerminal}(s),\\ \max_{a}\mathrm{Minimax}(\mathrm{Result}(s,a)) & \text{if }\mathrm{ToMove}(s)=\mathrm{MAX},\\ \min_{a}\mathrm{Minimax}(\mathrm{Result}(s,a)) & \text{if }\mathrm{ToMove}(s)=\mathrm{MIN}.\end{cases}
 $$
 
-The **minimax decision** at the root chooses the move leading to the child of highest value. The minimax algorithm computes these values by a depth-first traversal of the whole tree, backing values up from the leaves. With branching factor $b$ and maximum depth $m$ it takes $O(b^m)$ time and $O(bm)$ space.
+The **minimax decision** at the root chooses the move leading to the child of highest value. The minimax algorithm computes these values by a depth-first traversal of the whole tree, backing values up from the leaves. With branching factor $`b`$ and maximum depth $`m`$ it takes $`O(b^m)`$ time and $`O(bm)`$ space.
 
 Minimax play is optimal against an optimal opponent: MAX is guaranteed at least the minimax value whatever MIN does, and cannot guarantee more. Against a suboptimal opponent, minimax still guarantees the value, but it may miss chances. A position where every move draws against perfect play, but where one move sets a trap that a weak opponent is likely to fall into, is not distinguished by minimax. [Expectimax](#expectimax-against-imperfect-opponents) models the opponent's actual behavior instead, and game theory (chapter 15) treats simultaneous moves and hidden information, where optimal play may require randomizing.
 
@@ -37,10 +37,10 @@ With more than two players, utilities become vectors, one entry per player, and 
 
 Minimax examines every node, but many cannot influence the decision. Suppose MAX already has a move worth 3, and while examining a second move MAX finds that MIN has a reply leading to 2. MIN would choose that reply or something worse for MAX, so the second move is worth at most 2, and the rest of MIN's replies need not be examined. **Alpha–beta pruning** formalizes this by passing two bounds down the tree:
 
-- $\alpha$, the best value MAX can already guarantee along the current path;
-- $\beta$, the best value MIN can already guarantee along the current path.
+- $`\alpha`$, the best value MAX can already guarantee along the current path;
+- $`\beta`$, the best value MIN can already guarantee along the current path.
 
-A MAX node updates $\alpha$ with each child's value, a MIN node updates $\beta$, and a node stops examining its children as soon as $\alpha\ge\beta$, because the player above would never allow play to reach it. The value returned at the root is exactly the minimax value; values returned from pruned subtrees are only bounds, which is enough to show that those subtrees are not chosen ([Appendix A](#block-ai04-appendix-a)).
+A MAX node updates $`\alpha`$ with each child's value, a MIN node updates $`\beta`$, and a node stops examining its children as soon as $`\alpha\ge\beta`$, because the player above would never allow play to reach it. The value returned at the root is exactly the minimax value; values returned from pruned subtrees are only bounds, which is enough to show that those subtrees are not chosen ([Appendix A](#block-ai04-appendix-a)).
 
 ### <a id="move-ordering"></a>Move ordering
 
@@ -50,7 +50,7 @@ $$
 b^{\lceil d/2\rceil}+b^{\lfloor d/2\rfloor}-1
 $$
 
-leaves of a uniform tree of depth $d$, the minimum possible for any algorithm that proves the minimax value ([Knuth and Moore, 1975](https://www.sciencedirect.com/science/article/pii/0004370275900193)); that is $O(b^{d/2})$, as if the branching factor were $\sqrt b$, and it allows a search twice as deep in the same time. With children in random order, the number of leaves grows roughly as $b^{3d/4}$ for moderate $b$. Perfect ordering is impossible, since it would require knowing the values, but good ordering is cheap to approximate:
+leaves of a uniform tree of depth $`d`$, the minimum possible for any algorithm that proves the minimax value ([Knuth and Moore, 1975](https://www.sciencedirect.com/science/article/pii/0004370275900193)); that is $`O(b^{d/2})`$, as if the branching factor were $`\sqrt b`$, and it allows a search twice as deep in the same time. With children in random order, the number of leaves grows roughly as $`b^{3d/4}`$ for moderate $`b`$. Perfect ordering is impossible, since it would require knowing the values, but good ordering is cheap to approximate:
 
 - try **captures and threats** first, as a human player would;
 - use the best move found by a shallower search, which iterative deepening provides for free (the **principal variation**);
@@ -60,11 +60,11 @@ With these, chess programs come within a small factor of the best case.
 
 <img src="sources/images/ai-games-alphabeta.png" alt="ai-games-alphabeta" width="700">
 
-*Leaves evaluated to compute the root's minimax value in uniform trees with branching factor 5 and independent uniform random leaf values. At depth 9, minimax evaluates all 1,953,125 leaves; alpha–beta with children in random order evaluates 85,616 on average over ten trees, growing roughly as $b^{0.73d}$; and alpha–beta with the best child always first evaluates 3,749, exactly the Knuth–Moore minimum $b^{\lceil d/2\rceil}+b^{\lfloor d/2\rfloor}-1$.*
+*Leaves evaluated to compute the root's minimax value in uniform trees with branching factor 5 and independent uniform random leaf values. At depth 9, minimax evaluates all 1,953,125 leaves; alpha–beta with children in random order evaluates 85,616 on average over ten trees, growing roughly as $`b^{0.73d}`$; and alpha–beta with the best child always first evaluates 3,749, exactly the Knuth–Moore minimum $`b^{\lceil d/2\rceil}+b^{\lfloor d/2\rfloor}-1`$.*
 
 ### <a id="transpositions"></a>Transpositions
 
-Different move orders often lead to the same position, a **transposition**. A **transposition table** caches the value of each position searched, keyed by a hash of the position, so that it is searched once. With alpha–beta, the cached value may be only a bound: a node searched with window $(\alpha,\beta)$ that returned $v\le\alpha$ has true value at most $v$, and one that returned $v\ge\beta$ has true value at least $v$, so tables store a flag with each value. Tic-tac-toe shows the combined effect of pruning, ordering, and caching:
+Different move orders often lead to the same position, a **transposition**. A **transposition table** caches the value of each position searched, keyed by a hash of the position, so that it is searched once. With alpha–beta, the cached value may be only a bound: a node searched with window $`(\alpha,\beta)`$ that returned $`v\le\alpha`$ has true value at most $`v`$, and one that returned $`v\ge\beta`$ has true value at least $`v`$, so tables store a flag with each value. Tic-tac-toe shows the combined effect of pruning, ordering, and caching:
 
 ```python
 import math
@@ -154,7 +154,7 @@ All four searches agree that tic-tac-toe is a draw with perfect play. Alpha–be
 
 ### <a id="evaluation-functions"></a>Evaluation functions
 
-Chess cannot be searched to the end, so programs search to a limited depth and apply an **evaluation function** $\mathrm{Eval}(s)$, an estimate of the minimax value, at the frontier of the search. The resulting **heuristic minimax**, or H-Minimax, replaces the terminal test by a **cutoff test**, typically a depth limit chosen by iterative deepening so that a move is ready when time runs out.
+Chess cannot be searched to the end, so programs search to a limited depth and apply an **evaluation function** $`\mathrm{Eval}(s)`$, an estimate of the minimax value, at the frontier of the search. The resulting **heuristic minimax**, or H-Minimax, replaces the terminal test by a **cutoff test**, typically a depth limit chosen by iterative deepening so that a move is ready when time runs out.
 
 A good evaluation function orders terminal states as the utility does, is cheap to compute, and, for nonterminal states, is strongly correlated with the actual chance of winning. Classical evaluation functions are **weighted linear functions of features**,
 
@@ -182,9 +182,9 @@ $$
 \mathrm{ExpectiMinimax}(s)=\sum_{r}P(r)\,\mathrm{ExpectiMinimax}(\mathrm{Result}(s,r))\quad\text{at chance nodes},
 $$
 
-with max and min at the players' nodes as before. The cost grows to $O(b^mn^m)$, where $n$ is the number of distinct chance outcomes (21 for a roll of two dice), so programs search only a few plies. Alpha–beta can be extended to chance nodes when utilities are bounded, since a bound on the average follows from bounds on the children, but it prunes much less.
+with max and min at the players' nodes as before. The cost grows to $`O(b^mn^m)`$, where $`n`$ is the number of distinct chance outcomes (21 for a roll of two dice), so programs search only a few plies. Alpha–beta can be extended to chance nodes when utilities are bounded, since a bound on the average follows from bounds on the children, but it prunes much less.
 
-Chance changes what an evaluation function must get right. In a deterministic game, minimax decisions are unchanged by any strictly increasing transformation of the evaluation function, because only the order of values matters. With chance nodes the decision depends on averages, and an order-preserving transformation can change it: two moves with outcomes $\{1,4\}$ and $\{2,2\}$, each equally likely, have averages 2.5 and 2, but after squaring the values the averages become 2 and 4 and the preference reverses. An evaluation function in a game of chance must therefore be a positive linear transformation of the probability of winning, or more generally of the expected utility (chapter 12).
+Chance changes what an evaluation function must get right. In a deterministic game, minimax decisions are unchanged by any strictly increasing transformation of the evaluation function, because only the order of values matters. With chance nodes the decision depends on averages, and an order-preserving transformation can change it: two moves with outcomes $`\{1,4\}`$ and $`\{2,2\}`$, each equally likely, have averages 2.5 and 2, but after squaring the values the averages become 2 and 4 and the preference reverses. An evaluation function in a game of chance must therefore be a positive linear transformation of the probability of winning, or more generally of the expected utility (chapter 12).
 
 ### <a id="expectimax-against-imperfect-opponents"></a>Expectimax against imperfect opponents
 
@@ -205,13 +205,13 @@ When time runs out, the move with the most visits is played.
 
 ### <a id="selection-with-uct"></a>Selection with UCT
 
-The selection policy must balance **exploitation**, descending into moves with a high average reward, and **exploration**, trying moves with few visits whose average is uncertain. The **UCT** rule ([Kocsis and Szepesvári, 2006](https://doi.org/10.1007/11871842_29)) applies the UCB1 algorithm for multi-armed bandits ([Auer, Cesa-Bianchi, and Fischer, 2002](https://doi.org/10.1023/A:1013689704352)) at every node: from node $n$, choose the child $c$ maximizing
+The selection policy must balance **exploitation**, descending into moves with a high average reward, and **exploration**, trying moves with few visits whose average is uncertain. The **UCT** rule ([Kocsis and Szepesvári, 2006](https://doi.org/10.1007/11871842_29)) applies the UCB1 algorithm for multi-armed bandits ([Auer, Cesa-Bianchi, and Fischer, 2002](https://doi.org/10.1023/A:1013689704352)) at every node: from node $`n`$, choose the child $`c`$ maximizing
 
 $$
 \frac{W(c)}{N(c)}+C\sqrt{\frac{\ln N(n)}{N(c)}},
 $$
 
-where $W(c)/N(c)$ is the average reward of $c$ for the player who moves at $n$, $N(n)$ and $N(c)$ are visit counts, and $C$ is an exploration constant, $\sqrt2$ in the original analysis. The bonus shrinks as a child is visited and grows slowly for children that are neglected, so every child is visited infinitely often but the best ones overwhelmingly more. Kocsis and Szepesvári showed that UCT's estimate at the root converges to the minimax value and that the probability of choosing a suboptimal move goes to zero as the number of iterations grows. Bandits and the exploration–exploitation trade-off in general belong to the RL module.
+where $`W(c)/N(c)`$ is the average reward of $`c`$ for the player who moves at $`n`$, $`N(n)`$ and $`N(c)`$ are visit counts, and $`C`$ is an exploration constant, $`\sqrt2`$ in the original analysis. The bonus shrinks as a child is visited and grows slowly for children that are neglected, so every child is visited infinitely often but the best ones overwhelmingly more. Kocsis and Szepesvári showed that UCT's estimate at the root converges to the minimax value and that the probability of choosing a suboptimal move goes to zero as the number of iterations grows. Bandits and the exploration–exploitation trade-off in general belong to the RL module.
 
 ```python
 import math
@@ -299,7 +299,7 @@ With X in one corner and O in an adjacent corner, three of X's seven moves win b
 
 ### <a id="from-mcts-to-alphazero"></a>From MCTS to AlphaZero
 
-MCTS made computer Go competitive at the amateur level, and combining it with deep networks made it superhuman. AlphaGo ([Silver et al., 2016](https://doi.org/10.1038/nature16961)) guided the search with a **policy network**, a prior over moves learned from human games and self-play, and replaced most playouts by a **value network** that evaluates positions; it defeated the world-class player Lee Sedol in 2016. **AlphaZero** ([Silver et al., 2018](https://doi.org/10.1126/science.aar6404)) learned both networks from self-play alone, with no human data, and reached superhuman strength in Go, chess, and shogi with one algorithm. Its selection rule, PUCT, adds to each child's value an exploration bonus proportional to the network's prior probability of the move, $C\,P(c)\sqrt{N(n)}/(1+N(c))$, so the search explores the moves the network considers plausible. Search improves the network's move choices, and the network is trained to predict the search's choices and the game outcomes: the search acts as a policy-improvement operator, an idea developed in the RL module.
+MCTS made computer Go competitive at the amateur level, and combining it with deep networks made it superhuman. AlphaGo ([Silver et al., 2016](https://doi.org/10.1038/nature16961)) guided the search with a **policy network**, a prior over moves learned from human games and self-play, and replaced most playouts by a **value network** that evaluates positions; it defeated the world-class player Lee Sedol in 2016. **AlphaZero** ([Silver et al., 2018](https://doi.org/10.1126/science.aar6404)) learned both networks from self-play alone, with no human data, and reached superhuman strength in Go, chess, and shogi with one algorithm. Its selection rule, PUCT, adds to each child's value an exploration bonus proportional to the network's prior probability of the move, $`C\,P(c)\sqrt{N(n)}/(1+N(c))`$, so the search explores the moves the network considers plausible. Search improves the network's move choices, and the network is trained to predict the search's choices and the game outcomes: the search acts as a policy-improvement operator, an idea developed in the RL module.
 
 Modern chess engines show the two traditions converging. Stockfish, a descendant of the alpha–beta programs, now evaluates positions with an efficiently updatable neural network, while engines in the AlphaZero tradition use MCTS with large networks; both are far beyond human strength.
 
@@ -314,23 +314,23 @@ In games such as poker, bridge, and Kriegspiel (chess in which the opponent's pi
 <summary><a id="block-ai04-appendix-a"></a><b>A. Correctness of alpha–beta</b></summary>
 
 
-Let $V(n)$ denote the minimax value of node $n$, and let $\mathrm{AB}(n,\alpha,\beta)$ be the value returned by alpha–beta called on $n$ with window $\alpha<\beta$. The invariant is:
+Let $`V(n)`$ denote the minimax value of node $`n`$, and let $`\mathrm{AB}(n,\alpha,\beta)`$ be the value returned by alpha–beta called on $`n`$ with window $`\alpha<\beta`$. The invariant is:
 
-- if $V(n)\le\alpha$, then $\mathrm{AB}(n,\alpha,\beta)\le\alpha$;
-- if $V(n)\ge\beta$, then $\mathrm{AB}(n,\alpha,\beta)\ge\beta$;
-- if $\alpha<V(n)<\beta$, then $\mathrm{AB}(n,\alpha,\beta)=V(n)$.
+- if $`V(n)\le\alpha`$, then $`\mathrm{AB}(n,\alpha,\beta)\le\alpha`$;
+- if $`V(n)\ge\beta`$, then $`\mathrm{AB}(n,\alpha,\beta)\ge\beta`$;
+- if $`\alpha<V(n)<\beta`$, then $`\mathrm{AB}(n,\alpha,\beta)=V(n)`$.
 
-In short, the returned value equals $V(n)$ whenever $V(n)$ lies strictly inside the window, and otherwise lies on the same side of the window as $V(n)$ (a **fail-hard** or **fail-soft** bound, depending on the implementation).
+In short, the returned value equals $`V(n)`$ whenever $`V(n)`$ lies strictly inside the window, and otherwise lies on the same side of the window as $`V(n)`$ (a **fail-hard** or **fail-soft** bound, depending on the implementation).
 
-**Proof by induction on height.** At a leaf the returned value is exact. Consider a MAX node with children $c_1,\dots,c_k$; the algorithm calls each child with window $(\alpha_i,\beta)$, where $\alpha_i=\max(\alpha,v_{i-1})$ and $v_{i-1}$ is the largest value returned so far, and stops if $\alpha_i\ge\beta$. By the induction hypothesis, a returned child value $w_i$ equals $V(c_i)$ if $V(c_i)\in(\alpha_i,\beta)$, is at most $\alpha_i$ if $V(c_i)\le\alpha_i$, and is at least $\beta$ if $V(c_i)\ge\beta$. Three cases:
+**Proof by induction on height.** At a leaf the returned value is exact. Consider a MAX node with children $`c_1,\dots,c_k`$; the algorithm calls each child with window $`(\alpha_i,\beta)`$, where $`\alpha_i=\max(\alpha,v_{i-1})`$ and $`v_{i-1}`$ is the largest value returned so far, and stops if $`\alpha_i\ge\beta`$. By the induction hypothesis, a returned child value $`w_i`$ equals $`V(c_i)`$ if $`V(c_i)\in(\alpha_i,\beta)`$, is at most $`\alpha_i`$ if $`V(c_i)\le\alpha_i`$, and is at least $`\beta`$ if $`V(c_i)\ge\beta`$. Three cases:
 
-- If some child has $V(c_i)\ge\beta$, then $V(n)\ge\beta$. Either that child returns a value at least $\beta$, which triggers a cutoff and makes the node return at least $\beta$, or an earlier cutoff already did.
-- If all children have $V(c_i)\le\alpha$, every returned value is at most $\alpha$, and so is the node's value: correct, since $V(n)=\max_iV(c_i)\le\alpha$.
-- Otherwise $\alpha<V(n)<\beta$. Let $c_j$ be the first child with $V(c_j)=V(n)$. Every earlier child has $V(c_i)<V(n)$ and returns either that exact value or a value at most $\alpha_i$; by induction on $i$, starting from $\alpha<V(n)$, every $\alpha_i$ with $i\le j$ is below $V(n)$. Hence $V(c_j)\in(\alpha_j,\beta)$, the child returns $V(n)$ exactly, and no cutoff occurs because $V(n)<\beta$. Later children have $V(c_i)\le V(n)=\alpha_i$ and return at most $\alpha_i$. The node returns $V(n)$.
+- If some child has $`V(c_i)\ge\beta`$, then $`V(n)\ge\beta`$. Either that child returns a value at least $`\beta`$, which triggers a cutoff and makes the node return at least $`\beta`$, or an earlier cutoff already did.
+- If all children have $`V(c_i)\le\alpha`$, every returned value is at most $`\alpha`$, and so is the node's value: correct, since $`V(n)=\max_iV(c_i)\le\alpha`$.
+- Otherwise $`\alpha<V(n)<\beta`$. Let $`c_j`$ be the first child with $`V(c_j)=V(n)`$. Every earlier child has $`V(c_i)<V(n)`$ and returns either that exact value or a value at most $`\alpha_i`$; by induction on $`i`$, starting from $`\alpha<V(n)`$, every $`\alpha_i`$ with $`i\le j`$ is below $`V(n)`$. Hence $`V(c_j)\in(\alpha_j,\beta)`$, the child returns $`V(n)`$ exactly, and no cutoff occurs because $`V(n)<\beta`$. Later children have $`V(c_i)\le V(n)=\alpha_i`$ and return at most $`\alpha_i`$. The node returns $`V(n)`$.
 
-MIN nodes are symmetric. At the root, called with $(-\infty,+\infty)$, the third case always applies, so alpha–beta returns the exact minimax value.
+MIN nodes are symmetric. At the root, called with $`(-\infty,+\infty)`$, the third case always applies, so alpha–beta returns the exact minimax value.
 
-**The best case.** Knuth and Moore showed that any algorithm certifying the minimax value of a uniform tree must examine at least $b^{\lceil d/2\rceil}+b^{\lfloor d/2\rfloor}-1$ leaves: to prove a lower bound on MAX's value it suffices to examine one child at each MAX node and all children at each MIN node along a strategy for MAX, $b^{\lfloor d/2\rfloor}$ leaves, and symmetrically for the upper bound, $b^{\lceil d/2\rceil}$ leaves, with one leaf, on the principal variation, shared by both proofs. Alpha–beta with perfect ordering examines exactly these leaves, as the assertion in the figure script checks.
+**The best case.** Knuth and Moore showed that any algorithm certifying the minimax value of a uniform tree must examine at least $`b^{\lceil d/2\rceil}+b^{\lfloor d/2\rfloor}-1`$ leaves: to prove a lower bound on MAX's value it suffices to examine one child at each MAX node and all children at each MIN node along a strategy for MAX, $`b^{\lfloor d/2\rfloor}`$ leaves, and symmetrically for the upper bound, $`b^{\lceil d/2\rceil}`$ leaves, with one leaf, on the principal variation, shared by both proofs. Alpha–beta with perfect ordering examines exactly these leaves, as the assertion in the figure script checks.
 
 </details>
 
@@ -340,9 +340,9 @@ MIN nodes are symmetric. At the root, called with $(-\infty,+\infty)$, the third
 <summary><a id="block-ai04-appendix-b"></a><b>B. Why UCT explores enough</b></summary>
 
 
-Consider one node whose children are the arms of a bandit, each child's playout rewards lying in $[0,1]$ with mean $\mu_c$, and let $\mu^*=\max_c\mu_c$ and $\Delta_c=\mu^*-\mu_c$. With $C=\sqrt2$, the UCB1 index of a child is its average plus $\sqrt{2\ln N/N(c)}$. By Hoeffding's inequality (Foundations chapter 4), the average of $N(c)$ rewards deviates from $\mu_c$ by more than $\sqrt{2\ln N/N(c)}$ with probability at most $N^{-4}$. So, with high probability, each index is an upper confidence bound on its mean, and the optimal child's index is at least $\mu^*$.
+Consider one node whose children are the arms of a bandit, each child's playout rewards lying in $`[0,1]`$ with mean $`\mu_c`$, and let $`\mu^*=\max_c\mu_c`$ and $`\Delta_c=\mu^*-\mu_c`$. With $`C=\sqrt2`$, the UCB1 index of a child is its average plus $`\sqrt{2\ln N/N(c)}`$. By Hoeffding's inequality (Foundations chapter 4), the average of $`N(c)`$ rewards deviates from $`\mu_c`$ by more than $`\sqrt{2\ln N/N(c)}`$ with probability at most $`N^{-4}`$. So, with high probability, each index is an upper confidence bound on its mean, and the optimal child's index is at least $`\mu^*`$.
 
-A suboptimal child $c$ is chosen only if its index exceeds $\mu^*$, which requires its confidence radius to exceed $\Delta_c/2$ (unless an unlikely deviation occurred), that is $N(c)<8\ln N/\Delta_c^2$. Summing the failure probabilities gives Auer et al.'s bound: the expected number of plays of $c$ in $N$ rounds is at most $8\ln N/\Delta_c^2+O(1)$. Suboptimal moves are thus played only logarithmically often, and the average reward of the node converges to $\mu^*$.
+A suboptimal child $`c`$ is chosen only if its index exceeds $`\mu^*`$, which requires its confidence radius to exceed $`\Delta_c/2`$ (unless an unlikely deviation occurred), that is $`N(c)<8\ln N/\Delta_c^2`$. Summing the failure probabilities gives Auer et al.'s bound: the expected number of plays of $`c`$ in $`N`$ rounds is at most $`8\ln N/\Delta_c^2+O(1)`$. Suboptimal moves are thus played only logarithmically often, and the average reward of the node converges to $`\mu^*`$.
 
 In a tree, the children's reward distributions are not fixed: they change as the subtrees below are explored, because the averages below a node drift toward the minimax values as the selection there improves. Kocsis and Szepesvári extended the analysis to this drifting setting, by induction from the leaves, and showed that the failure probability at the root decays polynomially in the number of iterations. The constants can be poor: in the worst case, some trees require a number of iterations exponential in the depth before UCT's estimates become accurate, which is one reason practical programs add priors, heuristics, or learned values.
 

@@ -8,7 +8,7 @@
 
 ### <a id="why-probabilities-are-not-enough"></a>Why probabilities are not enough
 
-The models of chapters 8–12 describe what an agent observes. An agent that acts needs something more: what happens *if it does something*. The two questions have different answers whenever a common cause influences both what is done and what follows. Patients who receive a treatment may do worse than those who do not because doctors give it to the sickest; people who carry lighters get lung cancer more often because smokers carry lighters. A conditional probability $P(y\mid x)$ answers "what do I expect to see among cases where $X=x$"; a decision needs "what would happen if I *set* $X=x$". Causal inference is the theory of the second question: when it can be answered from data, and how.
+The models of chapters 8–12 describe what an agent observes. An agent that acts needs something more: what happens *if it does something*. The two questions have different answers whenever a common cause influences both what is done and what follows. Patients who receive a treatment may do worse than those who do not because doctors give it to the sickest; people who carry lighters get lung cancer more often because smokers carry lighters. A conditional probability $`P(y\mid x)`$ answers "what do I expect to see among cases where $`X=x`$"; a decision needs "what would happen if I *set* $`X=x`$". Causal inference is the theory of the second question: when it can be answered from data, and how.
 
 The distinction matters for AI in both directions. Agents that act on correlations learned from passive data take actions whose consequences the data never showed, and machine-learning models trained on one distribution fail under shift when they rely on non-causal features. Conversely, an agent that can intervene, like a scientist running experiments or a reinforcement learner trying actions, can learn causal structure that no amount of passive observation reveals.
 
@@ -18,19 +18,19 @@ A study of kidney-stone treatments ([Charig et al., 1986](https://doi.org/10.113
 
 <img src="sources/images/ai-causal-simpson.png" alt="ai-causal-simpson" width="880">
 
-*Left: success rates in the kidney-stone study, where treatment A beats B within each stone size and loses overall, because 263 of A's 350 patients had large stones against 80 of B's. Right: four estimators of an average treatment effect on 500 synthetic datasets of 2,000 units, in which a confounder $Z$ raises both the probability of treatment and the outcome, the true effect of the treatment is 1, and a variable $C$ is caused by both treatment and outcome. The difference of the outcome means between treated and untreated is 3.12 on average; regression adjustment for $Z$ gives 1.00 and inverse propensity weighting 1.01, the latter with almost three times the spread; adjusting for $Z$ and the collider $C$ gives 0.00.*
+*Left: success rates in the kidney-stone study, where treatment A beats B within each stone size and loses overall, because 263 of A's 350 patients had large stones against 80 of B's. Right: four estimators of an average treatment effect on 500 synthetic datasets of 2,000 units, in which a confounder $`Z`$ raises both the probability of treatment and the outcome, the true effect of the treatment is 1, and a variable $`C`$ is caused by both treatment and outcome. The difference of the outcome means between treated and untreated is 3.12 on average; regression adjustment for $`Z`$ gives 1.00 and inverse propensity weighting 1.01, the latter with almost three times the spread; adjusting for $`Z`$ and the collider $`C`$ gives 0.00.*
 
 Which figure should guide the choice of treatment? The data alone cannot say. If stone size influences the treatment choice, as here, the stratified comparison is right. If instead the treatment affected a variable in the table, for example if the outcome were compared within levels of a post-treatment blood pressure that the treatment itself changes, the aggregated comparison would be right. The same numbers support opposite conclusions under different causal stories, which is why causal inference needs assumptions beyond the data, stated in a form that can be examined.
 
 ## <a id="potential-outcomes"></a>Potential outcomes
 
-The **potential outcomes** framework ([Rubin, 1974](https://doi.org/10.1037/h0037350)), going back to Neyman, defines causal effects by comparing, for each unit $i$, the outcome $Y_i(1)$ it would have under treatment and the outcome $Y_i(0)$ it would have without. The **individual effect** $Y_i(1)-Y_i(0)$ is never observed, since each unit receives one treatment, which is the **fundamental problem of causal inference**. Population quantities can still be estimable, notably the **average treatment effect** $\mathrm{ATE}=\mathbb E[Y(1)-Y(0)]$. With the observed treatment $X$, the observed outcome is $Y=Y(X)$ (**consistency**, which presupposes no interference between units), and the naive comparison is
+The **potential outcomes** framework ([Rubin, 1974](https://doi.org/10.1037/h0037350)), going back to Neyman, defines causal effects by comparing, for each unit $`i`$, the outcome $`Y_i(1)`$ it would have under treatment and the outcome $`Y_i(0)`$ it would have without. The **individual effect** $`Y_i(1)-Y_i(0)`$ is never observed, since each unit receives one treatment, which is the **fundamental problem of causal inference**. Population quantities can still be estimable, notably the **average treatment effect** $`\mathrm{ATE}=\mathbb E[Y(1)-Y(0)]`$. With the observed treatment $`X`$, the observed outcome is $`Y=Y(X)`$ (**consistency**, which presupposes no interference between units), and the naive comparison is
 
 $$
 \mathbb E[Y\mid X=1]-\mathbb E[Y\mid X=0]=\mathbb E[Y(1)\mid X=1]-\mathbb E[Y(0)\mid X=0],
 $$
 
-which equals the ATE when the potential outcomes are independent of the treatment received. **Randomization** guarantees this: a coin flip cannot depend on how a unit would respond. That is why randomized controlled trials are the standard of evidence. In observational data, the substitute is **conditional ignorability**: $\bigl(Y(1),Y(0)\bigr)\perp X\mid Z$ for measured covariates $Z$, together with **positivity**, $0<P(X=1\mid z)<1$ for all $z$. Then the ATE is identified by comparing treated and untreated units with the same $Z$ and averaging, and the question becomes which covariates make ignorability hold. Graphs answer it.
+which equals the ATE when the potential outcomes are independent of the treatment received. **Randomization** guarantees this: a coin flip cannot depend on how a unit would respond. That is why randomized controlled trials are the standard of evidence. In observational data, the substitute is **conditional ignorability**: $`\bigl(Y(1),Y(0)\bigr)\perp X\mid Z`$ for measured covariates $`Z`$, together with **positivity**, $`0<P(X=1\mid z)<1`$ for all $`z`$. Then the ATE is identified by comparing treated and untreated units with the same $`Z`$ and averaging, and the question becomes which covariates make ignorability hold. Graphs answer it.
 
 ## <a id="structural-causal-models"></a>Structural causal models
 
@@ -42,21 +42,21 @@ $$
 V_i:=f_i\bigl(\mathrm{PA}_i,U_i\bigr),\qquad U_1,\dots,U_n\text{ independent},
 $$
 
-with the direct causes drawn as arrows in a **causal graph**. The assignments are mechanisms, not equations: each can be changed without changing the others. With acyclic graphs and independent noises, an SCM induces a joint distribution that factorizes over the graph as a Bayesian network does (chapter 8); what the SCM adds is a meaning for interventions. The **intervention** $\mathrm{do}(X=x)$ replaces the mechanism of $X$ by the constant $x$, cutting all arrows into $X$ and leaving the other mechanisms intact. The resulting interventional distribution follows from the **truncated factorization**:
+with the direct causes drawn as arrows in a **causal graph**. The assignments are mechanisms, not equations: each can be changed without changing the others. With acyclic graphs and independent noises, an SCM induces a joint distribution that factorizes over the graph as a Bayesian network does (chapter 8); what the SCM adds is a meaning for interventions. The **intervention** $`\mathrm{do}(X=x)`$ replaces the mechanism of $`X`$ by the constant $`x`$, cutting all arrows into $`X`$ and leaving the other mechanisms intact. The resulting interventional distribution follows from the **truncated factorization**:
 
 $$
 P\bigl(v\mid\mathrm{do}(x)\bigr)=\prod_{i:\,V_i\notin X}P\bigl(v_i\mid\mathrm{pa}_i\bigr)\Big|_{X=x},
 $$
 
-the factorization of the observational distribution with the factors of the intervened variables removed. This is the formal difference between $P(y\mid x)$, which filters the population to those units with $X=x$, and $P(y\mid\mathrm{do}(x))$, which changes the population so that every unit has $X=x$. Potential outcomes are defined within an SCM as $Y_x(u)$, the value of $Y$ in unit $u$ in the model modified by $\mathrm{do}(X=x)$, so the two frameworks describe the same objects in different notation.
+the factorization of the observational distribution with the factors of the intervened variables removed. This is the formal difference between $`P(y\mid x)`$, which filters the population to those units with $`X=x`$, and $`P(y\mid\mathrm{do}(x))`$, which changes the population so that every unit has $`X=x`$. Potential outcomes are defined within an SCM as $`Y_x(u)`$, the value of $`Y`$ in unit $`u`$ in the model modified by $`\mathrm{do}(X=x)`$, so the two frameworks describe the same objects in different notation.
 
 ### <a id="three-levels-of-causal-questions"></a>Three levels of causal questions
 
 Pearl's **ladder of causation** distinguishes three kinds of questions, each requiring more of a model than the one below:
 
-1. **Association**, $P(y\mid x)$: seeing. What does observing $x$ tell me about $y$? A joint distribution suffices.
-2. **Intervention**, $P(y\mid\mathrm{do}(x))$: doing. What happens if I set $x$? It needs a causal graph, or experiments.
-3. **Counterfactuals**, $P(y_x\mid x',y')$: imagining. Given that I observed $x'$ and $y'$, what would have happened had $x$ been different? It needs the functional mechanisms of an SCM, not just the graph.
+1. **Association**, $`P(y\mid x)`$: seeing. What does observing $`x`$ tell me about $`y`$? A joint distribution suffices.
+2. **Intervention**, $`P(y\mid\mathrm{do}(x))`$: doing. What happens if I set $`x`$? It needs a causal graph, or experiments.
+3. **Counterfactuals**, $`P(y_x\mid x',y')`$: imagining. Given that I observed $`x'`$ and $`y'`$, what would have happened had $`x`$ been different? It needs the functional mechanisms of an SCM, not just the graph.
 
 ## <a id="identification"></a>Identification
 
@@ -64,18 +64,18 @@ An interventional quantity is **identifiable** if it can be computed from the ob
 
 ### <a id="confounding-and-the-backdoor-criterion"></a>Confounding and the backdoor criterion
 
-A set of variables $Z$ satisfies the **backdoor criterion** relative to $(X,Y)$ if no variable in $Z$ is a descendant of $X$, and $Z$ blocks, in the sense of d-separation (chapter 8), every path between $X$ and $Y$ that starts with an arrow into $X$, the **backdoor paths**. Then
+A set of variables $`Z`$ satisfies the **backdoor criterion** relative to $`(X,Y)`$ if no variable in $`Z`$ is a descendant of $`X`$, and $`Z`$ blocks, in the sense of d-separation (chapter 8), every path between $`X`$ and $`Y`$ that starts with an arrow into $`X`$, the **backdoor paths**. Then
 
 $$
 P\bigl(y\mid\mathrm{do}(x)\bigr)=\sum_zP(y\mid x,z)\,P(z),
 $$
 
-the **adjustment formula** ([Appendix A](#block-ai13-appendix-a)). Backdoor paths carry the association that is due to common causes, and blocking them leaves only the causal paths from $X$ to $Y$. The criterion formalizes the rules of thumb about what to control for, and corrects some of them:
+the **adjustment formula** ([Appendix A](#block-ai13-appendix-a)). Backdoor paths carry the association that is due to common causes, and blocking them leaves only the causal paths from $`X`$ to $`Y`$. The criterion formalizes the rules of thumb about what to control for, and corrects some of them:
 
 - **Adjust for confounders**, common causes of treatment and outcome.
-- **Do not adjust for mediators**, variables on the causal path from $X$ to $Y$, when the total effect is wanted; that blocks part of the effect.
-- **Do not adjust for colliders**, common effects of $X$ and $Y$ or of their causes: conditioning on a collider opens a path that was blocked, the explaining-away effect of chapter 8. In the figure above, adding the collider $C$ to an otherwise correct adjustment erases the effect entirely. Selection of a sample by such a variable, **selection bias**, has the same effect.
-- More covariates are not always better. In the **M-bias** structure $X\leftarrow A\to M\leftarrow B\to Y$, the pretreatment variable $M$ is a collider, and adjusting for it creates confounding where there was none.
+- **Do not adjust for mediators**, variables on the causal path from $`X`$ to $`Y`$, when the total effect is wanted; that blocks part of the effect.
+- **Do not adjust for colliders**, common effects of $`X`$ and $`Y`$ or of their causes: conditioning on a collider opens a path that was blocked, the explaining-away effect of chapter 8. In the figure above, adding the collider $`C`$ to an otherwise correct adjustment erases the effect entirely. Selection of a sample by such a variable, **selection bias**, has the same effect.
+- More covariates are not always better. In the **M-bias** structure $`X\leftarrow A\to M\leftarrow B\to Y`$, the pretreatment variable $`M`$ is a collider, and adjusting for it creates confounding where there was none.
 
 ```python
 import numpy as np
@@ -117,52 +117,52 @@ print(f"truncated factorization (exact): {exact:+.3f}")
 # truncated factorization (exact): +0.100
 ```
 
-In this model the treatment raises the recovery probability by 0.10 in every stratum, but the sickest patients are treated four times as often, and in the observational data the treated recover 14 points less often. Simulating the experiment in the model recovers the true $+0.10$, and so does the adjustment formula applied to the observational data alone, because severity blocks the only backdoor path.
+In this model the treatment raises the recovery probability by 0.10 in every stratum, but the sickest patients are treated four times as often, and in the observational data the treated recover 14 points less often. Simulating the experiment in the model recovers the true $`+0.10`$, and so does the adjustment formula applied to the observational data alone, because severity blocks the only backdoor path.
 
 ### <a id="the-frontdoor-criterion-and-do-calculus"></a>The frontdoor criterion and do-calculus
 
-Adjustment is not the only route. When the confounder $U$ of $X$ and $Y$ is unobserved but the effect of $X$ on $Y$ passes entirely through a mediator $M$ that $U$ does not affect directly ($X\to M\to Y$, $X\leftarrow U\to Y$), the **frontdoor formula** identifies the effect:
+Adjustment is not the only route. When the confounder $`U`$ of $`X`$ and $`Y`$ is unobserved but the effect of $`X`$ on $`Y`$ passes entirely through a mediator $`M`$ that $`U`$ does not affect directly ($`X\to M\to Y`$, $`X\leftarrow U\to Y`$), the **frontdoor formula** identifies the effect:
 
 $$
 P\bigl(y\mid\mathrm{do}(x)\bigr)=\sum_mP(m\mid x)\sum_{x'}P(y\mid m,x')\,P(x'),
 $$
 
-by chaining two identifiable effects, of $X$ on $M$ (unconfounded) and of $M$ on $Y$ (confounded only through $X$, which can be adjusted for). The general tool is the **do-calculus** ([Pearl, 1995](https://doi.org/10.1093/biomet/82.4.669)), three rules for inserting and deleting observations and interventions, justified by d-separation in modified graphs:
+by chaining two identifiable effects, of $`X`$ on $`M`$ (unconfounded) and of $`M`$ on $`Y`$ (confounded only through $`X`$, which can be adjusted for). The general tool is the **do-calculus** ([Pearl, 1995](https://doi.org/10.1093/biomet/82.4.669)), three rules for inserting and deleting observations and interventions, justified by d-separation in modified graphs:
 
-1. **Insertion or deletion of observations:** $P(y\mid\mathrm{do}(x),z,w)=P(y\mid\mathrm{do}(x),w)$ if $Y\perp Z\mid X,W$ in the graph with the arrows into $X$ removed.
-2. **Exchange of action and observation:** $P(y\mid\mathrm{do}(x),\mathrm{do}(z),w)=P(y\mid\mathrm{do}(x),z,w)$ if $Y\perp Z\mid X,W$ in the graph with arrows into $X$ and out of $Z$ removed.
-3. **Insertion or deletion of actions:** $P(y\mid\mathrm{do}(x),\mathrm{do}(z),w)=P(y\mid\mathrm{do}(x),w)$ if $Y\perp Z\mid X,W$ in the graph with arrows into $X$ removed and arrows into those $Z$ that are not ancestors of $W$ removed.
+1. **Insertion or deletion of observations:** $`P(y\mid\mathrm{do}(x),z,w)=P(y\mid\mathrm{do}(x),w)`$ if $`Y\perp Z\mid X,W`$ in the graph with the arrows into $`X`$ removed.
+2. **Exchange of action and observation:** $`P(y\mid\mathrm{do}(x),\mathrm{do}(z),w)=P(y\mid\mathrm{do}(x),z,w)`$ if $`Y\perp Z\mid X,W`$ in the graph with arrows into $`X`$ and out of $`Z`$ removed.
+3. **Insertion or deletion of actions:** $`P(y\mid\mathrm{do}(x),\mathrm{do}(z),w)=P(y\mid\mathrm{do}(x),w)`$ if $`Y\perp Z\mid X,W`$ in the graph with arrows into $`X`$ removed and arrows into those $`Z`$ that are not ancestors of $`W`$ removed.
 
-A causal effect is identifiable if and only if repeated application of the rules reduces it to an expression without $\mathrm{do}$ ([Shpitser and Pearl, 2006](https://escholarship.org/uc/item/9598x714)), and an algorithm decides identifiability and produces the formula. When the answer is negative, no amount of observational data determines the effect without further assumptions.
+A causal effect is identifiable if and only if repeated application of the rules reduces it to an expression without $`\mathrm{do}`$ ([Shpitser and Pearl, 2006](https://escholarship.org/uc/item/9598x714)), and an algorithm decides identifiability and produces the formula. When the answer is negative, no amount of observational data determines the effect without further assumptions.
 
 ## <a id="estimation"></a>Estimation
 
-Identification yields a formula; estimating it from finite data is a statistical problem, and several estimators target the same adjusted quantity $\mathbb E[Y\mid\mathrm{do}(X=1)]-\mathbb E[Y\mid\mathrm{do}(X=0)]$ with a valid adjustment set $Z$:
+Identification yields a formula; estimating it from finite data is a statistical problem, and several estimators target the same adjusted quantity $`\mathbb E[Y\mid\mathrm{do}(X=1)]-\mathbb E[Y\mid\mathrm{do}(X=0)]`$ with a valid adjustment set $`Z`$:
 
-- **Outcome regression** fits $\mu_x(z)=\mathbb E[Y\mid X=x,Z=z]$ and averages $\mu_1(z)-\mu_0(z)$ over the sample. It relies on the regression model being right.
-- **Inverse propensity weighting** estimates the **propensity score** $e(z)=P(X=1\mid z)$ ([Rosenbaum and Rubin, 1983](https://doi.org/10.1093/biomet/70.1.41)) and reweights each unit by the inverse probability of the treatment it received, $\frac1n\sum_i\bigl(\frac{X_iY_i}{e(Z_i)}-\frac{(1-X_i)Y_i}{1-e(Z_i)}\bigr)$, creating a pseudo-population in which treatment is independent of $Z$ ([Appendix B](#block-ai13-appendix-b)). It relies on the propensity model and becomes unstable when some propensities are near 0 or 1, the practical face of positivity violations; the wider spread of the IPW estimates in the figure shows the cost.
-- **Doubly robust** estimators ([Robins, Rotnitzky, and Zhao, 1994](https://doi.org/10.1080/01621459.1994.10476818)) combine both, $\frac1n\sum_i\bigl(\mu_1(Z_i)-\mu_0(Z_i)+\frac{X_i(Y_i-\mu_1(Z_i))}{e(Z_i)}-\frac{(1-X_i)(Y_i-\mu_0(Z_i))}{1-e(Z_i)}\bigr)$, and are consistent if either model is correct. Combined with flexible machine-learning models and sample splitting, they underlie **double machine learning**.
+- **Outcome regression** fits $`\mu_x(z)=\mathbb E[Y\mid X=x,Z=z]`$ and averages $`\mu_1(z)-\mu_0(z)`$ over the sample. It relies on the regression model being right.
+- **Inverse propensity weighting** estimates the **propensity score** $`e(z)=P(X=1\mid z)`$ ([Rosenbaum and Rubin, 1983](https://doi.org/10.1093/biomet/70.1.41)) and reweights each unit by the inverse probability of the treatment it received, $`\frac1n\sum_i\bigl(\frac{X_iY_i}{e(Z_i)}-\frac{(1-X_i)Y_i}{1-e(Z_i)}\bigr)`$, creating a pseudo-population in which treatment is independent of $`Z`$ ([Appendix B](#block-ai13-appendix-b)). It relies on the propensity model and becomes unstable when some propensities are near 0 or 1, the practical face of positivity violations; the wider spread of the IPW estimates in the figure shows the cost.
+- **Doubly robust** estimators ([Robins, Rotnitzky, and Zhao, 1994](https://doi.org/10.1080/01621459.1994.10476818)) combine both, $`\frac1n\sum_i\bigl(\mu_1(Z_i)-\mu_0(Z_i)+\frac{X_i(Y_i-\mu_1(Z_i))}{e(Z_i)}-\frac{(1-X_i)(Y_i-\mu_0(Z_i))}{1-e(Z_i)}\bigr)`$, and are consistent if either model is correct. Combined with flexible machine-learning models and sample splitting, they underlie **double machine learning**.
 
 ### <a id="instrumental-variables"></a>Instrumental variables
 
-When confounders are unmeasured, adjustment is impossible, but an **instrumental variable** can still identify an effect. $Z$ is an instrument for the effect of $X$ on $Y$ if it affects $X$ (**relevance**), is independent of the unobserved confounders (**independence**), and affects $Y$ only through $X$ (**exclusion**). Classic instruments are a randomized encouragement to take a treatment, the draft lottery for military service, and genetic variants in **Mendelian randomization**. In a linear model $Y=\beta X+\gamma U+\varepsilon$, the **Wald estimator**
+When confounders are unmeasured, adjustment is impossible, but an **instrumental variable** can still identify an effect. $`Z`$ is an instrument for the effect of $`X`$ on $`Y`$ if it affects $`X`$ (**relevance**), is independent of the unobserved confounders (**independence**), and affects $`Y`$ only through $`X`$ (**exclusion**). Classic instruments are a randomized encouragement to take a treatment, the draft lottery for military service, and genetic variants in **Mendelian randomization**. In a linear model $`Y=\beta X+\gamma U+\varepsilon`$, the **Wald estimator**
 
 $$
 \hat\beta_{\mathrm{IV}}=\frac{\widehat{\mathrm{Cov}}(Z,Y)}{\widehat{\mathrm{Cov}}(Z,X)}
 $$
 
-is consistent, because $\mathrm{Cov}(Z,Y)=\beta\,\mathrm{Cov}(Z,X)$ when $Z$ is independent of $U$ and $\varepsilon$. Without linearity, an instrument identifies only the **local average treatment effect** among the units whose treatment the instrument changes ([Angrist, Imbens, and Rubin, 1996](https://doi.org/10.1080/01621459.1996.10476902)), under a monotonicity assumption. Instruments that barely affect the treatment, **weak instruments**, make the denominator small and the estimate unstable and biased toward the confounded regression.
+is consistent, because $`\mathrm{Cov}(Z,Y)=\beta\,\mathrm{Cov}(Z,X)`$ when $`Z`$ is independent of $`U`$ and $`\varepsilon`$. Without linearity, an instrument identifies only the **local average treatment effect** among the units whose treatment the instrument changes ([Angrist, Imbens, and Rubin, 1996](https://doi.org/10.1080/01621459.1996.10476902)), under a monotonicity assumption. Instruments that barely affect the treatment, **weak instruments**, make the denominator small and the estimate unstable and biased toward the confounded regression.
 
 <img src="sources/images/ai-causal-iv.png" alt="ai-causal-iv" width="880">
 
-*A linear model $Y=X+\gamma U+\varepsilon$ with an unobserved confounder $U$ that also enters $X$, estimated from 1,000 units, 400 repetitions per setting. Left: the regression of $Y$ on $X$ is unbiased only without confounding and reaches 1.71 at $\gamma=2$; the instrumental-variable estimate with a strong instrument stays at the true effect of 1, with 80% of estimates within 0.14 of it even at $\gamma=2$. Right: with the confounding fixed at $\gamma=1$ and the instrument's effect on $X$ reduced, the IV estimates spread out and their median drifts toward the confounded value: with effect 0.03 the median is 1.27 and the central 80% range from $-0.93$ to 3.67, while with effect 0.8 they stay within 0.08 of the truth.*
+*A linear model $`Y=X+\gamma U+\varepsilon`$ with an unobserved confounder $`U`$ that also enters $`X`$, estimated from 1,000 units, 400 repetitions per setting. Left: the regression of $`Y`$ on $`X`$ is unbiased only without confounding and reaches 1.71 at $`\gamma=2`$; the instrumental-variable estimate with a strong instrument stays at the true effect of 1, with 80% of estimates within 0.14 of it even at $`\gamma=2`$. Right: with the confounding fixed at $`\gamma=1`$ and the instrument's effect on $`X`$ reduced, the IV estimates spread out and their median drifts toward the confounded value: with effect 0.03 the median is 1.27 and the central 80% range from $`-0.93`$ to 3.67, while with effect 0.8 they stay within 0.08 of the truth.*
 
 ## <a id="counterfactuals"></a>Counterfactuals
 
 A counterfactual question conditions on what actually happened and asks about an alternative: "the patient took the drug and died; would she have survived without it?" Answering requires the SCM's mechanisms, in three steps:
 
-1. **Abduction:** update the distribution of the noise terms $U$ given the observed evidence, which pins down the unit's individual characteristics;
-2. **Action:** modify the model by the counterfactual intervention $\mathrm{do}(X=x)$;
+1. **Abduction:** update the distribution of the noise terms $`U`$ given the observed evidence, which pins down the unit's individual characteristics;
+2. **Action:** modify the model by the counterfactual intervention $`\mathrm{do}(X=x)`$;
 3. **Prediction:** compute the outcome in the modified model with the updated noise.
 
 Counterfactuals formalize notions that interventional distributions cannot: the **probability of necessity**, that the outcome would not have occurred without the cause, which is the legal standard of "but-for" causation; the **effect of treatment on the treated**; and path-specific effects in **mediation analysis**, which split a total effect into the part through a mediator and the rest. They are generally not identifiable from experiments alone; bounds are available, and point identification needs further assumptions such as monotonicity. Counterfactual reasoning also underlies definitions of **fairness** that ask whether a decision would have changed had a protected attribute been different, and explanations that ask which small change to an input would have changed a model's output.
@@ -173,8 +173,8 @@ Counterfactuals formalize notions that interventional distributions cannot: the 
 
 Can the graph itself be learned from data? Observational data determine the conditional independences of the distribution, and under the **faithfulness** assumption, that the distribution has no independences beyond those implied by the graph, they determine the graph up to Markov equivalence: its skeleton and v-structures (chapter 8). The **PC algorithm** ([Spirtes, Glymour, and Scheines, 2000](https://direct.mit.edu/books/monograph/2057/Causation-Prediction-and-Search)) finds this class with independence tests:
 
-1. Start from the complete undirected graph. For conditioning sets of growing size, remove the edge $X-Y$ whenever $X\perp Y\mid S$ for some set $S$ of current neighbors of $X$ or of $Y$, and record $S$ as their **separating set**.
-2. For each unshielded triple $X-M-Y$ (with $X$ and $Y$ nonadjacent), orient $X\to M\leftarrow Y$ if $M$ is not in their separating set, since a non-collider would have been needed to separate them.
+1. Start from the complete undirected graph. For conditioning sets of growing size, remove the edge $`X-Y`$ whenever $`X\perp Y\mid S`$ for some set $`S`$ of current neighbors of $`X`$ or of $`Y`$, and record $`S`$ as their **separating set**.
+2. For each unshielded triple $`X-M-Y`$ (with $`X`$ and $`Y`$ nonadjacent), orient $`X\to M\leftarrow Y`$ if $`M`$ is not in their separating set, since a non-collider would have been needed to separate them.
 3. Orient further edges where the opposite direction would create a new v-structure or a cycle (Meek's rules).
 
 ```python
@@ -245,7 +245,7 @@ print("oriented edges:", sorted(f"{names[i]}->{names[j]}" for i, j in directed),
 # oriented edges: ['A->C', 'B->C', 'B->E', 'C->D', 'D->E'] | unoriented: []
 ```
 
-From 5,000 samples of a five-variable linear Gaussian model, the tests remove exactly the five absent edges, and their separating sets reveal two colliders: $A$ and $B$ are independent without conditioning on $C$, so $C$ is a collider on $A-C-B$, and $D$ and $B$ both point into $E$. Meek's first rule then orients $C\to D$, since the reverse would create a v-structure at $C$ that the data do not show. Here the whole graph is identified; in general part of it remains undirected. The output is only as reliable as the independence tests: with less data or weaker effects, errors in early tests propagate, and violations of faithfulness, such as two paths whose effects cancel, mislead it.
+From 5,000 samples of a five-variable linear Gaussian model, the tests remove exactly the five absent edges, and their separating sets reveal two colliders: $`A`$ and $`B`$ are independent without conditioning on $`C`$, so $`C`$ is a collider on $`A-C-B`$, and $`D`$ and $`B`$ both point into $`E`$. Meek's first rule then orients $`C\to D`$, since the reverse would create a v-structure at $`C`$ that the data do not show. Here the whole graph is identified; in general part of it remains undirected. The output is only as reliable as the independence tests: with less data or weaker effects, errors in early tests propagate, and violations of faithfulness, such as two paths whose effects cancel, mislead it.
 
 ### <a id="beyond-equivalence-classes"></a>Beyond equivalence classes
 
@@ -267,15 +267,15 @@ Causal reasoning connects to the rest of AI in several ways, developed in later 
 <summary><a id="block-ai13-appendix-a"></a><b>A. The adjustment formula</b></summary>
 
 
-Let $Z$ satisfy the backdoor criterion for $(X,Y)$. In the graph $G_{\overline X}$ with the arrows into $X$ removed, which describes the intervened model, $Z$ is not affected by the intervention, since it contains no descendants of $X$; hence $P(z\mid\mathrm{do}(x))=P(z)$. Conditioning on $Z$,
+Let $`Z`$ satisfy the backdoor criterion for $`(X,Y)`$. In the graph $`G_{\overline X}`$ with the arrows into $`X`$ removed, which describes the intervened model, $`Z`$ is not affected by the intervention, since it contains no descendants of $`X`$; hence $`P(z\mid\mathrm{do}(x))=P(z)`$. Conditioning on $`Z`$,
 
 $$
 P\bigl(y\mid\mathrm{do}(x)\bigr)=\sum_zP\bigl(y\mid\mathrm{do}(x),z\bigr)\,P(z).
 $$
 
-It remains to show $P(y\mid\mathrm{do}(x),z)=P(y\mid x,z)$, which is rule 2 of the do-calculus: exchanging the action $\mathrm{do}(x)$ for the observation $x$ is allowed when $Y\perp X\mid Z$ in the graph $G_{\underline X}$ with the arrows *out of* $X$ removed. In $G_{\underline X}$, the only paths between $X$ and $Y$ are the backdoor paths, which $Z$ blocks by assumption. Combining the two steps gives the adjustment formula.
+It remains to show $`P(y\mid\mathrm{do}(x),z)=P(y\mid x,z)`$, which is rule 2 of the do-calculus: exchanging the action $`\mathrm{do}(x)`$ for the observation $`x`$ is allowed when $`Y\perp X\mid Z`$ in the graph $`G_{\underline X}`$ with the arrows *out of* $`X`$ removed. In $`G_{\underline X}`$, the only paths between $`X`$ and $`Y`$ are the backdoor paths, which $`Z`$ blocks by assumption. Combining the two steps gives the adjustment formula.
 
-A direct derivation for the case where $Z$ is the set of parents of $X$: by the truncated factorization, $P(y\mid\mathrm{do}(x))=\sum_{\mathrm{pa}}P(y\mid x,\mathrm{pa})P(\mathrm{pa})$, since removing the factor $P(x\mid\mathrm{pa})$ from the joint $P(\mathrm{pa})P(x\mid\mathrm{pa})P(y,\text{rest}\mid x,\mathrm{pa})$ and summing out the other variables leaves this sum. The parents of $X$ always satisfy the backdoor criterion when they are observed.
+A direct derivation for the case where $`Z`$ is the set of parents of $`X`$: by the truncated factorization, $`P(y\mid\mathrm{do}(x))=\sum_{\mathrm{pa}}P(y\mid x,\mathrm{pa})P(\mathrm{pa})`$, since removing the factor $`P(x\mid\mathrm{pa})`$ from the joint $`P(\mathrm{pa})P(x\mid\mathrm{pa})P(y,\text{rest}\mid x,\mathrm{pa})`$ and summing out the other variables leaves this sum. The parents of $`X`$ always satisfy the backdoor criterion when they are observed.
 
 </details>
 
@@ -285,15 +285,15 @@ A direct derivation for the case where $Z$ is the set of parents of $X$: by the 
 <summary><a id="block-ai13-appendix-b"></a><b>B. Inverse propensity weighting is unbiased</b></summary>
 
 
-With ignorability given $Z$ and positivity, and the true propensity $e(z)=P(X=1\mid z)$,
+With ignorability given $`Z`$ and positivity, and the true propensity $`e(z)=P(X=1\mid z)`$,
 
 $$
 \mathbb E\left[\frac{XY}{e(Z)}\right]=\mathbb E\left[\frac{\mathbb E[X\,Y(1)\mid Z]}{e(Z)}\right]=\mathbb E\left[\frac{\mathbb E[X\mid Z]\;\mathbb E[Y(1)\mid Z]}{e(Z)}\right]=\mathbb E\bigl[Y(1)\bigr],
 $$
 
-using consistency ($XY=XY(1)$), then ignorability to factor the conditional expectation, then $\mathbb E[X\mid Z]=e(Z)$. Symmetrically, $\mathbb E[(1-X)Y/(1-e(Z))]=\mathbb E[Y(0)]$, so the difference estimates the ATE without bias. Each unit's weight is the inverse of the probability that it would have received its treatment, so units of a kind that is rarely treated count more when treated, standing in for the many similar units that were not.
+using consistency ($`XY=XY(1)`$), then ignorability to factor the conditional expectation, then $`\mathbb E[X\mid Z]=e(Z)`$. Symmetrically, $`\mathbb E[(1-X)Y/(1-e(Z))]=\mathbb E[Y(0)]`$, so the difference estimates the ATE without bias. Each unit's weight is the inverse of the probability that it would have received its treatment, so units of a kind that is rarely treated count more when treated, standing in for the many similar units that were not.
 
-The variance is the problem: when $e(z)$ is near 0 or 1 for some $z$, the weights explode. Stabilized and truncated weights trade a little bias for much less variance, and the doubly robust estimator, whose correction terms have mean zero when the outcome model is right, reduces the dependence on the weights. When the propensity is estimated, as in the figure, the estimator remains consistent if the propensity model is correct.
+The variance is the problem: when $`e(z)`$ is near 0 or 1 for some $`z`$, the weights explode. Stabilized and truncated weights trade a little bias for much less variance, and the doubly robust estimator, whose correction terms have mean zero when the outcome model is right, reduces the dependence on the weights. When the propensity is estimated, as in the figure, the estimator remains consistent if the propensity model is correct.
 
 </details>
 
