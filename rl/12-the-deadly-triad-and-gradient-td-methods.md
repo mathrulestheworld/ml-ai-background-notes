@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Reinforcement Learning](README.md)
+[Background Notes](../README.md) › [Reinforcement Learning](README.md)
 
 # 12. The Deadly Triad and Gradient-TD Methods
 

@@ -1,4 +1,4 @@
-[ML Mastery Notes](../../README.md) › [Reinforcement Learning](../README.md)
+[Background Notes](../../README.md) › [Reinforcement Learning](../README.md)
 
 # Lab 8. Deep Q-Networks on CartPole and MinAtar
 

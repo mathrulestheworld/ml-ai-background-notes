@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Generative AI](README.md)
+[Background Notes](../README.md) › [Generative AI](README.md)
 
 # 8. Diffusion SDEs and Fast Sampling
 

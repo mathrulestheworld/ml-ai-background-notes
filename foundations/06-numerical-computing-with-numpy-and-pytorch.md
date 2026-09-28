@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Foundations](README.md)
+[Background Notes](../README.md) › [Foundations](README.md)
 
 # 6. Numerical Computing with NumPy and PyTorch
 

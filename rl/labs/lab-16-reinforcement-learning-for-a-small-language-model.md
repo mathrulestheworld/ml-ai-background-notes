@@ -1,4 +1,4 @@
-[ML Mastery Notes](../../README.md) › [Reinforcement Learning](../README.md)
+[Background Notes](../../README.md) › [Reinforcement Learning](../README.md)
 
 # Lab 16. Reinforcement Learning for a Small Language Model
 

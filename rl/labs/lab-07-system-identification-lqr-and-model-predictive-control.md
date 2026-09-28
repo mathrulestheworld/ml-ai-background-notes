@@ -1,4 +1,4 @@
-[ML Mastery Notes](../../README.md) › [Reinforcement Learning](../README.md)
+[Background Notes](../../README.md) › [Reinforcement Learning](../README.md)
 
 # Lab 7. System Identification, LQR, and Model Predictive Control
 

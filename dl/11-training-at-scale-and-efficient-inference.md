@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Deep Learning](README.md)
+[Background Notes](../README.md) › [Deep Learning](README.md)
 
 # 11. Training at Scale and Efficient Inference
 

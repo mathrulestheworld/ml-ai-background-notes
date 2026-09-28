@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Generative AI](README.md)
+[Background Notes](../README.md) › [Generative AI](README.md)
 
 # 14. Generative Models for Science and Control
 

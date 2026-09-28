@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [NLP and Large Language Models](README.md)
+[Background Notes](../README.md) › [NLP and Large Language Models](README.md)
 
 # 2. N-gram Language Models and Perplexity
 

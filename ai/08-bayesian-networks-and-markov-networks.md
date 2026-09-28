@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Artificial Intelligence](README.md)
+[Background Notes](../README.md) › [Artificial Intelligence](README.md)
 
 # 8. Bayesian Networks and Markov Networks
 

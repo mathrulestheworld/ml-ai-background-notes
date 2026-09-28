@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Reinforcement Learning](README.md)
+[Background Notes](../README.md) › [Reinforcement Learning](README.md)
 
 # 10. Planning and Learning with Tabular Models
 

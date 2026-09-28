@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md)
+[Background Notes](../README.md)
 
 # Foundations
 

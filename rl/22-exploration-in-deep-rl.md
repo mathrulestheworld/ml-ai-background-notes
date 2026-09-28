@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Reinforcement Learning](README.md)
+[Background Notes](../README.md) › [Reinforcement Learning](README.md)
 
 # 22. Exploration in Deep RL
 

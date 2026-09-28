@@ -1,4 +1,4 @@
-[ML Mastery Notes](../../README.md) › [Reinforcement Learning](../README.md)
+[Background Notes](../../README.md) › [Reinforcement Learning](../README.md)
 
 # Lab 5. Tile Coding and Linear Control on Mountain Car
 

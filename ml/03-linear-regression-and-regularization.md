@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Machine Learning](README.md)
+[Background Notes](../README.md) › [Machine Learning](README.md)
 
 # 3. Linear Regression and Regularization
 

@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [NLP and Large Language Models](README.md)
+[Background Notes](../README.md) › [NLP and Large Language Models](README.md)
 
 # 1. Text, Tokens, and Tokenization
 

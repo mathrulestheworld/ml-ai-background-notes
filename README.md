@@ -1,6 +1,6 @@
-# ML Mastery Notes
+# Background Notes on Machine Learning and AI
 
-Supplementary notes for [Generative AI from First Principles](https://github.com/mathrulestheworld/generative-ai-from-first-principles). They develop in full the background that the lectures assume: the mathematics of learning, machine learning, deep learning, classical AI, NLP and large language models, generative models, and reinforcement learning. They are working notes and are revised continually.
+Supplementary notes for [Generative AI from First Principles](https://github.com/mathrulestheworld/generative-ai-from-first-principles). They develop in full the material that the lectures assume: the mathematics of learning, machine learning, deep learning, classical AI, NLP and large language models, generative models, and reinforcement learning. They are working notes and are revised continually.
 
 Math, figures, and diagrams render in GitHub's file viewer. Proofs, derivations, and worked examples are in collapsed sections: click a heading marked ▸ to open it.
 

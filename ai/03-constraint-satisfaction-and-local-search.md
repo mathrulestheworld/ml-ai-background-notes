@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Artificial Intelligence](README.md)
+[Background Notes](../README.md) › [Artificial Intelligence](README.md)
 
 # 3. Constraint Satisfaction and Local Search
 

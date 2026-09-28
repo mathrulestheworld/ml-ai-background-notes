@@ -1,4 +1,4 @@
-[ML Mastery Notes](../README.md) › [Machine Learning](README.md)
+[Background Notes](../README.md) › [Machine Learning](README.md)
 
 # 14. Gaussian Mixtures and Expectation Maximization
 
