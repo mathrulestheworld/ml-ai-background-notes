@@ -2,6 +2,9 @@
 
 # Figure sources
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="figure-sources"></a>Figure sources
 
 Every figure in the Generative AI chapters is an original plot generated for these notes on 24 September 2026 with NumPy, SciPy, Matplotlib, PyTorch, and scikit-learn; no external artwork or course slides are reproduced. Each chapter's figures come from one script in `Sources/Figure code`, which is the complete record of the construction. The shared module `genfig.py` sets the palette, fonts, and export (white background, 200 dpi PNG). The scripts of chapters 1–3, 7, and 10–12 use scikit-learn's bundled $`8\times8`$ digits (1,797 images with intensities 0–16) with the module's split: a permutation by NumPy `default_rng(0)`, the first 1,500 images for training and the other 297 held out. Chapters 2, 3, and 12 binarize the digits at intensity $`>7`$, and chapters 7, 10, and 11 scale them to $`[-1,1]`$ by $`x/8-1`$. The other figures use synthetic distributions generated in the scripts: two moons, mixtures of Gaussians on a line and on a circle, points on a circle, and demonstrations of a steering task. No script loads a file or depends on another, and every model is trained from scratch when its script runs. [Data sources](data-sources.md) describes the data. The tables below summarize the data, seeds, and model settings of each figure so that it can be read and regenerated without opening the script; the [computing setup](computing-setup.md) gives the environment and commands.

@@ -2,6 +2,9 @@
 
 # Computing setup
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="computing-setup"></a>Computing setup
 
 The DL code blocks and figure scripts use PyTorch, NumPy, SciPy, Matplotlib, scikit-learn, and NetworkX, and everything runs on a CPU. The environment below is a **CPU reproducibility snapshot**, tested on Linux x86_64 with CPython 3.12.3. Every code block in the fifteen chapters was run in it with one and with two threads, and its printed output matched the comment lines at the end of the block. The version pins are not a claim that these are the newest releases, and a GPU is neither needed nor tested.

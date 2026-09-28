@@ -2,6 +2,9 @@
 
 # 24. Planning with Learned Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 23. Model-Based RL and World Models](23-model-based-rl-and-world-models.md) · [25. Imitation Learning and Inverse RL →](25-imitation-learning-and-inverse-rl.md)
 
 ## <a id="search-as-policy-improvement"></a>Search as policy improvement

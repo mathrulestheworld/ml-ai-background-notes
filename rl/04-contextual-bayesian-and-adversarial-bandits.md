@@ -2,6 +2,9 @@
 
 # 4. Contextual, Bayesian, and Adversarial Bandits
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 3. Multi-Armed Bandits](03-multi-armed-bandits.md) · [5. Monte Carlo Methods →](05-monte-carlo-methods.md)
 
 ## <a id="beyond-the-stochastic-bandit"></a>Beyond the stochastic bandit

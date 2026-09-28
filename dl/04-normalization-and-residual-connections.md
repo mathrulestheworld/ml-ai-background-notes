@@ -2,6 +2,9 @@
 
 # 4. Normalization and Residual Connections
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 3. Optimization for Deep Networks](03-optimization-for-deep-networks.md) · [5. Regularization and Generalization in Deep Networks →](05-regularization-and-generalization-in-deep-networks.md)
 
 ## <a id="normalizing-activations"></a>Normalizing activations

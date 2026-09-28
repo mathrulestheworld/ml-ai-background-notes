@@ -2,6 +2,9 @@
 
 # 6. Convolutional Networks
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 5. Regularization and Generalization in Deep Networks](05-regularization-and-generalization-in-deep-networks.md) · [7. Convolutional Architectures and Transfer Learning →](07-convolutional-architectures-and-transfer-learning.md)
 
 ## <a id="why-convolution"></a>Why convolution

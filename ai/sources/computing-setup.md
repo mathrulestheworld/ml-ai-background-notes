@@ -2,6 +2,9 @@
 
 # Computing setup
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="computing-setup"></a>Computing setup
 
 The AI code blocks and figure scripts use only NumPy, SciPy, Matplotlib, and NetworkX; every algorithm, from A\* and DPLL to variable elimination, particle filtering, and the PC algorithm, is implemented from scratch in plain Python so that the code shows the algorithm rather than a library call. Everything runs on a CPU. The environment below is a **CPU reproducibility snapshot**, tested on Linux x86_64 with CPython 3.12.3. Every code block in the fifteen chapters was run in it with one and with two threads, and its printed output matched the comment lines at the end of the block. The version pins are not a claim that these are the newest releases.

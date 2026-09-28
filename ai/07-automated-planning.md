@@ -2,6 +2,9 @@
 
 # 7. Automated Planning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 6. First-Order Logic and Knowledge Representation](06-first-order-logic-and-knowledge-representation.md) · [8. Bayesian Networks and Markov Networks →](08-bayesian-networks-and-markov-networks.md)
 
 ## <a id="classical-planning"></a>Classical planning

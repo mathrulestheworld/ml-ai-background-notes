@@ -2,6 +2,9 @@
 
 # Paper links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="papers"></a>Papers
 
 The notes link several hundred papers where their ideas arise. This index collects the original papers and principal analyses behind each chapter's main ideas, grouped by chapter; the chapters cite further work inline.

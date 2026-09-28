@@ -2,6 +2,9 @@
 
 # 15. Optimal Control and Trajectory Optimization
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 14. Partially Observable Environments](14-partially-observable-environments.md) · [16. Deep Q-Learning →](16-deep-q-learning.md)
 
 ## <a id="from-reinforcement-learning-to-optimal-control"></a>From reinforcement learning to optimal control

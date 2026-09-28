@@ -2,6 +2,9 @@
 
 # 7. Denoising Diffusion Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 6. Energy-Based Models and Score Matching](06-energy-based-models-and-score-matching.md) · [8. Diffusion SDEs and Fast Sampling →](08-diffusion-sdes-and-fast-sampling.md)
 
 ## <a id="the-forward-process"></a>The forward process

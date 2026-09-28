@@ -2,6 +2,9 @@
 
 # Lab 4. Planning with Learned and Given Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 3. Tabular Control with Monte Carlo and TD Methods](lab-03-tabular-control-with-monte-carlo-and-td-methods.md) · [Lab 5. Tile Coding and Linear Control on Mountain Car →](lab-05-tile-coding-and-linear-control-on-mountain-car.md)
 
 ## <a id="overview"></a>Overview

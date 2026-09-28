@@ -2,6 +2,9 @@
 
 # Video links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="video-links"></a>Video links
 
 The lecture recordings of the courses in the [course links](course-links.md), arranged by chapter. The [reading plan](../reading-plan.md) gives the matching slides and notes.

@@ -2,6 +2,9 @@
 
 # 10. Self-Supervised Representation Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 9. Attention and Transformers](09-attention-and-transformers.md) · [11. Training at Scale and Efficient Inference →](11-training-at-scale-and-efficient-inference.md)
 
 ## <a id="learning-without-labels"></a>Learning without labels

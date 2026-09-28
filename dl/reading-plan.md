@@ -2,6 +2,9 @@
 
 # Reading plan
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 ## <a id="courses"></a>Courses
 
 - **Main course — UMich EECS 498-007 / 598-005, Fall 2019: Justin Johnson, *Deep Learning for Computer Vision*.** [Course homepage](https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2019/) · [Schedule with slides and readings](https://web.eecs.umich.edu/~justincj/teaching/eecs498/FA2019/schedule.html). Supplies the main lecture sequence: neural networks, backpropagation in practice, training, convolutional and recurrent networks, and attention. The lectures use images as the running example, but most of the material is about deep learning in general.

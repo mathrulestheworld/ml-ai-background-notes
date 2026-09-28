@@ -2,6 +2,9 @@
 
 # Figure sources
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="figure-sources"></a>Figure sources
 
 Every figure in the ML chapters is an original plot made for these notes; no external artwork or course slides are reproduced. All figures are drawn with D3 and typeset with KaTeX in the style of the Foundations figures, then rendered to PNG at twice their CSS size by headless Chromium. The figures of chapter 1 were redrawn on 27 September 2026 and those of chapters 2 to 17 on 28 September 2026, replacing Matplotlib versions; a redrawn figure keeps the data, seeds, and fitted models of the version it replaces unless its row says otherwise. The source of each figure is `Sources/Figure code/js/src/<name>.js`. Figures that show a fitted model, such as a scikit-learn estimator, an EM run, or a Gaussian-process fit, read their numbers from `js/data/<name>.js`, which the chapter's script in `Sources/Figure code` writes; the other figures compute their data in JavaScript, drawing random numbers from the seeded generator of the Foundations figure code. Each chapter script, from `ch01_nearest_neighbors.py` to `ch17_smoothing.py`, also recomputes and prints every number that its chapter and captions quote from the figures. The tables below summarize the data, seeds, and model settings of each figure so that it can be read and regenerated without opening the code; the [computing setup](computing-setup.md) gives the environment and commands.

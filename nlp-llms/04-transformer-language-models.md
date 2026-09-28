@@ -2,6 +2,9 @@
 
 # 4. Transformer Language Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 3. Word Embeddings](03-word-embeddings.md) · [5. Pretraining and Transfer →](05-pretraining-and-transfer.md)
 
 ## <a id="neural-language-models"></a>Neural language models

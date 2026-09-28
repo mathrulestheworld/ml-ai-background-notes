@@ -2,6 +2,9 @@
 
 # 12. The Deadly Triad and Gradient-TD Methods
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 11. Value Function Approximation](11-value-function-approximation.md) · [13. Policy Gradient and Actor-Critic Methods →](13-policy-gradient-and-actor-critic-methods.md)
 
 ## <a id="off-policy-learning-with-function-approximation"></a>Off-policy learning with function approximation

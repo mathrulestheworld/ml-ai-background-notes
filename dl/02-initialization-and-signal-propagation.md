@@ -2,6 +2,9 @@
 
 # 2. Initialization and Signal Propagation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 1. Deep Feedforward Networks](01-deep-feedforward-networks.md) · [3. Optimization for Deep Networks →](03-optimization-for-deep-networks.md)
 
 ## <a id="why-the-scale-of-the-weights-matters"></a>Why the scale of the weights matters

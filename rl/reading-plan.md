@@ -2,6 +2,9 @@
 
 # Reading plan
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 ## <a id="courses"></a>Courses
 
 - **Main course — DeepMind x UCL Reinforcement Learning Lecture Series, 2021: Hado van Hasselt, Diana Borsa, and Matteo Hessel.** [Lecture playlist](https://www.youtube.com/playlist?list=PLqYmG7hTraZDVH599EItlEWsUOsJbAodm). Thirteen lectures on the foundations: bandits, Markov decision processes and dynamic programming with their theory, model-free prediction and control, function approximation, planning and models, policy gradients, off-policy and multi-step learning, and deep reinforcement learning. The playlist is labeled as a deep-learning series on YouTube but holds the RL lectures. No official slides remain online; an [unofficial mirror](https://github.com/yjavaherian/deepmind-x-ucl-rl) collects the thirteen slide decks.

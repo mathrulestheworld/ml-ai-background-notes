@@ -2,6 +2,9 @@
 
 # 15. Game Theory and Multiagent Systems
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 14. Learning Graphical Models](14-learning-graphical-models.md)
 
 ## <a id="multiagent-decision-making"></a>Multiagent decision making

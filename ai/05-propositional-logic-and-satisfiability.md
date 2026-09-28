@@ -2,6 +2,9 @@
 
 # 5. Propositional Logic and Satisfiability
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 4. Adversarial Search and Games](04-adversarial-search-and-games.md) · [6. First-Order Logic and Knowledge Representation →](06-first-order-logic-and-knowledge-representation.md)
 
 ## <a id="knowledge-based-agents"></a>Knowledge-based agents

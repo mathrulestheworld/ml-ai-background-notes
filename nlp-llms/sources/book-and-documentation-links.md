@@ -2,6 +2,9 @@
 
 # Book and documentation links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="books-and-documentation"></a>Books and documentation
 
 The chapter notes develop the module's main material. These books and documentation pages provide alternative explanations, fuller treatments of the classical methods, and the tools used for real work with language models. The [reading plan](../reading-plan.md) lists the lecture slides and readings for each topic.

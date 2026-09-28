@@ -2,6 +2,9 @@
 
 # 6. First-Order Logic and Knowledge Representation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 5. Propositional Logic and Satisfiability](05-propositional-logic-and-satisfiability.md) · [7. Automated Planning →](07-automated-planning.md)
 
 ## <a id="objects-relations-and-quantifiers"></a>Objects, relations, and quantifiers

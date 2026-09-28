@@ -2,6 +2,9 @@
 
 # 10. Bagging and Random Forests
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 9. Decision and Regression Trees](09-decision-and-regression-trees.md) · [11. Boosting →](11-boosting.md)
 
 ## <a id="averaging-to-reduce-variance"></a>Averaging to reduce variance

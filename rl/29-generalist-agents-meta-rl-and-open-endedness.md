@@ -2,6 +2,9 @@
 
 # 29. Generalist Agents, Meta-RL, and Open-Endedness
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 28. Reinforcement Learning for Language Models and Reasoning](28-reinforcement-learning-for-language-models-and-reasoning.md) · [30. The Theory of Reinforcement Learning →](30-the-theory-of-reinforcement-learning.md)
 
 ## <a id="learning-to-learn"></a>Learning to learn

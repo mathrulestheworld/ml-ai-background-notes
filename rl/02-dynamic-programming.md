@@ -2,6 +2,9 @@
 
 # 2. Dynamic Programming
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 1. Markov Decision Processes](01-markov-decision-processes.md) · [3. Multi-Armed Bandits →](03-multi-armed-bandits.md)
 
 ## <a id="planning-with-a-known-model"></a>Planning with a known model

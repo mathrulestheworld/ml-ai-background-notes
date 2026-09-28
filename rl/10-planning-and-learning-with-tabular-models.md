@@ -2,6 +2,9 @@
 
 # 10. Planning and Learning with Tabular Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 9. Off-Policy Learning](09-off-policy-learning.md) · [11. Value Function Approximation →](11-value-function-approximation.md)
 
 ## <a id="models-and-planning"></a>Models and planning

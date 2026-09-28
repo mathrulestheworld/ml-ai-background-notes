@@ -2,6 +2,9 @@
 
 # 6. Temporal-Difference Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 5. Monte Carlo Methods](05-monte-carlo-methods.md) · [7. Model-Free Control →](07-model-free-control.md)
 
 ## <a id="learning-a-guess-from-a-guess"></a>Learning a guess from a guess

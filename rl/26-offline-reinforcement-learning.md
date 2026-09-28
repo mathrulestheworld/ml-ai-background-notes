@@ -2,6 +2,9 @@
 
 # 26. Offline Reinforcement Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 25. Imitation Learning and Inverse RL](25-imitation-learning-and-inverse-rl.md) · [27. Multi-Agent RL and Self-Play →](27-multi-agent-rl-and-self-play.md)
 
 ## <a id="learning-from-fixed-data"></a>Learning from fixed data

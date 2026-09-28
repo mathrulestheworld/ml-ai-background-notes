@@ -2,6 +2,9 @@
 
 # 4. Adversarial Search and Games
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 3. Constraint Satisfaction and Local Search](03-constraint-satisfaction-and-local-search.md) · [5. Propositional Logic and Satisfiability →](05-propositional-logic-and-satisfiability.md)
 
 ## <a id="games-as-search-problems"></a>Games as search problems

@@ -2,6 +2,9 @@
 
 # 3. Word Embeddings
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 2. N-gram Language Models and Perplexity](02-n-gram-language-models-and-perplexity.md) · [4. Transformer Language Models →](04-transformer-language-models.md)
 
 ## <a id="meaning-from-context"></a>Meaning from context

@@ -2,6 +2,9 @@
 
 # 1. Agents and Uninformed Search
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [2. Heuristic Search →](02-heuristic-search.md)
 
 ## <a id="agents-and-rationality"></a>Agents and rationality

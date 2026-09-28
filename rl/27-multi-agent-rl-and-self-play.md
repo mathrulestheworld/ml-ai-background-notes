@@ -2,6 +2,9 @@
 
 # 27. Multi-Agent RL and Self-Play
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 26. Offline Reinforcement Learning](26-offline-reinforcement-learning.md) · [28. Reinforcement Learning for Language Models and Reasoning →](28-reinforcement-learning-for-language-models-and-reasoning.md)
 
 ## <a id="many-learners"></a>Many learners

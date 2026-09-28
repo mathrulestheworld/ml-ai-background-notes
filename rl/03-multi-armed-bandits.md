@@ -2,6 +2,9 @@
 
 # 3. Multi-Armed Bandits
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 2. Dynamic Programming](02-dynamic-programming.md) · [4. Contextual, Bayesian, and Adversarial Bandits →](04-contextual-bayesian-and-adversarial-bandits.md)
 
 ## <a id="the-explorationexploitation-dilemma"></a>The exploration–exploitation dilemma

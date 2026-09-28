@@ -2,6 +2,9 @@
 
 # 8. Decoding and Text Generation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 7. Scaling Laws](07-scaling-laws.md) · [9. In-Context Learning and Prompting →](09-in-context-learning-and-prompting.md)
 
 ## <a id="choosing-an-output"></a>Choosing an output

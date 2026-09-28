@@ -2,6 +2,9 @@
 
 # 5. Pretraining and Transfer
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 4. Transformer Language Models](04-transformer-language-models.md) · [6. Pretraining Data →](06-pretraining-data.md)
 
 ## <a id="pretrain-then-adapt"></a>Pretrain, then adapt

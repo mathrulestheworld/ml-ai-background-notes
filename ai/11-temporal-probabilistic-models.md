@@ -2,6 +2,9 @@
 
 # 11. Temporal Probabilistic Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 10. Approximate Inference](10-approximate-inference.md) · [12. Decision Theory and the Value of Information →](12-decision-theory-and-the-value-of-information.md)
 
 ## <a id="time-and-uncertainty"></a>Time and uncertainty

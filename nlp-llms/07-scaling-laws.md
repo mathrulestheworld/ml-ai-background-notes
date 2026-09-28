@@ -2,6 +2,9 @@
 
 # 7. Scaling Laws
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 6. Pretraining Data](06-pretraining-data.md) · [8. Decoding and Text Generation →](08-decoding-and-text-generation.md)
 
 ## <a id="power-laws-in-loss"></a>Power laws in loss

@@ -2,6 +2,9 @@
 
 # Lab 13. AlphaZero and Gumbel Search from Scratch
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 12. Model-Based RL with Learned Ensembles](lab-12-model-based-rl-with-learned-ensembles.md) · [Lab 14. Imitation and Offline Reinforcement Learning →](lab-14-imitation-and-offline-reinforcement-learning.md)
 
 ## <a id="overview"></a>Overview

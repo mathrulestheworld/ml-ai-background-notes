@@ -2,6 +2,9 @@
 
 # Lab 8. Deep Q-Networks on CartPole and MinAtar
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 7. System Identification, LQR, and Model Predictive Control](lab-07-system-identification-lqr-and-model-predictive-control.md) · [Lab 9. Advantage Actor-Critic with Parallel and Stale Actors →](lab-09-advantage-actor-critic-with-parallel-and-stale-actors.md)
 
 ## <a id="overview"></a>Overview

@@ -2,6 +2,9 @@
 
 # 8. Recurrent Networks
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 7. Convolutional Architectures and Transfer Learning](07-convolutional-architectures-and-transfer-learning.md) · [9. Attention and Transformers →](09-attention-and-transformers.md)
 
 ## <a id="sequences-and-shared-weights"></a>Sequences and shared weights

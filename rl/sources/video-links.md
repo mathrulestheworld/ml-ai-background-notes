@@ -2,6 +2,9 @@
 
 # Video links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="video-links"></a>Video links
 
 The lecture recordings of the courses in the [course links](course-links.md), arranged by chapter. The [reading plan](../reading-plan.md) gives the matching slides and readings. Where it identifies no individual video, the entry below links to the course playlist and is marked (playlist); the lecture number locates the recording there. Harvard CS2824, Cornell CS6789, and Szepesvári's CMPUT 653 are used through their slides and notes, with no recordings linked, so they appear only in the reading plan.

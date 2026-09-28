@@ -2,6 +2,9 @@
 
 # 11. Training at Scale and Efficient Inference
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 10. Self-Supervised Representation Learning](10-self-supervised-representation-learning.md) · [12. Practical Methodology →](12-practical-methodology.md)
 
 ## <a id="where-the-time-goes"></a>Where the time goes

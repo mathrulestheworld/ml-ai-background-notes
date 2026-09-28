@@ -2,6 +2,9 @@
 
 # 13. Causal Inference
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 12. Decision Theory and the Value of Information](12-decision-theory-and-the-value-of-information.md) · [14. Learning Graphical Models →](14-learning-graphical-models.md)
 
 ## <a id="association-and-causation"></a>Association and causation

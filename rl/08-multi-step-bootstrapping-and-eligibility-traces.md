@@ -2,6 +2,9 @@
 
 # 8. Multi-Step Bootstrapping and Eligibility Traces
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 7. Model-Free Control](07-model-free-control.md) · [9. Off-Policy Learning →](09-off-policy-learning.md)
 
 ## <a id="between-one-step-and-the-whole-episode"></a>Between one step and the whole episode

@@ -2,6 +2,9 @@
 
 # Lab 9. Advantage Actor-Critic with Parallel and Stale Actors
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 8. Deep Q-Networks on CartPole and MinAtar](lab-08-deep-q-networks-on-cartpole-and-minatar.md) · [Lab 10. Proximal Policy Optimization from Scratch →](lab-10-proximal-policy-optimization-from-scratch.md)
 
 ## <a id="overview"></a>Overview

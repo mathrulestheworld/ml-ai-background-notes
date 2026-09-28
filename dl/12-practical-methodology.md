@@ -2,6 +2,9 @@
 
 # 12. Practical Methodology
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 11. Training at Scale and Efficient Inference](11-training-at-scale-and-efficient-inference.md) · [13. Graph Neural Networks →](13-graph-neural-networks.md)
 
 ## <a id="a-workflow-for-training-networks"></a>A workflow for training networks

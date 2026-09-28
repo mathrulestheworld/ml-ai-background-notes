@@ -2,6 +2,9 @@
 
 # 1. Foundations of Generative Modeling
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [2. Autoregressive Models →](02-autoregressive-models.md)
 
 ## <a id="what-a-generative-model-does"></a>What a generative model does

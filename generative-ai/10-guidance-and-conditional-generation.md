@@ -2,6 +2,9 @@
 
 # 10. Guidance and Conditional Generation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 9. Flow Matching](09-flow-matching.md) · [11. Latent Diffusion and Large-Scale Generation →](11-latent-diffusion-and-large-scale-generation.md)
 
 ## <a id="conditional-generation"></a>Conditional generation

@@ -2,6 +2,9 @@
 
 # 9. Exact Inference
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 8. Bayesian Networks and Markov Networks](08-bayesian-networks-and-markov-networks.md) · [10. Approximate Inference →](10-approximate-inference.md)
 
 ## <a id="inference-tasks"></a>Inference tasks

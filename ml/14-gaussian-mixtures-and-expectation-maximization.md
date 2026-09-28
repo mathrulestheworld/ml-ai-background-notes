@@ -2,6 +2,9 @@
 
 # 14. Gaussian Mixtures and Expectation Maximization
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 13. Clustering](13-clustering.md) · [15. Gaussian Processes →](15-gaussian-processes.md)
 
 ## <a id="mixture-models"></a>Mixture models

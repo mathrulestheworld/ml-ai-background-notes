@@ -2,6 +2,9 @@
 
 # 8. Diffusion SDEs and Fast Sampling
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 7. Denoising Diffusion Models](07-denoising-diffusion-models.md) · [9. Flow Matching →](09-flow-matching.md)
 
 ## <a id="from-steps-to-continuous-time"></a>From steps to continuous time

@@ -2,6 +2,9 @@
 
 # 30. The Theory of Reinforcement Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 29. Generalist Agents, Meta-RL, and Open-Endedness](29-generalist-agents-meta-rl-and-open-endedness.md) · [31. Reinforcement Learning in the Real World →](31-reinforcement-learning-in-the-real-world.md)
 
 ## <a id="what-theory-asks"></a>What theory asks

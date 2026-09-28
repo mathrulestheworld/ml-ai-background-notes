@@ -2,6 +2,9 @@
 
 # 8. Support Vector Machines and Kernels
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 7. Statistical Learning Theory](07-statistical-learning-theory.md) · [9. Decision and Regression Trees →](09-decision-and-regression-trees.md)
 
 ## <a id="the-maximum-margin-classifier"></a>The maximum-margin classifier

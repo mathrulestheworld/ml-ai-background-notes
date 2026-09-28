@@ -2,6 +2,9 @@
 
 # 5. Generative Adversarial Networks
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 4. Normalizing Flows](04-normalizing-flows.md) · [6. Energy-Based Models and Score Matching →](06-energy-based-models-and-score-matching.md)
 
 ## <a id="the-adversarial-game"></a>The adversarial game

@@ -2,6 +2,9 @@
 
 # 4. Generative Classifiers
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 3. Linear Regression and Regularization](03-linear-regression-and-regularization.md) · [5. Logistic Regression and Probabilistic Prediction →](05-logistic-regression-and-probabilistic-prediction.md)
 
 ## <a id="classification-through-bayes-rule"></a>Classification through Bayes' rule

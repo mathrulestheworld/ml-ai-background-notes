@@ -2,6 +2,9 @@
 
 # 9. Decision and Regression Trees
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 8. Support Vector Machines and Kernels](08-support-vector-machines-and-kernels.md) · [10. Bagging and Random Forests →](10-bagging-and-random-forests.md)
 
 ## <a id="trees-as-piecewise-constant-predictors"></a>Trees as piecewise-constant predictors

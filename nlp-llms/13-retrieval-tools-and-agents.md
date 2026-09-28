@@ -2,6 +2,9 @@
 
 # 13. Retrieval, Tools, and Agents
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 12. Reasoning and Test-Time Compute](12-reasoning-and-test-time-compute.md) · [14. Evaluating Language Models →](14-evaluating-language-models.md)
 
 ## <a id="why-retrieve"></a>Why retrieve

@@ -2,6 +2,9 @@
 
 # 3. Constraint Satisfaction and Local Search
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 2. Heuristic Search](02-heuristic-search.md) · [4. Adversarial Search and Games →](04-adversarial-search-and-games.md)
 
 ## <a id="constraint-satisfaction-problems"></a>Constraint satisfaction problems

@@ -2,6 +2,9 @@
 
 # 7. Model-Free Control
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 6. Temporal-Difference Learning](06-temporal-difference-learning.md) · [8. Multi-Step Bootstrapping and Eligibility Traces →](08-multi-step-bootstrapping-and-eligibility-traces.md)
 
 ## <a id="control-without-a-model"></a>Control without a model

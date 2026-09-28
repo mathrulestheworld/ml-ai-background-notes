@@ -2,6 +2,9 @@
 
 # 18. Data-Efficient and Scalable Value-Based Agents
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 17. Distributional Reinforcement Learning](17-distributional-reinforcement-learning.md) · [19. Deep Actor-Critic and Distributed RL →](19-deep-actor-critic-and-distributed-rl.md)
 
 ## <a id="after-dqn"></a>After DQN

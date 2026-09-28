@@ -2,6 +2,9 @@
 
 # Figure sources
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="figure-sources"></a>Figure sources
 
 Every figure in the DL chapters is an original plot generated for these notes on 24 September 2026 with PyTorch 2.2.2 (CPU), NumPy, SciPy, Matplotlib, scikit-learn, and NetworkX; no external artwork or course slides are reproduced. Each chapter's figures come from one script in `Sources/Figure code`, which is the complete record of the construction. The shared module `dlfig.py` sets the palette, fonts, and export (opaque white background, 200 dpi PNG). The tables below summarize the data, seeds, and model settings of each figure so that it can be read and regenerated without opening the script; the [computing setup](computing-setup.md) gives the environment and commands.

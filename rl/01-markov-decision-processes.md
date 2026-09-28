@@ -2,6 +2,9 @@
 
 # 1. Markov Decision Processes
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [2. Dynamic Programming →](02-dynamic-programming.md)
 
 ## <a id="the-reinforcement-learning-problem"></a>The reinforcement learning problem

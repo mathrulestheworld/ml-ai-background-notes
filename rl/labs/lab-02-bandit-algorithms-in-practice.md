@@ -2,6 +2,9 @@
 
 # Lab 2. Bandit Algorithms in Practice
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 1. Dynamic Programming on FrozenLake and Taxi](lab-01-dynamic-programming-on-frozenlake-and-taxi.md) · [Lab 3. Tabular Control with Monte Carlo and TD Methods →](lab-03-tabular-control-with-monte-carlo-and-td-methods.md)
 
 ## <a id="overview"></a>Overview

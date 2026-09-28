@@ -2,6 +2,9 @@
 
 # 2. N-gram Language Models and Perplexity
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 1. Text, Tokens, and Tokenization](01-text-tokens-and-tokenization.md) · [3. Word Embeddings →](03-word-embeddings.md)
 
 ## <a id="language-models"></a>Language models

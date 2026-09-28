@@ -2,6 +2,9 @@
 
 # 2. Autoregressive Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 1. Foundations of Generative Modeling](01-foundations-of-generative-modeling.md) · [3. Variational Autoencoders →](03-variational-autoencoders.md)
 
 ## <a id="one-dimension-at-a-time"></a>One dimension at a time

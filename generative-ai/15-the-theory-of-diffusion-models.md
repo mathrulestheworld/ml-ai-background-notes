@@ -2,6 +2,9 @@
 
 # 15. The Theory of Diffusion Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 14. Generative Models for Science and Control](14-generative-models-for-science-and-control.md)
 
 ## <a id="what-theory-asks"></a>What theory asks

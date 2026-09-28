@@ -2,6 +2,9 @@
 
 # Paper links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="papers"></a>Papers
 
 The notes link these works where their ideas arise. This index collects the original papers and principal analyses, grouped by the chapters that use them; surveys that make good follow-up reading are marked.

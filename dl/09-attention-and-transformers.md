@@ -2,6 +2,9 @@
 
 # 9. Attention and Transformers
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 8. Recurrent Networks](08-recurrent-networks.md) · [10. Self-Supervised Representation Learning →](10-self-supervised-representation-learning.md)
 
 ## <a id="attention-as-a-differentiable-lookup"></a>Attention as a differentiable lookup

@@ -2,6 +2,9 @@
 
 # 11. Value Function Approximation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 10. Planning and Learning with Tabular Models](10-planning-and-learning-with-tabular-models.md) · [12. The Deadly Triad and Gradient-TD Methods →](12-the-deadly-triad-and-gradient-td-methods.md)
 
 ## <a id="from-tables-to-functions"></a>From tables to functions

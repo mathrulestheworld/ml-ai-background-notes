@@ -2,6 +2,9 @@
 
 # 8. Bayesian Networks and Markov Networks
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 7. Automated Planning](07-automated-planning.md) · [9. Exact Inference →](09-exact-inference.md)
 
 ## <a id="representing-uncertainty"></a>Representing uncertainty

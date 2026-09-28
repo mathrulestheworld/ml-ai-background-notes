@@ -2,6 +2,9 @@
 
 # Lab 3. Tabular Control with Monte Carlo and TD Methods
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 2. Bandit Algorithms in Practice](lab-02-bandit-algorithms-in-practice.md) · [Lab 4. Planning with Learned and Given Models →](lab-04-planning-with-learned-and-given-models.md)
 
 ## <a id="overview"></a>Overview

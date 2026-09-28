@@ -2,6 +2,9 @@
 
 # 19. Deep Actor-Critic and Distributed RL
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 18. Data-Efficient and Scalable Value-Based Agents](18-data-efficient-and-scalable-value-based-agents.md) · [20. Trust Regions and Proximal Policy Optimization →](20-trust-regions-and-proximal-policy-optimization.md)
 
 ## <a id="from-one-actor-to-many"></a>From one actor to many

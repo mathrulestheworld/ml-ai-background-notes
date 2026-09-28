@@ -2,6 +2,9 @@
 
 # 16. Syntactic Parsing
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 15. Machine Translation and Multilingual Models](15-machine-translation-and-multilingual-models.md)
 
 ## <a id="structure-in-sentences"></a>Structure in sentences

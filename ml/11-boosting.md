@@ -2,6 +2,9 @@
 
 # 11. Boosting
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 10. Bagging and Random Forests](10-bagging-and-random-forests.md) · [12. Principal Components and Dimensionality Reduction →](12-principal-components-and-dimensionality-reduction.md)
 
 ## <a id="weak-and-strong-learning"></a>Weak and strong learning

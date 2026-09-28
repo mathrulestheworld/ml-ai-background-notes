@@ -2,6 +2,9 @@
 
 # Reading plan
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 ## <a id="courses"></a>Courses
 
 - **Main course — UC Berkeley CS188, Spring 2024: *Introduction to Artificial Intelligence*.** [Course homepage](https://inst.eecs.berkeley.edu/~cs188/sp24/) · [Online textbook](https://inst.eecs.berkeley.edu/~cs188/textbook/) · [Lecture playlist](https://www.youtube.com/playlist?list=PLp8QV47qJEg67UTShQ4er4RYQ3rOeDKxv). Supplies the main lecture sequence: agents and search, games, propositional and first-order logic, Bayesian networks, hidden Markov models, and decisions under uncertainty. The online textbook collects the course notes by topic. Spring 2024 has no lectures on constraint satisfaction, so block 3 uses the Spring 2023 slides and notes.

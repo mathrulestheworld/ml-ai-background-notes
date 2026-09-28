@@ -2,6 +2,9 @@
 
 # 9. Off-Policy Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 8. Multi-Step Bootstrapping and Eligibility Traces](08-multi-step-bootstrapping-and-eligibility-traces.md) · [10. Planning and Learning with Tabular Models →](10-planning-and-learning-with-tabular-models.md)
 
 ## <a id="learning-about-one-policy-from-another"></a>Learning about one policy from another

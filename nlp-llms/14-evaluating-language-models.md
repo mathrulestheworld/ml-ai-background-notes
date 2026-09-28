@@ -2,6 +2,9 @@
 
 # 14. Evaluating Language Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 13. Retrieval, Tools, and Agents](13-retrieval-tools-and-agents.md) · [15. Machine Translation and Multilingual Models →](15-machine-translation-and-multilingual-models.md)
 
 ## <a id="what-evaluation-is-for"></a>What evaluation is for

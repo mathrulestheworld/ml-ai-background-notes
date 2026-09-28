@@ -2,6 +2,9 @@
 
 # 21. Continuous Control and Maximum-Entropy RL
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 20. Trust Regions and Proximal Policy Optimization](20-trust-regions-and-proximal-policy-optimization.md) · [22. Exploration in Deep RL →](22-exploration-in-deep-rl.md)
 
 ## <a id="continuous-actions"></a>Continuous actions

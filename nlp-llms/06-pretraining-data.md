@@ -2,6 +2,9 @@
 
 # 6. Pretraining Data
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 5. Pretraining and Transfer](05-pretraining-and-transfer.md) · [7. Scaling Laws →](07-scaling-laws.md)
 
 ## <a id="where-the-data-come-from"></a>Where the data come from

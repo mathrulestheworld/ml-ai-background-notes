@@ -2,6 +2,9 @@
 
 # 31. Reinforcement Learning in the Real World
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 30. The Theory of Reinforcement Learning](30-the-theory-of-reinforcement-learning.md)
 
 ## <a id="specifying-the-problem"></a>Specifying the problem

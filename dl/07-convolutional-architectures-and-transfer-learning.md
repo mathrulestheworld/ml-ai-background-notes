@@ -2,6 +2,9 @@
 
 # 7. Convolutional Architectures and Transfer Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 6. Convolutional Networks](06-convolutional-networks.md) · [8. Recurrent Networks →](08-recurrent-networks.md)
 
 ## <a id="a-decade-of-architectures"></a>A decade of architectures

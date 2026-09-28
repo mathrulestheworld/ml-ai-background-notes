@@ -2,6 +2,9 @@
 
 # 7. Statistical Learning Theory
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 6. Losses, Model Selection, and Evaluation](06-losses-model-selection-and-evaluation.md) · [8. Support Vector Machines and Kernels →](08-support-vector-machines-and-kernels.md)
 
 ## <a id="from-foundations-to-concrete-classes"></a>From Foundations to concrete classes

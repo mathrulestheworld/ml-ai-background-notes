@@ -2,6 +2,9 @@
 
 # Lab 15. Regret Minimization and Self-Play in Poker
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 14. Imitation and Offline Reinforcement Learning](lab-14-imitation-and-offline-reinforcement-learning.md) · [Lab 16. Reinforcement Learning for a Small Language Model →](lab-16-reinforcement-learning-for-a-small-language-model.md)
 
 ## <a id="overview"></a>Overview

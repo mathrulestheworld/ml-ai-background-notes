@@ -2,6 +2,9 @@
 
 # Lab 5. Tile Coding and Linear Control on Mountain Car
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 4. Planning with Learned and Given Models](lab-04-planning-with-learned-and-given-models.md) · [Lab 6. Policy Gradient and Actor-Critic Methods on CartPole →](lab-06-policy-gradient-and-actor-critic-methods-on-cartpole.md)
 
 ## <a id="overview"></a>Overview

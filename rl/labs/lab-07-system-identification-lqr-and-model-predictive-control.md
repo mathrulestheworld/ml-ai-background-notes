@@ -2,6 +2,9 @@
 
 # Lab 7. System Identification, LQR, and Model Predictive Control
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 6. Policy Gradient and Actor-Critic Methods on CartPole](lab-06-policy-gradient-and-actor-critic-methods-on-cartpole.md) · [Lab 8. Deep Q-Networks on CartPole and MinAtar →](lab-08-deep-q-networks-on-cartpole-and-minatar.md)
 
 ## <a id="overview"></a>Overview

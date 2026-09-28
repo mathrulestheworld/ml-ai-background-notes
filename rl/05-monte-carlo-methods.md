@@ -2,6 +2,9 @@
 
 # 5. Monte Carlo Methods
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 4. Contextual, Bayesian, and Adversarial Bandits](04-contextual-bayesian-and-adversarial-bandits.md) · [6. Temporal-Difference Learning →](06-temporal-difference-learning.md)
 
 ## <a id="learning-from-complete-episodes"></a>Learning from complete episodes

@@ -2,6 +2,9 @@
 
 # 15. Machine Translation and Multilingual Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 14. Evaluating Language Models](14-evaluating-language-models.md) · [16. Syntactic Parsing →](16-syntactic-parsing.md)
 
 ## <a id="translation"></a>Translation

@@ -2,6 +2,9 @@
 
 # 17. Distributional Reinforcement Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 16. Deep Q-Learning](16-deep-q-learning.md) · [18. Data-Efficient and Scalable Value-Based Agents →](18-data-efficient-and-scalable-value-based-agents.md)
 
 ## <a id="the-distribution-of-returns"></a>The distribution of returns

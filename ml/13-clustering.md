@@ -2,6 +2,9 @@
 
 # 13. Clustering
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 12. Principal Components and Dimensionality Reduction](12-principal-components-and-dimensionality-reduction.md) · [14. Gaussian Mixtures and Expectation Maximization →](14-gaussian-mixtures-and-expectation-maximization.md)
 
 ## <a id="the-clustering-problem"></a>The clustering problem

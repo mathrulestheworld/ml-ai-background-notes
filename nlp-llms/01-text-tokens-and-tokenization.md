@@ -2,6 +2,9 @@
 
 # 1. Text, Tokens, and Tokenization
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [2. N-gram Language Models and Perplexity →](02-n-gram-language-models-and-perplexity.md)
 
 ## <a id="from-text-to-symbols"></a>From text to symbols

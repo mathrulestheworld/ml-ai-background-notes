@@ -2,6 +2,9 @@
 
 # 12. Principal Components and Dimensionality Reduction
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 11. Boosting](11-boosting.md) · [13. Clustering →](13-clustering.md)
 
 ## <a id="pca-as-a-fitted-transformation"></a>PCA as a fitted transformation

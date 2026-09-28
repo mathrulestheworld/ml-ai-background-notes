@@ -2,6 +2,9 @@
 
 # 23. Model-Based RL and World Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 22. Exploration in Deep RL](22-exploration-in-deep-rl.md) · [24. Planning with Learned Models →](24-planning-with-learned-models.md)
 
 ## <a id="learning-models-of-the-world"></a>Learning models of the world

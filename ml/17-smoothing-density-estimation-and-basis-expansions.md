@@ -2,6 +2,9 @@
 
 # 17. Smoothing, Density Estimation, and Basis Expansions
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 16. Semi-Supervised and Active Learning](16-semi-supervised-and-active-learning.md)
 
 ## <a id="kernel-density-estimation"></a>Kernel density estimation

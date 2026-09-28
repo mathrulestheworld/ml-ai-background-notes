@@ -2,6 +2,9 @@
 
 # 14. Partially Observable Environments
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 13. Policy Gradient and Actor-Critic Methods](13-policy-gradient-and-actor-critic-methods.md) · [15. Optimal Control and Trajectory Optimization →](15-optimal-control-and-trajectory-optimization.md)
 
 ## <a id="partial-observability"></a>Partial observability

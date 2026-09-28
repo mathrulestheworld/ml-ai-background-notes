@@ -2,6 +2,9 @@
 
 # 2. Heuristic Search
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 1. Agents and Uninformed Search](01-agents-and-uninformed-search.md) · [3. Constraint Satisfaction and Local Search →](03-constraint-satisfaction-and-local-search.md)
 
 ## <a id="heuristics-and-best-first-search"></a>Heuristics and best-first search

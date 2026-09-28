@@ -2,6 +2,9 @@
 
 # 5. Logistic Regression and Probabilistic Prediction
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 4. Generative Classifiers](04-generative-classifiers.md) · [6. Losses, Model Selection, and Evaluation →](06-losses-model-selection-and-evaluation.md)
 
 ## <a id="the-logistic-model"></a>The logistic model

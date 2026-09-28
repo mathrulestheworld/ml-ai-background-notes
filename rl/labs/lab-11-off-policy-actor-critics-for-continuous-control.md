@@ -2,6 +2,9 @@
 
 # Lab 11. Off-Policy Actor-Critics for Continuous Control
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 10. Proximal Policy Optimization from Scratch](lab-10-proximal-policy-optimization-from-scratch.md) · [Lab 12. Model-Based RL with Learned Ensembles →](lab-12-model-based-rl-with-learned-ensembles.md)
 
 ## <a id="overview"></a>Overview

@@ -2,6 +2,9 @@
 
 # Reading plan
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 ## <a id="courses"></a>Courses
 
 - **Main course — Stanford CS224N, Spring 2024: Christopher Manning, *Natural Language Processing with Deep Learning*.** [Course homepage](https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1246/) · [Lecture playlist](https://www.youtube.com/playlist?list=PLoROMvodv4rOaMFbaqxPDoLWjDaRAdP9D). Supplies word vectors, language models, pretraining, post-training, evaluation, reasoning and agents, machine translation, and parsing. Its four assignments cover word vectors, dependency parsing, neural machine translation, and pretraining and fine-tuning a small transformer.

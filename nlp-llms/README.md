@@ -2,6 +2,9 @@
 
 # NLP and Large Language Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 Natural Language Processing and Large Language Models studies how machines model, generate, and use human language, from counting words to training, adapting, and evaluating the large language models at the center of current AI. It builds on the probability and information theory of [Foundations](../foundations/README.md), on the logistic regression and EM of [Machine Learning](../ml/README.md), on the transformer, self-supervised learning, and training at scale of [Deep Learning](../dl/README.md), and on the search, hidden Markov models, and conditional random fields of [Artificial Intelligence](../ai/README.md). Fourteen core chapters follow the main topics of the [reading plan](reading-plan.md), and two optional chapters cover the classical tasks of translation and parsing.
 
 ## <a id="chapters"></a>Chapters

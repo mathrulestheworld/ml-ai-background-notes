@@ -2,6 +2,9 @@
 
 # 11. Learning from Human Preferences
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 10. Fine-Tuning and Parameter-Efficient Adaptation](10-fine-tuning-and-parameter-efficient-adaptation.md) · [12. Reasoning and Test-Time Compute →](12-reasoning-and-test-time-compute.md)
 
 ## <a id="why-preferences"></a>Why preferences

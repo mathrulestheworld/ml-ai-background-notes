@@ -2,6 +2,9 @@
 
 # 13. Policy Gradient and Actor-Critic Methods
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 12. The Deadly Triad and Gradient-TD Methods](12-the-deadly-triad-and-gradient-td-methods.md) · [14. Partially Observable Environments →](14-partially-observable-environments.md)
 
 ## <a id="learning-policies-directly"></a>Learning policies directly

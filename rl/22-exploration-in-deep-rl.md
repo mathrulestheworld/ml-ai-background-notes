@@ -2,6 +2,9 @@
 
 # 22. Exploration in Deep RL
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 21. Continuous Control and Maximum-Entropy RL](21-continuous-control-and-maximum-entropy-rl.md) · [23. Model-Based RL and World Models →](23-model-based-rl-and-world-models.md)
 
 ## <a id="the-exploration-problem-in-deep-rl"></a>The exploration problem in deep RL

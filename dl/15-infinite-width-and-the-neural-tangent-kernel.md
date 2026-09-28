@@ -2,6 +2,9 @@
 
 # 15. Infinite Width and the Neural Tangent Kernel
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 14. Detection and Segmentation](14-detection-and-segmentation.md)
 
 ## <a id="wide-networks-at-initialization"></a>Wide networks at initialization

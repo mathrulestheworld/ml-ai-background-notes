@@ -2,6 +2,9 @@
 
 # Lab 1. Dynamic Programming on FrozenLake and Taxi
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [Lab 2. Bandit Algorithms in Practice →](lab-02-bandit-algorithms-in-practice.md)
 
 ## <a id="overview"></a>Overview

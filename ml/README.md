@@ -2,6 +2,9 @@
 
 # Machine Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 Machine Learning develops the classical methods for learning from data: how a prediction rule is fitted, how its error is estimated and controlled, and how structure is found without labels. It builds on the linear algebra, probability, optimization, and learning theory of [Foundations](../foundations/README.md) and covers the supervised and unsupervised core that later modules assume. Fifteen core chapters follow the main topics of the [reading plan](reading-plan.md), and two optional chapters cover its extensions.
 
 ## <a id="chapters"></a>Chapters

@@ -2,6 +2,9 @@
 
 # 13. Graph Neural Networks
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 12. Practical Methodology](12-practical-methodology.md) · [14. Detection and Segmentation →](14-detection-and-segmentation.md)
 
 ## <a id="graphs-as-inputs"></a>Graphs as inputs

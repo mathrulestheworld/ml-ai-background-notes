@@ -2,6 +2,9 @@
 
 # 10. Fine-Tuning and Parameter-Efficient Adaptation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 9. In-Context Learning and Prompting](09-in-context-learning-and-prompting.md) · [11. Learning from Human Preferences →](11-learning-from-human-preferences.md)
 
 ## <a id="supervised-fine-tuning"></a>Supervised fine-tuning

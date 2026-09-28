@@ -2,6 +2,9 @@
 
 # 1. Learning Problems and Nearest Neighbors
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [2. The Perceptron and Linear Separation →](02-the-perceptron-and-linear-separation.md)
 
 ## <a id="the-prediction-problem"></a>The prediction problem

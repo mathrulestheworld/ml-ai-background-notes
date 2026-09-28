@@ -2,6 +2,9 @@
 
 # Artificial Intelligence
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 Artificial Intelligence develops the methods by which an agent decides what to do when the answer is not learned end to end: searching through possibilities, reasoning with logic, representing and updating uncertain beliefs, weighing outcomes by their utility, reasoning about causes and interventions, and interacting with other agents. It builds on the probability, statistics, and information theory of [Foundations](../foundations/README.md), on the generative models and EM of [Machine Learning](../ml/README.md), and, where heuristics and evaluation functions are learned, on the networks of [Deep Learning](../dl/README.md). Thirteen core chapters follow the main topics of the [reading plan](reading-plan.md), and two optional chapters cover its extensions.
 
 ## <a id="chapters"></a>Chapters

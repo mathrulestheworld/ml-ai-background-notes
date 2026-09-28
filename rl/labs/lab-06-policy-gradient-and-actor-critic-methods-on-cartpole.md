@@ -2,6 +2,9 @@
 
 # Lab 6. Policy Gradient and Actor-Critic Methods on CartPole
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 5. Tile Coding and Linear Control on Mountain Car](lab-05-tile-coding-and-linear-control-on-mountain-car.md) · [Lab 7. System Identification, LQR, and Model Predictive Control →](lab-07-system-identification-lqr-and-model-predictive-control.md)
 
 ## <a id="overview"></a>Overview

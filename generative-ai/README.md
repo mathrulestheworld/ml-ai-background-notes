@@ -2,6 +2,9 @@
 
 # Generative AI
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 Generative AI studies models that learn a probability distribution from examples and produce new samples from it: images, audio, video, molecules, actions, and text. It builds on the probability, information theory, and change of variables of [Foundations](../foundations/README.md), on the mixtures, EM, and density estimation of [Machine Learning](../ml/README.md), on the autoencoders, U-Nets, transformers, and contrastive image–text models of [Deep Learning](../dl/README.md), on the variational inference and Markov chain Monte Carlo of [Artificial Intelligence](../ai/README.md), and on the autoregressive transformers, tokenizers, and preference optimization of [NLP and LLMs](../nlp-llms/README.md). Thirteen core chapters follow the main topics of the [reading plan](reading-plan.md), and two optional chapters cover applications in science and control and the theory of diffusion models.
 
 ## <a id="chapters"></a>Chapters

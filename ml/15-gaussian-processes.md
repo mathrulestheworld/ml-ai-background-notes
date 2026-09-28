@@ -2,6 +2,9 @@
 
 # 15. Gaussian Processes
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 14. Gaussian Mixtures and Expectation Maximization](14-gaussian-mixtures-and-expectation-maximization.md) · [16. Semi-Supervised and Active Learning →](16-semi-supervised-and-active-learning.md)
 
 ## <a id="from-weights-to-functions"></a>From weights to functions

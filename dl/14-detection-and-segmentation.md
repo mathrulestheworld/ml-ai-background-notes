@@ -2,6 +2,9 @@
 
 # 14. Detection and Segmentation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 13. Graph Neural Networks](13-graph-neural-networks.md) · [15. Infinite Width and the Neural Tangent Kernel →](15-infinite-width-and-the-neural-tangent-kernel.md)
 
 ## <a id="from-labels-to-locations"></a>From labels to locations

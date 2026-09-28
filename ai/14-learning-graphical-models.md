@@ -2,6 +2,9 @@
 
 # 14. Learning Graphical Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 13. Causal Inference](13-causal-inference.md) · [15. Game Theory and Multiagent Systems →](15-game-theory-and-multiagent-systems.md)
 
 ## <a id="learning-from-data"></a>Learning from data

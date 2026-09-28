@@ -2,6 +2,9 @@
 
 # Figure sources
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="figure-sources"></a>Figure sources
 
 Every figure in the NLP and LLMs chapters is an original plot generated for these notes on 24 September 2026 with NumPy, SciPy, Matplotlib, PyTorch, and scikit-learn; no external artwork or course slides are reproduced. Each chapter's figures come from one script in `Sources/Figure code`, which is the complete record of the construction. The shared module `nlpfig.py` sets the palette, fonts, and export (white background, 200 dpi PNG). The ten figures of chapters 1–6, 8, and 10 are computed from Tiny Shakespeare (`Sources/Data/tinyshakespeare.txt`, 1,115,394 characters from Karpathy's char-rnn repository), and chapters 5, 8, and 10 reuse the character transformer trained in chapter 4 (`Sources/Data/shakespeare-char-transformer.pt`, 4 layers, 4 heads, width 128, context 128). [Data sources](data-sources.md) describes both files. The tables below summarize the data, seeds, and model settings of each figure so that it can be read and regenerated without opening the script; the [computing setup](computing-setup.md) gives the environment and commands.

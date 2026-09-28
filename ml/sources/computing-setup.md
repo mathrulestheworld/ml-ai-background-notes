@@ -2,6 +2,9 @@
 
 # Computing setup
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="computing-setup"></a>Computing setup
 
 The ML code blocks and figure scripts use Python, NumPy, SciPy, and scikit-learn; the environment also pins Matplotlib, and PyTorch is not needed. The figures themselves are drawn with Node.js, as described [below](#regenerating-the-figures). The environment below is a **CPU reproducibility snapshot**, tested on Linux x86_64 with CPython 3.12.3. Every code block in the seventeen chapters was run in it with one and with two BLAS threads, and its printed output matched the comment lines at the end of the block. The version pins are not a claim that these are the newest releases.

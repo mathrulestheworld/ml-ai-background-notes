@@ -2,6 +2,9 @@
 
 # Course links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="course-links"></a>Course links
 
 | Course | Links | Role |

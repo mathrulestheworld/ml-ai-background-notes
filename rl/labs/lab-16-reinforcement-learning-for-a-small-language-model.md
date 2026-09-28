@@ -2,6 +2,9 @@
 
 # Lab 16. Reinforcement Learning for a Small Language Model
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 15. Regret Minimization and Self-Play in Poker](lab-15-regret-minimization-and-self-play-in-poker.md) · [Lab 17. Safe and Robust Reinforcement Learning →](lab-17-safe-and-robust-reinforcement-learning.md)
 
 ## <a id="overview"></a>Overview

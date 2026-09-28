@@ -2,6 +2,9 @@
 
 # Deep Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 Deep Learning develops the networks that learn their own features: how they are built, why they can be trained, how they generalize despite fitting their training data, and how they are made to work in practice and at scale. It builds on the differentiation, optimization, and PyTorch interfaces of [Foundations](../foundations/README.md) and on the losses, regularization, model selection, and kernels of [Machine Learning](../ml/README.md). Twelve core chapters follow the main topics of the [reading plan](reading-plan.md), and three optional chapters cover its extensions.
 
 ## <a id="chapters"></a>Chapters

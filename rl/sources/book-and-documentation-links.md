@@ -2,6 +2,9 @@
 
 # Book and documentation links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="books-and-documentation"></a>Books and documentation
 
 The chapter notes develop the module's main material. These books, libraries, and tutorials provide alternative explanations, fuller proofs, and the tools used to run reinforcement learning experiments. The [reading plan](../reading-plan.md) lists the lecture slides and readings for each topic, and cites the main references by the abbreviations in parentheses below or by the first author's name.

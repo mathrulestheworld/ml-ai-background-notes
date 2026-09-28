@@ -2,6 +2,9 @@
 
 # 16. Deep Q-Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 15. Optimal Control and Trajectory Optimization](15-optimal-control-and-trajectory-optimization.md) · [17. Distributional Reinforcement Learning →](17-distributional-reinforcement-learning.md)
 
 ## <a id="from-tabular-to-deep-q-learning"></a>From tabular to deep Q-learning

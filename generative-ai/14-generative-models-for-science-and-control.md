@@ -2,6 +2,9 @@
 
 # 14. Generative Models for Science and Control
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 13. Evaluating Generative Models](13-evaluating-generative-models.md) · [15. The Theory of Diffusion Models →](15-the-theory-of-diffusion-models.md)
 
 ## <a id="generative-models-beyond-media"></a>Generative models beyond media

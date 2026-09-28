@@ -2,6 +2,9 @@
 
 # Paper links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="papers"></a>Papers
 
 The notes cite the original papers where their ideas arise. This index collects the principal ones by topic; the chapters give further references inline.

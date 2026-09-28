@@ -2,6 +2,9 @@
 
 # 12. Reasoning and Test-Time Compute
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 11. Learning from Human Preferences](11-learning-from-human-preferences.md) · [13. Retrieval, Tools, and Agents →](13-retrieval-tools-and-agents.md)
 
 ## <a id="thinking-in-tokens"></a>Thinking in tokens

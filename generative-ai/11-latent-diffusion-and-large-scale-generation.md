@@ -2,6 +2,9 @@
 
 # 11. Latent Diffusion and Large-Scale Generation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 10. Guidance and Conditional Generation](10-guidance-and-conditional-generation.md) · [12. Discrete Tokens and Multimodal Generation →](12-discrete-tokens-and-multimodal-generation.md)
 
 ## <a id="why-generate-in-a-latent-space"></a>Why generate in a latent space

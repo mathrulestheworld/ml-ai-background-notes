@@ -2,6 +2,9 @@
 
 # Reading plan
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 ## <a id="courses"></a>Courses
 
 - **Main course — CMU 10-601, Spring 2015: Tom Mitchell and Maria-Florina Balcan.** [Course and lecture schedule](https://www.cs.cmu.edu/~ninamf/courses/601sp15/lectures.shtml). Supplies the main mathematical development, formal learning theory, and unsupervised learning.

@@ -2,6 +2,9 @@
 
 # 20. Trust Regions and Proximal Policy Optimization
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 19. Deep Actor-Critic and Distributed RL](19-deep-actor-critic-and-distributed-rl.md) · [21. Continuous Control and Maximum-Entropy RL →](21-continuous-control-and-maximum-entropy-rl.md)
 
 ## <a id="why-the-step-size-matters"></a>Why the step size matters

@@ -2,6 +2,9 @@
 
 # 2. The Perceptron and Linear Separation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 1. Learning Problems and Nearest Neighbors](01-learning-problems-and-nearest-neighbors.md) · [3. Linear Regression and Regularization →](03-linear-regression-and-regularization.md)
 
 ## <a id="linear-classifiers"></a>Linear classifiers

@@ -2,6 +2,9 @@
 
 # Data sources
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="data-sources"></a>Data sources
 
 The Generative AI code blocks and figure scripts use one small real dataset, the $`8\times8`$ handwritten digits bundled with scikit-learn, and synthetic distributions generated inside the code that uses them. Nothing needs to be downloaded, and the `Sources/Data` folder is empty.

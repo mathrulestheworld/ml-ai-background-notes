@@ -2,6 +2,9 @@
 
 # 5. Regularization and Generalization in Deep Networks
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 4. Normalization and Residual Connections](04-normalization-and-residual-connections.md) · [6. Convolutional Networks →](06-convolutional-networks.md)
 
 ## <a id="the-generalization-puzzle"></a>The generalization puzzle

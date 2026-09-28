@@ -2,6 +2,9 @@
 
 # 16. Semi-Supervised and Active Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 15. Gaussian Processes](15-gaussian-processes.md) · [17. Smoothing, Density Estimation, and Basis Expansions →](17-smoothing-density-estimation-and-basis-expansions.md)
 
 ## <a id="learning-when-labels-are-scarce"></a>Learning when labels are scarce

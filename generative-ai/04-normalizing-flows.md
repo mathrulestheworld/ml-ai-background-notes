@@ -2,6 +2,9 @@
 
 # 4. Normalizing Flows
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 3. Variational Autoencoders](03-variational-autoencoders.md) · [5. Generative Adversarial Networks →](05-generative-adversarial-networks.md)
 
 ## <a id="invertible-generative-models"></a>Invertible generative models

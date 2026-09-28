@@ -2,6 +2,9 @@
 
 # 13. Evaluating Generative Models
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 12. Discrete Tokens and Multimodal Generation](12-discrete-tokens-and-multimodal-generation.md) · [14. Generative Models for Science and Control →](14-generative-models-for-science-and-control.md)
 
 ## <a id="what-to-measure"></a>What to measure

@@ -2,6 +2,9 @@
 
 # 25. Imitation Learning and Inverse RL
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 24. Planning with Learned Models](24-planning-with-learned-models.md) · [26. Offline Reinforcement Learning →](26-offline-reinforcement-learning.md)
 
 ## <a id="learning-from-demonstrations"></a>Learning from demonstrations

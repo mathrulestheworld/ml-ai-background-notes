@@ -2,6 +2,9 @@
 
 # 3. Linear Regression and Regularization
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 2. The Perceptron and Linear Separation](02-the-perceptron-and-linear-separation.md) · [4. Generative Classifiers →](04-generative-classifiers.md)
 
 ## <a id="linear-regression-as-a-learning-method"></a>Linear regression as a learning method

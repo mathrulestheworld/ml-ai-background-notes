@@ -2,6 +2,9 @@
 
 # Lab 14. Imitation and Offline Reinforcement Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 13. AlphaZero and Gumbel Search from Scratch](lab-13-alphazero-and-gumbel-search-from-scratch.md) · [Lab 15. Regret Minimization and Self-Play in Poker →](lab-15-regret-minimization-and-self-play-in-poker.md)
 
 ## <a id="overview"></a>Overview

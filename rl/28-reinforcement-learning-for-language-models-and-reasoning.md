@@ -2,6 +2,9 @@
 
 # 28. Reinforcement Learning for Language Models and Reasoning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 27. Multi-Agent RL and Self-Play](27-multi-agent-rl-and-self-play.md) · [29. Generalist Agents, Meta-RL, and Open-Endedness →](29-generalist-agents-meta-rl-and-open-endedness.md)
 
 ## <a id="language-generation-as-a-decision-problem"></a>Language generation as a decision problem

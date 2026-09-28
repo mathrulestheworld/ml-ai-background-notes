@@ -2,6 +2,9 @@
 
 # 6. Energy-Based Models and Score Matching
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 5. Generative Adversarial Networks](05-generative-adversarial-networks.md) · [7. Denoising Diffusion Models →](07-denoising-diffusion-models.md)
 
 ## <a id="energy-based-models"></a>Energy-based models

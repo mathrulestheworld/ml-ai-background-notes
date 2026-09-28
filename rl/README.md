@@ -2,6 +2,9 @@
 
 # Reinforcement Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 Reinforcement learning studies agents that learn to act from the consequences of their actions: an agent observes, acts, receives rewards, and must find behavior that maximizes the rewards it will collect, without being told what the right actions are. It builds on the probability, optimization, and linear algebra of [Foundations](../foundations/README.md), on the supervised learning and function approximation of [Machine Learning](../ml/README.md) and [Deep Learning](../dl/README.md), on the decision theory, filtering, game trees, Monte Carlo tree search, and game theory of [Artificial Intelligence](../ai/README.md), on the preference learning and reasoning of [NLP and LLMs](../nlp-llms/README.md), and on the generative models of [Generative AI](../generative-ai/README.md). The module is about twice the size of the others: 31 chapters in two parts follow the topics of the [reading plan](reading-plan.md), and 17 labs apply them to working agents.
 
 ## <a id="chapters"></a>Chapters

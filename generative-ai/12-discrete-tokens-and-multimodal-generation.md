@@ -2,6 +2,9 @@
 
 # 12. Discrete Tokens and Multimodal Generation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 11. Latent Diffusion and Large-Scale Generation](11-latent-diffusion-and-large-scale-generation.md) · [13. Evaluating Generative Models →](13-evaluating-generative-models.md)
 
 ## <a id="discrete-latent-variables"></a>Discrete latent variables

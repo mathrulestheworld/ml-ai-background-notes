@@ -2,6 +2,9 @@
 
 # 3. Optimization for Deep Networks
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 2. Initialization and Signal Propagation](02-initialization-and-signal-propagation.md) · [4. Normalization and Residual Connections →](04-normalization-and-residual-connections.md)
 
 ## <a id="what-is-different-about-deep-networks"></a>What is different about deep networks

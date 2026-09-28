@@ -2,6 +2,9 @@
 
 # 9. In-Context Learning and Prompting
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 8. Decoding and Text Generation](08-decoding-and-text-generation.md) · [10. Fine-Tuning and Parameter-Efficient Adaptation →](10-fine-tuning-and-parameter-efficient-adaptation.md)
 
 ## <a id="learning-from-the-prompt"></a>Learning from the prompt

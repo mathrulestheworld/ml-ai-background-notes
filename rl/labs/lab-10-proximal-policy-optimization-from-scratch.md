@@ -2,6 +2,9 @@
 
 # Lab 10. Proximal Policy Optimization from Scratch
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 9. Advantage Actor-Critic with Parallel and Stale Actors](lab-09-advantage-actor-critic-with-parallel-and-stale-actors.md) · [Lab 11. Off-Policy Actor-Critics for Continuous Control →](lab-11-off-policy-actor-critics-for-continuous-control.md)
 
 ## <a id="overview"></a>Overview

@@ -2,6 +2,9 @@
 
 # 6. Losses, Model Selection, and Evaluation
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 5. Logistic Regression and Probabilistic Prediction](05-logistic-regression-and-probabilistic-prediction.md) · [7. Statistical Learning Theory →](07-statistical-learning-theory.md)
 
 ## <a id="losses-and-what-they-estimate"></a>Losses and what they estimate

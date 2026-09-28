@@ -2,6 +2,9 @@
 
 # Computing setup
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="computing-setup"></a>Computing setup
 
 The RL code blocks, figure scripts, and labs use NumPy, SciPy, Matplotlib, PyTorch, and Gymnasium, and everything runs on a CPU. Every agent, from value iteration and Q-learning to DQN, PPO, SAC, AlphaZero, CFR, and the GRPO of the language-model lab, is implemented from scratch rather than taken from a library such as Stable-Baselines3 or CleanRL, so that the code shows the method; Gymnasium supplies only environments, and several environments are written in NumPy in the code itself. The environment below is a **CPU reproducibility snapshot**, tested on Linux x86_64 with CPython 3.12.3. Every code block in the 31 chapters was run in it and its printed output matches the comment lines at the end of the block, and every lab script printed the results quoted on its page. The version pins are not a claim that these are the newest releases, and a GPU is neither needed nor tested.

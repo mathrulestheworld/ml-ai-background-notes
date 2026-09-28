@@ -2,6 +2,9 @@
 
 # Data sources
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="data-sources"></a>Data sources
 
 The NLP code blocks and figure scripts use one text corpus and one trained model, both stored in `Sources/Data`. Everything else, from the toy English–Spanish corpus of chapter 15 to the simulated benchmarks of chapter 14, is generated inside the code that uses it, so nothing needs to be downloaded.

@@ -2,6 +2,9 @@
 
 # 3. Variational Autoencoders
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 2. Autoregressive Models](02-autoregressive-models.md) · [4. Normalizing Flows →](04-normalizing-flows.md)
 
 ## <a id="latent-variable-models"></a>Latent-variable models

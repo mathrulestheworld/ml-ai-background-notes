@@ -2,6 +2,9 @@
 
 # Figure sources
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="figure-sources"></a>Figure sources
 
 Every figure in the AI chapters is an original plot generated for these notes on 24 September 2026 with NumPy, SciPy, Matplotlib, and NetworkX; no external artwork or course slides are reproduced. Each chapter's figures come from one script in `Sources/Figure code`, which is the complete record of the construction. The shared module `aifig.py` sets the palette, fonts, and export (opaque white background, 200 dpi PNG). The tables below summarize the problems, seeds, and settings of each figure; the [computing setup](computing-setup.md) gives the environment and commands.

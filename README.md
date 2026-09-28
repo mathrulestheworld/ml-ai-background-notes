@@ -1,6 +1,6 @@
 # Background Notes on Machine Learning and AI
 
-Supplementary notes for [Generative AI from First Principles](https://mathrulestheworld.github.io/genai-first-principles/). They develop in full the material that the lectures assume: the mathematics of learning, machine learning, deep learning, classical AI, NLP and large language models, generative models, and reinforcement learning. They are working notes and are revised continually.
+Supplementary notes for [Generative AI from First Principles](https://mathrulestheworld.github.io/genai-first-principles/). They develop in full the material that the lectures assume: the mathematics of learning, machine learning, deep learning, classical AI, NLP and large language models, generative models, and reinforcement learning. They are a work in progress: Foundations has had its final review, and the modules marked *(work in progress)* are still being revised.
 
 The same notes are also on the course website: <https://mathrulestheworld.github.io/genai-first-principles/notes/>. Here, math, figures, and diagrams render in GitHub's file viewer; proofs, derivations, and worked examples are in collapsed sections (click a heading marked ▸ to open it).
 
@@ -13,7 +13,7 @@ The same notes are also on the course website: <https://mathrulestheworld.github
 - [5. Information and Learning Theory](foundations/05-information-and-learning-theory.md)
 - [6. Numerical Computing with NumPy and PyTorch](foundations/06-numerical-computing-with-numpy-and-pytorch.md)
 
-## [Machine Learning](ml/README.md)
+## [Machine Learning](ml/README.md) *(work in progress)*
 
 - [1. Learning Problems and Nearest Neighbors](ml/01-learning-problems-and-nearest-neighbors.md)
 - [2. The Perceptron and Linear Separation](ml/02-the-perceptron-and-linear-separation.md)
@@ -33,7 +33,7 @@ The same notes are also on the course website: <https://mathrulestheworld.github
 - [16. Semi-Supervised and Active Learning](ml/16-semi-supervised-and-active-learning.md)
 - [17. Smoothing, Density Estimation, and Basis Expansions](ml/17-smoothing-density-estimation-and-basis-expansions.md)
 
-## [Deep Learning](dl/README.md)
+## [Deep Learning](dl/README.md) *(work in progress)*
 
 - [1. Deep Feedforward Networks](dl/01-deep-feedforward-networks.md)
 - [2. Initialization and Signal Propagation](dl/02-initialization-and-signal-propagation.md)
@@ -51,7 +51,7 @@ The same notes are also on the course website: <https://mathrulestheworld.github
 - [14. Detection and Segmentation](dl/14-detection-and-segmentation.md)
 - [15. Infinite Width and the Neural Tangent Kernel](dl/15-infinite-width-and-the-neural-tangent-kernel.md)
 
-## [Artificial Intelligence](ai/README.md)
+## [Artificial Intelligence](ai/README.md) *(work in progress)*
 
 - [1. Agents and Uninformed Search](ai/01-agents-and-uninformed-search.md)
 - [2. Heuristic Search](ai/02-heuristic-search.md)
@@ -69,7 +69,7 @@ The same notes are also on the course website: <https://mathrulestheworld.github
 - [14. Learning Graphical Models](ai/14-learning-graphical-models.md)
 - [15. Game Theory and Multiagent Systems](ai/15-game-theory-and-multiagent-systems.md)
 
-## [NLP and Large Language Models](nlp-llms/README.md)
+## [NLP and Large Language Models](nlp-llms/README.md) *(work in progress)*
 
 - [1. Text, Tokens, and Tokenization](nlp-llms/01-text-tokens-and-tokenization.md)
 - [2. N-gram Language Models and Perplexity](nlp-llms/02-n-gram-language-models-and-perplexity.md)
@@ -88,7 +88,7 @@ The same notes are also on the course website: <https://mathrulestheworld.github
 - [15. Machine Translation and Multilingual Models](nlp-llms/15-machine-translation-and-multilingual-models.md)
 - [16. Syntactic Parsing](nlp-llms/16-syntactic-parsing.md)
 
-## [Generative AI](generative-ai/README.md)
+## [Generative AI](generative-ai/README.md) *(work in progress)*
 
 - [1. Foundations of Generative Modeling](generative-ai/01-foundations-of-generative-modeling.md)
 - [2. Autoregressive Models](generative-ai/02-autoregressive-models.md)
@@ -106,7 +106,7 @@ The same notes are also on the course website: <https://mathrulestheworld.github
 - [14. Generative Models for Science and Control](generative-ai/14-generative-models-for-science-and-control.md)
 - [15. The Theory of Diffusion Models](generative-ai/15-the-theory-of-diffusion-models.md)
 
-## [Reinforcement Learning](rl/README.md)
+## [Reinforcement Learning](rl/README.md) *(work in progress)*
 
 - [1. Markov Decision Processes](rl/01-markov-decision-processes.md)
 - [2. Dynamic Programming](rl/02-dynamic-programming.md)

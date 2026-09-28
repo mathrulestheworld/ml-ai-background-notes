@@ -2,6 +2,9 @@
 
 # Book and documentation links
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="books-and-documentation"></a>Books and documentation
 
 The chapter notes develop the module's main material. These books and official documentation provide alternative explanations, fuller derivations, and the details of the library interfaces used in the code. The [reading plan](../reading-plan.md) lists the lecture slides and readings for each topic.

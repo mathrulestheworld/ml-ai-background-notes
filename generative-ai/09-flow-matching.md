@@ -2,6 +2,9 @@
 
 # 9. Flow Matching
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 8. Diffusion SDEs and Fast Sampling](08-diffusion-sdes-and-fast-sampling.md) · [10. Guidance and Conditional Generation →](10-guidance-and-conditional-generation.md)
 
 ## <a id="flows-from-velocity-fields"></a>Flows from velocity fields

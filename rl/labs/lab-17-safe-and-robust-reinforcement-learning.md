@@ -2,6 +2,9 @@
 
 # Lab 17. Safe and Robust Reinforcement Learning
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 16. Reinforcement Learning for a Small Language Model](lab-16-reinforcement-learning-for-a-small-language-model.md)
 
 ## <a id="overview"></a>Overview

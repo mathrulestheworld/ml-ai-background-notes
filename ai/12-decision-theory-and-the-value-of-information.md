@@ -2,6 +2,9 @@
 
 # 12. Decision Theory and the Value of Information
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 11. Temporal Probabilistic Models](11-temporal-probabilistic-models.md) · [13. Causal Inference →](13-causal-inference.md)
 
 ## <a id="rational-preferences"></a>Rational preferences

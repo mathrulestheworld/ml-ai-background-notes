@@ -2,6 +2,9 @@
 
 # Reading plan
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 ## <a id="courses"></a>Courses
 
 - **Main course — Stanford CS236, Fall 2023: Stefano Ermon, *Deep Generative Models*.** [Course homepage](https://deepgenerativemodels.github.io/) · [Syllabus with slides](https://deepgenerativemodels.github.io/syllabus.html) · [Lecture playlist](https://www.youtube.com/playlist?list=PLoROMvodv4rPOWA-omMM6STXaWW4FvJT8) · [Course notes](https://deepgenerativemodels.github.io/notes/). The standard graduate course on the families of generative models: autoregressive models, variational autoencoders, normalizing flows, adversarial networks, energy-based models, score-based and diffusion models, evaluation, and discrete latent variables. Its notes cover the first half of the course.

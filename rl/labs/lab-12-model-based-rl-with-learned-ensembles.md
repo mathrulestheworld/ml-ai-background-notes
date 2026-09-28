@@ -2,6 +2,9 @@
 
 # Lab 12. Model-Based RL with Learned Ensembles
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← Lab 11. Off-Policy Actor-Critics for Continuous Control](lab-11-off-policy-actor-critics-for-continuous-control.md) · [Lab 13. AlphaZero and Gumbel Search from Scratch →](lab-13-alphazero-and-gumbel-search-from-scratch.md)
 
 ## <a id="overview"></a>Overview

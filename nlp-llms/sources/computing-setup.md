@@ -2,6 +2,9 @@
 
 # Computing setup
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 # <a id="computing-setup"></a>Computing setup
 
 The NLP code blocks and figure scripts use PyTorch, NumPy, SciPy, Matplotlib, and scikit-learn, and everything runs on a CPU. Tokenizers, n-gram models, retrieval indexes, parsers, and the small transformers are implemented from scratch rather than taken from libraries such as Hugging Face `transformers`, so that the code shows the method. The environment below is a **CPU reproducibility snapshot**, tested on Linux x86_64 with CPython 3.12.3. Every code block in the sixteen chapters was run in it with one and with two threads, and its printed output matched the comment lines at the end of the block. The version pins are not a claim that these are the newest releases, and a GPU is neither needed nor tested.

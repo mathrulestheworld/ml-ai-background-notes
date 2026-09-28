@@ -2,6 +2,9 @@
 
 # 10. Approximate Inference
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [← 9. Exact Inference](09-exact-inference.md) · [11. Temporal Probabilistic Models →](11-temporal-probabilistic-models.md)
 
 ## <a id="why-approximate"></a>Why approximate

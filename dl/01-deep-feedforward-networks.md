@@ -2,6 +2,9 @@
 
 # 1. Deep Feedforward Networks
 
+> [!WARNING]
+> Work in progress: this part of the notes is still being revised.
+
 [2. Initialization and Signal Propagation →](02-initialization-and-signal-propagation.md)
 
 ## <a id="from-fixed-features-to-learned-features"></a>From fixed features to learned features
